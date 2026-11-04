@@ -83,6 +83,20 @@ export class HighflyP810{
    ['▣ GUARDAR',()=>this.game.saveSys?.save()],
    ['Ⅱ PAUSAR',()=>this.game.setState('paused')]
   ];
+  if(this.game.p14Enabled){
+   // Reuse existing authored landmarks as a reproducible parkour lab.
+   const go=(x,z,label)=>{
+    const g=this.game,p=g.player;
+    p.group.position.set(x,g.terrain.getHeight(x,z)+.12,z);
+    p.vel.set(0,0,0);p.onGround=true;p.dashT=-1;
+    p.fury?.reset();
+    g.hud.notify(label+' · SALTO + mantener USAR para agarrarte');
+   };
+   items.splice(4,0,
+    ['🏔 PROBAR PARKOUR',()=>go(-220,-161,'Monolitos de piedra')],
+    ['❄ MESETA MONTAÑOSA',()=>go(360,-183,'Meseta nevada')]
+   );
+  }
   for(const [label,fn] of items){
    const btn=node('button',null,label,this.quick);btn.type='button';
    btn.addEventListener('click',e=>{
