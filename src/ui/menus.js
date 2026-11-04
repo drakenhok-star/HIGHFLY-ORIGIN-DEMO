@@ -12,21 +12,21 @@ const EMBLEM_SVG =
   '</g></svg>';
 
 const HELP_KEYS = [
-  ['W A S D', '移动'],
-  ['Shift', '疾跑'],
-  ['空格', '跳跃'],
-  ['鼠标', '视角'],
-  ['左键', '近战攻击'],
-  ['右键', '火球术'],
-  ['F', '龙吼'],
-  ['Q', '切换龙吼'],
-  ['E', '互动'],
-  ['V', '第一/第三人称'],
-  ['T', '手持火把'],
-  ['滚轮', '缩放视角'],
-  ['Tab', '物品栏'],
-  ['J', '任务日志'],
-  ['Esc', '暂停'],
+  ['W A S D', 'Mover'],
+  ['Shift', 'Correr'],
+  ['Espacio', 'Saltar'],
+  ['Ratón', 'Cámara'],
+  ['Click izquierdo', 'Ataque cuerpo a cuerpo'],
+  ['Click derecho', 'Bola de fuego'],
+  ['F', 'Grito'],
+  ['Q', 'Cambiar grito'],
+  ['E', 'Interactuar'],
+  ['V', 'Primera/tercera persona'],
+  ['T', 'Antorcha'],
+  ['Rueda', 'Acercar/alejar cámara'],
+  ['Tab', 'Inventario'],
+  ['J', 'Misiones'],
+  ['Esc', 'Pausa'],
 ];
 
 function el(tag, cls, parent, text) {
@@ -89,8 +89,8 @@ export class Menus {
   buildSplash() {
     this.splash = el('div', null, this.root);
     this.splash.id = 'boot-splash';
-    el('div', 'boot-splash-title', this.splash, '天 际');
-    el('div', 'boot-splash-tip', this.splash, '正在生成天际省……');
+    el('div', 'boot-splash-title', this.splash, 'HIGHFLY');
+    el('div', 'boot-splash-tip', this.splash, 'Preparando el mundo…');
   }
 
   hideSplash() {
@@ -107,22 +107,22 @@ export class Menus {
     const panel = el('div', 'menu-panel menu-main-panel', s);
     const emblem = el('div', 'menu-emblem', panel);
     emblem.innerHTML = EMBLEM_SVG;
-    el('div', 'menu-title', panel, '天 际');
+    el('div', 'menu-title', panel, 'HIGHFLY');
     const rule = el('div', 'menu-rule', panel);
     el('div', 'menu-rule-diamond', rule);
-    el('div', 'menu-subtitle', panel, 'T I A N J I E · V');
+    el('div', 'menu-subtitle', panel, 'O R I G I N · H I G H F L Y');
     this.mainBtns = el('div', 'menu-btn-col', panel);
-    el('div', 'menu-footer', s, 'TIANJIE V · 基于 Three.js 构筑');
+    el('div', 'menu-footer', s, 'HIGHFLY ORIGIN · Three.js');
   }
 
   showMain() {
     this.mainBtns.innerHTML = '';
     if (this.game.saveSys.hasSave()) {
-      this.mainBtns.appendChild(this.btn('继续游戏', 'btn-continue', () => this.game.continueGame()));
+      this.mainBtns.appendChild(this.btn('CONTINUAR', 'btn-continue', () => this.game.continueGame()));
     }
-    this.mainBtns.appendChild(this.btn('新游戏', 'btn-new', () => this.game.newGame()));
+    this.mainBtns.appendChild(this.btn('NUEVA PARTIDA', 'btn-new', () => this.game.newGame()));
     this.mainBtns.appendChild(
-      this.btn('操作说明', 'btn-help', () => {
+      this.btn('CONTROLES', 'btn-help', () => {
         this.helpReturn = 'main';
         this.showScreen('help');
       })
@@ -133,53 +133,53 @@ export class Menus {
   buildHelp() {
     const s = this.screen('help', 'menu-help');
     const panel = el('div', 'menu-panel', s);
-    el('h2', 'menu-h2', panel, '操作说明');
+    el('h2', 'menu-h2', panel, 'CONTROLES');
     const grid = el('div', 'menu-keys', panel);
     for (const [k, d] of HELP_KEYS) {
       const row = el('div', 'menu-key-row', grid);
       el('span', 'menu-keycap', row, k);
       el('span', 'menu-keydesc', row, d);
     }
-    panel.appendChild(this.btn('返回', 'btn-help-back', () => this.showScreen(this.helpReturn)));
+    panel.appendChild(this.btn('VOLVER', 'btn-help-back', () => this.showScreen(this.helpReturn)));
   }
 
   buildPause() {
     const s = this.screen('pause', 'menu-pause');
     const panel = el('div', 'menu-panel', s);
-    el('h2', 'menu-h2', panel, '已暂停');
+    el('h2', 'menu-h2', panel, 'PAUSA');
     this.pauseMain = el('div', 'menu-btn-col', panel);
-    this.pauseMain.appendChild(this.btn('继续游戏', 'btn-resume', () => this.game.setState('playing')));
-    const saveBtn = this.btn('保存游戏', 'btn-save', () => {
+    this.pauseMain.appendChild(this.btn('CONTINUAR', 'btn-resume', () => this.game.setState('playing')));
+    const saveBtn = this.btn('GUARDAR PARTIDA', 'btn-save', () => {
       this.game.saveSys.save();
-      saveBtn.textContent = '已保存';
+      saveBtn.textContent = 'GUARDADO';
       setTimeout(() => {
-        saveBtn.textContent = '保存游戏';
+        saveBtn.textContent = 'GUARDAR PARTIDA';
       }, 1000);
     });
     this.pauseMain.appendChild(saveBtn);
     this.pauseMain.appendChild(
-      this.btn('操作说明', 'btn-pause-help', () => {
+      this.btn('CONTROLES', 'btn-pause-help', () => {
         this.helpReturn = 'pause';
         this.showScreen('help');
       })
     );
     this.pauseMain.appendChild(
-      this.btn('回到主菜单', 'btn-quit', () => {
+      this.btn('MENÚ PRINCIPAL', 'btn-quit', () => {
         this.pauseMain.style.display = 'none';
         this.pauseConfirm.style.display = 'flex';
       })
     );
     this.pauseConfirm = el('div', 'menu-confirm', panel);
-    el('div', 'menu-confirm-text', this.pauseConfirm, '未保存的进度将丢失，确定吗？');
+    el('div', 'menu-confirm-text', this.pauseConfirm, 'Se perderán los cambios sin guardar. ¿Salir?');
     const row = el('div', 'menu-confirm-row', this.pauseConfirm);
     row.appendChild(
-      this.btn('确定', 'btn-quit-confirm', () => {
+      this.btn('CONFIRMAR', 'btn-quit-confirm', () => {
         this.resetPause();
         this.game.setState('menu');
         this.showMain();
       })
     );
-    row.appendChild(this.btn('取消', 'btn-quit-cancel', () => this.resetPause()));
+    row.appendChild(this.btn('CANCELAR', 'btn-quit-cancel', () => this.resetPause()));
   }
 
   resetPause() {
@@ -196,15 +196,15 @@ export class Menus {
     const s = this.screen('inventory', 'menu-inventory');
     const panel = el('div', 'menu-panel menu-box-panel menu-inv-panel', s);
     const header = el('div', 'menu-panel-header', panel);
-    el('h2', 'menu-h2 menu-h2-header', header, '物品栏');
-    el('span', 'menu-hint', header, 'Tab 关闭');
+    el('h2', 'menu-h2 menu-h2-header', header, 'Inventario');
+    el('span', 'menu-hint', header, 'Tab para cerrar');
     const body = el('div', 'menu-inv-body', panel);
     const left = el('div', 'menu-inv-left', body);
     this.invList = el('div', 'menu-inv-list', left);
     this.invDesc = el('div', 'menu-item-desc', left);
     this.invStats = el('div', 'menu-inv-right', body);
     const bottom = el('div', 'menu-inv-bottom', panel);
-    this.btnUse = this.btn('使用', 'btn-use', () => {
+    this.btnUse = this.btn('USAR', 'btn-use', () => {
       this.game.inventory.useOrEquip(this.invSelected);
       this.refreshInventory();
     });
@@ -222,13 +222,13 @@ export class Menus {
       const row = el('div', 'menu-item-row', this.invList);
       const nameBox = el('div', 'menu-item-name', row);
       el('span', null, nameBox, item.name);
-      if (inv.equipped.weapon === id || inv.equipped.armor === id) el('span', 'menu-tag-equipped', nameBox, '已装备');
+      if (inv.equipped.weapon === id || inv.equipped.armor === id) el('span', 'menu-tag-equipped', nameBox, 'Equipado');
       const parts = [];
       if (count > 1) parts.push('×' + count);
-      if (item.type === 'potion') parts.push(item.heal ? '恢复 ' + item.heal + ' 生命' : '恢复 ' + item.mana + ' 法力');
-      else if (item.type === 'weapon') parts.push('伤害 ' + item.damage);
-      else if (item.type === 'armor') parts.push('护甲 ' + item.armor);
-      parts.push('价值 ' + item.value);
+      if (item.type === 'potion') parts.push(item.heal ? 'Restaura ' + item.heal + ' HP' : 'Restaura ' + item.mana + ' MP');
+      else if (item.type === 'weapon') parts.push('Daño ' + item.damage);
+      else if (item.type === 'armor') parts.push('Armadura ' + item.armor);
+      parts.push('Valor ' + item.value);
       el('div', 'menu-item-meta', row, parts.join(' · '));
       if (id === this.invSelected) {
         row.classList.add('menu-item-selected');
@@ -241,17 +241,17 @@ export class Menus {
     }
     if (!hasSel) this.invSelected = null;
 
-    this.invDesc.textContent = this.invSelected ? ITEM_DB[this.invSelected].desc : '选择一件物品查看详情。';
+    this.invDesc.textContent = this.invSelected ? ITEM_DB[this.invSelected].desc : 'Seleccioná un objeto para ver sus detalles.';
 
     this.invUsable = false;
-    let label = '使用';
+    let label = 'USAR';
     if (this.invSelected) {
       const t = ITEM_DB[this.invSelected].type;
       if (t === 'weapon' || t === 'armor') {
-        label = '装备';
+        label = 'EQUIPAR';
         this.invUsable = true;
       } else if (t === 'potion') {
-        label = '使用';
+        label = 'USAR';
         this.invUsable = true;
       }
     }
@@ -260,14 +260,14 @@ export class Menus {
 
     this.invStats.innerHTML = '';
     const rows = [
-      ['等级', st.level],
-      ['经验', Math.floor(st.xp) + ' / ' + st.xpNext()],
-      ['生命', Math.ceil(st.hp) + ' / ' + st.maxHp],
-      ['法力', Math.ceil(st.mp) + ' / ' + st.maxMp],
-      ['耐力', Math.ceil(st.sp) + ' / ' + st.maxSp],
-      ['护甲', inv.armorValue()],
-      ['武器伤害', inv.weaponDamage()],
-      ['金币', inv.gold],
+      ['Nivel', st.level],
+      ['Experiencia', Math.floor(st.xp) + ' / ' + st.xpNext()],
+      ['Salud', Math.ceil(st.hp) + ' / ' + st.maxHp],
+      ['Maná', Math.ceil(st.mp) + ' / ' + st.maxMp],
+      ['Energía', Math.ceil(st.sp) + ' / ' + st.maxSp],
+      ['Armadura', inv.armorValue()],
+      ['Daño de arma', inv.weaponDamage()],
+      ['Oro', inv.gold],
     ];
     for (const [k, v] of rows) {
       const r = el('div', 'menu-stat-row', this.invStats);
@@ -280,26 +280,26 @@ export class Menus {
     const s = this.screen('quests', 'menu-quests');
     const panel = el('div', 'menu-panel menu-box-panel menu-quest-panel', s);
     const header = el('div', 'menu-panel-header', panel);
-    el('h2', 'menu-h2 menu-h2-header', header, '任务日志');
-    el('span', 'menu-hint', header, 'J 关闭');
+    el('h2', 'menu-h2 menu-h2-header', header, 'Misiones');
+    el('span', 'menu-hint', header, 'J para cerrar');
     this.questBody = el('div', 'menu-quest-body', panel);
   }
 
   refreshQuests() {
     const list = this.game.quests.list();
     this.questBody.innerHTML = '';
-    el('div', 'menu-section-title', this.questBody, '进行中');
+    el('div', 'menu-section-title', this.questBody, 'En curso');
     const active = list.filter((q) => q.state === 'active' || q.state === 'complete');
-    if (!active.length) el('div', 'menu-quest-empty', this.questBody, '暂无进行中的任务。');
+    if (!active.length) el('div', 'menu-quest-empty', this.questBody, 'No hay misiones en curso.');
     for (const q of active) {
       const card = el('div', 'menu-quest-card', this.questBody);
       const name = el('div', 'menu-quest-name', card, q.name);
-      el('span', 'menu-quest-progress', name, q.state === 'complete' ? '可交付' : q.progress + ' / ' + q.need);
+      el('span', 'menu-quest-progress', name, q.state === 'complete' ? 'Lista para entregar' : q.progress + ' / ' + q.need);
       el('div', 'menu-quest-desc', card, q.desc);
     }
-    el('div', 'menu-section-title', this.questBody, '已完成');
+    el('div', 'menu-section-title', this.questBody, 'Completadas');
     const done = list.filter((q) => q.state === 'done');
-    if (!done.length) el('div', 'menu-quest-empty', this.questBody, '尚未完成任何任务。');
+    if (!done.length) el('div', 'menu-quest-empty', this.questBody, 'Aún no completaste misiones.');
     for (const q of done) {
       const card = el('div', 'menu-quest-card menu-quest-card-done', this.questBody);
       el('div', 'menu-quest-name', card, q.name);
@@ -334,17 +334,17 @@ export class Menus {
 
   buildDeath() {
     const s = this.screen('death', 'menu-death');
-    el('div', 'menu-death-title', s, '你 死 了');
+    el('div', 'menu-death-title', s, 'HAS CAÍDO');
     this.deathBtns = el('div', 'menu-btn-col', s);
   }
 
   showDeath() {
     this.deathBtns.innerHTML = '';
     if (this.game.saveSys.hasSave()) {
-      this.deathBtns.appendChild(this.btn('读取存档', 'btn-load-death', () => this.game.continueGame()));
+      this.deathBtns.appendChild(this.btn('CARGAR PARTIDA', 'btn-load-death', () => this.game.continueGame()));
     }
     this.deathBtns.appendChild(
-      this.btn('回到主菜单', 'btn-death-menu', () => {
+      this.btn('MENÚ PRINCIPAL', 'btn-death-menu', () => {
         this.game.setState('menu');
         this.showMain();
       })

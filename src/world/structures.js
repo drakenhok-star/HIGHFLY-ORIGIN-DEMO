@@ -82,10 +82,10 @@ export class Structures {
     });
 
     this.enterableDoors = [
-      { id: 'inn', pos: this._doorAnchor(this._ringHouses[1]), label: '进入 暖炉客栈' },
-      { id: 'olaf_house', pos: this._doorAnchor(this._ringHouses[3]), label: '进入 村长家' },
-      { id: 'smithy', pos: this._doorAnchor(this._smithyHouse), label: '进入 铁匠铺' },
-      { id: 'barrow', pos: barrowDoorPos, label: '进入 风暮地穴' },
+      { id: 'inn', pos: this._doorAnchor(this._ringHouses[1]), label: 'Entrar a la taberna' },
+      { id: 'olaf_house', pos: this._doorAnchor(this._ringHouses[3]), label: 'Entrar a la casa de Olaf' },
+      { id: 'smithy', pos: this._doorAnchor(this._smithyHouse), label: 'Entrar a la herrería' },
+      { id: 'barrow', pos: barrowDoorPos, label: 'Entrar a la cripta' },
     ];
   }
 

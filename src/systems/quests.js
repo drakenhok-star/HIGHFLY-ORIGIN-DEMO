@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 
 const QUEST_DEFS = {
-  q1: { name: '狼患', giver: 'olaf', desc: '为村长奥拉夫猎杀 5 头冰原狼。', kind: 'kill', target: 'wolf', need: 5, rewardGold: 100, rewardXp: 80 },
-  q2: { name: '先祖之刃', giver: 'sigrid', desc: '从立石阵的石箱中取回先祖之刃。', kind: 'item', target: 'ancient_sword', need: 1, rewardGold: 150, rewardXp: 100 },
-  q3: { name: '天际之祸', giver: 'olaf', desc: '斩杀盘踞古塔的远古巨龙。', kind: 'kill', target: 'dragon', need: 1, rewardGold: 500, rewardXp: 400 },
+  q1: { name: 'Amenaza de lobos', giver: 'olaf', desc: 'Eliminá 5 lobos para ayudar a Olaf.', kind: 'kill', target: 'wolf', need: 5, rewardGold: 100, rewardXp: 80 },
+  q2: { name: 'Espada ancestral', giver: 'sigrid', desc: 'Recuperá la espada ancestral del cofre de las ruinas.', kind: 'item', target: 'ancient_sword', need: 1, rewardGold: 150, rewardXp: 100 },
+  q3: { name: 'Amenaza del dragón', giver: 'olaf', desc: 'Derrotá al dragón que habita la torre.', kind: 'kill', target: 'dragon', need: 1, rewardGold: 500, rewardXp: 400 },
 };
 
 const QUEST_IDS = ['q1', 'q2', 'q3'];
-const GIVER_NAMES = { olaf: '村长奥拉夫', sigrid: '铁匠西格丽德' };
+const GIVER_NAMES = { olaf: 'Olaf, jefe de la aldea', sigrid: 'Sigrid, herrera' };
 const WOLF_PACK_HOMES = [
   [120, 160],
   [-150, 120],
@@ -37,7 +37,7 @@ export class Quests {
   accept(id) {
     const def = QUEST_DEFS[id];
     this.states[id] = 'active';
-    this.game.hud.questBanner('接受任务：' + def.name);
+    this.game.hud.questBanner('Misión aceptada: ' + def.name);
     this.game.audio.play('quest');
     if (def.kind === 'item' && this.game.inventory.has(def.target)) {
       this.progress[id] = def.need;
@@ -56,8 +56,8 @@ export class Quests {
   _complete(id) {
     const def = QUEST_DEFS[id];
     this.states[id] = 'complete';
-    this.game.hud.questBanner('任务目标完成：' + def.name);
-    this.game.hud.notify('回去向' + GIVER_NAMES[def.giver] + '交付任务');
+    this.game.hud.questBanner('Objetivo completado: ' + def.name);
+    this.game.hud.notify('Volvé con ' + GIVER_NAMES[def.giver] + ' para entregar la misión');
   }
 
   onEnemyKilled(type) {
@@ -83,17 +83,17 @@ export class Quests {
     const def = QUEST_DEFS[id];
     this.states[id] = 'done';
     this.game.inventory.gold += def.rewardGold;
-    this.game.hud.notify('获得 ' + def.rewardGold + ' 金币');
+    this.game.hud.notify('Obtuviste ' + def.rewardGold + ' de oro');
     this.game.stats.addXP(def.rewardXp);
-    this.game.hud.questBanner('任务完成：' + def.name);
+    this.game.hud.questBanner('Misión completada: ' + def.name);
     this.game.audio.play('quest');
     if (this.states.q1 === 'done' && this.states.q2 === 'done' && this.states.q3 === 'locked') {
       this.states.q3 = 'available';
-      this.game.hud.notify('村长奥拉夫似乎有新的委托');
+      this.game.hud.notify('Olaf, jefe de la aldea tiene una misión nueva');
     }
     this.game.saveSys.save();
     if (id === 'q3') {
-      this.game.hud.questBanner('天际恢复了安宁');
+      this.game.hud.questBanner('La región vuelve a estar en paz');
       this.game.audio.play('fanfare');
     }
   }

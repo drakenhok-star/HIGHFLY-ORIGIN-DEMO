@@ -13,7 +13,7 @@ const COMBO_CLIPS=[
   '1H_Melee_Attack_Slice_Diagonal',
   '1H_Melee_Attack_Slice_Horizontal',
   '1H_Melee_Attack_Stab',
-  '1H_Melee_Attack_Slice_Vertical'
+  '1H_Melee_Attack_Chop'
 ];
 
 export class Combat {
@@ -22,9 +22,9 @@ export class Combat {
     this.meleeCd = 0;
     this.castCd = 0;
     this.shouts = [
-      { id: 'fus', name: '不屈之力', words: 'FUS · RO · DAH', cd: 15 },
-      { id: 'frost', name: '凛冬之息', words: 'FO · KRAH · DIIN', cd: 18 },
-      { id: 'wuld', name: '旋风冲刺', words: 'WULD · NAH · KEST', cd: 8 }
+      { id: 'fus', name: 'Fuerza implacable', words: 'FUS · RO · DAH', cd: 15 },
+      { id: 'frost', name: 'Aliento helado', words: 'FO · KRAH · DIIN', cd: 18 },
+      { id: 'wuld', name: 'Embestida veloz', words: 'WULD · NAH · KEST', cd: 8 }
     ];
     this.learnedShouts = ['fus'];
     this.equippedShout = 'fus';
@@ -130,7 +130,7 @@ export class Combat {
     const idx = this.learnedShouts.indexOf(this.equippedShout);
     this.equippedShout = this.learnedShouts[(idx + 1) % this.learnedShouts.length];
     const def = this.shoutDef(this.equippedShout) || this.shouts[0];
-    this.game.hud.notify('已切换龙吼：' + def.name);
+    this.game.hud.notify('Grito equipado: ' + def.name);
     this.game.audio.play('click');
   }
 
@@ -149,8 +149,8 @@ export class Combat {
       if (this.learnedShouts.indexOf(def.id) === -1) this.learnedShouts.push(def.id);
       this.equippedShout = def.id;
       g.audio.play('word');
-      g.hud.questBanner('习得龙吼之词 — ' + def.name);
-      g.hud.notify('按 F 释放，Q 切换龙吼');
+      g.hud.questBanner('Aprendiste el grito: ' + def.name);
+      g.hud.notify('F para lanzar · Q para cambiar');
     }
   }
 
@@ -222,6 +222,7 @@ export class Combat {
     }
     this.castCd=CAST_CD;
     g.player.castT=0;
+    if(g.p6Enabled)g.player.actionDuration=0.35;
     g.player._castAnimStarted=false;
     g.audio.play('cast');
     const muzzle=this._muzzle.copy(g.player.pos);

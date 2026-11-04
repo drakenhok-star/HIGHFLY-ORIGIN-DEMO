@@ -253,7 +253,7 @@ export class PremiumHudP5 {
     this.lastDash=now;
     if(g.p6Enabled){
       if(!g.player.onGround)g.player._airDashUsed=true;
-      g.player.startDash({speed:26,duration:0.24});
+      g.player.startDash({speed:26,duration:0.24,style:'dodge'});
     }else g.player.startDash();
   }
   render() {

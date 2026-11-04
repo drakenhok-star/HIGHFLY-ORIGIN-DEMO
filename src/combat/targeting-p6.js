@@ -8,14 +8,16 @@ export function insideBlockingObject(game,x,y,z,pad=0) {
   if(!s || (game.interiors && game.interiors.inside)) return false;
   const terrain=game.terrain;
   for(const c of s.colliders || []) {
-    if(y > terrain.getHeight(c.x,c.z) + 6.2) continue;
-    const dx=x-c.x, dz=z-c.z, co=Math.cos(c.ry), si=Math.sin(c.ry);
-    if(Math.abs(dx*co-dz*si)<c.hw+pad && Math.abs(dx*si+dz*co)<c.hd+pad) return true;
+    const dx=x-c.x,dz=z-c.z;
+    if(Math.abs(dx)>10+pad||Math.abs(dz)>10+pad)continue;
+    const co=Math.cos(c.ry),si=Math.sin(c.ry);
+    if(Math.abs(dx*co-dz*si)>=c.hw+pad||Math.abs(dx*si+dz*co)>=c.hd+pad)continue;
+    if(y<=terrain.getHeight(c.x,c.z)+6.2)return true;
   }
   for(const c of s.circleColliders || []) {
-    if(y > terrain.getHeight(c.x,c.z)+2.8) continue;
     const dx=x-c.x,dz=z-c.z;
-    if(dx*dx+dz*dz<(c.r+pad)*(c.r+pad)) return true;
+    if(dx*dx+dz*dz>=(c.r+pad)*(c.r+pad))continue;
+    if(y<=terrain.getHeight(c.x,c.z)+2.8)return true;
   }
   return false;
 }

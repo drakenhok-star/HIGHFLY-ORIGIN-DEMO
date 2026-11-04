@@ -65,6 +65,10 @@ export class Player {
     this._cameraReady = false;
     this.attackClip = ATTACK_CLIP;
     this.actionDuration = ACTION_DURATION;
+    this.dashClip=null;
+    this._dashAnimStarted=false;
+    this._jumpAnimT=0;
+    this._jumpAnimStarted=false;
     this.torchOn = false;
 
     this.group = new THREE.Group();
@@ -263,6 +267,17 @@ export class Player {
     this._dashDir.normalize();
     this._dashSpeed=opts.speed||DASH_SPEED;
     this._dashDuration=opts.duration||DASH_DURATION;
+    this.dashClip=null;this._dashAnimStarted=false;
+    if(opts.style==='dodge' && this.game.p6Enabled){
+      // The GLB audit confirmed all four Dodge_* clips in player_barbarian.glb.
+      const forward=this.getForward();
+      const fd=this._dashDir.dot(forward);
+      const side=this._dashDir.x*Math.cos(this.yaw)-this._dashDir.z*Math.sin(this.yaw);
+      this.dashClip=Math.abs(fd)>=Math.abs(side)
+        ? (fd>=0?'Dodge_Forward':'Dodge_Backward')
+        : (side>=0?'Dodge_Right':'Dodge_Left');
+      if(!this.rig.clips.has(this.dashClip))this.dashClip=null;
+    }
     const effects=this.game.effects;
     this._dashTrailFallback=!(effects && typeof effects.dashTrail==='function');
     if(!this._dashTrailFallback)effects.dashTrail(()=>new THREE.Vector3(
@@ -309,7 +324,7 @@ export class Player {
 
     if (input.justPressed.has('KeyT')) {
       this.torchOn = !this.torchOn;
-      g.hud.notify(this.torchOn ? '火把点燃' : '火把熄灭');
+      g.hud.notify(this.torchOn ? 'Antorcha encendida' : 'Antorcha apagada');
       // 复用施法短噪声当点火声（audio.play 无音量参数，cast 峰值本就低）
       if (this.torchOn) g.audio.play('cast');
     }
@@ -372,6 +387,7 @@ export class Player {
       }else if(g.p6Enabled && !this.onGround && this._jumpCount===1 && stats.useStamina(12)){
         // Verified Jump_Idle fallback; no invented mid-air somersault.
         this.vel.y=8.8;this._jumpCount=2;
+        this._jumpAnimT=0.34;this._jumpAnimStarted=false;
       }
     }
 
@@ -466,7 +482,9 @@ export class Player {
     this.updateTorch();
 
     let targetYaw = this.bodyYaw;
-    if (this.attackT >= 0 || this.castT >= 0) {
+    if(g.p6Enabled && this.dashT>=0 && this.dashClip){
+      targetYaw=this.yaw;
+    } else if (this.attackT >= 0 || this.castT >= 0) {
       const target=g.p6Enabled && g.targeting && this.attackT>=0 ? g.targeting.get(4.8) : null;
       if(target){
         const dx=target.group.position.x-this.pos.x,dz=target.group.position.z-this.pos.z;
@@ -507,7 +525,15 @@ export class Player {
       }
     }
 
-    if (this.attackT >= 0 && this.attackT < 1) {
+    if(this._jumpAnimT>0)this._jumpAnimT=Math.max(0,this._jumpAnimT-dt);
+    if(this.dashT>=0 && this.dashClip && this.game.p6Enabled){
+      if(!this._dashAnimStarted){
+        this._dashAnimStarted=true;
+        const clip=this.rig.clips.get(this.dashClip);
+        const scale=clip ? clip.duration/this._dashDuration : 1;
+        this.rig.play(this.dashClip,{once:true,fade:0.04,timeScale:scale});
+      }
+    } else if (this.attackT >= 0 && this.attackT < 1) {
       if (!this._attackAnimStarted) {
         this._attackAnimStarted = true;
         const name=this.rig.clips.has(this.attackClip) ? this.attackClip : ATTACK_CLIP;
@@ -517,6 +543,13 @@ export class Player {
       if (!this._castAnimStarted) {
         this._castAnimStarted = true;
         this.rig.play(CAST_CLIP, { once: true, fade: 0.08, timeScale: this.actionTimeScale(CAST_CLIP) });
+      }
+    } else if(this._jumpAnimT>0 && this.game.p6Enabled && this.rig.clips.has('Jump_Full_Short')){
+      if(!this._jumpAnimStarted){
+        this._jumpAnimStarted=true;
+        const clip=this.rig.clips.get('Jump_Full_Short');
+        this.rig.play('Jump_Full_Short',{once:true,fade:0.06,
+          timeScale:clip.duration/0.34});
       }
     } else if (!this.onGround) {
       this.rig.play('Jump_Idle');
@@ -671,6 +704,8 @@ export class Player {
     this._moveDir.set(0,0,0);
     this._jumpCount=0;this._airDashUsed=false;this._cameraReady=false;
     this.attackClip=ATTACK_CLIP;this.actionDuration=ACTION_DURATION;
+    this.dashClip=null;this._dashAnimStarted=false;
+    this._jumpAnimT=0;this._jumpAnimStarted=false;
     this.torchOn = false;
     this.updateTorch();
     this.faceVillage();

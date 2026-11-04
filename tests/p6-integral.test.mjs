@@ -49,6 +49,12 @@ const glb=await readFile(new URL('../assets/models/player_barbarian.glb',import.
 const inventory=inspectGlb(glb,'player_barbarian.glb');
 assert.ok(inventory.animations.length>0,'real player rig animations must exist');
 assert.ok(inventory.skins>0,'player must be skinned');
+for(const clip of ['1H_Melee_Attack_Slice_Diagonal','1H_Melee_Attack_Slice_Horizontal',
+  '1H_Melee_Attack_Stab','1H_Melee_Attack_Chop',
+  'Dodge_Forward','Dodge_Backward','Dodge_Left','Dodge_Right',
+  'Jump_Full_Short','Jump_Idle']){
+  assert.ok(inventory.animations.includes(clip),'Missing verified player clip '+clip);
+}
 const source=await readFile(new URL('../src/player/player.js',import.meta.url),'utf8');
 assert.ok(source.includes('this.rig.clips.has(this.attackClip)'),'combo fallback must use real clips');
 assert.ok(source.includes('const steps = g.p6Enabled'),'dash collision substepping');

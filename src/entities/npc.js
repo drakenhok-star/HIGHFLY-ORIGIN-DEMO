@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 
 const BJORN_LINES = [
-  '听说山顶的古塔最近有龙影出没……',
-  '昨夜我看见北边天上有绿光流动，像河一样。',
-  '今年的雪来得早。',
-  '东北雪峰上有面会低语的石墙……我可不敢上去。',
-  '立石阵旁的古冢大门，夜里会透出蓝光。',
+  'Dicen que vieron un dragón cerca de la torre de la montaña.',
+  'Anoche vi una aurora verde sobre las montañas del norte.',
+  'Este año llegó temprano la nieve.',
+  'En la cumbre nevada hay una pared de piedra que susurra.',
+  'De noche sale luz azul de la puerta de la vieja cripta.',
 ];
 
 // NPC 的 yaw 约定是 atan2(dx, dz)（+Z 朝目标），KayKit 模型本身面向 +Z，
@@ -25,13 +25,13 @@ export class NPCs {
     this.list = [];
 
     const olaf = this._makeNPC({
-      id: 'olaf', name: '村长奥拉夫', x: 3, z: 36, model: 'npc_mage',
+      id: 'olaf', name: 'Olaf, jefe de la aldea', x: 3, z: 36, model: 'npc_mage',
     });
     const sigrid = this._makeNPC({
-      id: 'sigrid', name: '铁匠西格丽德', x: 16.5, z: 49.5, model: 'npc_knight',
+      id: 'sigrid', name: 'Sigrid, herrera', x: 16.5, z: 49.5, model: 'npc_knight',
     });
     const bjorn = this._makeNPC({
-      id: 'bjorn', name: '村民比约恩', x: -5, z: 46, model: 'npc_rogue',
+      id: 'bjorn', name: 'Bjorn, aldeano', x: -5, z: 46, model: 'npc_rogue',
     });
     bjorn.wander = { homeX: 0, homeZ: 40, r: 12, target: null, idleT: 1.5 };
     sigrid.hammer = { t: 3 + Math.random() * 3, busy: false };
@@ -80,16 +80,16 @@ export class NPCs {
     const game = this.game;
     const q = game.quests;
     const close = () => game.menus.closeDialogue();
-    const bye = { label: '再见', action: close };
+    const bye = { label: 'Hasta luego', action: close };
 
     if (npc.id === 'olaf') {
       const s1 = q.getState('q1');
       if (s1 === 'available') {
         return {
           name: npc.name,
-          text: '陌生人，冰原狼最近频频袭击村庄，孩子们都不敢出门了。你看起来像个能打的——帮帮我们。',
+          text: 'Los lobos están atacando nuestra aldea. Necesitamos que nos ayudes.',
           options: [
-            { label: '接受「狼患」', action: () => { q.accept('q1'); close(); } },
+            { label: 'Aceptar: Amenaza de lobos', action: () => { q.accept('q1'); close(); } },
             bye,
           ],
         };
@@ -97,16 +97,16 @@ export class NPCs {
       if (s1 === 'active') {
         return {
           name: npc.name,
-          text: '狼解决得怎么样了？（' + this._questProgress('q1') + '/5）',
+          text: '¿Cuántos lobos eliminaste? (' + this._questProgress('q1') + '/5）',
           options: [bye],
         };
       }
       if (s1 === 'complete') {
         return {
           name: npc.name,
-          text: '干得好！这是你应得的报酬。',
+          text: '¡Excelente trabajo! Te ganaste esta recompensa.',
           options: [
-            { label: '完成任务', action: () => { q.turnIn('q1'); this.startDialogue(npc); } },
+            { label: 'Entregar misión', action: () => { q.turnIn('q1'); this.startDialogue(npc); } },
             bye,
           ],
         };
@@ -115,9 +115,9 @@ export class NPCs {
       if (s3 === 'available') {
         return {
           name: npc.name,
-          text: '山顶古塔的远古巨龙苏醒了……求你了，为天际除掉这祸患！',
+          text: 'El dragón de la torre despertó. ¡Ayudanos a proteger la región!',
           options: [
-            { label: '接受「天际之祸」', action: () => { q.accept('q3'); close(); } },
+            { label: 'Aceptar: Amenaza del dragón', action: () => { q.accept('q3'); close(); } },
             bye,
           ],
         };
@@ -125,16 +125,16 @@ export class NPCs {
       if (s3 === 'active') {
         return {
           name: npc.name,
-          text: '巨龙还在古塔上空盘旋……愿诸神护佑你。',
+          text: 'El dragón sigue volando sobre la torre. Tené cuidado.',
           options: [bye],
         };
       }
       if (s3 === 'complete') {
         return {
           name: npc.name,
-          text: '屠龙者！你就是传说中的龙裔！',
+          text: '¡Derrotaste al dragón! ¡Sos una leyenda!',
           options: [
-            { label: '完成任务', action: () => { q.turnIn('q3'); this.startDialogue(npc); } },
+            { label: 'Entregar misión', action: () => { q.turnIn('q3'); this.startDialogue(npc); } },
             bye,
           ],
         };
@@ -142,13 +142,13 @@ export class NPCs {
       if (s3 === 'done') {
         return {
           name: npc.name,
-          text: '天际因你而安宁，龙裔。',
+          text: 'Gracias a vos, la región está en paz.',
           options: [bye],
         };
       }
       return {
         name: npc.name,
-        text: '铁匠西格丽德好像有事相求。',
+        text: 'Sigrid, la herrera, parece necesitar ayuda.',
         options: [bye],
       };
     }
@@ -158,9 +158,9 @@ export class NPCs {
       if (s2 === 'available') {
         return {
           name: npc.name,
-          text: '我家祖传的「先祖之刃」被尸鬼夺走了，就藏在西北立石阵的石箱里。若你能取回，它就归你了。',
+          text: 'Unos draugr robaron mi espada ancestral. Si la recuperás del cofre de las ruinas, te la quedás.',
           options: [
-            { label: '接受「先祖之刃」', action: () => { q.accept('q2'); close(); } },
+            { label: 'Aceptar: Espada ancestral', action: () => { q.accept('q2'); close(); } },
             bye,
           ],
         };
@@ -168,16 +168,16 @@ export class NPCs {
       if (s2 === 'active') {
         return {
           name: npc.name,
-          text: '小心立石阵的尸鬼，它们不知疲倦。',
+          text: 'Cuidado con los draugr de las ruinas.',
           options: [bye],
         };
       }
       if (s2 === 'complete') {
         return {
           name: npc.name,
-          text: '你……真的取回来了。它就托付给你了，挥舞它吧。',
+          text: '¡Recuperaste la espada! Ahora te pertenece.',
           options: [
-            { label: '完成任务', action: () => { q.turnIn('q2'); this.startDialogue(npc); } },
+            { label: 'Entregar misión', action: () => { q.turnIn('q2'); this.startDialogue(npc); } },
             bye,
           ],
         };
@@ -188,7 +188,7 @@ export class NPCs {
           action: () => {
             const inv = game.inventory;
             if (!inv.has(materialId) || inv.gold < cost) {
-              game.hud.notify('材料或金币不足');
+              game.hud.notify('No tenés materiales u oro suficientes');
               return;
             }
             inv.removeItem(materialId, 1);
@@ -201,17 +201,17 @@ export class NPCs {
         });
         return {
           name: npc.name,
-          text: '屠龙者的材料……让我看看。我这双手，还能为你打出传说之物。',
+          text: 'Tenés materiales de dragón. Puedo forjarte equipo legendario.',
           options: [
-            craft('锻造·龙鳞甲（龙鳞 ×1 + 200 金币）', 'dragon_scale', 200, 'dragonscale_armor', '西格丽德为你锻造了龙鳞甲'),
-            craft('锻造·龙骨剑（龙骨 ×1 + 300 金币）', 'dragon_bone', 300, 'dragonbone_sword', '西格丽德为你锻造了龙骨剑'),
+            craft('Forjar armadura de escamas (1 escama + 200 oro)', 'dragon_scale', 200, 'dragonscale_armor', 'Sigrid forjó tu armadura de escamas'),
+            craft('Forjar espada de dragón (1 hueso + 300 oro)', 'dragon_bone', 300, 'dragonbone_sword', 'Sigrid forjó tu espada de dragón'),
             bye,
           ],
         };
       }
       return {
         name: npc.name,
-        text: '先祖之刃在你手中熠熠生辉。……若你能取来巨龙之材，我能为你锻造传说之物。',
+        text: 'La espada ancestral está en buenas manos. Traeme materiales de dragón y forjaré algo especial.',
         options: [bye],
       };
     }

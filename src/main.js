@@ -138,7 +138,7 @@ class Game {
   newGame() {
     this.resetAll();
     this.setState('playing');
-    this.hud.questBanner('欢迎来到天际省');
+    this.hud.questBanner('¡Bienvenido a HIGHFLY!');
     this.audio.startAmbience();
   }
 
@@ -146,7 +146,7 @@ class Game {
     this.resetAll();
     this.saveSys.applyLoaded();
     this.setState('playing');
-    this.hud.questBanner('欢迎回来');
+    this.hud.questBanner('¡Bienvenido de nuevo!');
     this.audio.startAmbience();
   }
 
@@ -256,10 +256,10 @@ function buildAssetSplash() {
   div.style.cssText = 'position:fixed;inset:0;z-index:10000;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;color:#e8e2d0;font-family:Georgia,"Songti SC","SimSun",serif;';
   const title = document.createElement('div');
   title.style.cssText = 'font-size:64px;letter-spacing:0.4em;text-indent:0.4em;';
-  title.textContent = '天 际';
+  title.textContent = 'HIGHFLY';
   const line = document.createElement('div');
   line.style.cssText = 'font-size:16px;opacity:0.75;letter-spacing:0.1em;';
-  line.textContent = '正在唤醒天际省……(0/15)';
+  line.textContent = 'Preparando el mundo…(0/15)';
   div.appendChild(title);
   div.appendChild(line);
   document.body.appendChild(div);
@@ -270,12 +270,12 @@ const assetSplash = buildAssetSplash();
 const assets = new AssetLib();
 try {
   await assets.loadAll((done, total) => {
-    assetSplash.line.textContent = `正在唤醒天际省……(${done}/${total})`;
+    assetSplash.line.textContent = `Preparando el mundo…(${done}/${total})`;
   });
 } catch (err) {
   console.error('[boot] 资源加载失败:', err);
   const msg = err && err.message ? err.message : String(err);
-  assetSplash.line.textContent = `资源加载失败：${msg}（请刷新重试）`;
+  assetSplash.line.textContent = `Error de carga de recursos: ${msg} (recargá la página)`;
   assetSplash.line.style.cssText += 'color:#e07a6a;opacity:1;max-width:80%;text-align:center;';
   throw err;
 }
