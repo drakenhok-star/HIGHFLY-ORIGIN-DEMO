@@ -1,0 +1,47 @@
+name: HIGHFLY P7 · FURY 360 and visual inventory CI
+on:
+  push:
+    branches: [p7-fury-360-combat-20261104]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check first party module syntax
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -type f -name '*.js' -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+      - name: Regression and P7 math + UI contracts
+        run: |
+          node tests/premium-hud.test.mjs
+          node tests/p6-integral.test.mjs
+          node tests/p7-fury.test.mjs
+      - name: Verify existing public GLBs/animation names
+        run: node scripts/audit_animation_p6.mjs
+      - name: Ensure public P7 package includes all modules, no proprietary SOURCE
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -f assets/models/player_barbarian.glb
+          test -f src/ui/inventory-p7.js
+          test -f src/world/obstacles-p7.js
+          test -f src/combat/motion-p7.js
+          ! find . -iname '*SOURCE*.zip' -o -iname '*CraftPix*' | grep -q .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: highfly-p7-glb-audit
+          path: audit-output/animation_inventory_p6.json
+          if-no-files-found: ignore
+          retention-days: 7
