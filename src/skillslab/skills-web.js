@@ -238,15 +238,15 @@ export class TianjieMobaSkillsLab {
       // FURY owns physical movement/collisions/terrain and KayKit pose.
       const raw=landingTarget?.clone()||at.clone().addScaledVector(dir,6);
       const toward=raw.clone().sub(at).setY(0);
-      const distance=clamp(toward.length(),.5,7.4);
+      const distance=clamp(toward.length(),0,7.4);
       const travelDir=toward.lengthSq()>.01?toward.normalize():dir;
       if(p.onGround){
         p.onGround=false;p._jumpCount=Math.max(1,p._jumpCount||0);
         p._jumpBufferT=0;g.combat?.keepAirCombo?.('jump');
       }
       p.vel.y=Math.max(p.vel.y,8.6);
-      p.startDash({direction:{x:travelDir.x,z:travelDir.z},
-        speed:Math.max(12,distance/.36),duration:.36,style:'dodge'});
+      if(distance>.65)p.startDash({direction:{x:travelDir.x,z:travelDir.z},
+        speed:distance/.36,duration:.36,style:'dodge'});
       this.activeLeap={started:this.now(),deadline:this.now()+1.6,
         intended:raw.clone(),initial:at.clone(),landed:false};
       this.fx.ascend(at,travelDir);
@@ -552,7 +552,7 @@ export class TianjieMobaSkillsLab {
         const a=this.aim,dx=e.clientX-a.x,dy=e.clientY-a.y;
         if(Math.hypot(dx,dy)>12)a.dragged=true;
         if(!a.dragged)return;
-        const pr=AIM_PROFILES[this.style][slot-1];
+        const pr=this.aimGuide.profile||AIM_PROFILES[this.style][slot-1];
         if(pr.kind==='self'){
           this.refreshPreview();return;
         }
@@ -592,16 +592,19 @@ export class TianjieMobaSkillsLab {
   }
   makePreview(slot){
     if(!this.aim)return;
-    this.aimGuide.begin(this.style,slot);
+    // Aerial S2 recast is a directional blink, not the landing circle.
+    const recast=this.style===0&&slot===2&&this.canRecast();
+    const recastProfile=recast?{kind:'dash',range:4.4,width:2.7,radius:0}:null;
+    this.aimGuide.begin(this.style,slot,recastProfile);
     this.preview=this.aimGuide.root;
-    const dir=this.aimDirection(null,AIM_PROFILES[this.style][slot-1].range||17);
+    const dir=this.aimDirection(null,this.aimGuide.profile.range||17);
     this.aim.dir=dir;
     this.refreshPreview();
   }
   refreshPreview(){
     if(!this.aim)return;
     const a=this.aim,p=this.game.player;
-    const prof=AIM_PROFILES[this.style][a.slot-1];
+    const prof=this.aimGuide.profile||AIM_PROFILES[this.style][a.slot-1];
     const dir=a.dir||this.aimDirection(null,prof.range||17);
     let target=a.target;
     if(prof.kind==='zone'&&!target){
