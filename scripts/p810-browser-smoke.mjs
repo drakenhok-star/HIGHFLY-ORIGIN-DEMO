@@ -74,6 +74,8 @@ try{
  await page.locator('#hf-p10-editor button').filter({hasText:'TERMINAR'}).first().click();
  const playing=await page.evaluate(()=>window.game?.state==='playing' && !window.game?.input?.hudEditing);
  assert.equal(playing,true,'HUD editor closes and returns movement controls');
+ await mkdir('audit-output',{recursive:true});
+ await page.screenshot({path:'audit-output/p810-mobile-landscape.png',fullPage:true,timeout:30000});
  await page.locator('#hf-p810-menu').dispatchEvent('pointerdown',{
   pointerId:45,pointerType:'touch',bubbles:true,cancelable:true
  });
