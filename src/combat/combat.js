@@ -5,6 +5,7 @@ import { comboStep } from './motion-p7.js';
 import {AIR_CHAIN_P14,advanceComboClock,airStrikeProfile} from './air-chain-p14.js';
 import {strikeProfile,resolveCombatContext,reactionPolicy,pickMeleeTarget,
   canCancelAction,FURY_CANCEL_P15} from './fury-combat-p15.js';
+import {finisherInput,finisherAllowed} from './fury-finisher-p15.js';
 
 const MELEE_CD = 0.5;
 const CAST_CD = 0.6;
@@ -45,6 +46,7 @@ export class Combat {
     this.attackBuffer=0;
     this._meleeStep=1;
     this._meleeContext='ground';
+    this._finisher=null;
     this.projectiles = [];
     this.projGeo = new THREE.SphereGeometry(0.22, 10, 8);
     this.projMat = new THREE.MeshStandardMaterial({
@@ -210,6 +212,8 @@ export class Combat {
     }
     this.comboStep=step;
     this._meleeStep=step;
+    // Snapshot the joystick ON the fourth ATK, never on the delayed damage frame.
+    this._finisher=g.p15Enabled && step===4?finisherInput(g.input,g.player.yaw):null;
     const context=g.p15Enabled?resolveCombatContext({grounded:g.player.onGround,
       verticalSpeed:g.player.vel.y,dashRecovery:g.player._dashFollowupT>0,
       runSpeed:Math.hypot(g.player.vel.x,g.player.vel.z)}):'ground';
@@ -273,19 +277,27 @@ export class Combat {
       const bonus=g.p6Enabled?COMBO_BONUS[this._meleeStep-1]:1;
       const dmg = (g.inventory.weaponDamage() + (g.p7Enabled&&g.inventory.offhandDamage?g.inventory.offhandDamage():0))
         * (1 + (g.stats.level - 1) * 0.05)*bonus*strike.damageMultiplier;
-      e.takeDamage(dmg, this._hitImpulse.copy(forward).multiplyScalar(g.p6Enabled&&this._meleeStep===4?5:3));
+      const directional=g.p15Enabled && this._meleeStep===4 &&
+        this._finisher && finisherAllowed(e,e.hp-dmg);
+      if(directional){
+        this._hitImpulse.set(this._finisher.vx,this._finisher.vy,this._finisher.vz);
+      }else{
+        this._hitImpulse.copy(forward).multiplyScalar(g.p6Enabled&&this._meleeStep===4?5:3);
+      }
+      e.takeDamage(dmg,this._hitImpulse);
       if(g.p15Enabled&&e.alive){
         const reaction=reactionPolicy({type:e.type,boss:!!e.boss,radius:e.hitRadius,
           step:this._meleeStep,airborne:aerial,remainingHp:e.hp});
         if(reaction.stun>0){
-          e.hitstunT=Math.max(e.hitstunT||0,reaction.stun);
+          e.hitstunT=Math.max(e.hitstunT||0,
+            directional?this._finisher.stun:reaction.stun);
           e.hitPending=-1;e.boltPending=-1;
           // Enemy visual recoil remains a real rig clip only if present.
           if(e.rig?.clips?.has('HitReact') && e.animLock<=0)
             e.rig.play('HitReact',{once:true,fade:.06,timeScale:1.2});
         }
       }
-      if(g.p14Enabled&&strike.launch&&e.alive&&e.kbVel){
+      if(g.p14Enabled&&!g.p15Enabled&&strike.launch&&e.alive&&e.kbVel){
         e.kbVel.y=Math.max(e.kbVel.y,strike.launchVelocity);
       }
       g.audio.play('hit');
@@ -542,7 +554,7 @@ export class Combat {
     this.shoutCd = 0;
     this.shoutCdMax = 15;
     this.meleeHitT = -1;
-    this.comboStep=0;this.comboTimer=0;this.airComboGrace=0;this.attackBuffer=0;this._meleeStep=1;this._meleeContext='ground';
+    this.comboStep=0;this.comboTimer=0;this.airComboGrace=0;this.attackBuffer=0;this._meleeStep=1;this._meleeContext='ground';this._finisher=null;
     this._attackTarget=null;this._castTarget=null;
     for (const id in this.shoutCooldowns) this.shoutCooldowns[id] = 0;
     this.learnedShouts = ['fus'];
