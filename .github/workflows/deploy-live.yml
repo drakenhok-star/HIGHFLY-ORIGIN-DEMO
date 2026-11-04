@@ -39,7 +39,9 @@ jobs:
           test -f assets/models/player_barbarian.glb
           node --input-type=module --check < src/main.js
           node --input-type=module --check < src/ui/touch-controls.js
-          echo "OK: juego público verificable"
+          node --input-type=module --check < src/ui/premium-hud-p5.js
+          node tests/premium-hud.test.mjs
+          echo "OK: juego público y HUD premium verificables"
 
       - name: Prepare static Pages site from current source
         shell: bash
