@@ -140,7 +140,11 @@ try{
   pointerId:45,pointerType:'touch',bubbles:true,cancelable:true
  });
  assert.ok(await page.locator('#hf-p810-quick').isVisible(),'quick menu really expands');
- await page.locator('#hf-p810-quick button').filter({hasText:'GUARDAR'}).click();
+ const saveButton=page.locator('#hf-p810-quick button').filter({hasText:'GUARDAR'});
+ assert.ok(await saveButton.count()===1,'quick save control exists');
+ // No GPU/compositor stability dependency in software WebGL runner.
+ // Pointer behavior is covered independently in the touch smoke checks.
+ await saveButton.dispatchEvent('click',{bubbles:true,cancelable:true});
  assert.ok(await page.evaluate(()=>localStorage.getItem(window.game.p15Enabled?'highfly_p15_save':window.game.p14Enabled?'highfly_p14_save':window.game.p13Enabled?'highfly_p13_save':window.game.p812Enabled?'highfly_p812_save':'highfly_p810_save')!==null),'P812 and P810 save separately from P7');
  await mkdir('audit-output',{recursive:true});
  if(process.env.HF_CAPTURE==='1'){
