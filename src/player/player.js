@@ -533,7 +533,7 @@ export class Player {
     if(g.p7Enabled){
       if(this.dashT>=0){targetYaw=this.bodyYaw;}
       else if(this.attackT>=0 || this.castT>=0){
-        const target=this.attackT>=0?g.combat?._attackTarget:g.targeting?.locked;
+        const target=this.attackT>=0?g.combat?._attackTarget:(g.combat?._castTarget||g.targeting?.locked);
         if(target?.alive){
           targetYaw=angleTo(target.group.position.x-this.pos.x,target.group.position.z-this.pos.z);
         }else targetYaw=this.bodyYaw;

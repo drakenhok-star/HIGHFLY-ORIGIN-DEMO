@@ -97,7 +97,7 @@ export class PremiumInventoryP7 {
   make('span','p7-chip','⚔ ATAQUE '+(inv.weaponDamage()+inv.offhandDamage()),foot);
   make('span','p7-chip','⛨ DEFENSA '+inv.armorValue(),foot);
   const torch=make('button','p7-torch',this.game.player.torchOn?'🔥 APAGAR':'🔥 ANTORCHA',foot);
-  torch.type='button';torch.addEventListener('click',()=>{this.game.player.toggleTorch();this.render('equipment');});
+  torch.type='button';torch.addEventListener('click',()=>{this.game.player.toggleTorch();this.game.saveSys?.save();this.render('equipment');});
   this._dirty=true;
  }
  details(){
@@ -105,7 +105,7 @@ export class PremiumInventoryP7 {
   const act=(title,fn,disabled=false)=>{
    const b=make('button',null,title,p);b.type='button';b.disabled=disabled;
    if(disabled)b.style.opacity='.45';
-   b.addEventListener('click',()=>{fn();this._dirty=true;this.render(this.tab);});
+   b.addEventListener('click',()=>{fn();this.game.saveSys?.save();this._dirty=true;this.render(this.tab);});
   };
   if(!db||!inv.has(id)){
    make('h3',null,'✧ TU EQUIPO',p);

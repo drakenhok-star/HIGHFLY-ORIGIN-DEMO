@@ -27,7 +27,7 @@ export class SaveSys {
       dragonDead: !dragon || !dragon.alive,
     };
     localStorage.setItem(this.key, JSON.stringify(data));
-    g.hud.notify('已保存');
+    g.hud.notify('Partida guardada');
   }
 
   hasSave() {

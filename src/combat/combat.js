@@ -36,6 +36,7 @@ export class Combat {
     this.comboStep=0;
     this._attackTarget=null;
     this._castTarget=null;
+    this._frostDirection=null;
     this.comboTimer=0;
     this.attackBuffer=0;
     this._meleeStep=1;
@@ -153,7 +154,8 @@ export class Combat {
       this.equippedShout = def.id;
       g.audio.play('word');
       g.hud.questBanner('Aprendiste el grito: ' + def.name);
-      g.hud.notify('F para lanzar · Q para cambiar');
+      g.hud.notify('¡Habilidad desbloqueada! Disponible en la barra de skills.');
+      if(g.p7Enabled && g.saveSys?.save)g.saveSys.save();
     }
   }
 
@@ -369,8 +371,8 @@ export class Combat {
     g.audio.play('shout');
     g.hud.shoutText('FUS · RO · DAH');
     g.player.addShake(0.5);
-    const target=g.p6Enabled && g.targeting ? g.targeting.get(14) : null;
-    const forward=this._fwd.copy(g.player.getForward());
+    const target=g.p7Enabled?g.targeting?.attackTarget(14):g.p6Enabled && g.targeting ? g.targeting.get(14) : null;
+    const forward=this._fwd.copy(g.p7Enabled?g.player.getCombatForward():g.player.getForward());
     if(target){forward.copy(target.group.position).sub(g.player.pos).setY(0).normalize();}
     const burstPos = this._v1.copy(g.player.pos).addScaledVector(forward, 2);
     burstPos.y += 1.4;
@@ -396,6 +398,10 @@ export class Combat {
     g.audio.play('frost');
     g.hud.shoutText('FO · KRAH · DIIN');
     player.addShake(0.3);
+    const target=g.p7Enabled?g.targeting?.attackTarget(15):g.p6Enabled && g.targeting ? g.targeting.get(15) : null;
+    const frostForward=this._frostForward||(this._frostForward=new THREE.Vector3());
+    frostForward.copy(g.p7Enabled?player.getCombatForward():player.getForward());
+    if(target)frostForward.copy(target.group.position).sub(player.pos).setY(0).normalize();
     if (g.effects.frostCone) {
       const origin = new THREE.Vector3();
       g.effects.frostCone(
@@ -404,12 +410,11 @@ export class Combat {
           origin.y += player.eyeHeight * 0.85;
           return origin;
         },
-        () => player.getForward(),
+        () => g.p7Enabled ? frostForward.clone() : player.getForward(),
         1.2
       );
     }
-    const target=g.p6Enabled && g.targeting ? g.targeting.get(15) : null;
-    const forward=this._fwd.copy(player.getForward());
+    const forward=this._fwd.copy(g.p7Enabled?frostForward:player.getForward());
     if(target)forward.copy(target.group.position).sub(player.pos).setY(0).normalize();
     const targets = this.collectTargets();
     for (let i = 0; i < targets.length; i++) {
