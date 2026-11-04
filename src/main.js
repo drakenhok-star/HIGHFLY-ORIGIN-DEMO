@@ -116,6 +116,9 @@ class Game {
     if (this.p810Enabled && this.worldMapP34?.mini){
       this.worldMapP34.mini.style.visibility=s==='playing'?'visible':'hidden';
     }
+    if (this.p810Enabled && this.touch?.premium?.p810?.perf){
+      this.touch.premium.p810.perf.style.visibility=s==='playing'?'visible':'hidden';
+    }
     if (s === 'playing') this.requestPointerLock();
     else this.releasePointerLock();
   }
