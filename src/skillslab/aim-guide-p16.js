@@ -110,9 +110,9 @@ export class TianjieAimGuide {
       });
     }
   }
-  begin(style,slot){
+  begin(style,slot,override=null){
     this.clear();
-    this.profile=AIM_PROFILES[style]?.[slot-1]||AIM_PROFILES[0][0];
+    this.profile=override||AIM_PROFILES[style]?.[slot-1]||AIM_PROFILES[0][0];
     this.mainColor=COLORS[style]||COLORS[0];
     const pr=this.profile;
     switch(pr.kind){
@@ -165,11 +165,21 @@ export class TianjieAimGuide {
       center=origin.clone().add(diff);
     }
     center.y=g.terrain?.getHeight?.(center.x,center.z)??origin.y;
-    this.valid=!(pr.kind==='zone'&&
-      (insideBlockingObject(g,center.x,center.y+1,center.z,.6)||
-       !hasLineOfSight(g,
-         {x:origin.x,y:origin.y+1.15,z:origin.z},
-         {x:center.x,y:center.y+1.15,z:center.z})));
+    let blocked=false;
+    if(pr.kind==='zone'){
+      blocked=insideBlockingObject(g,center.x,center.y+1,center.z,.6)||
+        !hasLineOfSight(g,
+          {x:origin.x,y:origin.y+1.15,z:origin.z},
+          {x:center.x,y:center.y+1.15,z:center.z});
+    }else if(pr.kind==='dash'){
+      const end=origin.clone().addScaledVector(dir,pr.range);
+      end.y=g.terrain.getHeight(end.x,end.z);
+      blocked=insideBlockingObject(g,end.x,end.y+1,end.z,.4)||
+        !hasLineOfSight(g,
+          {x:origin.x,y:origin.y+1,z:origin.z},
+          {x:end.x,y:end.y+1,z:end.z});
+    }
+    this.valid=!blocked;
     this.root.position.set(center.x,center.y+.075,center.z);
     this.root.rotation.y=(pr.kind==='zone'||pr.kind==='self')?0:yaw;
     this.root.visible=true;
