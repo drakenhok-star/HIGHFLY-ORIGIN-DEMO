@@ -10,6 +10,8 @@ on:
       - "src/**"
       - "lib/**"
       - "assets/**"
+      - "tests/**"
+      - ".github/workflows/deploy-live.yml"
 
 permissions:
   contents: read
