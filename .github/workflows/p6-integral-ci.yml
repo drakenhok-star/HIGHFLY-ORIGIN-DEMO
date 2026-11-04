@@ -1,0 +1,36 @@
+name: HIGHFLY P6 · Integrated safe checks
+on:
+  push:
+    branches: [p6-integral-combate-20261104]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate all first-party ES module syntax
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -type f -name '*.js' -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+      - name: P5 regression and P6 integration rules
+        run: |
+          node tests/premium-hud.test.mjs
+          node tests/p6-integral.test.mjs
+      - name: Inspect animation names, bone joints and GLBs
+        run: node scripts/audit_animation_p6.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: highfly-p6-animation-audit
+          path: audit-output/animation_inventory_p6.json
+          if-no-files-found: ignore

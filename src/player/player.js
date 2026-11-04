@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { cameraSafeFraction } from '../combat/targeting-p6.js';
 
 const _tmpV1 = new THREE.Vector3();
 const _tmpV2 = new THREE.Vector3();
@@ -55,6 +56,19 @@ export class Player {
     this._rippleT = 0;
     this.dashT = -1;
     this._dashTrailFallback = false;
+    this._dashDir = new THREE.Vector3(0,0,-1);
+    this._dashSpeed = DASH_SPEED;
+    this._dashDuration = DASH_DURATION;
+    this._moveDir = new THREE.Vector3(0,0,0);
+    this._jumpCount = 0;
+    this._airDashUsed = false;
+    this._cameraReady = false;
+    this.attackClip = ATTACK_CLIP;
+    this.actionDuration = ACTION_DURATION;
+    this.dashClip=null;
+    this._dashAnimStarted=false;
+    this._jumpAnimT=0;
+    this._jumpAnimStarted=false;
     this.torchOn = false;
 
     this.group = new THREE.Group();
@@ -244,18 +258,31 @@ export class Player {
     this._torchFlame.scale.y = 1 + 0.1 * Math.sin(el * 11.3) + 0.05 * Math.sin(el * 37.1);
   }
 
-  // 旋风冲刺：0.28s 内水平速度锁定为前向 52，不耗体力（由龙吼 WULD 触发）
-  startDash() {
+  // P6 directional evasion and existing WULD share the same movement primitive.
+  startDash(opts = {}) {
     this.dashT = 0;
-    const effects = this.game.effects;
-    this._dashTrailFallback = !(effects && typeof effects.dashTrail === 'function');
-    if (!this._dashTrailFallback) {
-      effects.dashTrail(() => new THREE.Vector3(
-        this.group.position.x,
-        this.group.position.y + 1.0,
-        this.group.position.z
-      ), DASH_DURATION);
+    const direction=opts.direction || (this.game.p6Enabled && this._moveDir.lengthSq()>0.1 ? this._moveDir : this.getForward());
+    this._dashDir.set(direction.x||0,0,direction.z||0);
+    if(this._dashDir.lengthSq()<0.001)this._dashDir.copy(this.getForward());
+    this._dashDir.normalize();
+    this._dashSpeed=opts.speed||DASH_SPEED;
+    this._dashDuration=opts.duration||DASH_DURATION;
+    this.dashClip=null;this._dashAnimStarted=false;
+    if(opts.style==='dodge' && this.game.p6Enabled){
+      // The GLB audit confirmed all four Dodge_* clips in player_barbarian.glb.
+      const forward=this.getForward();
+      const fd=this._dashDir.dot(forward);
+      const side=this._dashDir.x*Math.cos(this.yaw)-this._dashDir.z*Math.sin(this.yaw);
+      this.dashClip=Math.abs(fd)>=Math.abs(side)
+        ? (fd>=0?'Dodge_Forward':'Dodge_Backward')
+        : (side>=0?'Dodge_Right':'Dodge_Left');
+      if(!this.rig.clips.has(this.dashClip))this.dashClip=null;
     }
+    const effects=this.game.effects;
+    this._dashTrailFallback=!(effects && typeof effects.dashTrail==='function');
+    if(!this._dashTrailFallback)effects.dashTrail(()=>new THREE.Vector3(
+      this.group.position.x,this.group.position.y+1,this.group.position.z
+    ),this._dashDuration);
   }
 
   addShake(s) {
@@ -297,7 +324,7 @@ export class Player {
 
     if (input.justPressed.has('KeyT')) {
       this.torchOn = !this.torchOn;
-      g.hud.notify(this.torchOn ? '火把点燃' : '火把熄灭');
+      g.hud.notify(this.torchOn ? 'Antorcha encendida' : 'Antorcha apagada');
       // 复用施法短噪声当点火声（audio.play 无音量参数，cast 峰值本就低）
       if (this.torchOn) g.audio.play('cast');
     }
@@ -328,10 +355,11 @@ export class Player {
     if (moving) {
       const len = Math.hypot(mx, mz);
       const lx = mx / len, lz = mz / len;
-      const analog = input.touchMove ? Math.min(1, len) : 1;
+      const analog = Math.min(1, len);
       tx = (lx * cos + lz * sin) * speed * analog;
       tz = (-lx * sin + lz * cos) * speed * analog;
-    }
+      this._moveDir.set(tx,0,tz).normalize();
+    } else this._moveDir.set(0,0,0);
     const k = 1 - Math.exp(-10 * dt);
     this.vel.x += (tx - this.vel.x) * k;
     this.vel.z += (tz - this.vel.z) * k;
@@ -340,9 +368,9 @@ export class Player {
     const dashing = this.dashT >= 0;
     if (dashing) {
       this.dashT += dt;
-      const fwd = this.getForward();
-      this.vel.x = fwd.x * DASH_SPEED;
-      this.vel.z = fwd.z * DASH_SPEED;
+      const fwd = g.p6Enabled ? this._dashDir : this.getForward();
+      this.vel.x = fwd.x * this._dashSpeed;
+      this.vel.z = fwd.z * this._dashSpeed;
       this.vel.y = 0;
       if (this._dashTrailFallback && g.effects) {
         g.effects.spawnBurst(
@@ -350,20 +378,28 @@ export class Player {
           '#eef4f8', 5, 2.5, 0.35, 0.14
         );
       }
-      if (this.dashT >= DASH_DURATION) this.dashT = -1;
+      if (this.dashT >= this._dashDuration) this.dashT = -1;
     }
 
-    if (input.justPressed.has('Space') && this.onGround && !inWater && !dashing && stats.useStamina(8)) {
-      this.vel.y = 9.5;
-      this.onGround = false;
+    if (input.justPressed.has('Space') && !inWater && !dashing) {
+      if(this.onGround && stats.useStamina(8)){
+        this.vel.y=9.5;this.onGround=false;this._jumpCount=1;
+      }else if(g.p6Enabled && !this.onGround && this._jumpCount===1 && stats.useStamina(12)){
+        // Verified Jump_Idle fallback; no invented mid-air somersault.
+        this.vel.y=8.8;this._jumpCount=2;
+        this._jumpAnimT=0.34;this._jumpAnimStarted=false;
+      }
     }
 
     if (!dashing) this.vel.y -= 26 * dt;
+    // Small collision steps prevent dash from tunnelling through buildings/well.
+    const steps = g.p6Enabled ? Math.max(1,Math.ceil(Math.hypot(this.vel.x*dt,this.vel.z*dt)/0.35)) : 1;
+    for(let step=0;step<steps;step++){
     const prevX = this.group.position.x;
     const prevZ = this.group.position.z;
-    this.group.position.x += this.vel.x * dt;
-    this.group.position.z += this.vel.z * dt;
-    this.group.position.y += this.vel.y * dt;
+    this.group.position.x += this.vel.x * dt / steps;
+    this.group.position.z += this.vel.z * dt / steps;
+    this.group.position.y += this.vel.y * dt / steps;
 
     // 室内墙体无碰撞网格：按房间可行走范围夹取，防普通移动/旋风冲刺穿墙出屋（inside 状态脱节）
     if (g.interiors && g.interiors.inside && typeof g.interiors.constrain === 'function') {
@@ -403,6 +439,8 @@ export class Player {
       }
     }
 
+    }
+
     const fallSpeed = Math.max(0, -this.vel.y);
 
     const ground = terrain.getHeight(this.group.position.x, this.group.position.z);
@@ -415,6 +453,7 @@ export class Player {
       this.onGround = this.group.position.y - floor < 0.02;
     }
 
+    if(this.onGround){this._jumpCount=0;this._airDashUsed=false;}
     const horizSpeed = Math.hypot(this.vel.x, this.vel.z);
 
     // 水花钩子：入水/出水溅起、游动涟漪
@@ -443,8 +482,14 @@ export class Player {
     this.updateTorch();
 
     let targetYaw = this.bodyYaw;
-    if (this.attackT >= 0 || this.castT >= 0) {
-      targetYaw = this.yaw;
+    if(g.p6Enabled && this.dashT>=0 && this.dashClip){
+      targetYaw=this.yaw;
+    } else if (this.attackT >= 0 || this.castT >= 0) {
+      const target=g.p6Enabled && g.targeting && this.attackT>=0 ? g.targeting.get(4.8) : null;
+      if(target){
+        const dx=target.group.position.x-this.pos.x,dz=target.group.position.z-this.pos.z;
+        targetYaw=Math.atan2(-dx,-dz);
+      } else targetYaw=this.yaw;
     } else if (horizSpeed > 0.5) {
       targetYaw = Math.atan2(-this.vel.x, -this.vel.z);
     }
@@ -461,12 +506,12 @@ export class Player {
 
   actionTimeScale(clipName) {
     const clip = this.rig.clips.get(clipName);
-    return clip ? clip.duration / ACTION_DURATION : 1;
+    return clip ? clip.duration / (this.actionDuration || ACTION_DURATION) : 1;
   }
 
   animate(dt, horizSpeed) {
     if (this.attackT >= 0) {
-      this.attackT += dt / ACTION_DURATION;
+      this.attackT += dt / (this.actionDuration || ACTION_DURATION);
       if (this.attackT > 1) {
         this.attackT = -1;
         this._attackAnimStarted = false;
@@ -480,15 +525,31 @@ export class Player {
       }
     }
 
-    if (this.attackT >= 0 && this.attackT < 1) {
+    if(this._jumpAnimT>0)this._jumpAnimT=Math.max(0,this._jumpAnimT-dt);
+    if(this.dashT>=0 && this.dashClip && this.game.p6Enabled){
+      if(!this._dashAnimStarted){
+        this._dashAnimStarted=true;
+        const clip=this.rig.clips.get(this.dashClip);
+        const scale=clip ? clip.duration/this._dashDuration : 1;
+        this.rig.play(this.dashClip,{once:true,fade:0.04,timeScale:scale});
+      }
+    } else if (this.attackT >= 0 && this.attackT < 1) {
       if (!this._attackAnimStarted) {
         this._attackAnimStarted = true;
-        this.rig.play(ATTACK_CLIP, { once: true, fade: 0.08, timeScale: this.actionTimeScale(ATTACK_CLIP) });
+        const name=this.rig.clips.has(this.attackClip) ? this.attackClip : ATTACK_CLIP;
+        this.rig.play(name,{once:true,fade:0.06,timeScale:this.actionTimeScale(name)});
       }
     } else if (this.castT >= 0 && this.castT < 1) {
       if (!this._castAnimStarted) {
         this._castAnimStarted = true;
         this.rig.play(CAST_CLIP, { once: true, fade: 0.08, timeScale: this.actionTimeScale(CAST_CLIP) });
+      }
+    } else if(this._jumpAnimT>0 && this.game.p6Enabled && this.rig.clips.has('Jump_Full_Short')){
+      if(!this._jumpAnimStarted){
+        this._jumpAnimStarted=true;
+        const clip=this.rig.clips.get('Jump_Full_Short');
+        this.rig.play('Jump_Full_Short',{once:true,fade:0.06,
+          timeScale:clip.duration/0.34});
       }
     } else if (!this.onGround) {
       this.rig.play('Jump_Idle');
@@ -527,9 +588,18 @@ export class Player {
         -sp * this.camDist,
         Math.cos(this.yaw) * cp * this.camDist
       );
-      cam.position.copy(target).add(_tmpV2);
-      const minY = terrain.getHeight(cam.position.x, cam.position.z) + 0.5;
-      if (cam.position.y < minY) cam.position.y = minY;
+      const goal=_tmpV3.copy(target).add(_tmpV2);
+      if(this.game.p6Enabled){
+        const fraction=cameraSafeFraction(this.game,target,goal);
+        goal.copy(target).addScaledVector(_tmpV2,fraction);
+        const safeDistance=this.camDist*fraction;
+        if(!this._cameraReady || (fraction<0.99 && cam.position.distanceTo(target)>safeDistance+0.25))
+          cam.position.copy(goal);
+        else cam.position.lerp(goal,1-Math.exp(-12*dt));
+      }else cam.position.copy(goal);
+      this._cameraReady=true;
+      const minY=terrain.getHeight(cam.position.x,cam.position.z)+0.5;
+      if(cam.position.y<minY)cam.position.y=minY;
       cam.lookAt(target);
     }
 
@@ -627,8 +697,15 @@ export class Player {
     this.camDist = 6;
     this._inWater = false;
     this._rippleT = 0;
-    this.dashT = -1;
-    this._dashTrailFallback = false;
+    this.dashT=-1;
+    this._dashTrailFallback=false;
+    this._dashSpeed=DASH_SPEED;
+    this._dashDuration=DASH_DURATION;
+    this._moveDir.set(0,0,0);
+    this._jumpCount=0;this._airDashUsed=false;this._cameraReady=false;
+    this.attackClip=ATTACK_CLIP;this.actionDuration=ACTION_DURATION;
+    this.dashClip=null;this._dashAnimStarted=false;
+    this._jumpAnimT=0;this._jumpAnimStarted=false;
     this.torchOn = false;
     this.updateTorch();
     this.faceVillage();

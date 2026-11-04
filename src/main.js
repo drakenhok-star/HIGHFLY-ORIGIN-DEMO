@@ -27,6 +27,8 @@ import { MobileAudit } from './ui/mobile-audit.js'; // HIGHFLY_AUDIT_P1
 import { PerformanceP2 } from './ui/performance-p2.js'; // HIGHFLY_P2_20261104
 import { WorldMapP34 } from './ui/world-map-p34.js'; // HIGHFLY_WORLD_MAP_P34
 import { TouchControls } from './ui/touch-controls.js'; // HIGHFLY_TOUCH_PATCH_V1
+import { TargetingP6 } from './combat/targeting-p6.js';
+import { PerfProbeP6 } from './ui/perf-probe-p6.js';
 
 class Game {
   constructor(assets) {
@@ -34,6 +36,7 @@ class Game {
     this.worldSeed = 1337;
     this.state = 'menu';
     this.time = { elapsed: 0, dayTime: 0.35, dayLength: 600 };
+    this.p6Enabled=!new URLSearchParams(location.search).has('hf_p6_off');
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     // P1 quality HIGH baseline: restore original render scale on Android.
@@ -80,6 +83,7 @@ class Game {
     this.effects = new Effects(this);
     this.combat = new Combat(this);
     this.enemies = new Enemies(this);
+    this.targeting=this.p6Enabled?new TargetingP6(this):null;
     this.npcs = new NPCs(this);
     this.audio = new AudioSys(this);
     this.saveSys = new SaveSys(this);
@@ -87,6 +91,7 @@ class Game {
     this.menus = new Menus(this);
     this.touch = new TouchControls(this);
     this.mobileAudit = new MobileAudit(this);
+    this.p6Perf = new PerfProbeP6(this);
     this.performanceP2 = new PerformanceP2(this);
     this.worldMapP34 = null;
     if (!new URLSearchParams(location.search).has('hf_no_map')) {
@@ -133,7 +138,7 @@ class Game {
   newGame() {
     this.resetAll();
     this.setState('playing');
-    this.hud.questBanner('欢迎来到天际省');
+    this.hud.questBanner('¡Bienvenido a HIGHFLY!');
     this.audio.startAmbience();
   }
 
@@ -141,7 +146,7 @@ class Game {
     this.resetAll();
     this.saveSys.applyLoaded();
     this.setState('playing');
-    this.hud.questBanner('欢迎回来');
+    this.hud.questBanner('¡Bienvenido de nuevo!');
     this.audio.startAmbience();
   }
 
@@ -154,6 +159,7 @@ class Game {
     this.enemies.reset();
     this.player.reset();
     this.combat.reset();
+    if(this.targeting)this.targeting.cancel();
     // 室内重开新游戏/读档：立即恢复户外状态，不等 interiors.update 的远距自愈
     this.interiors.forceOutside();
     // Effects 无 reset()：用大 dt 走 update 的到期路径，移除并 dispose 跨局残留粒子
@@ -250,10 +256,10 @@ function buildAssetSplash() {
   div.style.cssText = 'position:fixed;inset:0;z-index:10000;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;color:#e8e2d0;font-family:Georgia,"Songti SC","SimSun",serif;';
   const title = document.createElement('div');
   title.style.cssText = 'font-size:64px;letter-spacing:0.4em;text-indent:0.4em;';
-  title.textContent = '天 际';
+  title.textContent = 'HIGHFLY';
   const line = document.createElement('div');
   line.style.cssText = 'font-size:16px;opacity:0.75;letter-spacing:0.1em;';
-  line.textContent = '正在唤醒天际省……(0/15)';
+  line.textContent = 'Preparando el mundo…(0/15)';
   div.appendChild(title);
   div.appendChild(line);
   document.body.appendChild(div);
@@ -264,12 +270,12 @@ const assetSplash = buildAssetSplash();
 const assets = new AssetLib();
 try {
   await assets.loadAll((done, total) => {
-    assetSplash.line.textContent = `正在唤醒天际省……(${done}/${total})`;
+    assetSplash.line.textContent = `Preparando el mundo…(${done}/${total})`;
   });
 } catch (err) {
   console.error('[boot] 资源加载失败:', err);
   const msg = err && err.message ? err.message : String(err);
-  assetSplash.line.textContent = `资源加载失败：${msg}（请刷新重试）`;
+  assetSplash.line.textContent = `Error de carga de recursos: ${msg} (recargá la página)`;
   assetSplash.line.style.cssText += 'color:#e07a6a;opacity:1;max-width:80%;text-align:center;';
   throw err;
 }
@@ -285,6 +291,7 @@ let splashHidden = false;
 function loop() {
   requestAnimationFrame(loop);
   game.mobileAudit.begin();
+  game.p6Perf.begin();
   const dt = Math.min(clock.getDelta(), 0.05);
   game.time.elapsed += dt;
 
@@ -296,10 +303,14 @@ function loop() {
   game.terrain.update(dt);
   game.structures.update(dt);
   game.interiors.update(dt);
+  game.p6Perf.mark('world');
 
   if (game.state === 'playing') {
     game.player.update(dt);
+    game.p6Perf.mark('player');
+    if(game.targeting)game.targeting.update(dt);
     game.combat.update(dt);
+    game.p6Perf.mark('combat');
     game.effects.update(dt);
     game.enemies.update(dt);
     game.npcs.update(dt);
@@ -308,6 +319,7 @@ function loop() {
     game.hud.update(dt);
     game.audio.update(dt);
     game.saveSys.update(dt);
+    game.p6Perf.mark('entities');
   }
 
   if (game.state === 'menu') {
@@ -321,6 +333,8 @@ function loop() {
   }
 
   game.composer.render();
+  game.p6Perf.mark('render');
+  game.p6Perf.end();
   game.mobileAudit.end();
 
   if (!splashHidden) {

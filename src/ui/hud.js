@@ -23,10 +23,10 @@ export class HUD {
     this.compassWrap = el('div', 'hud-compass-wrap', this.root);
     this.compass = el('div', 'hud-compass', this.compassWrap);
     this.cardinals = [
-      { bearing: 0, label: '北' },
-      { bearing: Math.PI / 2, label: '东' },
-      { bearing: Math.PI, label: '南' },
-      { bearing: -Math.PI / 2, label: '西' },
+      { bearing: 0, label: 'N' },
+      { bearing: Math.PI / 2, label: 'E' },
+      { bearing: Math.PI, label: 'S' },
+      { bearing: -Math.PI / 2, label: 'O' },
     ].map((c) => ({ bearing: c.bearing, dom: el('div', 'hud-compass-cardinal', this.compass, c.label) }));
     this.markerEls = [];
     this.dotEls = [];
@@ -63,14 +63,14 @@ export class HUD {
     const sc = el('div', 'hud-shoutcd', this.root);
     const scRow = el('div', 'hud-shoutcd-row', sc);
     const scLeft = el('div', 'hud-shoutcd-left', scRow);
-    this.shoutLabel = el('span', 'hud-shoutcd-label', scLeft, 'F 龙吼');
+    this.shoutLabel = el('span', 'hud-shoutcd-label', scLeft, 'F Grito');
     this.shoutQHint = el('span', 'hud-shoutcd-q', scLeft, 'Q');
     this.shoutQHint.style.display = 'none';
     this.shoutStatus = el('span', 'hud-shoutcd-status', scRow, '');
     const scBar = el('div', 'hud-shoutcd-bar', sc);
     this.shoutFill = el('div', 'hud-shoutcd-fill', scBar);
     this.shoutReady = null;
-    this.shoutLabelText = 'F 龙吼';
+    this.shoutLabelText = 'F Grito';
     this.shoutQShown = false;
 
     this.fadeOverlay = el('div', 'hud-fade', document.body);
@@ -265,7 +265,7 @@ export class HUD {
     const cb = g.combat;
     const cd = Math.max(0, cb.shoutCd);
     this.shoutFill.style.width = (1 - cd / cb.shoutCdMax) * 100 + '%';
-    let shoutName = '龙吼';
+    let shoutName = 'Grito';
     if (cb.shouts && cb.equippedShout) {
       for (let i = 0; i < cb.shouts.length; i++) {
         if (cb.shouts[i].id === cb.equippedShout) {
@@ -287,7 +287,7 @@ export class HUD {
     const ready = cd <= 0;
     if (ready !== this.shoutReady) {
       this.shoutReady = ready;
-      this.shoutStatus.textContent = ready ? '就绪' : '';
+      this.shoutStatus.textContent = ready ? 'LISTO' : '';
     }
   }
 }

@@ -8,12 +8,12 @@ const WOLF_PACK_HOMES = [
 const WOLF_OFFSETS = [[0, 0], [4.2, 2.6], [-3.6, 3.4]];
 const COS35 = Math.cos((35 * Math.PI) / 180);
 
-// 雪原高台霜狼群（PLATEAU 380,-150，4 只一群，120s 重生）
+// 雪原高台Lobo helado群（PLATEAU 380,-150，4 只一群，120s 重生）
 const ICE_PACK_HOME = { x: 380, z: -150 };
 const ICE_WOLF_OFFSETS = [[0, 0], [4.5, 2.5], [-4, 3.5], [2, -4.5]];
 const ICE_TINT = new THREE.Color(0xcfe0ea);
 
-// 风暮地穴尸鬼（BARROW_ORIGIN -3000,34,-3000，沿入口->回廊->圆厅->王座厅路径摆放）
+// 风暮地穴Draugr（BARROW_ORIGIN -3000,34,-3000，沿入口->回廊->圆厅->王座厅路径摆放）
 const BARROW_ORIGIN = { x: -3000, z: -3000 };
 const BARROW_DRAUGR = [
   { dx: 0, dz: 16, variant: 'warrior' },   // 回廊
@@ -144,7 +144,7 @@ export class Enemies {
       'warrior'
     );
     boss.boss = true;
-    boss.name = '尸鬼领主';
+    boss.name = 'Señor draugr';
     boss.hp = boss.maxHp = 150;
     boss.dmg = 22;
     boss.speed = 4.6;
@@ -192,7 +192,7 @@ export class Enemies {
     e.slowDur = Math.max(e.slowDur, seconds);
   }
 
-  // 霜狼皮毛染冰白色（per-spawn 克隆材质，安全），并把冰蓝微光写回 mats 基准值
+  // Lobo helado皮毛染冰白色（per-spawn 克隆材质，安全），并把冰蓝微光写回 mats 基准值
   _tintIce(e) {
     e.rig.root.traverse((o) => {
       if (!o.isMesh || !o.material) return;
@@ -213,7 +213,7 @@ export class Enemies {
 
   _spawnWolf(x, z, packIdx, ice = false) {
     const hp = ice ? 45 : 30 + (this.game.stats.level - 1) * 5;
-    const e = this._base('wolf', ice ? '霜狼' : '冰原狼', hp, 1.0, x, z);
+    const e = this._base('wolf', ice ? 'Lobo helado' : 'Lobo', hp, 1.0, x, z);
     e.dmg = ice ? 12 : 8;
     e.speed = ice ? 8 : 7.5;
     e.aggroR = 28; e.attackRange = 2.3; e.attackCd = 1.3;
@@ -227,7 +227,7 @@ export class Enemies {
   }
 
   _spawnDraugr(x, z, variant = 'warrior') {
-    const e = this._base('draugr', variant === 'mage' ? '尸鬼法师' : '尸鬼', 60, 1.0, x, z);
+    const e = this._base('draugr', variant === 'mage' ? 'Draugr mago' : 'Draugr', 60, 1.0, x, z);
     e.dmg = 14; e.speed = 4.2; e.aggroR = 20; e.attackRange = 2.6; e.attackCd = 1.6;
     e.variant = variant;
     e.awakened = false;
@@ -241,7 +241,7 @@ export class Enemies {
     const perch = this.game.structures.perchPos;
     const group = new THREE.Group();
     const e = {
-      type: 'dragon', name: '远古巨龙', group,
+      type: 'dragon', name: 'Dragón antiguo', group,
       hp: 400, maxHp: 400, alive: true, hitRadius: 4.5,
       state: 'perch', sub: '', subT: 0,
       perch: perch.clone(),
@@ -375,7 +375,7 @@ export class Enemies {
       gold = 300;
     }
     g.stats.addXP(xp);
-    // 霜狼按独立类型上报：q1「狼患」只认冰原狼
+    // Lobo helado按独立类型上报：q1「狼患」只认Lobo
     g.quests.onEnemyKilled(e.ice ? 'ice_wolf' : e.type);
     this._spawnDrop(e.group.position.x, e.group.position.z, items, gold);
 
@@ -384,7 +384,7 @@ export class Enemies {
     }
     if (e.type === 'dragon') {
       g.effects.spawnSoulStream(e.group.position.clone(), 2.5);
-      g.hud.questBanner('你吸收了龙魂');
+      g.hud.questBanner('Absorbiste el alma del dragón');
       g.audio.play('soul');
     }
   }

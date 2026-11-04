@@ -1,19 +1,19 @@
 export const ITEM_DB = {
-  iron_sword: { name: '铁剑', type: 'weapon', damage: 8, value: 25, desc: '寻常的铁制长剑。' },
-  steel_sword: { name: '钢剑', type: 'weapon', damage: 14, value: 120, desc: '精钢锻造，锋利可靠。' },
-  ancient_sword: { name: '先祖之刃', type: 'weapon', damage: 22, value: 400, desc: '诺德先祖锻造的古剑，泛着幽蓝寒光。' },
-  dragonbone_sword: { name: '龙骨剑', type: 'weapon', damage: 30, value: 900, desc: '以龙骨锻成，挥动时隐有龙吟。' },
-  cloth_armor: { name: '布衣', type: 'armor', armor: 5, value: 10, desc: '粗布衣裳，聊胜于无。' },
-  hide_armor: { name: '兽皮甲', type: 'armor', armor: 14, value: 120, desc: '坚韧的兽皮护甲。' },
-  dragonscale_armor: { name: '龙鳞甲', type: 'armor', armor: 28, value: 1200, desc: '龙鳞层叠，刀剑难伤。' },
-  health_potion: { name: '治疗药水', type: 'potion', heal: 40, value: 30, desc: '恢复 40 点生命。' },
-  mana_potion: { name: '法力药水', type: 'potion', mana: 40, value: 30, desc: '恢复 40 点法力。' },
-  wolf_pelt: { name: '狼皮', type: 'misc', value: 12, desc: '冰原狼的毛皮。' },
-  draugr_bone: { name: '尸鬼骨灰', type: 'misc', value: 18, desc: '散发寒气的骨灰。' },
-  dragon_bone: { name: '龙骨', type: 'misc', value: 500, desc: '远古巨龙的骨骼。' },
-  dragon_scale: { name: '龙鳞', type: 'misc', value: 350, desc: '坚不可摧的鳞片。' },
-  ancient_relic: { name: '先祖遗物', type: 'misc', value: 220, desc: '地穴深处的古物，泛着幽光。' },
-  frost_essence: { name: '霜之精华', type: 'misc', value: 60, desc: '霜狼体内凝结的寒气。' },
+  iron_sword: { name: 'Espada de hierro', type: 'weapon', damage: 8, value: 25, desc: 'Una espada sencilla de hierro.' },
+  steel_sword: { name: 'Espada de acero', type: 'weapon', damage: 14, value: 120, desc: 'Acero bien forjado, resistente y afilado.' },
+  ancient_sword: { name: 'Espada ancestral', type: 'weapon', damage: 22, value: 400, desc: 'Una espada ancestral de brillo azulado.' },
+  dragonbone_sword: { name: 'Espada de hueso de dragón', type: 'weapon', damage: 30, value: 900, desc: 'Forjada con hueso de dragón.' },
+  cloth_armor: { name: 'Ropa de tela', type: 'armor', armor: 5, value: 10, desc: 'Ropa sencilla de tela.' },
+  hide_armor: { name: 'Armadura de piel', type: 'armor', armor: 14, value: 120, desc: 'Protección de cuero resistente.' },
+  dragonscale_armor: { name: 'Armadura de escamas', type: 'armor', armor: 28, value: 1200, desc: 'Armadura de escamas muy resistentes.' },
+  health_potion: { name: 'Poción de salud', type: 'potion', heal: 40, value: 30, desc: 'Restaura 40 HP.' },
+  mana_potion: { name: 'Poción de maná', type: 'potion', mana: 40, value: 30, desc: 'Restaura 40 MP.' },
+  wolf_pelt: { name: 'Piel de lobo', type: 'misc', value: 12, desc: 'Pelaje de lobo de las tierras frías.' },
+  draugr_bone: { name: 'Restos de draugr', type: 'misc', value: 18, desc: 'Restos impregnados de frío.' },
+  dragon_bone: { name: 'Hueso de dragón', type: 'misc', value: 500, desc: 'Huesos de un dragón antiguo.' },
+  dragon_scale: { name: 'Escama de dragón', type: 'misc', value: 350, desc: 'Escamas extraordinariamente resistentes.' },
+  ancient_relic: { name: 'Reliquia ancestral', type: 'misc', value: 220, desc: 'Reliquia encontrada en la cripta.' },
+  frost_essence: { name: 'Esencia helada', type: 'misc', value: 60, desc: 'Esencia de un lobo helado.' },
 };
 
 export class Inventory {
@@ -36,11 +36,11 @@ export class Inventory {
     const item = ITEM_DB[id];
     // 手改存档/任务配置可能带未知 id，静默丢弃并留日志，避免 TypeError 中断游戏循环
     if (!item) {
-      console.warn('[inventory] 未知物品 id: ' + id);
+      console.warn('[inventory] Objeto desconocido: ' + id);
       return;
     }
     this.slots.set(id, (this.slots.get(id) || 0) + n);
-    this.game.hud.notify('获得 ' + item.name + (n > 1 ? ' ×' + n : ''));
+    this.game.hud.notify('Obtuviste ' + item.name + (n > 1 ? ' ×' + n : ''));
     this.game.quests.onItemAcquired(id);
   }
 
@@ -61,16 +61,16 @@ export class Inventory {
       this.removeItem(id, 1);
       if (item.heal) {
         this.game.stats.heal(item.heal);
-        this.game.hud.notify('恢复 ' + item.heal + ' 点生命');
+        this.game.hud.notify('Recuperaste ' + item.heal + ' HP');
       }
       if (item.mana) {
         this.game.stats.restoreMp(item.mana);
-        this.game.hud.notify('恢复 ' + item.mana + ' 点法力');
+        this.game.hud.notify('Recuperaste ' + item.mana + ' MP');
       }
       this.game.audio.play('potion');
     } else if (item.type === 'weapon' || item.type === 'armor') {
       this.equipped[item.type] = id;
-      this.game.hud.notify('已装备 ' + item.name);
+      this.game.hud.notify('Equipado: ' + item.name);
     }
   }
 
@@ -88,7 +88,7 @@ export class Inventory {
     this.game.audio.play('chest');
     if (chest.gold > 0) {
       this.gold += chest.gold;
-      this.game.hud.notify('获得 ' + chest.gold + ' 金币');
+      this.game.hud.notify('Obtuviste ' + chest.gold + ' de oro');
     }
     for (const id of chest.loot) this.addItem(id);
   }
@@ -97,7 +97,7 @@ export class Inventory {
     this.game.audio.play('chest');
     if (drop.gold > 0) {
       this.gold += drop.gold;
-      this.game.hud.notify('获得 ' + drop.gold + ' 金币');
+      this.game.hud.notify('Obtuviste ' + drop.gold + ' de oro');
     }
     for (const id of drop.items) this.addItem(id);
     if (drop.mesh && drop.mesh.parent) drop.mesh.parent.remove(drop.mesh);
