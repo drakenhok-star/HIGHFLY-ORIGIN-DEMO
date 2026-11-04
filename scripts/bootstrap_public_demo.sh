@@ -2,7 +2,7 @@
 # Bootstrap public HIGHFLY demo from PINNED Tianjie5 MIT source and 15 CC0-declared GLB.
 # Intended for GitHub Actions; never reads private repositories or SOURCE assets.
 set -Eeuo pipefail
-ROOT="$(cd "$(dirname "\${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(git rev-parse --show-toplevel)"
 PIN="42eebcb4b422f3aa432cff882f1e51b2a856a6b2"
 cd "$ROOT"
 
