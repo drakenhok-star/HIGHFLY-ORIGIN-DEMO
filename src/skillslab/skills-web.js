@@ -328,6 +328,46 @@ export class TianjieMobaSkillsLab {
     }
   }
 
+  updateLeap(){
+    const leap=this.activeLeap;
+    if(!leap)return;
+    const t=this.now(),p=this.game.player;
+    if(t>leap.started+.28&&p.onGround&&p.dashT<0){
+      // The real Tianjie collision/physics system confirmed ground contact.
+      // Landing AoE at the ACTUAL position even if an obstacle shortened dash.
+      const impactPoint=p.pos.clone();
+      this.activeLeap=null;
+      const count=this.hitSphere(impactPoint,2.45,84,{
+        launch:true,stun:1.15
+      });
+      this.fx.landing(impactPoint,0,2.45);
+      this.recastStyle=0;
+      this.recastUntil=t+3.5;
+      this.announce(count?
+        '¡IMPACTO TERRESTRE! '+count+' enemigo(s) elevados · S3 → S2 ↻':
+        '¡ATERRIZAJE! S3 y S2 ↻ disponibles');
+    }else if(t>leap.deadline){
+      // Never fake an impact while still airborne, submerged or blocked.
+      this.activeLeap=null;
+      this.recastStyle=0;this.recastUntil=t+2.0;
+      this.announce('Ascenso interrumpido: sin golpe hasta tocar suelo');
+    }
+  }
+
+  applyBurn(enemy,ticks=4,perTick=7,interval=.42){
+    const n=Math.max(0,Math.min(8,ticks|0));
+    for(let i=1;i<=n;i++){
+      this.schedule(i*interval,()=>{
+        if(!enemy?.alive)return;
+        enemy.takeDamage(perTick,vec());
+        if(i===n&&enemy.group?.position){
+          this.fx.sparks(enemy.group.position.clone().add(vec(0,1,0)),
+            '#ffae67',11,1.8,.35,.13);
+        }
+      });
+    }
+  }
+
   update(dt){
     const now=this.now(),g=this.game;
     if(this.enemiesList!==g.enemies.list){
@@ -485,68 +525,106 @@ export class TianjieMobaSkillsLab {
     },true);
   }
   attachTouchButtons(){
+    // Intercept ORIGINAL S1-S3 controls, no second overlapping buttons.
+    // Pointer capture works with drag from the skill icon to any direction.
     for(let slot=1;slot<=3;slot++){
       const b=document.querySelector('.hf-p5-s'+slot);
-      if(!b||b.dataset.hfLabBound)continue; // idempotent per element
-      b.dataset.hfLabBound='1';
+      if(!b||b.dataset.hfLabBound)continue;
+      b.dataset.hfLabBound='p16';
       b.addEventListener('pointerdown',e=>{
-        if(this.game.state!=='playing')return;
-        if(this.game.input.hudEditing)return;
+        if(this.game.state!=='playing'||this.game.input.hudEditing)return;
         e.preventDefault();e.stopImmediatePropagation();
         this.cancelAim();
-        b.setPointerCapture(e.pointerId);
-        this.aim={slot,id:e.pointerId,x:e.clientX,y:e.clientY,dragged:false,button:b,dir:null};
+        try{b.setPointerCapture(e.pointerId);}catch(_){}
+        const p=this.game.player;
+        this.aim={
+          slot,id:e.pointerId,x:e.clientX,y:e.clientY,
+          dragged:false,button:b,dir:null,target:null,
+          startOrigin:p.pos.clone(),baseForward:p.getForward(),
+          valid:true
+        };
         this.cancelBtn.hidden=false;
         this.makePreview(slot);
       },true);
       b.addEventListener('pointermove',e=>{
         if(!this.aim||this.aim.id!==e.pointerId)return;
         e.preventDefault();e.stopImmediatePropagation();
-        const dx=e.clientX-this.aim.x,dy=e.clientY-this.aim.y;
-        if(Math.hypot(dx,dy)>15)this.aim.dragged=true;
-        if(this.aim.dragged){
-          const p=this.game.player,forward=p.getForward(),right=vec(-forward.z,0,forward.x);
-          const dir=right.multiplyScalar(dx).addScaledVector(forward,-dy).setY(0);
-          if(dir.lengthSq()>.001)this.aim.dir=dir.normalize();
-          this.movePreview(this.aim.dir||this.aimDirection(null));
+        const a=this.aim,dx=e.clientX-a.x,dy=e.clientY-a.y;
+        if(Math.hypot(dx,dy)>12)a.dragged=true;
+        if(!a.dragged)return;
+        const pr=AIM_PROFILES[this.style][slot-1];
+        if(pr.kind==='self'){
+          this.refreshPreview();return;
         }
+        const forward=a.baseForward,right=vec(-forward.z,0,forward.x);
+        if(pr.kind==='zone'){
+          const forwardDist=Math.min(pr.range*.76,pr.range<9?5.4:13);
+          const delta=right.multiplyScalar(dx*.082)
+            .addScaledVector(forward,clamp(forwardDist-dy*.082,.5,pr.range));
+          if(delta.length()>pr.range)delta.setLength(pr.range);
+          const target=a.startOrigin.clone().add(delta);
+          target.y=this.game.terrain.getHeight(target.x,target.z);
+          a.target=target;
+          if(delta.lengthSq()>.001)a.dir=delta.normalize();
+        }else{
+          const delta=right.multiplyScalar(dx)
+            .addScaledVector(forward,-dy);
+          if(delta.lengthSq()>.1)a.dir=delta.normalize();
+        }
+        this.refreshPreview();
       },true);
       b.addEventListener('pointerup',e=>{
         if(!this.aim||this.aim.id!==e.pointerId)return;
         e.preventDefault();e.stopImmediatePropagation();
-        const aimed=this.aim.dir;
+        const a=this.aim,dir=a.dir,target=a.target,valid=this.aimGuide.valid;
         this.cancelAim();
-        this.cast(slot,aimed,'pointer');
+        if(!valid){
+          this.announce('Apuntado bloqueado: elegí un lugar libre');
+          return; // no cooldown, no resource spent
+        }
+        this.cast(slot,dir,'pointer',target);
       },true);
-      b.addEventListener('pointercancel',e=>{if(this.aim?.id===e.pointerId)this.cancelAim();},true);
-      b.addEventListener('lostpointercapture',e=>{if(this.aim?.id===e.pointerId)this.cancelAim();},true);
+      for(const type of ['pointercancel','lostpointercapture'])
+        b.addEventListener(type,e=>{
+          if(this.aim?.id===e.pointerId)this.cancelAim();
+        },true);
     }
   }
   makePreview(slot){
-    if(this.preview)return;
-    const geo=new THREE.BufferGeometry().setFromPoints([vec(),vec()]);
-    const mat=new THREE.LineBasicMaterial({color:PALETTE[this.style],transparent:true,opacity:.93});
-    this.preview=new THREE.Line(geo,mat);
-    this.preview.frustumCulled=false;
-    this.game.scene.add(this.preview);
-    this.movePreview(this.aimDirection(null));
+    if(!this.aim)return;
+    this.aimGuide.begin(this.style,slot);
+    this.preview=this.aimGuide.root;
+    const dir=this.aimDirection(null,AIM_PROFILES[this.style][slot-1].range||17);
+    this.aim.dir=dir;
+    this.refreshPreview();
   }
-  movePreview(direction){
-    if(!this.preview||!direction)return;
-    const p=this.game.player.pos;
-    const distance=this.aim?.slot===1?16:this.aim?.slot===2?7:4.6;
-    const arr=this.preview.geometry.attributes.position;
-    arr.setXYZ(0,p.x,p.y+.18,p.z);
-    arr.setXYZ(1,p.x+direction.x*distance,p.y+.18,p.z+direction.z*distance);
-    arr.needsUpdate=true;
+  refreshPreview(){
+    if(!this.aim)return;
+    const a=this.aim,p=this.game.player;
+    const prof=AIM_PROFILES[this.style][a.slot-1];
+    const dir=a.dir||this.aimDirection(null,prof.range||17);
+    let target=a.target;
+    if(prof.kind==='zone'&&!target){
+      const lock=this.game.targeting?.get(prof.range);
+      if(lock?.alive&&lock.group)target=lock.group.position.clone();
+      else target=p.pos.clone().addScaledVector(dir,
+        Math.min(prof.range*.76,prof.range<9?5.4:13));
+    }
+    const result=this.aimGuide.updateAim(dir,target);
+    if(result){
+      a.valid=result.valid;
+      if(prof.kind==='zone'){
+        a.target=result.target;
+        const d=result.target.clone().sub(p.pos).setY(0);
+        if(d.lengthSq()>.001)a.dir=d.normalize();
+      }
+    }
   }
   cancelAim(){
     this.aim=null;
     if(this.cancelBtn)this.cancelBtn.hidden=true;
-    if(this.preview){
-      this.game.scene.remove(this.preview);
-      this.preview.geometry.dispose();this.preview.material.dispose();
-      this.preview=null;
-    }
+    this.preview=null;
+    this.aimGuide?.clear();
   }
+
 }
