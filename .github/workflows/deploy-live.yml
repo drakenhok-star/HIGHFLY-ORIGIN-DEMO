@@ -67,6 +67,25 @@ jobs:
           node --input-type=module --check < .site/p6/src/combat/combat.js
           echo "Pages stable: / ; P6 preview: /p6/ (main gameplay unchanged)"
 
+      - name: Add P7 FURY 360 playable preview with premium equipment (stable and P6 preserved)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags --depth=1 origin refs/heads/p7-fury-360-combat-20261104
+          test "$(git rev-parse FETCH_HEAD)" = "55c631cc39dae9b8fb4aab819bf8176ea62d6fc9"
+          mkdir -p .site/p7
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets | tar -x -C .site/p7
+          test -s .site/p7/index.html
+          test -s .site/p7/src/ui/inventory-p7.js
+          test -s .site/p7/src/combat/motion-p7.js
+          test -s .site/p7/src/world/obstacles-p7.js
+          test -s .site/p7/assets/models/player_barbarian.glb
+          find .site/p7/src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+          echo "P7 checked: 55c631cc39dae9b8fb4aab819bf8176ea62d6fc9"
+          echo "Public: / stable · /p6 prior · /p7 FURY 360"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
