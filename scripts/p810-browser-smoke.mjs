@@ -84,7 +84,10 @@ try{
  const playing=await page.evaluate(()=>window.game?.state==='playing' && !window.game?.input?.hudEditing);
  assert.equal(playing,true,'HUD editor closes and returns movement controls');
  await mkdir('audit-output',{recursive:true});
- await page.screenshot({path:'audit-output/p810-mobile-landscape.png',fullPage:true,timeout:30000});
+ if(process.env.HF_CAPTURE==='1'){
+  try{await page.screenshot({path:'audit-output/p810-mobile-landscape.png',animations:'disabled',fullPage:false,timeout:15000});}
+  catch(err){console.warn('[P812] Optional software-rendered screenshot unavailable:',err.message);}
+ }
  await page.locator('#hf-p810-menu').dispatchEvent('pointerdown',{
   pointerId:45,pointerType:'touch',bubbles:true,cancelable:true
  });
@@ -92,7 +95,10 @@ try{
  await page.locator('#hf-p810-quick button').filter({hasText:'GUARDAR'}).click();
  assert.ok(await page.evaluate(()=>localStorage.getItem(window.game.p812Enabled?'highfly_p812_save':'highfly_p810_save')!==null),'P812 and P810 save separately from P7');
  await mkdir('audit-output',{recursive:true});
- await page.screenshot({path:'audit-output/p810-mobile-landscape.png',fullPage:true,timeout:30000});
+ if(process.env.HF_CAPTURE==='1'){
+  try{await page.screenshot({path:'audit-output/p810-mobile-landscape.png',animations:'disabled',fullPage:false,timeout:15000});}
+  catch(err){console.warn('[P812] Optional software-rendered screenshot unavailable:',err.message);}
+ }
  // A failed optional WebGL preview is graceful; actual JS exceptions are not.
  const fatal=errors.filter(s=>/pageerror:|Uncaught|Cannot read properties|Failed to resolve module|Failed to fetch dynamically|404 .*p810|Script error/.test(s));
  if(fatal.length)throw new Error('Browser exceptions: '+fatal.slice(0,5).join('\n'));
