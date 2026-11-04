@@ -2,6 +2,7 @@
  * HIGHFLY P5-A - HUD mobile premium, built on Tianjie5's REAL stats/inventory.
  * No images or private assets. MIT extension. Disable with ?hf_classic_hud=1.
  */
+import { canCancelAction,FURY_CANCEL_P15 } from '../combat/fury-combat-p15.js';
 const LABELS = {
   iron_sword:'Espada de hierro', steel_sword:'Espada de acero',
   ancient_sword:'Espada ancestral', dragonbone_sword:'Espada de hueso de dragón',
@@ -278,6 +279,12 @@ export class PremiumHudP5 {
   }
   tryDash() {
     const g=this.game,now=performance.now();
+    if(g.p15Enabled && g.player.attackT>=0 &&
+       !canCancelAction({kind:'attack',elapsed:g.player.attackT*g.player.actionDuration,
+         step:g.combat?._meleeStep||1,request:'dash',grounded:g.player.onGround})){
+      g.player._queuedDashT=FURY_CANCEL_P15.dashQueue;
+      return;
+    }
     if(now-this.lastDash<(g.p812Enabled?340:g.p7Enabled?420:g.p6Enabled?2200:3000)){g.hud.notify('Dash recargando');return;}
     if(g.player.dashT>=0 || (g.p7Enabled && !g.player.onGround && g.player._airDashCount>=2) ||
       (!g.p7Enabled && g.p6Enabled && !g.player.onGround && g.player._airDashUsed) ||

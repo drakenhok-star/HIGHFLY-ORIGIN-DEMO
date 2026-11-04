@@ -83,8 +83,8 @@ export class HighflyP810{
    ['▣ GUARDAR',()=>this.game.saveSys?.save()],
    ['Ⅱ PAUSAR',()=>this.game.setState('paused')]
   ];
-  if(this.game.p14Enabled){
-   // Reuse existing authored landmarks as a reproducible parkour lab.
+  if(this.game.p14Enabled && !this.game.p15Enabled){
+   // Old P14 playtest-only teleports, removed from P15 player-facing menu.
    const go=(x,z,label)=>{
     const g=this.game,p=g.player;
     p.group.position.set(x,g.terrain.getHeight(x,z)+.12,z);

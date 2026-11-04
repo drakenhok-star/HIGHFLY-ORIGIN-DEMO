@@ -3,6 +3,7 @@ import { ABILITIES_P6, abilityForShout, spendAbilityResource } from './abilities
 import { hasLineOfSight, insideBlockingObject } from './targeting-p6.js';
 import { comboStep } from './motion-p7.js';
 import {AIR_CHAIN_P14,advanceComboClock,airStrikeProfile} from './air-chain-p14.js';
+import {strikeProfile,resolveCombatContext,reactionPolicy,pickMeleeTarget} from './fury-combat-p15.js';
 
 const MELEE_CD = 0.5;
 const CAST_CD = 0.6;
@@ -42,6 +43,7 @@ export class Combat {
     this.airComboGrace=0;
     this.attackBuffer=0;
     this._meleeStep=1;
+    this._meleeContext='ground';
     this.projectiles = [];
     this.projGeo = new THREE.SphereGeometry(0.22, 10, 8);
     this.projMat = new THREE.MeshStandardMaterial({
@@ -65,6 +67,7 @@ export class Combat {
     this._camRay=new THREE.Vector3();
     this._segmentA=new THREE.Vector3();
     this._segmentDelta=new THREE.Vector3();
+    this._hitImpulse=new THREE.Vector3();
   }
 
   collectTargets() {
@@ -198,14 +201,23 @@ export class Combat {
     }
     this.comboStep=step;
     this._meleeStep=step;
+    const context=g.p15Enabled?resolveCombatContext({grounded:g.player.onGround,
+      verticalSpeed:g.player.vel.y,dashRecovery:g.player._dashFollowupT>0,
+      runSpeed:Math.hypot(g.player.vel.x,g.player.vel.z)}):'ground';
+    const profile=g.p15Enabled?strikeProfile(step,context):null;
+    this._meleeContext=context;
     this.comboTimer=g.p14Enabled?1.65:g.p7Enabled?1.45:0.92;
     if(g.p14Enabled && !g.player.onGround)this.keepAirCombo('air-attack');
-    this.meleeCd=g.p7Enabled?(step===4?0.42:0.34):g.p6Enabled ? (step===4?0.47:0.32) : MELEE_CD;
+    this.meleeCd=profile?profile.cooldown:
+      g.p7Enabled?(step===4?0.42:0.34):g.p6Enabled ? (step===4?0.47:0.32) : MELEE_CD;
     this.attackBuffer=0;
     if(g.p7Enabled){
       const previous=this._attackTarget;
       const stillValid=previous && g.targeting?.valid(previous,4.7,true);
-      this._attackTarget=g.targeting?.valid(g.targeting.locked,4.7,true)?g.targeting.locked
+      const proposed=g.p15Enabled?pickMeleeTarget(this.collectTargets(),g.player.pos,
+        stillValid?previous:null,g.targeting?.locked,4.5):null;
+      this._attackTarget=g.p15Enabled && proposed && g.targeting?.valid(proposed,4.7,true)
+        ?proposed:g.targeting?.valid(g.targeting.locked,4.7,true)?g.targeting.locked
         :stillValid?previous:g.targeting?.attackTarget(4.5)||null;
       if(this._attackTarget && !g.targeting.locked)g.targeting.soft=this._attackTarget;
       if(!g.p810Enabled)g.hud.notify('COMBO '+step+'/4'+(step===4?' · ¡GOLPE FINAL!':''));
@@ -215,10 +227,11 @@ export class Combat {
     if(g.p6Enabled){
       const rig=g.player.rig;
       g.player.attackClip=rig.clips.has(COMBO_CLIPS[step-1])?COMBO_CLIPS[step-1]:COMBO_CLIPS[0];
-      g.player.actionDuration=step===4?0.43:0.32;
+      g.player.actionDuration=profile?profile.duration:step===4?0.43:0.32;
+      if(profile)g.player._attackFade=profile.fade;
     }
     g.audio.play('swing');
-    this.meleeHitT=g.p6Enabled ? 0.13 : MELEE_HIT_DELAY;
+    this.meleeHitT=profile?profile.hitAt:g.p6Enabled ? 0.13 : MELEE_HIT_DELAY;
   }
 
   resolveMelee() {
@@ -251,7 +264,18 @@ export class Combat {
       const bonus=g.p6Enabled?COMBO_BONUS[this._meleeStep-1]:1;
       const dmg = (g.inventory.weaponDamage() + (g.p7Enabled&&g.inventory.offhandDamage?g.inventory.offhandDamage():0))
         * (1 + (g.stats.level - 1) * 0.05)*bonus*strike.damageMultiplier;
-      e.takeDamage(dmg, forward.clone().multiplyScalar(g.p6Enabled&&this._meleeStep===4?5:3));
+      e.takeDamage(dmg, this._hitImpulse.copy(forward).multiplyScalar(g.p6Enabled&&this._meleeStep===4?5:3));
+      if(g.p15Enabled&&e.alive){
+        const reaction=reactionPolicy({type:e.type,boss:!!e.boss,radius:e.hitRadius,
+          step:this._meleeStep,airborne:aerial,remainingHp:e.hp});
+        if(reaction.stun>0){
+          e.hitstunT=Math.max(e.hitstunT||0,reaction.stun);
+          e.hitPending=-1;e.boltPending=-1;
+          // Enemy visual recoil remains a real rig clip only if present.
+          if(e.rig?.clips?.has('HitReact') && e.animLock<=0)
+            e.rig.play('HitReact',{once:true,fade:.06,timeScale:1.2});
+        }
+      }
       if(g.p14Enabled&&strike.launch&&e.alive&&e.kbVel){
         e.kbVel.y=Math.max(e.kbVel.y,strike.launchVelocity);
       }
@@ -259,8 +283,9 @@ export class Combat {
       g.hud.showEnemyHP(e);
       const chest = this._v2.copy(e.group.position);
       chest.y += Math.min(1.2, Math.max(0.8, e.hitRadius));
+      const fluid=g.p15Enabled && g.performanceP2?.preset==='FLUID';
       g.effects.spawnBurst(chest,g.p6Enabled&&this._meleeStep===4?'#ffd09c':'#b03030',
-        g.p6Enabled?this._meleeStep===4?12:6:8);
+        fluid?(this._meleeStep===4?7:4):(g.p6Enabled?this._meleeStep===4?12:6:8));
     }
   }
 
@@ -328,12 +353,12 @@ export class Combat {
         c.y += Math.min(1.0, e.hitRadius);
         const segLen2=this._segmentDelta.lengthSq();
         const t=segLen2>1e-5?Math.max(0,Math.min(1,
-          c.clone().sub(this._segmentA).dot(this._segmentDelta)/segLen2)):0;
+          this._v3.copy(c).sub(this._segmentA).dot(this._segmentDelta)/segLen2)):0;
         const nearest=this._v2.copy(this._segmentA).addScaledVector(this._segmentDelta,t);
         if (nearest.distanceTo(c) < 1.0 + e.hitRadius &&
           (!g.p6Enabled || hasLineOfSight(g,this._segmentA,nearest))) {
           const dmg = 24 + g.stats.level;
-          e.takeDamage(dmg, p.vel.clone().normalize().multiplyScalar(4));
+          e.takeDamage(dmg, this._hitImpulse.copy(p.vel).normalize().multiplyScalar(4));
           g.effects.spawnBurst(pos, '#ff8c3a', 14);
           g.hud.showEnemyHP(e);
           g.audio.play('hit');
@@ -508,7 +533,7 @@ export class Combat {
     this.shoutCd = 0;
     this.shoutCdMax = 15;
     this.meleeHitT = -1;
-    this.comboStep=0;this.comboTimer=0;this.airComboGrace=0;this.attackBuffer=0;this._meleeStep=1;
+    this.comboStep=0;this.comboTimer=0;this.airComboGrace=0;this.attackBuffer=0;this._meleeStep=1;this._meleeContext='ground';
     this._attackTarget=null;this._castTarget=null;
     for (const id in this.shoutCooldowns) this.shoutCooldowns[id] = 0;
     this.learnedShouts = ['fus'];

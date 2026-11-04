@@ -165,6 +165,7 @@ export class Enemies {
       home: new THREE.Vector3(x, y, z),
       yaw: Math.random() * Math.PI * 2,
       kbVel: new THREE.Vector3(),
+      hitstunT:0,
       wanderTarget: new THREE.Vector3(x, y, z),
       wanderT: Math.random() * 3,
       cdT: 0, aggroT: 0, hitPending: -1, boltPending: -1,
@@ -500,7 +501,12 @@ export class Enemies {
     let mx = 0, mz = 0, sp = 0;
     let faceX = 0, faceZ = 0, hasFace = false;
 
-    if (e.state === 'return') {
+    if (this.game.p15Enabled && e.hitstunT>0){
+      e.hitstunT=Math.max(0,e.hitstunT-dt);
+      // Suppress enemy movement/attack while hit-reacting, but preserve kbVel physics.
+      e.hitPending=-1;e.boltPending=-1;
+      e.cdT=Math.max(e.cdT,.12);
+    } else if (e.state === 'return') {
       const hx = e.home.x - pos.x;
       const hz = e.home.z - pos.z;
       const hd = Math.hypot(hx, hz);

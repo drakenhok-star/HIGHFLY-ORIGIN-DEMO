@@ -3,6 +3,7 @@ import { cameraSafeFraction } from '../combat/targeting-p6.js';
 import { resolveDashDirection,relativeDodgeClip,worldMove,angleTo,wrapAngle } from '../combat/motion-p7.js';
 import { FuryTraversalP13 } from './fury-traversal-p13.js';
 import { landingRock } from './fury-surfaces-p13.js';
+import { canCancelAction } from '../combat/fury-combat-p15.js';
 
 const _tmpV1 = new THREE.Vector3();
 const _tmpV2 = new THREE.Vector3();
@@ -79,6 +80,9 @@ export class Player {
     this._dashAnimStarted=false;
     this._jumpAnimT=0;
     this._jumpAnimStarted=false;
+    this._queuedDashT=0;
+    this._dashFollowupT=0;
+    this._attackFade=.06;
     this.torchOn = false;
 
     this.group = new THREE.Group();
@@ -319,6 +323,11 @@ export class Player {
   // P6 directional evasion and existing WULD share the same movement primitive.
   startDash(opts = {}) {
     this.dashT = 0;
+    if(this.game.p15Enabled){
+      this._dashFollowupT=.36;
+      // The hit marker has already resolved before recovery-cancel is permitted.
+      if(this.attackT>=0){this.attackT=-1;this._attackAnimStarted=false;}
+    }
     if(this.game.p14Enabled && !this.onGround)this.game.combat?.keepAirCombo('air-dash');
     if(this.fury && this.fury.mode!=='AIR')this.fury.stop('dash');
     const direction=opts.direction || (this.game.p7Enabled
@@ -405,6 +414,18 @@ export class Player {
     const groundHere = terrain.getHeight(this.group.position.x, this.group.position.z);
     const inWater = groundHere < terrain.waterY - 0.6;
 
+    if(g.p15Enabled){
+      this._dashFollowupT=Math.max(0,this._dashFollowupT-dt);
+      if(this._queuedDashT>0){
+        this._queuedDashT=Math.max(0,this._queuedDashT-dt);
+        if(this._queuedDashT>0 && (this.attackT<0 ||
+            canCancelAction({kind:'attack',elapsed:this.attackT*this.actionDuration,
+              step:g.combat?._meleeStep||1,request:'dash',grounded:this.onGround}))){
+          this._queuedDashT=0;
+          g.touch?.premium?.tryDash();
+        }
+      }
+    }
     let speed = g.p812Enabled?7.5:6;
     if (moving && (input.keys.has('ShiftLeft') || input.touchSprint) &&
         (g.p14Enabled || stats.useStamina((g.p812Enabled?10:12) * dt))) {
@@ -556,7 +577,7 @@ export class Player {
     if(g.p810Enabled&&this._secondJumpVfxT>0){
       this._secondJumpVfxT=Math.max(0,this._secondJumpVfxT-dt);
       if(this._secondJumpVfxT>0.11 && this._secondJumpVfxT-dt<=0.11 && g.effects){
-        g.effects.spawnBurst(_tmpV2.copy(this.pos).add(new THREE.Vector3(0,0.35,0)),'#83e1ff',5,1.1,0.22,0.13);
+        g.effects.spawnBurst(_tmpV2.copy(this.pos).add(_tmpV3.set(0,.35,0)),'#83e1ff',5,1.1,0.22,0.13);
       }
     }
     const horizSpeed = Math.hypot(this.vel.x, this.vel.z);
@@ -648,7 +669,8 @@ export class Player {
       if (!this._attackAnimStarted) {
         this._attackAnimStarted = true;
         const name=this.rig.clips.has(this.attackClip) ? this.attackClip : ATTACK_CLIP;
-        this.rig.play(name,{once:true,fade:0.06,timeScale:this.actionTimeScale(name)});
+        this.rig.play(name,{once:true,fade:this.game.p15Enabled?this._attackFade:0.06,
+          timeScale:this.actionTimeScale(name)});
       }
     } else if (this.castT >= 0 && this.castT < 1) {
       if (!this._castAnimStarted) {
@@ -824,6 +846,7 @@ export class Player {
     this.attackClip=ATTACK_CLIP;this.actionDuration=ACTION_DURATION;
     this.dashClip=null;this._dashAnimStarted=false;
     this._jumpAnimT=0;this._jumpAnimStarted=false;
+    this._queuedDashT=0;this._dashFollowupT=0;this._attackFade=.06;
     this.torchOn = false;
     this.updateTorch();
     this.faceVillage();
