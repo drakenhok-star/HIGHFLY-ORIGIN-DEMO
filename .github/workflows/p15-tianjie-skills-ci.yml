@@ -1,0 +1,69 @@
+name: HIGHFLY P15 · Tianjie skills lab on native FURY P14
+on:
+  push:
+    branches: [p15-tianjie-moba-skills-lab-20261104]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check first-party JavaScript syntax
+        run: |
+          set -Eeuo pipefail
+          find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+      - name: Run FURY P5-P14 plus P15 checks
+        run: |
+          set -Eeuo pipefail
+          node tests/premium-hud.test.mjs
+          node tests/p6-integral.test.mjs
+          node tests/p7-fury.test.mjs
+          node tests/p810-integral.test.mjs
+          node tests/p812-polish.test.mjs
+          node tests/p13-fury.test.mjs
+          node tests/p14-air-chain.test.mjs
+          node tests/p15-skill-lab.test.mjs
+      - name: Ensure no private kit ZIPs or restricted assets
+        run: |
+          set -Eeuo pipefail
+          test -s LICENSE
+          test -s PROVENANCE.md
+          test -s lab.html
+          test -s assets/models/player_barbarian.glb
+          if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
+            echo 'Restricted media detected'; exit 1
+          fi
+  browser:
+    needs: source-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser driver
+        run: |
+          printf '{"private":true,"type":"module"}\n' > package.json
+          npm install --no-save --no-package-lock playwright-core@1.58.0
+          command -v google-chrome || command -v chromium
+      - name: Simulated Android landscape + real KayKit and mana/stamina smoke
+        run: |
+          set -Eeuo pipefail
+          python3 -m http.server 8957 --bind 127.0.0.1 > /tmp/p15-http.log 2>&1 &
+          CHROME_PATH="$(command -v google-chrome || command -v chromium)" node scripts/p15-browser-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: highfly-p15-s23-landscape-simulated
+          path: audit-output/p15-tianjie-mobile.png
+          if-no-files-found: ignore
+          retention-days: 7
