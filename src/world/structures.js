@@ -487,6 +487,8 @@ export class Structures {
       m.castShadow = true;
       m.receiveShadow = true;
       this.root.add(m);
+      if(this.game.p14Enabled)this.game.scatter?.obstacles?.register(sx,sz,
+        Math.max(.60,m.scale.x*.52),m.position.y,m.position.y+m.scale.y,'stone-pillar');
     }
 
     this._box(4.4, 0.4, 3.2, this.matDarkStone, sc.x, sc.y + 0.1, sc.z, this.root, false);
@@ -543,6 +545,9 @@ export class Structures {
       rock.castShadow = true;
       rock.receiveShadow = true;
       this.root.add(rock);
+      // These authored tower rocks are not instanced scatter; P13 never collided with them.
+      if(this.game.p14Enabled)this.game.scatter?.obstacles?.register(rx,rz,
+        Math.max(.55,sc*.82),rock.position.y-rock.scale.y,rock.position.y+rock.scale.y,'tower-rock');
     }
 
     this.perchPos.set(tx, maxTop + 0.4, tz);

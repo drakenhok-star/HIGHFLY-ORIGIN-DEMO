@@ -319,6 +319,7 @@ export class Player {
   // P6 directional evasion and existing WULD share the same movement primitive.
   startDash(opts = {}) {
     this.dashT = 0;
+    if(this.game.p14Enabled && !this.onGround)this.game.combat?.keepAirCombo('air-dash');
     if(this.fury && this.fury.mode!=='AIR')this.fury.stop('dash');
     const direction=opts.direction || (this.game.p7Enabled
       ? resolveDashDirection(this.game.input.touchMove,this.yaw,this._lastMoveDir,this.bodyYaw)
@@ -405,7 +406,8 @@ export class Player {
     const inWater = groundHere < terrain.waterY - 0.6;
 
     let speed = g.p812Enabled?7.5:6;
-    if (moving && (input.keys.has('ShiftLeft') || input.touchSprint) && stats.useStamina((g.p812Enabled?10:12) * dt)) {
+    if (moving && (input.keys.has('ShiftLeft') || input.touchSprint) &&
+        (g.p14Enabled || stats.useStamina((g.p812Enabled?10:12) * dt))) {
       speed = g.p812Enabled?11.2:10;
     }
     if (inWater) speed *= 0.55;
@@ -460,9 +462,11 @@ export class Player {
     if(wantJump && !furyHandledJump && !inWater && !dashing){
       if(this.onGround && stats.useStamina(8)){
         this.vel.y=9.5;this.onGround=false;this._jumpCount=1;this._jumpBufferT=0;
+        if(g.p14Enabled)g.combat?.keepAirCombo('jump');
       }else if(g.p6Enabled && !this.onGround && this._jumpCount===1 && stats.useStamina(12)){
         this.vel.y=8.8;this._jumpCount=2;this._jumpBufferT=0;
         if(this.fury)this.fury.beginFlip(mx,mz);
+        if(g.p14Enabled)g.combat?.keepAirCombo('double-jump');
         if(g.p810Enabled){
           // Keep a steady airborne pose. Jump_Full_Short on a second impulse
           // makes the head snap on the KayKit rig at mobile frame rates.
@@ -789,7 +793,7 @@ export class Player {
 
     if (best) {
       g.hud.prompt(best.text);
-      if (g.input.justPressed.has('KeyE')) best.exec();
+      if (g.input.justPressed.has('KeyE') && !(g.p14Enabled && this.fury?.isHolding())) best.exec();
     } else {
       g.hud.prompt(null);
     }

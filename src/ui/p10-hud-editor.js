@@ -36,7 +36,7 @@ export class HudEditorP10{
   const p=placeHudItem(it,vw,vh,scale,['combo','perf','header'].includes(id));
   for(const [k,v] of [['position','fixed'],['left',p.left+'px'],['top',p.top+'px'],
     ['right','auto'],['bottom','auto'],['transform','none'],['transform-origin','top left'],
-    ['opacity',String(it.opacity)],['display',it.hidden?'none':(id==='header'||id==='combo'||id==='perf'||id==='joy'?'block':'flex')]]){
+    ['opacity',String(it.opacity)],['display',it.hidden?'none':(id==='combo'&&this.game.p14Enabled&&!el.textContent?'none':(id==='header'||id==='combo'||id==='perf'||id==='joy'?'block':'flex'))]]){
     el.style.setProperty(k,v,'important');
   }
   if(['radar','joy','run','jump','dash','use','s1','atk','s2','s3','s4','lock','next','clear','bag','menu'].includes(id)){

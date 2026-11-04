@@ -19,6 +19,7 @@ export class TouchControls {
       new URLSearchParams(location.search).has('hf_touch');
     game.input.touchMove = { x: 0, y: 0 };
     game.input.touchSprint = false;
+    game.input.touchUseHold = false;
     this.joystickId = null;
     this.cameraId = null;
     this.runIds = new Set();
@@ -104,7 +105,12 @@ export class TouchControls {
     const actions = document.createElement('div');
     actions.className = 'hf-actions';
     root.appendChild(actions);
-    this.addButton(actions,'USAR','',()=>this.key('KeyE'));
+    this.addButton(actions,'USAR','',()=>{
+      // P14: airborne hold is reserved for a grip; ground tap interacts normally.
+      if(!this.game.p14Enabled || this.game.player?.onGround)this.key('KeyE');
+    },pressed=>{
+      if(this.game.p14Enabled)this.game.input.touchUseHold=pressed;
+    });
     this.addButton(actions,'MAGIA','hf-btn-magic',()=>{this.game.input.rightClick=true;});
     this.addButton(actions,'SALTO','',()=>this.key('Space'));
     this.addButton(actions,'CORRER','',()=>{
@@ -194,6 +200,7 @@ export class TouchControls {
     this.game.input.touchMove.x=0;this.game.input.touchMove.y=0;
     this.game.input.touchSprint=false;this.runIds.clear();
     if(this.game.p812Enabled)this.game.input.touchAttackHold=false;
+    if(this.game.p14Enabled)this.game.input.touchUseHold=false;
     if(this.game.p812Enabled){this.runToggle=false;this.runButton?.classList.remove('hf-p812-running');}
     this.joystickId=null;this.cameraId=null;
     if(this.knob)this.knob.style.transform='translate(-50%,-50%)';

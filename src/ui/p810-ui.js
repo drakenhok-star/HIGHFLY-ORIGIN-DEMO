@@ -3,6 +3,7 @@ const CSS="\nbody.hf-p810 #hf-touch{font-family:system-ui,Arial,sans-serif;--hf-
 
 import { HudEditorP10 } from './p10-hud-editor.js';
 import { installP812Polish } from './p812-polish.js';
+import { installP14Polish } from './p14-polish.js';
 import { HighflyPanelsP9 } from './p9-panels.js';
 const node=(tag,cls,txt,parent)=>{
  const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;
@@ -30,6 +31,7 @@ export class HighflyP810{
   this.editor.apply();
   this.panels.updateTabs();
   installP812Polish(this.game,this);
+  installP14Polish(this.game,this);
  }
  mountHud(){
   const root=this.touch.root;
@@ -131,6 +133,9 @@ export class HighflyP810{
    const c=this.game.combat;
    this.combo.textContent=visible&&(c?.comboTimer>0||this.editor.editing)
       ?'⚔ COMBO '+(c?.comboStep||1)+' / 4'+(c?.comboStep===4?' ✦ FINAL':''):'';
+   // P14 fixes the inline !important display previously left by the HUD editor.
+   if(this.game.p14Enabled)this.combo.style.setProperty('display',
+      this.combo.textContent?'block':'none','important');
   }
   if(this.zoom){
    this.zoom.style.display=visible&&!this.editor.editing?'flex':'none';

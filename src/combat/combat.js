@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { ABILITIES_P6, abilityForShout, spendAbilityResource } from './abilities-p6.js';
 import { hasLineOfSight, insideBlockingObject } from './targeting-p6.js';
 import { comboStep } from './motion-p7.js';
+import {AIR_CHAIN_P14,advanceComboClock,airStrikeProfile} from './air-chain-p14.js';
 
 const MELEE_CD = 0.5;
 const CAST_CD = 0.6;
@@ -38,6 +39,7 @@ export class Combat {
     this._castTarget=null;
     this._frostDirection=null;
     this.comboTimer=0;
+    this.airComboGrace=0;
     this.attackBuffer=0;
     this._meleeStep=1;
     this.projectiles = [];
@@ -80,12 +82,24 @@ export class Combat {
     return out;
   }
 
+  keepAirCombo(action){
+    if(!this.game.p14Enabled || this.comboStep<1 || this.comboTimer<=0)return false;
+    this.airComboGrace=Math.max(this.airComboGrace,
+      action==='double-jump'?AIR_CHAIN_P14.aerialComboGrace:
+      action==='air-dash'?AIR_CHAIN_P14.transitionGrace:1.2);
+    this.comboTimer=Math.max(this.comboTimer,.55);
+    return true;
+  }
   update(dt) {
     this.meleeCd = Math.max(0, this.meleeCd - dt);
     this.castCd = Math.max(0, this.castCd - dt);
     if(this.game.p6Enabled){
-      this.comboTimer=Math.max(0,this.comboTimer-dt);
-      if(this.comboTimer<=0){this.comboStep=0;this._attackTarget=null;}
+      if(this.game.p14Enabled){
+        const tick=advanceComboClock(this.comboTimer,this.airComboGrace,dt,
+          this.game.player.onGround,this.comboStep);
+        this.comboTimer=tick.timer;this.airComboGrace=tick.grace;
+      }else this.comboTimer=Math.max(0,this.comboTimer-dt);
+      if(this.comboTimer<=0){this.comboStep=0;this._attackTarget=null;this.airComboGrace=0;}
       this.attackBuffer=Math.max(0,this.attackBuffer-dt);
     }
     for (const id in this.shoutCooldowns) {
@@ -184,7 +198,8 @@ export class Combat {
     }
     this.comboStep=step;
     this._meleeStep=step;
-    this.comboTimer=g.p7Enabled?1.45:0.92;
+    this.comboTimer=g.p14Enabled?1.65:g.p7Enabled?1.45:0.92;
+    if(g.p14Enabled && !g.player.onGround)this.keepAirCombo('air-attack');
     this.meleeCd=g.p7Enabled?(step===4?0.42:0.34):g.p6Enabled ? (step===4?0.47:0.32) : MELEE_CD;
     this.attackBuffer=0;
     if(g.p7Enabled){
@@ -221,7 +236,12 @@ export class Combat {
     for (let i = 0; i < targets.length; i++) {
       const e = targets[i];
       const to = this._v1.copy(e.group.position).sub(player.pos);
-      if (to.length() >= 3.4 + e.hitRadius * 0.5) continue;
+      const aerial=g.p14Enabled&&!player.onGround;
+      const strike=airStrikeProfile(this._meleeStep,aerial,e);
+      const horizontal=Math.hypot(to.x,to.z);
+      const bodyVertical=Math.abs((e.group.position.y+Math.min(.95,e.hitRadius||.9))-(player.pos.y+1.0));
+      if(horizontal >= 3.4+e.hitRadius*.5 ||
+          (g.p14Enabled?bodyVertical>strike.maxVerticalDistance:to.length()>=3.4+e.hitRadius*.5))continue;
       to.y = 0;
       if (to.lengthSq() < 1e-6) to.copy(forward);
       to.normalize();
@@ -230,8 +250,11 @@ export class Combat {
           {x:e.group.position.x,y:e.group.position.y+Math.min(1.3,e.hitRadius||1),z:e.group.position.z})) continue;
       const bonus=g.p6Enabled?COMBO_BONUS[this._meleeStep-1]:1;
       const dmg = (g.inventory.weaponDamage() + (g.p7Enabled&&g.inventory.offhandDamage?g.inventory.offhandDamage():0))
-        * (1 + (g.stats.level - 1) * 0.05)*bonus;
+        * (1 + (g.stats.level - 1) * 0.05)*bonus*strike.damageMultiplier;
       e.takeDamage(dmg, forward.clone().multiplyScalar(g.p6Enabled&&this._meleeStep===4?5:3));
+      if(g.p14Enabled&&strike.launch&&e.alive&&e.kbVel){
+        e.kbVel.y=Math.max(e.kbVel.y,strike.launchVelocity);
+      }
       g.audio.play('hit');
       g.hud.showEnemyHP(e);
       const chest = this._v2.copy(e.group.position);
@@ -485,7 +508,7 @@ export class Combat {
     this.shoutCd = 0;
     this.shoutCdMax = 15;
     this.meleeHitT = -1;
-    this.comboStep=0;this.comboTimer=0;this.attackBuffer=0;this._meleeStep=1;
+    this.comboStep=0;this.comboTimer=0;this.airComboGrace=0;this.attackBuffer=0;this._meleeStep=1;
     this._attackTarget=null;this._castTarget=null;
     for (const id in this.shoutCooldowns) this.shoutCooldowns[id] = 0;
     this.learnedShouts = ['fus'];

@@ -36,7 +36,8 @@ export class FuryTraversalP13{
  isRunning(){return this.mode==='WALL_RUN';}
  beginFlip(mx,mz){
   if(this.flipT>=0)return false;
-  if(!this.game.stats.useStamina(FURY_PARKOUR.flipEnergy))return false;
+  // P14: the flip is a visual variant of the paid double jump, never double-charged.
+  if(!this.game.p14Enabled && !this.game.stats.useStamina(FURY_PARKOUR.flipEnergy))return false;
   this.flipType=Math.abs(mx)>Math.abs(mz)
     ?(mx<0?'left':'right'):(mz>0?'back':'front');
   this.flipT=0;this.flipDone=false;
@@ -79,7 +80,8 @@ export class FuryTraversalP13{
    if(this.mode!=='AIR')this.stop('dash-or-interior');
    return;
   }
-  const facing=this.surface ? dirX*this.surface.nx+dirZ*this.surface.nz : 0;
+  const wantsGrip=!g.p14Enabled || Boolean(g.input?.touchUseHold || g.input?.keys?.has('KeyE'));
+  if(this.mode==='HANG' && !wantsGrip){this.stop('released-grip');return;}
   if(this.mode==='HANG'){
    if(!this.surface || !g.stats.useStamina(FURY_PARKOUR.ledgeHangEnergyPerSec*dt)){
     this.stop('ledge-energy-empty');return;
@@ -106,7 +108,7 @@ export class FuryTraversalP13{
    return;
   }
   if(this.cooldown>0 || !surface || !moving || dirX*surface.nx+dirZ*surface.nz>-.08)return;
-  if(canGrabLedge(surface,p.pos.y,p.vel.y,true)){
+  if(wantsGrip && canGrabLedge(surface,p.pos.y,p.vel.y,true)){
    this.mode='HANG';this.surface=surface;
    this.hangY=surface.top-1.04;
    p.vel.x=0;p.vel.y=0;p.vel.z=0;
