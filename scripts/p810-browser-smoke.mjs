@@ -67,6 +67,21 @@ try{
   assert.equal(finisher.step,4,'fourth hit triggers from an existing chain');
   assert.equal(finisher.mode,'launch','UP joystick is captured as fourth-hit launch');
   assert.ok(finisher.vy>8.5 && finisher.energySpent,'launcher has real vertical physics and usual attack cost');
+  const interruption=await page.evaluate(()=>{
+    const g=window.game,c=g.combat,s=g.stats,p=g.player;
+    c.comboStep=3;c.comboTimer=.8;c.meleeHitT=.1;c._finisher={mode:'launch'};
+    const initialHp=s.hp;
+    p.dodgeInvulnT=.12;
+    s.damage(5);
+    const dodgeKept=c.comboStep===3 && s.hp===initialHp;
+    p.dodgeInvulnT=0;
+    s.damage(5);
+    const hitBroke=c.comboStep===0&&c.meleeHitT===-1&&c._finisher===null&&s.hp<initialHp;
+    s.hp=initialHp;
+    return {dodgeKept,hitBroke};
+  });
+  assert.ok(interruption.dodgeKept,'successful dodge preserves combo and HP');
+  assert.ok(interruption.hitBroke,'real enemy hit breaks the combo and pending fourth strike');
  }
  if(await page.evaluate(()=>window.game.p13Enabled)){
    const ready=await page.evaluate(()=>({

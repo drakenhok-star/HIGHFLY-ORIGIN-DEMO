@@ -56,3 +56,17 @@ El cuarto ATK almacena la dirección del joystick **cuando comienza el golpe**, 
 
 CI: \`tests/p15-finisher.test.mjs\` verifica las cuatro direcciones, orientación con cámara, diagonales, umbral neutro, inmunidades y snapshot.
 Browser: prueba la cuarta entrada real \`combat.melee()\` con joystick arriba, coste de Energía y captura de elevación.
+
+
+## Regla definitiva de interrupción de combo
+- Cualquier **daño efectivo** recibido mientras se juega rompe el combo inmediatamente y cancela el impacto pendiente.
+- DASH con estilo \`dodge\` tiene una ventana corta de evasión (~125 ms); si realmente evita el daño, la cadena se conserva.
+- Los saltos, mortales y dashes permitidos conservan el combo sólo dentro de las ventanas y el reloj de la cadena.
+- Cuando expira el tiempo permitido se reinicia el combo, sin guardar el cuarto remate.
+- Actualmente NO hay un botón activo de guardia ni parry en HIGHFLY; no se inventa bloqueo al recibir daño.
+- En un módulo futuro podemos agregar guardia con escudo: una guardia exitosa deberá enviar resultado 'blocked' y conservar combo;
+  la mitigación parcial que todavía deja entrar HP puede tratarse distinto según diseño de juego.
+- KayKit Character Animations 1.1 (CC0) publica animaciones de bloquear/impacto, no una IA defensiva ni física de derribo.
+- World of ClaudeCraft v0.44.7 (commit 493c35a) tiene código MIT de bloqueo/parry con escudo: src/sim/combat/warrior_hit_table.ts;
+  stuns: src/sim/combat/cc.ts, stun_dr.ts; retroceso con barrido de colisiones: src/sim/knockback.ts.
+  Son mecánicas para estudiar/adaptar, no código o assets transplantados a P15.
