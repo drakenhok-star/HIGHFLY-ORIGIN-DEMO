@@ -77,7 +77,7 @@ try{
  const changed=await page.evaluate(()=>{
    const editor=window.game.touch.premium.p810.editor;
    editor.choose('atk');editor.change('size',102);editor.persist();
-   return [editor.layout.atk.size,JSON.parse(localStorage.getItem('hf_p10_hud_layout_v1')).layout.atk.size];
+   return [editor.layout.atk.size,JSON.parse(localStorage.getItem(window.game.p812Enabled?'hf_p812_hud_layout_v2':'hf_p10_hud_layout_v1')).layout.atk.size];
  });
  assert.deepEqual(changed,[102,102],'HUD size saved');
  await page.locator('#hf-p10-editor button').filter({hasText:'TERMINAR'}).first().click();
