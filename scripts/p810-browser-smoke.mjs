@@ -26,7 +26,16 @@ try{
  await page.waitForFunction(()=>window.game?.state==='playing',null,{timeout:12000});
  assert.ok(await page.locator('#hf-p810-bag').isVisible(),'bag shortcut visible');
  assert.ok(await page.locator('#hf-p810-menu').isVisible(),'four-tile menu visible');
- assert.ok(await page.locator('#hf-worldmini').isVisible(),'real minimap visible');
+ await page.locator('#hf-worldmini').waitFor({state:'visible',timeout:10000}).catch(async err=>{
+  const why=await page.evaluate(()=>{
+   const mini=document.querySelector('#hf-worldmini');
+   return {game:window.game?.state,hasMap:!!window.game?.worldMapP34,
+     mounted:window.game?.touch?.premium?.p810?._mapMounted,
+     inline:mini?.getAttribute('style'),computed:mini?getComputedStyle(mini).cssText:null,
+     bounds:mini?.getBoundingClientRect().toJSON()};
+  });
+  throw new Error('Real minimap not visible: '+JSON.stringify(why));
+ });
  assert.ok(await page.locator('#hf-p810-perf').isVisible(),'FPS monitor visible');
  const editorCount=await page.evaluate(()=>window.game.touch.premium.p810.editor.elements.size);
  assert.ok(editorCount>=13,'HUD editor registered live gameplay controls');

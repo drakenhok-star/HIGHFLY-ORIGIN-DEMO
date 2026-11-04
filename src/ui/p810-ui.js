@@ -23,6 +23,9 @@ export class HighflyP810{
   const style=node('style',null,CSS,document.head);style.id='highfly-p810-style';
   this.editor=new HudEditorP10(hud);
   this.mountHud();
+  // The async module loads after Game construction; map already exists.
+  // Register radar immediately rather than relying on one more GPU render frame.
+  if(this.game.worldMapP34)this.mountMap();
   this.editor.apply();
   this.panels.updateTabs();
  }

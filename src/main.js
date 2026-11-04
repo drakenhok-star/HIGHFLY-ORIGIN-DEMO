@@ -113,6 +113,9 @@ class Game {
     if (this.mobileAudit) this.mobileAudit.setState(s);
     if (this.performanceP2) this.performanceP2.setState(s);
     if (this.worldMapP34) this.worldMapP34.setState(s);
+    if (this.p810Enabled && this.worldMapP34?.mini){
+      this.worldMapP34.mini.style.visibility=s==='playing'?'visible':'hidden';
+    }
     if (s === 'playing') this.requestPointerLock();
     else this.releasePointerLock();
   }
