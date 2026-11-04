@@ -1,0 +1,56 @@
+name: HIGHFLY ORIGIN · Build and publish MIT/CC0 demo
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/publish-pages.yml"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "highfly-pages"
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: github-pages
+    timeout-minutes: 20
+    steps:
+      - name: Checkout HIGHFLY public source and patches
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Build full game from pinned public Tianjie5 MIT and declared CC0 models
+        shell: bash
+        run: bash scripts/bootstrap_public_demo.sh
+
+      - name: Commit validated playable source files (first publication)
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add LICENSE index.html styles.css server.mjs src lib assets .nojekyll
+          if ! git diff --cached --quiet; then
+            git commit -m "feat(public): materialize runnable MIT/CC0 HIGHFLY demo"
+            git push origin HEAD:main
+          else
+            echo "Original assets and game source already current"
+          fi
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload static game
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .public-site
+
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
