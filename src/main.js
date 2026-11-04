@@ -367,7 +367,10 @@ function loop(time) {
     game.camera.lookAt(0, 8, 40);
   }
 
-  if(game.p812Enabled && game.performanceP2?.preset==='FLUID'){
+  if(game.p812Enabled && (game.state==='inventory'||game.state==='quests')){
+    // Keep the scene frozen while inventory/quest overlays cover it; preview 3D
+    // renders separately and can update at a low frame rate.
+  }else if(game.p812Enabled && game.performanceP2?.preset==='FLUID'){
     // FLUID mode does not require a full-screen postprocessing composer pass.
     // Renderer already owns SRGB output and ACES tone mapping.
     game.renderer.render(game.scene,game.camera);

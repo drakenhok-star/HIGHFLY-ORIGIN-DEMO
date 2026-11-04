@@ -86,6 +86,14 @@ export class HighflyPanelsP9 {
    const row=el('div','hf-p9-eqline',undefined,info);
    el('span',null,title,row);el('strong',null,String(value),row);
   };
+  if(g.p812Enabled){
+   line('Nivel del cazador',st.level);
+   line('Daño equipado',inv.weaponDamage()+inv.offhandDamage());
+   line('Defensa',inv.armorValue());
+   const btn=el('button',null,'✦ VER ESTADÍSTICAS DETALLADAS',info);
+   btn.addEventListener('click',()=>{this.settingsSection='stats';this.hud.show('settings');});
+   return;
+  }
   line('Nivel',st.level);
   line('Experiencia',Math.floor(st.xp)+' / '+st.xpNext());
   line('Vida',Math.ceil(st.hp)+' / '+st.maxHp);

@@ -146,7 +146,7 @@ export class PremiumInventoryP7 {
     }
    }
   }
-  if(!this.game.p812Enabled || this.tab!=='equipment')
+  if(!this.game.p812Enabled)
    act(this.game.player.torchOn?'🔥 APAGAR ANTORCHA':'🔥 ENCENDER ANTORCHA',()=>this.game.player.toggleTorch());
  }
  initPreview(){
