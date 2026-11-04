@@ -53,3 +53,34 @@ jobs:
           path: audit-output/animation_inventory_p6.json
           if-no-files-found: ignore
           retention-days: 14
+
+  mobile-browser-smoke:
+    runs-on: ubuntu-latest
+    needs: integrate
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser automation library (no Codespaces)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          printf '{"private":true,"type":"module"}\n' > package.json
+          npm install --no-save --no-package-lock playwright-core@1.58.0
+          command -v google-chrome || command -v chromium
+      - name: Run real browser HUD and movement input smoke
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m http.server 8957 --bind 127.0.0.1 > /tmp/highfly-p810-http.log 2>&1 &
+          CHROME_PATH="$(command -v google-chrome || command -v chromium)" node scripts/p810-browser-smoke.mjs
+      - name: Upload viewport screenshot for visual comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: highfly-p810-chromium-mobile-screenshot
+          path: audit-output/p810-mobile-landscape.png
+          if-no-files-found: ignore
+          retention-days: 10
