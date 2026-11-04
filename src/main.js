@@ -37,6 +37,7 @@ class Game {
     this.state = 'menu';
     this.time = { elapsed: 0, dayTime: 0.35, dayLength: 600 };
     this.p6Enabled=!new URLSearchParams(location.search).has('hf_p6_off');
+    this.p7Enabled=!new URLSearchParams(location.search).has('hf_p7_off');
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     // P1 quality HIGH baseline: restore original render scale on Android.
@@ -333,6 +334,7 @@ function loop() {
   }
 
   game.composer.render();
+  if(game.touch?.premium?.p7Inventory)game.touch.premium.p7Inventory.update(dt);
   game.p6Perf.mark('render');
   game.p6Perf.end();
   game.mobileAudit.end();

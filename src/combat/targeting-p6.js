@@ -5,6 +5,7 @@
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export function insideBlockingObject(game,x,y,z,pad=0) {
   const s=game.structures;
+  if(game.p7Enabled && game.scatter?.obstacles?.blocked(x,y,z,pad))return true;
   if(!s || (game.interiors && game.interiors.inside)) return false;
   const terrain=game.terrain;
   for(const c of s.colliders || []) {
@@ -76,6 +77,16 @@ export class TargetingP6 {
   acquire(maxRange=this.range){
     return this.candidates(maxRange,false)[0]||null;
   }
+  acquireAny(maxRange=4.5){
+    return this.candidates(maxRange,true).sort((a,b)=>{
+      const p=this.game.player.pos;
+      return Math.hypot(a.group.position.x-p.x,a.group.position.z-p.z)-Math.hypot(b.group.position.x-p.x,b.group.position.z-p.z);
+    })[0]||null;
+  }
+  attackTarget(maxRange=4.5){
+    if(this.valid(this.locked,maxRange,true))return this.locked;
+    return this.acquireAny(maxRange);
+  }
   get(maxRange=this.range){
     if(this.valid(this.locked,maxRange,true))return this.locked;
     if(this.valid(this.soft,maxRange,false))return this.soft;
@@ -83,7 +94,7 @@ export class TargetingP6 {
   }
   toggle(){
     if(this.locked){this.locked=null;this.game.hud.notify('Objetivo libre');return;}
-    this.locked=this.acquire();
+    this.locked=this.game.p7Enabled?this.acquireAny(this.range):this.acquire();
     this.game.hud.notify(this.locked?'Objetivo fijado: '+this.locked.name:'No hay objetivo visible');
   }
   next(){

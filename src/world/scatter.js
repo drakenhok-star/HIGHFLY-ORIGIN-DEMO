@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { makeNoise2D, mulberry32, fbm } from '../core/noise.js';
+import { NatureObstaclesP7 } from './obstacles-p7.js';
 
 const REGION = 700;
 const GRASS_COUNT = 36000;
@@ -34,6 +35,7 @@ export class Scatter {
   constructor(game) {
     this.game = game;
     this.meshes = [];
+    this.obstacles = game.p7Enabled ? new NatureObstaclesP7(12) : null;
     this.forestNoise = makeNoise2D(1338);
     this.rand = mulberry32(1339);
     this.buildPines();
@@ -114,6 +116,7 @@ export class Scatter {
       p.set(t.x, t.y - 0.2, t.z);
       sc.set(scale, scale, scale);
       variants[key].push(new THREE.Matrix4().compose(p, q, sc));
+      if(this.obstacles)this.obstacles.register(t.x,t.z, key==='pine_snow'?0.9:Math.max(0.45,scale*0.48),t.y-0.8,t.y+10,'tree');
     }
 
     for (const key of Object.keys(variants)) {
@@ -155,6 +158,7 @@ export class Scatter {
         const base = 0.7 + (s - 0.5) * 0.3;
         sc.set(base * jx, base * jy, base * jz);
         large.push(new THREE.Matrix4().compose(p, q, sc));
+        if(this.obstacles)this.obstacles.register(x,z,Math.max(0.8,Math.min(1.7,base*1.12)),y-0.7,y+2.2,'large-rock');
       } else {
         e.set(rx, ry, rz);
         q.setFromEuler(e);
@@ -162,6 +166,7 @@ export class Scatter {
         // rock1 原生仅 0.6u，旧 1u 十二面体的 3 倍补齐体量。
         sc.set(s * jx * 3, s * jy * 3, s * jz * 3);
         small.push(new THREE.Matrix4().compose(p, q, sc));
+        if(this.obstacles)this.obstacles.register(x,z,Math.max(0.38,Math.min(1.4,s*0.41)),y-0.6,y+1.9,'rock');
       }
     }
 
