@@ -1,0 +1,62 @@
+name: HIGHFLY ORIGIN · Deploy updated public game
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "styles.css"
+      - "src/**"
+      - "lib/**"
+      - "assets/**"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "highfly-pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: github-pages
+    timeout-minutes: 20
+    steps:
+      - name: Checkout current public game
+        uses: actions/checkout@v4
+
+      - name: Validate public game content
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -f LICENSE
+          test -f index.html
+          test -f assets/manifest.json
+          test -f assets/models/player_barbarian.glb
+          node --input-type=module --check < src/main.js
+          node --input-type=module --check < src/ui/touch-controls.js
+          echo "OK: juego público verificable"
+
+      - name: Prepare static Pages site from current source
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p .site
+          cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets .site/
+          touch .site/.nojekyll
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .site
+
+      - name: Publish updated game
+        id: deployment
+        uses: actions/deploy-pages@v4
