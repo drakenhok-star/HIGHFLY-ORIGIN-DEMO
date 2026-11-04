@@ -71,3 +71,76 @@ body.hf-skills-lab #hf-touch .hf-lab-cooling {filter:saturate(.5)!important}
   #hf-tianjie-skills-lab .hf-lab-sub>span {display:none}
   #hf-tianjie-skills-lab #hf-lab-message {display:none}
 }
+
+/* P16 / SUPER-AIM: the gameplay telegraph is a true 3D ground decal
+   rendered by aim-guide-p16.js, never an HTML or one-pixel CSS line.
+   Keep the original FURY controls, header and map fully accessible. */
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-top {
+  width:min(930px,72vw);
+  max-height:35vh;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes {
+  display:flex;flex-wrap:nowrap;gap:5px;
+  max-width:min(710px,100%);width:auto;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes button {
+  min-width:0;white-space:nowrap;
+  padding:6px 10px;letter-spacing:.2px;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes button:nth-child(4) {
+  border-color:#ffae77;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes button:nth-child(5) {
+  border-color:#79dfff;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-sub {
+  flex-wrap:nowrap;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-cancel:not([hidden]) {
+  animation:hf-lab-cancel-pulse 1.0s ease-in-out infinite alternate;
+}
+@keyframes hf-lab-cancel-pulse {
+  from {box-shadow:0 0 2px #f7749d}
+  to {box-shadow:0 0 13px #fc557b}
+}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-title {
+  white-space:nowrap;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-message {
+  max-width:min(680px,70vw);
+}
+@media(max-height:460px) {
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-top {
+    top:3px;left:50%;max-height:34vh;gap:2px;
+    width:min(780px,70vw);
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-title {
+    font-size:10px;padding:2px 7px;
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes {
+    gap:4px;
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes button {
+    font-size:9px;min-height:24px;padding:3px 5px;
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-sub>span {
+    display:none;
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-message {
+    font-size:9px;padding:2px 6px;
+  }
+}
+@media(max-width:900px) and (orientation:landscape) {
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-top {
+    left:49%;width:min(660px,68vw);
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-title span {
+    font-size:8px;
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes button {
+    font-size:8px;padding:3px 4px;
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-message {
+    display:none;
+  }
+}
