@@ -177,6 +177,29 @@ jobs:
           echo "P14 pinned to CI-green commit e8d0dcbccf86aaee2380e1da3e27b3d8e8a1bbce"
           echo "Paths kept: /, /p6/, /p7/, /p810/, /p812/, /p13/, /p14/"
 
+      - name: Add P15 FURY Combat Evolution and directional fourth hit preview (keep older paths)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags --depth=1 origin refs/heads/p15-fury-combat-evolution-20261104
+          test "$(git rev-parse FETCH_HEAD)" = "768dd202c95da57f9b6c02e06a5d8d0a251203d1"
+          mkdir -p .site/p15
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets | tar -x -C .site/p15
+          test -s .site/p15/index.html
+          test -s .site/p15/src/combat/fury-combat-p15.js
+          test -s .site/p15/src/combat/fury-finisher-p15.js
+          test -s .site/p15/src/player/fury-traversal-p13.js
+          test -s .site/p15/src/ui/p14-polish.js
+          test -s .site/p15/assets/models/player_barbarian.glb
+          find .site/p15/src -name '*.js' -type f -print0 | while IFS= read -r -d '' f; do
+            node --input-type=module --check < "$f"
+          done
+          if find .site/p15 -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
+            echo "Restricted assets detected"; exit 1
+          fi
+          echo "P15 published from SHA 768dd202c95da57f9b6c02e06a5d8d0a251203d1, CI verified"
+          echo "Previous /, /p6/, /p7/, /p810/, /p812/, /p13/, /p14/ untouched"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
