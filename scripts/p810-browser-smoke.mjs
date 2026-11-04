@@ -42,6 +42,15 @@ try{
  await page.locator('#btn-new').click({timeout:30000});
  await page.waitForFunction(()=>window.game?.state==='playing',null,{timeout:12000});
  assert.ok(await page.locator('#hf-p810-bag').isVisible(),'bag shortcut visible');
+ if(await page.evaluate(()=>window.game.p15Enabled)){
+  const p15=await page.evaluate(()=>({saveKey:window.game.saveSys.key,active:window.game.p15Enabled,
+   menuText:document.getElementById('hf-p810-quick')?.textContent||'',
+   initialized:window.game.combat?._meleeContext==='ground'}));
+  assert.ok(p15.active&&p15.initialized,'P15 combat registered in the live 3D game');
+  assert.equal(p15.saveKey,'highfly_p15_save','save is separate from P14');
+  assert.ok(!p15.menuText.includes('PROBAR PARKOUR')&&!p15.menuText.includes('MESETA MONTAÑOSA'),
+   'temporary P14 teleport tools removed from player menu');
+ }
  if(await page.evaluate(()=>window.game.p13Enabled)){
    const ready=await page.evaluate(()=>({
      traversal:!!window.game.player.fury,
@@ -115,7 +124,7 @@ try{
  });
  assert.ok(await page.locator('#hf-p810-quick').isVisible(),'quick menu really expands');
  await page.locator('#hf-p810-quick button').filter({hasText:'GUARDAR'}).click();
- assert.ok(await page.evaluate(()=>localStorage.getItem(window.game.p14Enabled?'highfly_p14_save':window.game.p13Enabled?'highfly_p13_save':window.game.p812Enabled?'highfly_p812_save':'highfly_p810_save')!==null),'P812 and P810 save separately from P7');
+ assert.ok(await page.evaluate(()=>localStorage.getItem(window.game.p15Enabled?'highfly_p15_save':window.game.p14Enabled?'highfly_p14_save':window.game.p13Enabled?'highfly_p13_save':window.game.p812Enabled?'highfly_p812_save':'highfly_p810_save')!==null),'P812 and P810 save separately from P7');
  await mkdir('audit-output',{recursive:true});
  if(process.env.HF_CAPTURE==='1'){
   try{await page.screenshot({path:'audit-output/p810-mobile-landscape.png',animations:'disabled',fullPage:false,timeout:15000});}
