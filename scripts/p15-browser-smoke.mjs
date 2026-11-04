@@ -62,12 +62,12 @@ try{
   await page.locator('[data-style="0"]').dispatchEvent('pointerdown',{
     pointerId:52,pointerType:'touch',bubbles:true,cancelable:true
   });
-  // Browser software-WebGL can run below 5 FPS. Use the GAME CLOCK, not wall time,
-  // to wait for real recovery windows and avoid false skill failures.
-  await page.waitForFunction(()=>window.highflySkillsLab.now() >
-    window.highflySkillsLab.busyUntil + .02,null,{timeout:20000});
+  // Headless SwiftShader can run at <1 FPS. Advance only the test game clock
+  // beyond the 0.12s recovery window, then exercise the REAL skill and resources.
+  // A separate integration test covers normal realtime UI and input.
   const magical=await page.evaluate(()=>{
     const g=window.game,l=window.highflySkillsLab;
+    g.time.elapsed=Math.max(g.time.elapsed,l.busyUntil+.05);
     const old=g.stats.mp;
     const success=l.cast(1,g.player.getCombatForward(),'QA');
     return {success,spent:old-g.stats.mp,cd:l.cooldown(1)};
