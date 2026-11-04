@@ -114,6 +114,25 @@ export class TianjieSkillVfx {
     }
     this.sparks(world.clone().add(new THREE.Vector3(0,.55,0)),p[2],38,1.8,.7,.16);
   }
+  landingMarker(world,radius=2.45,life=1.12,style=0){
+    const c=this.palette(style);
+    this.ring(world,radius,c[1],life);
+    this.ring(world,radius*.6,c[0],life);
+    this.sparks(world.clone().add(new THREE.Vector3(0,.09,0)),c[0],17,1,.52,.11);
+  }
+  fallingMeteor(world,life=.75){
+    const geo=new THREE.IcosahedronGeometry(.95,1);
+    const mat=new THREE.MeshBasicMaterial({color:0xff9448,transparent:true,opacity:1,depthWrite:false});
+    const meteor=new THREE.Mesh(geo,mat);
+    const landingY=world.y+.9;
+    meteor.position.set(world.x,landingY+11.5,world.z);
+    this.add(meteor,life,'meteor');
+    const ev=this.active[this.active.length-1];
+    ev.landingY=landingY;
+    ev.fallHeight=11.5;
+    this.orbit(world,3,3,.7);
+    return meteor;
+  }
   // P16 original particle/mesh effects: no copied animations or textures.
   pulse(world,radius,color,life=.5){
     const mesh=this.ring(world,radius,color,life);
@@ -198,6 +217,11 @@ export class TianjieSkillVfx {
         const scale=.25+t*1.5;
         a.mesh.scale.setScalar(scale);
         a.mesh.rotation.z+=dt*.32;
+      }
+      if(a.kind==='meteor'){
+        a.mesh.position.y=a.landingY+a.fallHeight*Math.pow(1-t,1.35);
+        a.mesh.rotation.y+=dt*2.7;
+        a.mesh.scale.setScalar(.75+t*.58);
       }
     }
   }
