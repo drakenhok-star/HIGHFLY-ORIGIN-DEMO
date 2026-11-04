@@ -678,7 +678,7 @@ export class Player {
         const safeDistance=this.camDist*fraction;
         if(!this._cameraReady || (fraction<0.99 && cam.position.distanceTo(target)>safeDistance+0.25))
           cam.position.copy(goal);
-        else cam.position.lerp(goal,1-Math.exp(-(g.p810Enabled?(this.cameraSmoothing||12):12)*dt));
+        else cam.position.lerp(goal,1-Math.exp(-(this.game.p810Enabled?(this.cameraSmoothing||12):12)*dt));
       }else cam.position.copy(goal);
       this._cameraReady=true;
       const minY=terrain.getHeight(cam.position.x,cam.position.z)+0.5;
