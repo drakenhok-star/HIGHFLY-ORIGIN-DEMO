@@ -250,6 +250,7 @@ export class TianjieMobaSkillsLab {
       this.activeLeap={started:this.now(),deadline:this.now()+1.6,
         intended:raw.clone(),initial:at.clone(),landed:false};
       this.fx.ascend(at,travelDir);
+      this.fx.landingMarker(raw,2.45,1.17,0);
       this.announce('ASCENSO: ¡el daño y la elevación ocurren al aterrizar!');
     }
     if(slot===3){
