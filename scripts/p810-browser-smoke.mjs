@@ -31,6 +31,14 @@ try{
    throw new Error('Splash still blocking entry: '+JSON.stringify(info)+' ERR '+err.message+
        ' JS '+errors.slice(0,4).join(', '));
  });
+ if(await page.evaluate(()=>window.game.p14Enabled)){
+   const ghost=await page.evaluate(()=>{
+     const el=document.getElementById('hf-p810-combo');
+     return {text:el?.textContent,display:el?getComputedStyle(el).display:null};
+   });
+   assert.equal(ghost.text,'','no combo text on title screen');
+   assert.equal(ghost.display,'none','empty combo panel hidden before starting game');
+ }
  await page.locator('#btn-new').click({timeout:30000});
  await page.waitForFunction(()=>window.game?.state==='playing',null,{timeout:12000});
  assert.ok(await page.locator('#hf-p810-bag').isVisible(),'bag shortcut visible');
@@ -73,6 +81,10 @@ try{
  });
  await page.waitForFunction(()=>window.game?.state==='inventory',null,{timeout:7000});
  assert.ok(await page.locator('.p7-grid').isVisible(),'MOCHILA is a slot grid');
+ if(await page.evaluate(()=>window.game.p14Enabled)){
+   const gap=await page.locator('.p7-grid').evaluate(el=>parseFloat(getComputedStyle(el).rowGap));
+   assert.ok(gap>=11,'P14 backpack rows must have actual vertical spacing');
+ }
  const filled=await page.locator('.p7-cell:not(.empty)').count();
  assert.ok(filled>=3,'actual player bag items appear');
  await page.locator('.hf-p5-tabs button').filter({hasText:'INVENTARIO'}).first().click();
@@ -103,7 +115,7 @@ try{
  });
  assert.ok(await page.locator('#hf-p810-quick').isVisible(),'quick menu really expands');
  await page.locator('#hf-p810-quick button').filter({hasText:'GUARDAR'}).click();
- assert.ok(await page.evaluate(()=>localStorage.getItem(window.game.p13Enabled?'highfly_p13_save':window.game.p812Enabled?'highfly_p812_save':'highfly_p810_save')!==null),'P812 and P810 save separately from P7');
+ assert.ok(await page.evaluate(()=>localStorage.getItem(window.game.p14Enabled?'highfly_p14_save':window.game.p13Enabled?'highfly_p13_save':window.game.p812Enabled?'highfly_p812_save':'highfly_p810_save')!==null),'P812 and P810 save separately from P7');
  await mkdir('audit-output',{recursive:true});
  if(process.env.HF_CAPTURE==='1'){
   try{await page.screenshot({path:'audit-output/p810-mobile-landscape.png',animations:'disabled',fullPage:false,timeout:15000});}
