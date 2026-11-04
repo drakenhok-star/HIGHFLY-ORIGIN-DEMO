@@ -60,15 +60,19 @@ try{
   await page.locator('[data-style="0"]').dispatchEvent('pointerdown',{
     pointerId:52,pointerType:'touch',bubbles:true,cancelable:true
   });
-  await page.waitForTimeout(300);
+  // Browser software-WebGL can run below 5 FPS. Use the GAME CLOCK, not wall time,
+  // to wait for real recovery windows and avoid false skill failures.
+  await page.waitForFunction(()=>window.highflySkillsLab.now() >
+    window.highflySkillsLab.busyUntil + .02,null,{timeout:20000});
   const magical=await page.evaluate(()=>{
     const g=window.game,l=window.highflySkillsLab;
     const old=g.stats.mp;
     const success=l.cast(1,g.player.getCombatForward(),'QA');
     return {success,spent:old-g.stats.mp,cd:l.cooldown(1)};
   });
+  console.log('MAGICAL CHECK:',JSON.stringify(magical));
   assert.ok(magical.success&&magical.spent>=13&&magical.spent<=14.1&&magical.cd>0,
-    'magical S1 uses Tianjie MP and launches projectile');
+    'magical S1 uses Tianjie MP and launches projectile: '+JSON.stringify(magical));
   await mkdir('audit-output',{recursive:true});
   await page.screenshot({path:'audit-output/p15-tianjie-mobile.png',
     animations:'disabled',timeout:20000});
