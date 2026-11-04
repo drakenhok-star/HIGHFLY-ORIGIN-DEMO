@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { hasLineOfSight, insideBlockingObject } from '../combat/targeting-p6.js';
 import { TianjieSkillVfx } from './lab-vfx.js';
+import { TianjieAimGuide, AIM_PROFILES } from './aim-guide-p16.js';
+import { castClaudeSkill } from './claudecraft-kit-p16.js';
 
 // Tianjie FURY P14 remains authoritative for camera, physics, KayKit rig,
 // locomotion, jump, dash, aerial combos, ATK and world RPG. This module owns
@@ -11,7 +13,11 @@ export const LAB_STYLES = Object.freeze([
   Object.freeze({ name:'ASALTANTE ABISAL',short:'ABISAL',cost:[18,25,42],cd:[5,12,32],
     names:['CORTES DE FURIA','PASO / RECAST','CORTE FINAL'] }),
   Object.freeze({ name:'GUARDIÁN GRAVITACIONAL',short:'GUARDIÁN',cost:[18,25,42],cd:[6,14,44],
-    names:['ONDA DE HIERRO','EMBESTIDA / RECAST','COLAPSO'] })
+    names:['ONDA DE HIERRO','EMBESTIDA / RECAST','COLAPSO'] }),
+  Object.freeze({ name:'CLAUDECRAFT · MAGO',short:'CLAUDE MAGO',cost:[20,42,27],cd:[3.8,17,13],
+    names:['FIREBALL · CINDERBOLT','METEOR · SKYSTONE','FROST NOVA · ICEBIND'] }),
+  Object.freeze({ name:'CLAUDECRAFT · PÍCARO',short:'CLAUDE PÍCARO',cost:[17,25,22],cd:[3.2,12,10],
+    names:['BACKSTAB · CRAVEN THRUST','KIDNEY SHOT · LOW BLOW','CHARGE · ONRUSH'] })
 ]);
 const PALETTE=['#ac79ff','#ff607f','#f0c976'];
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
@@ -29,6 +35,8 @@ export class TianjieMobaSkillsLab {
     this.projectiles=[];
     this.exposed=new WeakMap();
     this.fx=new TianjieSkillVfx(game);
+    this.aimGuide=new TianjieAimGuide(game);
+    this.activeLeap=null;
     this.aim=null;
     this.preview=null;
     this.aimPoint=null;
@@ -48,8 +56,10 @@ export class TianjieMobaSkillsLab {
   styleDef(){return LAB_STYLES[this.style];}
   announce(s){this.note.textContent=s;this.game.hud?.notify?.(s);}
   setStyle(i){
-    this.style=clamp(i|0,0,2);
-    // Keep cooldowns per style; only old recast gets cleared.
+    this.cancelAim();
+    this.style=clamp(i|0,0,LAB_STYLES.length-1);
+    // P16 preserves all per-style cooldowns, including off-screen styles.
+    // Recast closes on switch but cannot reset a skill cooldown.
     this.recastUntil=0;this.recastStyle=-1;
     this.renderHud(true);
   }
@@ -136,13 +146,33 @@ export class TianjieMobaSkillsLab {
   schedule(delay,fn){this.events.push({at:this.now()+delay,fn});}
   consume(slot){
     const def=this.styleDef(),price=def.cost[slot-1],stats=this.game.stats;
-    return this.style===0?stats.useMagicka(price):stats.useStamina(price);
+    return (this.style===0||this.style===3)?stats.useMagicka(price):stats.useStamina(price);
   }
-  cast(slot,requested=null,origin='touch'){
+  cast(slot,requested=null,origin='touch',requestedTarget=null){
     const g=this.game;
     if(g.state!=='playing'||slot<1||slot>3)return false;
     if(g.stats.hp<=0)return false;
     const t=this.now(),dir=this.aimDirection(requested);
+    if(this.activeLeap&&this.style===0&&slot===3){
+      this.announce('Esperá a aterrizar para encadenar TEMPESTAD');
+      return false;
+    }
+    const pr=AIM_PROFILES[this.style]?.[slot-1];
+    let groundTarget=null;
+    if(pr?.kind==='zone' && !(slot===2&&this.canRecast())){
+      const raw=requestedTarget?.clone() ||
+        this.game.targeting?.get(pr.range)?.group?.position?.clone() ||
+        g.player.pos.clone().addScaledVector(dir,pr.range*.76);
+      const delta=raw.clone().sub(g.player.pos).setY(0);
+      if(delta.length()>pr.range)delta.setLength(pr.range);
+      groundTarget=g.player.pos.clone().add(delta);
+      groundTarget.y=g.terrain.getHeight(groundTarget.x,groundTarget.z);
+      const forbidden=insideBlockingObject(g,groundTarget.x,groundTarget.y+1,groundTarget.z,.5)||
+        !hasLineOfSight(g,
+          {x:g.player.pos.x,y:g.player.pos.y+1.1,z:g.player.pos.z},
+          {x:groundTarget.x,y:groundTarget.y+1.1,z:groundTarget.z});
+      if(forbidden){this.announce('Destino bloqueado: apuntá a una zona despejada');return false;}
+    }
     if(slot===2&&this.canRecast()){
       if(g.player.dashT>=0)return false;
       this.recastUntil=0;
@@ -163,13 +193,15 @@ export class TianjieMobaSkillsLab {
     if(!this.consume(slot)){this.announce(this.style===0?'MANÁ insuficiente':'ENERGÍA insuficiente');return false;}
     this.ready[this.style][slot-1]=t+this.styleDef().cd[slot-1];
     this.busyUntil=t+(slot===3?.30:.12);
-    if(slot===2){
+    if(slot===2&&this.style>0&&this.style<3){
       this.recastStyle=this.style;
       this.recastUntil=t+3.5;
     }
-    if(this.style===0)this.aerial(slot,dir);
+    // AERIAL recast starts only after actual ground impact, not takeoff.
+    if(this.style===0)this.aerial(slot,dir,groundTarget);
     else if(this.style===1)this.rift(slot,dir);
-    else this.guardian(slot,dir);
+    else if(this.style===2)this.guardian(slot,dir);
+    else castClaudeSkill(this,slot,dir,groundTarget);
     this.animatePlayer(slot);
     this.renderHud(true);
     return true;
@@ -178,7 +210,7 @@ export class TianjieMobaSkillsLab {
     const p=this.game.player;
     // Combat animations use the actual KayKit barbarian animation controller.
     // There is no new animation rig and never a substituted test avatar.
-    if(this.style===0){
+    if(this.style===0||this.style===3){
       p.castT=0;p._castAnimStarted=false;
     }else{
       p.attackT=0;p._attackAnimStarted=false;
@@ -187,7 +219,7 @@ export class TianjieMobaSkillsLab {
     }
     p.actionDuration=slot===3?.42:.32;
   }
-  aerial(slot,dir){
+  aerial(slot,dir,landingTarget=null){
     const g=this.game,p=g.player,at=p.pos.clone();
     if(slot===1){
       this.fx.launch(at,dir,0);
@@ -201,23 +233,24 @@ export class TianjieMobaSkillsLab {
       this.projectiles.push({mesh,dir:dir.clone(),speed:28,remaining:17,style:0});
     }
     if(slot===2){
-      // Tianjie's native dash zeros vertical velocity while onGround.
-      // Start the magical launch in the same native airborne state used by P14,
-      // so the first dash frame cannot erase the upward impulse.
+      // Authentic skill ordering: AIM GROUND -> TAKE OFF -> TRAVEL -> LAND
+      // -> AoE impact -> lift enemies. Never deal damage at dash start.
+      // FURY owns physical movement/collisions/terrain and KayKit pose.
+      const raw=landingTarget?.clone()||at.clone().addScaledVector(dir,6);
+      const toward=raw.clone().sub(at).setY(0);
+      const distance=clamp(toward.length(),.5,7.4);
+      const travelDir=toward.lengthSq()>.01?toward.normalize():dir;
       if(p.onGround){
-        p.onGround=false;
-        p._jumpCount=Math.max(1,p._jumpCount||0);
-        p._jumpBufferT=0;
-        g.combat?.keepAirCombo?.('jump');
+        p.onGround=false;p._jumpCount=Math.max(1,p._jumpCount||0);
+        p._jumpBufferT=0;g.combat?.keepAirCombo?.('jump');
       }
-      p.vel.y=Math.max(p.vel.y,8.3);
-      p.startDash({direction:{x:dir.x,z:dir.z},speed:17,duration:.4,style:'dodge'});
-      this.fx.launch(at,dir,0);
-      this.schedule(.41,()=>{
-        const hit=this.hitSphere(g.player.pos,2.45,84,{launch:true,stun:1.15});
-        this.fx.impact(g.player.pos.clone(),0,2.45);
-        if(hit)this.announce('¡ELEVACIÓN! Encadená S3.');
-      });
+      p.vel.y=Math.max(p.vel.y,8.6);
+      p.startDash({direction:{x:travelDir.x,z:travelDir.z},
+        speed:Math.max(12,distance/.36),duration:.36,style:'dodge'});
+      this.activeLeap={started:this.now(),deadline:this.now()+1.6,
+        intended:raw.clone(),initial:at.clone(),landed:false};
+      this.fx.ascend(at,travelDir);
+      this.announce('ASCENSO: ¡el daño y la elevación ocurren al aterrizar!');
     }
     if(slot===3){
       this.busyUntil=this.now()+.25;
@@ -276,9 +309,10 @@ export class TianjieMobaSkillsLab {
       });
     }
     if(slot===3){
-      const center=at.add(dir.clone().multiplyScalar(1.4));
-      this.fx.vortex(center,4.8,2);
+      // Tigreal-like pull follows OUR character, not a displaced target.
+      this.fx.vortex(p.pos.clone(),4.8,2);
       for(let tick=0;tick<8;tick++)this.schedule(tick*.09,()=>{
+        const center=p.pos.clone();
         for(const e of this.candidates(center,4.8)){
           if(e.boss||e.type==='dragon')continue;
           const pull=center.clone().sub(e.group.position).setY(0);
@@ -288,7 +322,7 @@ export class TianjieMobaSkillsLab {
         }
         if(tick===7){
           this.hitSphere(center,4.8,105,{launch:true,stun:1.25});
-          this.fx.impact(center,2,4.8);
+          this.fx.landing(center,2,4.8);
         }
       });
     }
@@ -301,11 +335,14 @@ export class TianjieMobaSkillsLab {
       this.events.length=0;
       this.ready=LAB_STYLES.map(()=>[0,0,0]);
       this.recastUntil=0;
+      this.activeLeap=null;
+      this.busyUntil=0;
     }
     if(this.lastSpawn<0){
       this.lastSpawn=now; // one real CC0 training group per session reset
       this.spawnTraining(false);
     }
+    this.updateLeap();
     for(let i=this.events.length-1;i>=0;i--){
       const ev=this.events[i];
       if(ev.at>now)continue;
@@ -328,9 +365,10 @@ export class TianjieMobaSkillsLab {
           const projection=clamp(to.dot(pr.dir),0,step);
           const closest=old.clone().addScaledVector(pr.dir,projection);
           if(closest.distanceTo(e.group.position.clone().add(vec(0,1,0)))<(e.hitRadius||1)+.39){
-            this.struck(e,65,pr.dir);
-            e.applySlow?.(.72,1.3);
-            this.fx.impact(closest,0,1.5);
+            this.struck(e,pr.damage??65,pr.dir);
+            if(pr.burn)this.applyBurn(e,pr.burn.ticks,pr.burn.perTick,pr.burn.interval);
+            else e.applySlow?.(.72,1.3);
+            this.fx.impact(closest,pr.style,1.5);
             impact=true;break;
           }
         }
@@ -342,6 +380,7 @@ export class TianjieMobaSkillsLab {
       }
     }
     this.fx.update(dt);
+    if(this.aim)this.refreshPreview();
     if(now-this.lastHud>.11){this.lastHud=now;this.renderHud();}
   }
 
@@ -378,11 +417,13 @@ export class TianjieMobaSkillsLab {
     root.id='hf-tianjie-skills-lab';
     root.setAttribute('translate','no');
     root.innerHTML=`<div class="hf-lab-top">
-      <strong class="hf-lab-title">HIGHFLY <span>TIANJIE · SKILLS LAB P15</span></strong>
+      <strong class="hf-lab-title">HIGHFLY <span>TIANJIE · AIM + VFX P16</span></strong>
       <div class="hf-lab-modes">
         <button type="button" data-style="0">✦ AÉREA</button>
         <button type="button" data-style="1">⚔ ABISAL</button>
         <button type="button" data-style="2">◉ GUARDIÁN</button>
+        <button type="button" data-style="3">☄ CLAUDE MAGO</button>
+        <button type="button" data-style="4">✦ CLAUDE PÍCARO</button>
       </div>
       <div class="hf-lab-sub">
         <span id="hf-lab-readout">S1 · S2 · S3 NUEVAS | S4 WULD ORIGINAL</span>
@@ -419,7 +460,7 @@ export class TianjieMobaSkillsLab {
     const def=this.styleDef();
     for(const b of this.root.querySelectorAll('[data-style]'))
       b.classList.toggle('active',Number(b.dataset.style)===this.style);
-    this.readout.textContent=def.name+' · '+(this.style===0?'MANÁ':'ENERGÍA')+
+    this.readout.textContent=def.name+' · '+((this.style===0||this.style===3)?'MANÁ':'ENERGÍA')+
       ' · S1 '+def.names[0]+' | S2 '+(this.canRecast()?'¡RECAST DISPONIBLE!':def.names[1])+
       ' | S3 '+def.names[2];
     // Use EXISTING P14 S1-S3 buttons, not duplicates. CSS shows labels from
@@ -438,7 +479,7 @@ export class TianjieMobaSkillsLab {
   bindKeyboard(){
     document.addEventListener('keydown',e=>{
       if(this.game.state!=='playing'||e.repeat)return;
-      const n={Digit5:0,Digit6:1,Digit7:2}[e.code];
+      const n={Digit5:0,Digit6:1,Digit7:2,Digit8:3,Digit9:4}[e.code];
       if(n!==undefined)this.setStyle(n);
       if(e.code==='Escape'&&this.aim)this.cancelAim();
     },true);
