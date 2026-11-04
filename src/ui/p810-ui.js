@@ -92,7 +92,7 @@ export class HighflyP810{
     p.fury?.reset();
     g.hud.notify(label+' · SALTO + mantener USAR para agarrarte');
    };
-   items.splice(4,0,
+   items.push(
     ['🏔 PROBAR PARKOUR',()=>go(-220,-161,'Monolitos de piedra')],
     ['❄ MESETA MONTAÑOSA',()=>go(360,-183,'Meseta nevada')]
    );
