@@ -49,6 +49,8 @@ export class Player {
     this.bodyYaw = 0;
     this.currentWeapon = null;
     this.currentArmor = null;
+    this.currentOffhand=null;
+    this._offhandSword=null;
     this._attackAnimStarted = false;
     this._castAnimStarted = false;
     this._swordParts = null;
@@ -176,6 +178,7 @@ export class Player {
 
     const style = WEAPON_STYLES[id] || WEAPON_STYLES.iron_sword;
     for (const part of this._swordParts) {
+      part.root.visible=!!id;
       part.root.scale.copy(part.baseScale).multiplyScalar(style.scale || 1);
       for (const m of part.meshes) this.applyMaterialStyle(m, style);
     }
@@ -193,9 +196,27 @@ export class Player {
     for (const m of this._armorParts.cape) this.applyMaterialStyle(m, style.cape || {});
   }
 
-  // 装备外观总入口：监视 inventory.equipped 变化（武器 + 护甲）
+  // Uses the SAME licensed sword asset as the right hand; no new GLBs.
+  updateOffhandVisual() {
+    const id=this.game.inventory?.equipped.offhand||null;
+    if(id===this.currentOffhand)return;
+    this.currentOffhand=id;
+    if(this._offhandSword){this._offhandSword.removeFromParent();this._offhandSword=null;}
+    if(!id)return;
+    const bone=this.rig.root.getObjectByName('handslotl');
+    const src=this.game.assets._lib.sword?.gltf?.scene;
+    if(!bone||!src){console.warn('[P7] Falta anclaje/espada secundaria');return;}
+    const off=src.clone(true);off.name='highfly_offhand_sword';
+    const style=WEAPON_STYLES[id]||WEAPON_STYLES.iron_sword;
+    off.scale.multiplyScalar(style.scale||1);
+    off.traverse(o=>{if(o.isMesh){this.prepClonedMaterials(o);this.applyMaterialStyle(o,style);}});
+    bone.add(off);this._offhandSword=off;
+    this.torchOn=false;
+  }
+
   applyEquipment() {
     this.updateWeaponVisual();
+    this.updateOffhandVisual();
     this.updateArmorVisual();
   }
 
@@ -260,6 +281,17 @@ export class Player {
       + 0.18 * Math.sin(el * 47.3)
       + 0.1 * Math.sin(el * 29.7);
     this._torchFlame.scale.y = 1 + 0.1 * Math.sin(el * 11.3) + 0.05 * Math.sin(el * 37.1);
+  }
+
+  toggleTorch(){
+    if(!this.torchOn && this.game.p7Enabled && this.game.inventory.equipped.offhand){
+      this.game.hud.notify('Desequipá la espada secundaria para usar antorcha');return false;
+    }
+    this.torchOn=!this.torchOn;
+    this.updateTorch();
+    this.game.hud.notify(this.torchOn?'Antorcha encendida':'Antorcha apagada');
+    if(this.torchOn)this.game.audio.play('cast');
+    return true;
   }
 
   // P6 directional evasion and existing WULD share the same movement primitive.
@@ -332,12 +364,7 @@ export class Player {
       this.firstPerson = !this.firstPerson;
     }
 
-    if (input.justPressed.has('KeyT')) {
-      this.torchOn = !this.torchOn;
-      g.hud.notify(this.torchOn ? 'Antorcha encendida' : 'Antorcha apagada');
-      // 复用施法短噪声当点火声（audio.play 无音量参数，cast 峰值本就低）
-      if (this.torchOn) g.audio.play('cast');
-    }
+    if (input.justPressed.has('KeyT'))this.toggleTorch();
 
     let mx = 0, mz = 0;
     if (input.keys.has('KeyW')) mz -= 1;
@@ -743,6 +770,8 @@ export class Player {
     this.rig.play('Idle', { fade: 0 });
     this.currentWeapon = null;
     this.currentArmor = null;
+    this.currentOffhand=null;
+    if(this._offhandSword){this._offhandSword.removeFromParent();this._offhandSword=null;}
     this.applyEquipment();
   }
 }

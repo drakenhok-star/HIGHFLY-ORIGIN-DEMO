@@ -28,7 +28,7 @@ export class Inventory {
       ['cloth_armor', 1],
       ['health_potion', 3],
     ]);
-    this.equipped = { weapon: 'iron_sword', armor: 'cloth_armor' };
+    this.equipped = { weapon: 'iron_sword', offhand: null, armor: 'cloth_armor' };
     this.gold = 50;
   }
 
@@ -54,7 +54,7 @@ export class Inventory {
     return (this.slots.get(id) || 0) > 0;
   }
 
-  useOrEquip(id) {
+  useOrEquip(id, slot=null) {
     const item = ITEM_DB[id];
     if (!item || !this.has(id)) return;
     if (item.type === 'potion') {
@@ -69,17 +69,35 @@ export class Inventory {
       }
       this.game.audio.play('potion');
     } else if (item.type === 'weapon' || item.type === 'armor') {
-      this.equipped[item.type] = id;
-      this.game.hud.notify('Equipado: ' + item.name);
+      const targetSlot=slot==='offhand'&&item.type==='weapon'?'offhand':item.type;
+      if(targetSlot==='offhand' && this.equipped.weapon===id && this.slots.get(id)<2){
+        this.game.hud.notify('Necesitás dos copias de esa espada.');return false;
+      }
+      if(targetSlot==='weapon' && this.equipped.offhand===id && this.slots.get(id)<2){
+        this.game.hud.notify('La otra mano ya usa esa única espada.');return false;
+      }
+      this.equipped[targetSlot] = id;
+      if(targetSlot==='offhand'&&this.game.player){this.game.player.torchOn=false;this.game.player.updateTorch();}
+      this.game.hud.notify('Equipado: ' + item.name+(targetSlot==='offhand'?' (mano secundaria)':''));
     }
+    return true;
+  }
+
+  unequip(slot) {
+    if(!['weapon','offhand','armor'].includes(slot))return;
+    this.equipped[slot]=null;
+    this.game.hud.notify('Objeto desequipado');
   }
 
   weaponDamage() {
-    return ITEM_DB[this.equipped.weapon].damage;
+    return ITEM_DB[this.equipped.weapon]?.damage || 2;
+  }
+  offhandDamage() {
+    return this.equipped.offhand ? Math.round((ITEM_DB[this.equipped.offhand]?.damage||0)*0.3) : 0;
   }
 
   armorValue() {
-    return ITEM_DB[this.equipped.armor].armor;
+    return ITEM_DB[this.equipped.armor]?.armor || 0;
   }
 
   openChest(chest) {
@@ -109,7 +127,7 @@ export class Inventory {
   serialize() {
     return {
       slots: Array.from(this.slots.entries()),
-      equipped: { weapon: this.equipped.weapon, armor: this.equipped.armor },
+      equipped: { weapon: this.equipped.weapon, offhand: this.equipped.offhand, armor: this.equipped.armor },
       gold: this.gold,
     };
   }
@@ -117,10 +135,15 @@ export class Inventory {
   applyData(d) {
     if (!d) return;
     this.slots = new Map(d.slots || []);
+    const eq=d.equipped||{};
+    const valid=(id,type)=>id===null||(ITEM_DB[id]?.type===type && this.has(id));
     this.equipped = {
-      weapon: (d.equipped && d.equipped.weapon) || 'iron_sword',
-      armor: (d.equipped && d.equipped.armor) || 'cloth_armor',
+      weapon:valid(eq.weapon,'weapon')?eq.weapon:'iron_sword',
+      armor:valid(eq.armor,'armor')?eq.armor:'cloth_armor',
+      offhand:valid(eq.offhand,'weapon')?eq.offhand:null
     };
+    if(this.equipped.weapon && this.equipped.offhand===this.equipped.weapon &&
+       (this.slots.get(this.equipped.weapon)||0)<2)this.equipped.offhand=null;
     // Number.isFinite 挡手改存档写入的 NaN/字符串
     this.gold = Number.isFinite(d.gold) ? d.gold : 50;
   }

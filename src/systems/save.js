@@ -1,9 +1,11 @@
-const KEY = 'tianjie5_save';
+const LEGACY_KEY = 'tianjie5_save';
+const KEY = 'highfly_p7_save';
 
 export class SaveSys {
   constructor(game) {
     this.game = game;
     this.autosaveTimer = 0;
+    this.key=game.p7Enabled?KEY:LEGACY_KEY;
   }
 
   save() {
@@ -14,7 +16,7 @@ export class SaveSys {
     const yaw = g.interiors && typeof g.interiors.saveYaw === 'function' ? g.interiors.saveYaw() : g.player.yaw;
     const data = {
       dayTime: g.time.dayTime,
-      player: { x: pos.x, y: pos.y, z: pos.z, yaw },
+      player: { x: pos.x, y: pos.y, z: pos.z, yaw, torchOn:!!g.player.torchOn },
       stats: g.stats.serialize(),
       inv: g.inventory.serialize(),
       quests: g.quests.serialize(),
@@ -24,16 +26,17 @@ export class SaveSys {
         .filter((i) => i >= 0),
       dragonDead: !dragon || !dragon.alive,
     };
-    localStorage.setItem(KEY, JSON.stringify(data));
+    localStorage.setItem(this.key, JSON.stringify(data));
     g.hud.notify('已保存');
   }
 
   hasSave() {
-    return localStorage.getItem(KEY) !== null;
+    return localStorage.getItem(this.key) !== null || (this.game.p7Enabled && localStorage.getItem(LEGACY_KEY)!==null);
   }
 
   loadRaw() {
-    const raw = localStorage.getItem(KEY);
+    // First P7 visit reads P6 progress, but writes ONLY P7: original never overwritten.
+    const raw = localStorage.getItem(this.key) || (this.game.p7Enabled?localStorage.getItem(LEGACY_KEY):null);
     if (!raw) return null;
     // 持久化数据是外部边界，损坏存档按无存档处理
     try {
@@ -69,6 +72,9 @@ export class SaveSys {
     }
     if (d.player) {
       g.player.pos.set(d.player.x, d.player.y, d.player.z);
+      if(this.game.p7Enabled){g.player.torchOn=!!d.player.torchOn;
+        if(g.inventory.equipped.offhand)g.player.torchOn=false;
+        g.player.updateTorch();}
       if (typeof d.player.yaw === 'number') {
         g.player.yaw = d.player.yaw;
         // 同步身体朝向，避免读档后第一帧身体从重置朝向转过来
