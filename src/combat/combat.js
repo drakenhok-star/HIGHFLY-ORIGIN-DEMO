@@ -288,7 +288,7 @@ export class Combat {
       if(g.p15Enabled&&e.alive){
         const reaction=reactionPolicy({type:e.type,boss:!!e.boss,radius:e.hitRadius,
           step:this._meleeStep,airborne:aerial,remainingHp:e.hp});
-        if(reaction.stun>0){
+        if(reaction.stun>0 && !e.blocking && !e.defending && !e.ccImmune){
           e.hitstunT=Math.max(e.hitstunT||0,
             directional?this._finisher.stun:reaction.stun);
           e.hitPending=-1;e.boltPending=-1;
