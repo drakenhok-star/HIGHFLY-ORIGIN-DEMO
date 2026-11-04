@@ -239,7 +239,13 @@ export class Combat {
     g.player._attackAnimStarted=false;
     if(g.p6Enabled){
       const rig=g.player.rig;
-      g.player.attackClip=rig.clips.has(COMBO_CLIPS[step-1])?COMBO_CLIPS[step-1]:COMBO_CLIPS[0];
+      // Closest verified sword clip for directional remate; a true uppercut
+      // animation remains a future rig asset, never invent a non-existent GLB clip.
+      const finisherClip=step===4&&g.p15Enabled&&this._finisher
+        ?(this._finisher.mode==='launch'?COMBO_CLIPS[0]:
+          (this._finisher.mode==='left'||this._finisher.mode==='right')?COMBO_CLIPS[1]:COMBO_CLIPS[3])
+        :COMBO_CLIPS[step-1];
+      g.player.attackClip=rig.clips.has(finisherClip)?finisherClip:COMBO_CLIPS[0];
       g.player.actionDuration=profile?profile.duration:step===4?0.43:0.32;
       if(profile)g.player._attackFade=profile.fade;
     }
