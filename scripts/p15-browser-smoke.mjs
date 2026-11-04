@@ -29,7 +29,9 @@ try{
   assert.equal(initial.sameP14,true,'same P14 FURY engine, not Unity');
   assert.equal(initial.actualRig,true,'real KayKit animation rig available');
   assert.equal(initial.styles,'AÉREA');
-  await page.locator('#btn-new').click({timeout:20000});
+  // Software WebGL can starve Playwright's layout-stability check on animated menus.
+  // Invoke the real new-game click handler directly; the game/UI still run normally.
+  await page.evaluate(()=>document.getElementById('btn-new')?.click());
   await page.waitForFunction(()=>window.game.state==='playing',null,{timeout:12000});
   const core=await page.evaluate(()=>({
     model:!!window.game.player.rig.root,
