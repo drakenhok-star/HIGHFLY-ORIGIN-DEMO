@@ -33,7 +33,7 @@ export class HudEditorP10{
   const el=this.elements.get(id),it=this.layout[id];if(!el||!it)return;
   const vw=window.innerWidth,vh=window.innerHeight;
   const scale=Math.min(1.22,Math.max(.72,Math.min(vw/915,vh/412)));
-  const p=placeHudItem(it,vw,vh,scale);
+  const p=placeHudItem(it,vw,vh,scale,['combo','perf','header'].includes(id));
   for(const [k,v] of [['position','fixed'],['left',p.left+'px'],['top',p.top+'px'],
     ['right','auto'],['bottom','auto'],['transform','none'],['transform-origin','top left'],
     ['opacity',String(it.opacity)],['display',it.hidden?'none':(id==='header'||id==='combo'||id==='perf'||id==='joy'?'block':'flex')]]){

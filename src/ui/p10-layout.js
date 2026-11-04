@@ -2,9 +2,9 @@
 export const HUD_LAYOUT_KEY='hf_p10_hud_layout_v1';
 export const HUD_LAYOUT_VERSION=1;
 export const HUD_DEFAULTS=Object.freeze({
- joy:{x:.025,y:.66,size:122},run:{x:.43,y:.82,size:54},
- jump:{x:.51,y:.82,size:58},dash:{x:.59,y:.82,size:58},
- use:{x:.67,y:.82,size:56},s1:{x:.75,y:.82,size:58},atk:{x:.85,y:.765,size:90},
+ joy:{x:.025,y:.66,size:122},run:{x:.43,y:.75,size:54},
+ jump:{x:.51,y:.75,size:58},dash:{x:.59,y:.75,size:58},
+ use:{x:.67,y:.75,size:56},s1:{x:.75,y:.75,size:58},atk:{x:.85,y:.695,size:90},
  s2:{x:.75,y:.625,size:51},s3:{x:.825,y:.52,size:51},s4:{x:.905,y:.555,size:51},
  lock:{x:.61,y:.57,size:43},next:{x:.665,y:.49,size:42},clear:{x:.72,y:.445,size:37},
  radar:{x:.845,y:.014,size:122},bag:{x:.855,y:.395,size:50},
@@ -30,9 +30,10 @@ export function sanitizeHudLayout(input={}){
  for(const id of ['joy','atk','jump','dash','use','menu'])out[id].hidden=false;
  return out;
 }
-export function placeHudItem(item,width,height,scale=1){
+export function placeHudItem(item,width,height,scale=1,autoHeight=false){
  const w=Math.max(250,width),h=Math.max(200,height);
  const size=clamp(item.size*scale,20,Math.min(w*.5,h*.57));
- const top=clamp(item.y*h,4,h-size-4),left=clamp(item.x*w,4,w-size-4);
+ const drawHeight=autoHeight?Math.min(120,Math.max(23,size*.12)):size;
+ const top=clamp(item.y*h,4,h-drawHeight-4),left=clamp(item.x*w,4,w-size-4);
  return {left,top,size,opacity:item.opacity};
 }

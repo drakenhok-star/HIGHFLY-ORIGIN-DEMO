@@ -7,6 +7,8 @@ const {HUD_LAYOUT_KEY,HUD_IDS,HUD_DEFAULTS,sanitizeHudLayout,placeHudItem}=await
 assert.equal(HUD_LAYOUT_KEY,'hf_p10_hud_layout_v1');
 assert.ok(HUD_IDS.includes('radar')&&HUD_IDS.includes('atk')&&HUD_IDS.includes('combo'));
 const defaults=sanitizeHudLayout();
+const comboPlace=placeHudItem(defaults.combo,915,412,1,true);
+assert.ok(comboPlace.top>360,'combo notification remains at bottom, not mid-screen');
 const sequence=['run','jump','dash','use','s1','atk'];
 assert.deepEqual(sequence,sequence.toSorted((a,b)=>defaults[a].x-defaults[b].x),
  'primary row is CORRER / SALTO / DASH / USAR / S1 / ATK');
