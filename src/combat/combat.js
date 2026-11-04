@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { ABILITIES_P6, abilityForShout, spendAbilityResource } from './abilities-p6.js';
 import { hasLineOfSight, insideBlockingObject } from './targeting-p6.js';
+import { comboStep } from './motion-p7.js';
 
 const MELEE_CD = 0.5;
 const CAST_CD = 0.6;
@@ -33,6 +34,8 @@ export class Combat {
     this.shoutCdMax = 15;
     this.meleeHitT = -1;
     this.comboStep=0;
+    this._attackTarget=null;
+    this._castTarget=null;
     this.comboTimer=0;
     this.attackBuffer=0;
     this._meleeStep=1;
@@ -81,7 +84,7 @@ export class Combat {
     this.castCd = Math.max(0, this.castCd - dt);
     if(this.game.p6Enabled){
       this.comboTimer=Math.max(0,this.comboTimer-dt);
-      if(this.comboTimer<=0)this.comboStep=0;
+      if(this.comboTimer<=0){this.comboStep=0;this._attackTarget=null;}
       this.attackBuffer=Math.max(0,this.attackBuffer-dt);
     }
     for (const id in this.shoutCooldowns) {
@@ -157,19 +160,29 @@ export class Combat {
   melee() {
     const g=this.game;
     if(this.meleeCd>0){
-      if(g.p6Enabled && this.meleeCd<0.18)this.attackBuffer=0.19;
+      if(g.p7Enabled)this.attackBuffer=Math.min(0.7,Math.max(this.attackBuffer,this.meleeCd+0.09));
+      else if(g.p6Enabled && this.meleeCd<0.18)this.attackBuffer=0.19;
       return;
     }
-    const step=g.p6Enabled ? (this.comboTimer>0 ? this.comboStep%4+1 : 1) : 1;
+    const step=g.p7Enabled ? comboStep(this.comboStep,this.comboTimer>0)
+      : g.p6Enabled ? (this.comboTimer>0 ? this.comboStep%4+1 : 1) : 1;
     const cost=g.p6Enabled && step===4 ? 10 : g.p6Enabled && step===3 ? 7 : 6;
     if(!g.stats.useStamina(cost)){
       g.hud.notify('Energía insuficiente');return;
     }
     this.comboStep=step;
     this._meleeStep=step;
-    this.comboTimer=0.92;
-    this.meleeCd=g.p6Enabled ? (step===4?0.47:0.32) : MELEE_CD;
+    this.comboTimer=g.p7Enabled?1.45:0.92;
+    this.meleeCd=g.p7Enabled?(step===4?0.42:0.34):g.p6Enabled ? (step===4?0.47:0.32) : MELEE_CD;
     this.attackBuffer=0;
+    if(g.p7Enabled){
+      const previous=this._attackTarget;
+      const stillValid=previous && g.targeting?.valid(previous,4.7,true);
+      this._attackTarget=g.targeting?.valid(g.targeting.locked,4.7,true)?g.targeting.locked
+        :stillValid?previous:g.targeting?.attackTarget(4.5)||null;
+      if(this._attackTarget && !g.targeting.locked)g.targeting.soft=this._attackTarget;
+      g.hud.notify('COMBO '+step+'/4'+(step===4?' · ¡GOLPE FINAL!':''));
+    }
     g.player.attackT=0;
     g.player._attackAnimStarted=false;
     if(g.p6Enabled){
@@ -184,12 +197,13 @@ export class Combat {
   resolveMelee() {
     const g = this.game;
     const player = g.player;
-    const locked=g.p6Enabled && g.targeting?g.targeting.get(4.8):null;
-    const forward=this._fwd.copy(player.getForward());
+    const locked=g.p7Enabled?this._attackTarget:
+      g.p6Enabled && g.targeting?g.targeting.get(4.8):null;
+    const forward=this._fwd.copy(g.p7Enabled?player.getCombatForward():player.getForward());
     if(locked){
       forward.copy(locked.group.position).sub(player.pos);
       forward.y=0;if(forward.lengthSq()>0.001)forward.normalize();
-      else forward.copy(player.getForward());
+      else forward.copy(g.p7Enabled?player.getCombatForward():player.getForward());
     }
     const targets = this.collectTargets();
     for (let i = 0; i < targets.length; i++) {
@@ -203,7 +217,8 @@ export class Combat {
       if(g.p6Enabled && !hasLineOfSight(g,{x:player.pos.x,y:player.pos.y+1.25,z:player.pos.z},
           {x:e.group.position.x,y:e.group.position.y+Math.min(1.3,e.hitRadius||1),z:e.group.position.z})) continue;
       const bonus=g.p6Enabled?COMBO_BONUS[this._meleeStep-1]:1;
-      const dmg = g.inventory.weaponDamage() * (1 + (g.stats.level - 1) * 0.05)*bonus;
+      const dmg = (g.inventory.weaponDamage() + (g.p7Enabled&&g.inventory.offhandDamage?g.inventory.offhandDamage():0))
+        * (1 + (g.stats.level - 1) * 0.05)*bonus;
       e.takeDamage(dmg, forward.clone().multiplyScalar(g.p6Enabled&&this._meleeStep===4?5:3));
       g.audio.play('hit');
       g.hud.showEnemyHP(e);
@@ -221,6 +236,7 @@ export class Combat {
       g.hud.notify('MP insuficiente');return;
     }
     this.castCd=CAST_CD;
+    this._castTarget=g.p7Enabled?(g.targeting?.locked||g.targeting?.acquireAny(16)||null):null;
     g.player.castT=0;
     if(g.p6Enabled)g.player.actionDuration=0.35;
     g.player._castAnimStarted=false;
@@ -229,7 +245,8 @@ export class Combat {
     muzzle.y+=g.player.eyeHeight;
     const aim=this._aimRay;
     if(g.p6Enabled){
-      const lock=g.targeting && g.targeting.get(def.range);
+      const lock=g.p7Enabled && this._castTarget && g.targeting?.valid(this._castTarget,def.range,true)
+        ? this._castTarget:g.targeting && g.targeting.get(def.range);
       if(lock){
         this._aimPoint.copy(lock.group.position);
         this._aimPoint.y+=Math.min(1.3,Math.max(0.6,lock.hitRadius||1));
@@ -452,6 +469,7 @@ export class Combat {
     this.shoutCdMax = 15;
     this.meleeHitT = -1;
     this.comboStep=0;this.comboTimer=0;this.attackBuffer=0;this._meleeStep=1;
+    this._attackTarget=null;this._castTarget=null;
     for (const id in this.shoutCooldowns) this.shoutCooldowns[id] = 0;
     this.learnedShouts = ['fus'];
     this.equippedShout = 'fus';
