@@ -201,7 +201,16 @@ export class TianjieMobaSkillsLab {
       this.projectiles.push({mesh,dir:dir.clone(),speed:28,remaining:17,style:0});
     }
     if(slot===2){
-      if(p.onGround)p.vel.y=Math.max(p.vel.y,8.3);
+      // Tianjie's native dash zeros vertical velocity while onGround.
+      // Start the magical launch in the same native airborne state used by P14,
+      // so the first dash frame cannot erase the upward impulse.
+      if(p.onGround){
+        p.onGround=false;
+        p._jumpCount=Math.max(1,p._jumpCount||0);
+        p._jumpBufferT=0;
+        g.combat?.keepAirCombo?.('jump');
+      }
+      p.vel.y=Math.max(p.vel.y,8.3);
       p.startDash({direction:{x:dir.x,z:dir.z},speed:17,duration:.4,style:'dodge'});
       this.fx.launch(at,dir,0);
       this.schedule(.41,()=>{
