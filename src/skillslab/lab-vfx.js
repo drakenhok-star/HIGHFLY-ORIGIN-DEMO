@@ -18,7 +18,9 @@ export class TianjieSkillVfx {
     this._sparkAt=0;
   }
   setQuality(n) { this.quality=Math.max(0,Math.min(2,n|0)); }
-  palette(style) { return PALETTES[style]||PALETTES[0]; }
+  palette(style) { return PALETTES[style]||(
+    style===3?['#ff914f','#ffd069','#fff2b3']:
+    style===4?['#62dfff','#b4f4ff','#ffffff']:PALETTES[0]); }
   free(ev) {
     this.game.scene.remove(ev.mesh);
     ev.mesh.geometry?.dispose();
@@ -56,12 +58,14 @@ export class TianjieSkillVfx {
         origin.y+.6+spread*1.35+offset,
         origin.z+dir.z*(.55+t*length)+orth.z*(t-.5)*length*.46));
     }
-    const geo=new THREE.BufferGeometry().setFromPoints(pts);
-    const mat=new THREE.LineBasicMaterial({
-      color,linewidth:2,transparent:true,opacity:1,
+    // Hardware WebGL linewidth is effectively 1px on most Android GPUs.
+    // Use a real tubular luminous ribbon instead of invisible fine lines.
+    const geo=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),24,.085,5,false);
+    const mat=new THREE.MeshBasicMaterial({
+      color,transparent:true,opacity:.95,side:THREE.DoubleSide,
       depthWrite:false,blending:THREE.AdditiveBlending
     });
-    return this.add(new THREE.Line(geo,mat),life,'arc');
+    return this.add(new THREE.Mesh(geo,mat),life,'arc');
   }
   sparks(world,color,count=16,velocity=3,life=.52,size=.12){
     if(this.quality===0)count=Math.min(count,11);
@@ -109,6 +113,75 @@ export class TianjieSkillVfx {
       this.ring(world,radius*(1-i*.18),i%2?p[1]:p[0],.55+i*.1);
     }
     this.sparks(world.clone().add(new THREE.Vector3(0,.55,0)),p[2],38,1.8,.7,.16);
+  }
+  // P16 original particle/mesh effects: no copied animations or textures.
+  pulse(world,radius,color,life=.5){
+    const mesh=this.ring(world,radius,color,life);
+    mesh.scale.setScalar(.18);
+    return mesh;
+  }
+  orbit(world,radius,style=0,life=.6){
+    const c=this.palette(style),count=this.quality===0?8:this.quality===1?12:20;
+    const pts=[];
+    for(let i=0;i<=count*3;i++){
+      const t=i/(count*3),a=t*Math.PI*6,r=radius*(.2+t*.8);
+      pts.push(new THREE.Vector3(
+        world.x+Math.cos(a)*r,
+        world.y+.4+(1-t)*2.25,
+        world.z+Math.sin(a)*r));
+    }
+    const geo=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),count*3,.06,5,false);
+    const mat=new THREE.MeshBasicMaterial({color:c[0],transparent:true,opacity:.9,depthWrite:false,blending:THREE.AdditiveBlending});
+    this.add(new THREE.Mesh(geo,mat),life,'arc');
+  }
+  ascend(world,dir){
+    this.launch(world,dir,0);
+    this.orbit(world,2.1,0,.66);
+    this.sparks(world.clone().add(new THREE.Vector3(0,2,0)),'#e9b9ff',38,3.2,.65,.2);
+  }
+  landing(world,style=0,radius=2.45){
+    this.impact(world,style,radius);
+    this.pulse(world,radius*1.4,this.palette(style)[2],.63);
+    this.orbit(world,Math.min(radius,2),style,.52);
+    this.sparks(world.clone().add(new THREE.Vector3(0,.18,0)),this.palette(style)[1],55,5.5,.7,.22);
+    this.game.player.addShake?.(.18);
+  }
+  projectileGlow(world,style=3){
+    const color=this.palette(style)[0];
+    const mesh=new THREE.Mesh(new THREE.IcosahedronGeometry(.34,1),
+      new THREE.MeshBasicMaterial({color,transparent:true,opacity:.85,depthWrite:false}));
+    mesh.position.copy(world);
+    return this.add(mesh,.46,'spark');
+  }
+  meteorWarning(world,radius){
+    this.pulse(world,radius,'#ffb46d',.8);
+    this.ring(world,radius*.76,'#ff6334',.75);
+    this.sparks(world.clone().add(new THREE.Vector3(0,.2,0)),'#ffb56c',30,2,.6,.14);
+  }
+  meteorImpact(world,radius=4.15){
+    this.landing(world,1,radius);
+    for(let i=0;i<(this.quality===0?3:7);i++){
+      const a=i*Math.PI*2/7;
+      const spot=world.clone().add(new THREE.Vector3(Math.sin(a)*radius*.75,.8,Math.cos(a)*radius*.75));
+      this.sparks(spot,'#ffb363',12,4.7,.62,.19);
+    }
+    this.pulse(world,radius*1.2,'#ffe7ad',.8);
+  }
+  frostNova(world,radius=5){
+    this.pulse(world,radius,'#83e4ff',.72);
+    this.ring(world,radius*.7,'#d2f9ff',.55);
+    this.ring(world,radius*.38,'#b1cbff',.42);
+    const num=this.quality===0?6:12;
+    for(let i=0;i<num;i++){
+      const a=i*2*Math.PI/num;
+      const x=world.x+Math.cos(a)*radius*.78,z=world.z+Math.sin(a)*radius*.78;
+      this.sparks(new THREE.Vector3(x,world.y+.65,z),'#94f0ff',8,1.8,.85,.20);
+    }
+  }
+  backstab(world,dir){
+    this.arc(world,dir,3.6,'#77e6ff',.4,.12);
+    this.arc(world.clone().add(new THREE.Vector3(0,.4,0)),dir,2.8,'#f2faff',.27);
+    this.sparks(world.clone().add(new THREE.Vector3(0,1.1,0)),'#89eaff',28,4,.36,.12);
   }
   update(dt){
     for(let i=this.active.length-1;i>=0;i--){
