@@ -1,5 +1,3 @@
-import { PremiumInventoryP7 } from './inventory-p7.js';
-
 /**
  * HIGHFLY P5-A - HUD mobile premium, built on Tianjie5's REAL stats/inventory.
  * No images or private assets. MIT extension. Disable with ?hf_classic_hud=1.
@@ -120,7 +118,11 @@ export class PremiumHudP5 {
     this.makeHeader();
     this.makeOverlay();
     if(this.game.p7Enabled){
-      this.p7Inventory=new PremiumInventoryP7(this);
+      // Keep P5 DOM regression harness independent of the real Three.js P7 preview.
+      import('./inventory-p7.js').then(({PremiumInventoryP7})=>{
+        this.p7Inventory=new PremiumInventoryP7(this);
+        if(this.open)this.render();
+      }).catch(err=>console.warn('[P7] Vista premium no disponible, usando P5:',err));
       const style=make('style',null, [
         'body.hf-p7 #hf-touch .hf-actions{width:min(362px,70vw);height:min(190px,60vh)}',
         'body.hf-p7 #hf-touch .hf-actions>.hf-p5-atk{right:0;bottom:0;width:78px;height:78px}',
