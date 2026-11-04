@@ -66,6 +66,8 @@ const PRESET_STYLE = [
   'body.hf-p5 .hf-p5-invlinks button:active{background:#395c97}',
   'body.hf-p5 #hf-p5-overlay{position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;background:#020a18bb;pointer-events:auto;color:#eef7ff;font-family:system-ui,sans-serif;touch-action:pan-y}',
   'body.hf-p5-open #menus{visibility:hidden!important}',
+  'html:has(body.hf-p5-open),body.hf-p5-open{touch-action:pan-y!important}',
+  'body.hf-p5-open #hf-p5-overlay,body.hf-p5-open .hf-p5-list{touch-action:pan-y!important}',
   'body.hf-p5 .hf-p5-panel{width:min(750px,90vw);height:min(340px,84vh);display:flex;flex-direction:column;border-radius:12px;border:1px solid #7dbeff;background:linear-gradient(150deg,#11284bf5,#0c1430f7);box-shadow:0 0 25px #000b,inset 0 0 25px #5889ff19;overflow:hidden}',
   'body.hf-p5 .hf-p5-tabs{display:flex;flex-shrink:0;align-items:center;gap:2px;padding:7px;background:#08182fd9;border-bottom:1px solid #506f9a88}',
   'body.hf-p5 .hf-p5-tabs button{background:transparent;border:1px solid transparent;border-radius:6px;color:#b9d6f2;font-size:11px;font-weight:bold;padding:7px 9px;touch-action:manipulation}',
