@@ -155,6 +155,28 @@ jobs:
           echo "P13 pinned to verified green commit 1890b3ac1644429fedc98cc96406c1519d732793"
           echo "Pages: / stable · /p6/ · /p7/ · /p810/ · /p812/ · /p13/"
 
+      - name: Add P14 FURY Air Chain mobile game (pin verified commit, preserve prior versions)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags --depth=1 origin refs/heads/p14-fury-air-chain-20261104
+          test "$(git rev-parse FETCH_HEAD)" = "e8d0dcbccf86aaee2380e1da3e27b3d8e8a1bbce"
+          mkdir -p .site/p14
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets | tar -x -C .site/p14
+          test -s .site/p14/index.html
+          test -s .site/p14/src/combat/air-chain-p14.js
+          test -s .site/p14/src/player/fury-traversal-p13.js
+          test -s .site/p14/src/ui/p14-polish.js
+          test -s .site/p14/assets/models/player_barbarian.glb
+          find .site/p14/src -type f -name '*.js' -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+          if find .site/p14 -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
+            echo "Restricted assets detected"; exit 1
+          fi
+          echo "P14 pinned to CI-green commit e8d0dcbccf86aaee2380e1da3e27b3d8e8a1bbce"
+          echo "Paths kept: /, /p6/, /p7/, /p810/, /p812/, /p13/, /p14/"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
