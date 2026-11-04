@@ -34,6 +34,12 @@ export class AudioSys {
     }
     this.master = this.ctx.createGain();
     this.master.gain.value = 0.32;
+    if(this.game.p810Enabled){
+      try{
+        const saved=Number(localStorage.getItem('hf_p9_audio_volume'));
+        if(Number.isFinite(saved)&&saved>=0&&saved<=.5)this.master.gain.value=saved;
+      }catch(err){}
+    }
     this.master.connect(this.ctx.destination);
     if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
     if (this.ambienceWanted && !this.ambienceStarted) this.startAmbience();

@@ -143,7 +143,7 @@ class Game {
     const root=document.documentElement;
     try {
       const result=root.requestFullscreen?.({navigationUI:'hide'});
-      if(result?.then)result.then(()=>screen.orientation?.lock?.('landscape').catch(()=>{})).catch(()=>{});
+      if(result?.then)result.then(()=>screen.orientation?.lock?.('landscape')?.catch?.(()=>{})).catch(()=>{});
     }catch(err){console.info('[HIGHFLY] Fullscreen requires explicit browser permission',err);}
   }
 

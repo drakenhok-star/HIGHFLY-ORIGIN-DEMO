@@ -117,7 +117,13 @@ export class PremiumHudP5 {
     this.makeControls();
     this.makeHeader();
     this.makeOverlay();
-    if(this.game.p7Enabled){
+    if(this.game.p810Enabled){
+      // Lazy browser-only load: P5/P6 headless tests keep their original DOM harness.
+      import('./p810-ui.js').then(({HighflyP810})=>{
+        this.p810=new HighflyP810(this);
+        if(this.open)this.render();
+      }).catch(err=>console.error('[HIGHFLY P810] Falló la interfaz, manteniendo HUD previo:',err));
+    } else if(this.game.p7Enabled){
       // Keep P5 DOM regression harness independent of the real Three.js P7 preview.
       import('./inventory-p7.js').then(({PremiumInventoryP7})=>{
         this.p7Inventory=new PremiumInventoryP7(this);
@@ -198,7 +204,7 @@ export class PremiumHudP5 {
     const bag=make('button',null,'♧ BOLSA',links);
     bag.type='button';
     this.targetLine=make('div','hf-p6-target','',head);
-    for(const [btn,tab] of [[inventory,'all'],[bag,'bag']]) {
+    for(const [btn,tab] of [[inventory,this.game.p810Enabled?'equipment':'all'],[bag,'bag']]) {
       btn.addEventListener('pointerdown',e=>{
         e.preventDefault();e.stopPropagation();
         if(this.game.state==='playing')this.show(tab);
@@ -252,7 +258,7 @@ export class PremiumHudP5 {
     this.wuldButton.classList.toggle('hf-p5-locked',!learned.includes('wuld'));
     if(g.p6Enabled && g.targeting){
       const lock=g.targeting.locked,soft=g.targeting.soft,target=lock||soft;
-      const combo=g.p7Enabled && g.combat?.comboTimer>0?'⚔ COMBO '+g.combat.comboStep+'/4 · ':'';
+      const combo=!g.p810Enabled && g.p7Enabled && g.combat?.comboTimer>0?'⚔ COMBO '+g.combat.comboStep+'/4 · ':'';
       this.targetLine.textContent=combo+(target?(lock?'◎ FIJADO: ':'◌ CERCA: ')+target.name:'');
       this.targetLine.style.display=(target||combo)?'block':'none';
       const remaining=[g.combat.castCd,g.combat.shoutCooldowns.fus,
@@ -290,6 +296,7 @@ export class PremiumHudP5 {
     if(!this.open)return;
     for(const [key,btn] of Object.entries(this.tabButtons))btn.classList.toggle('active',key===this.tab);
     this.list.replaceChildren();this.detail.replaceChildren();
+    if(this.p810)return this.p810.panels.render(this.tab);
     if(this.tab==='quests')return this.renderQuests();
     if(this.tab==='settings')return this.renderSettings();
     if(this.p7Inventory)return this.p7Inventory.render(this.tab);

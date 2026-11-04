@@ -58,6 +58,7 @@ export class HighflyPanelsP9 {
   if(this.hud.tabButtons.settings)this.hud.tabButtons.settings.textContent='⚙ AJUSTES';
  }
  render(tab){
+  this.hud.list.style.display='';this.hud.list.style.flexDirection='';this.hud.list.style.gap='';
   for(const [key,button] of Object.entries(this.hud.tabButtons)){
    button.classList.toggle('active',key===(tab==='equipment'?'all':tab));
   }
@@ -125,7 +126,12 @@ export class HighflyPanelsP9 {
   el('div','hf-p9-quest-title','✧ MISIONES',center);
   const search=el('input','hf-p9-quest-search',undefined,center);
   search.type='search';search.placeholder='Buscar misión...';search.value=this.questSearch;
-  search.addEventListener('input',()=>{this.questSearch=search.value;this.renderQuests();});
+  search.addEventListener('input',()=>{
+   const selection=search.selectionStart;
+   this.questSearch=search.value;this.renderQuests();
+   const input=this.hud.list.querySelector('.hf-p9-quest-search');
+   input?.focus();if(input?.setSelectionRange)input.setSelectionRange(selection,selection);
+  });
   const categories=[['all','Todas'],['principal','Principales'],['secundaria','Secundarias'],
     ['active','En curso'],['complete','Para entregar'],['done','Completadas']];
   for(const [key,name] of categories){

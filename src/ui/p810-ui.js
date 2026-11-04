@@ -108,12 +108,16 @@ export class HighflyP810{
    });
   }
   this.zoom=zoom;
-  map.buildAtlas();
+  if(this.game.state==='playing')map.buildAtlas();
   this.editor.apply();
  }
  update(dt){
   if(!this._mapMounted && this.game.worldMapP34)this.mountMap();
   const visible=this.game.state==='playing';
+  if(this._mapMounted){
+   this.game.worldMapP34.mini.style.visibility=visible?'visible':'hidden';
+   if(visible&&!this.game.worldMapP34.atlasStarted)this.game.worldMapP34.buildAtlas();
+  }
   if(this.quickOpen&&!visible)this.toggleQuickMenu(false);
   if(this.perf)this.perf.style.visibility=visible?'visible':'hidden';
   if(this.combo){

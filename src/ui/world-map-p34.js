@@ -134,7 +134,7 @@ export class WorldMapP34 {
   }
   drawMini() {
     const n=this.miniCanvas.width,ctx=this.miniCanvas.getContext("2d"),p=this.game.player.pos;
-    const radius=120,scale=n/(radius*2);
+    const radius=this.game.p810Enabled?(this.zoom||120):120,scale=n/(radius*2);
     ctx.fillStyle="#203d3b";ctx.fillRect(0,0,n,n);
     if(this.atlasReady) {
       const size=1400*scale,left=n/2-(p.x+700)*scale,top=n/2-(p.z+700)*scale;
