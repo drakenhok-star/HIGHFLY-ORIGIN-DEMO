@@ -34,3 +34,21 @@ Para ver o reejecutar manualmente: **Actions → HIGHFLY ORIGIN · Build and pub
 [Ver detalles de procedencia](PROVENANCE.md).
 
 **Aviso:** la partida se guarda en el navegador y su progreso no se traslada automáticamente entre Codespaces y Pages.
+
+
+## HUD premium táctil — P5-A
+
+El HUD de Android ya tiene un primer rediseño **hecho en código**, no en imágenes:
+- HP, MP y Energía reales arriba a la izquierda, con nivel del cazador.
+- **INVENTARIO** y **BOLSA** justo debajo de las barras.
+- Panel táctil con filtros INVENTARIO / EQUIPO / BOLSA / MISIONES; equipamiento de armas/armaduras y uso de pociones con la lógica original.
+- Joystick a la izquierda; **SALTO — DASH — USAR** agrupados a la izquierda del ataque ATK. CORRER mantiene su función al mantener pulsado, cerca del joystick.
+- Cuatro botones de habilidades: S1 magia, S2 FUS, S3 HIELO, S4 WULD. S3/S4 se muestran bloqueadas hasta aprender los gritos originales.
+- DASH experimental reutiliza el dash de Tianjie5; movilidad y colisiones avanzadas aún son fase de desarrollo. 
+- Fluido permanece como perfil gráfico seguro; los FPS/GPU siguen visibles para comparar rendimiento.
+
+**Recuperación:** agregar `?hf_classic_hud=1` a la dirección del juego para utilizar los controles anteriores. Si el mapamundi molesta, `?hf_no_map=1` lo desactiva.
+
+Código fuente: [HUD premium](src/ui/premium-hud-p5.js) · [conexión con el controlador táctil](src/ui/touch-controls.js) · [prueba automática](tests/premium-hud.test.mjs).
+
+La traducción completa de menús y diálogos originales sigue pendiente; esta fase traduce el HUD y el inventario táctil.
