@@ -82,6 +82,7 @@ export class Player {
     this._jumpAnimStarted=false;
     this._queuedDashT=0;
     this._dashFollowupT=0;
+    this.dodgeInvulnT=0;
     this._attackFade=.06;
     this.torchOn = false;
 
@@ -323,6 +324,10 @@ export class Player {
   // P6 directional evasion and existing WULD share the same movement primitive.
   startDash(opts = {}) {
     this.dashT = 0;
+    if(this.game.p15Enabled && opts.style==='dodge'){
+      // Short skill-based evade window. A long dash is NOT permanent immunity.
+      this.dodgeInvulnT=Math.max(this.dodgeInvulnT,Math.min(.125,opts.duration||.15));
+    }
     if(this.game.p15Enabled){
       this._dashFollowupT=.36;
       // The hit marker has already resolved before recovery-cancel is permitted.
@@ -426,6 +431,7 @@ export class Player {
         }
       }
     }
+    if(g.p15Enabled)this.dodgeInvulnT=Math.max(0,this.dodgeInvulnT-dt);
     let speed = g.p812Enabled?7.5:6;
     if (moving && (input.keys.has('ShiftLeft') || input.touchSprint) &&
         (g.p14Enabled || stats.useStamina((g.p812Enabled?10:12) * dt))) {
@@ -846,7 +852,7 @@ export class Player {
     this.attackClip=ATTACK_CLIP;this.actionDuration=ACTION_DURATION;
     this.dashClip=null;this._dashAnimStarted=false;
     this._jumpAnimT=0;this._jumpAnimStarted=false;
-    this._queuedDashT=0;this._dashFollowupT=0;this._attackFade=.06;
+    this._queuedDashT=0;this._dashFollowupT=0;this._attackFade=.06;this.dodgeInvulnT=0;
     this.torchOn = false;
     this.updateTorch();
     this.faceVillage();

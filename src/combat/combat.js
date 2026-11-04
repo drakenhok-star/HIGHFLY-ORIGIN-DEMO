@@ -88,6 +88,21 @@ export class Combat {
     return out;
   }
 
+  breakCombo(reason='hit'){
+    if(!this.game.p15Enabled)return false;
+    const active=this.comboStep>0||this.meleeHitT>=0||this.attackBuffer>0;
+    if(!active)return false;
+    this.comboStep=0;this.comboTimer=0;this.airComboGrace=0;
+    this.attackBuffer=0;this._meleeStep=1;this._finisher=null;
+    this._attackTarget=null;this.meleeHitT=-1;
+    // Brief recovery prevents ATK hold from making the broken chain invisible.
+    this.meleeCd=Math.max(this.meleeCd,.22);
+    const p=this.game.player;
+    if(p){p.attackT=-1;p._attackAnimStarted=false;p._queuedDashT=0;}
+    this.lastComboBreak=reason;
+    return true;
+  }
+
   canCancelDash(){
     const p=this.game.player;
     return canCancelAction({kind:p.attackT>=0?'attack':'idle',
@@ -113,7 +128,10 @@ export class Combat {
           this.game.player.onGround,this.comboStep);
         this.comboTimer=tick.timer;this.airComboGrace=tick.grace;
       }else this.comboTimer=Math.max(0,this.comboTimer-dt);
-      if(this.comboTimer<=0){this.comboStep=0;this._attackTarget=null;this.airComboGrace=0;}
+      if(this.comboTimer<=0){
+        if(this.game.p15Enabled && this.comboStep>0)this.breakCombo('timeout');
+        else {this.comboStep=0;this._attackTarget=null;this.airComboGrace=0;}
+      }
       this.attackBuffer=Math.max(0,this.attackBuffer-dt);
     }
     for (const id in this.shoutCooldowns) {
