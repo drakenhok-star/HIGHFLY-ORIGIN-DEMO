@@ -177,7 +177,7 @@ export class PremiumHudP5 {
     const panel=make('div','hf-p5-panel',undefined,overlay);
     const tabs=make('div','hf-p5-tabs',undefined,panel);
     this.tabButtons={};
-    for(const [key,text] of [['all','INVENTARIO'],['equipment','EQUIPO'],['bag','BOLSA'],['quests','MISIONES']]){
+    for(const [key,text] of [['all','INVENTARIO'],['equipment','EQUIPO'],['bag','BOLSA'],['quests','MISIONES'],['settings','AJUSTES']]){
       const btn=make('button',null,text,tabs);btn.type='button';
       btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();this.tab=key;this.selected=null;this.render();});
       this.tabButtons[key]=btn;
@@ -235,6 +235,7 @@ export class PremiumHudP5 {
     for(const [key,btn] of Object.entries(this.tabButtons))btn.classList.toggle('active',key===this.tab);
     this.list.replaceChildren();this.detail.replaceChildren();
     if(this.tab==='quests')return this.renderQuests();
+    if(this.tab==='settings')return this.renderSettings();
     const inv=this.game.inventory,all=Array.from(inv.slots.entries()).filter(([,n])=>n>0);
     const filtered=all.filter(([id])=>{
       const type= id.includes('sword')?'weapon':id.includes('armor')?'armor':
@@ -285,6 +286,25 @@ export class PremiumHudP5 {
   }
   weaponDamage(id){return {iron_sword:8,steel_sword:14,ancient_sword:22,dragonbone_sword:30}[id]||0;}
   armorValue(id){return {cloth_armor:5,hide_armor:14,dragonscale_armor:28}[id]||0;}
+  renderSettings() {
+    make('h3',null,'CÁMARA TÁCTIL',this.list);
+    make('p',null,'Ajustá la velocidad de giro arrastrando el dedo sobre el mundo. No modifica el joystick, la cámara de PC ni los FPS.',this.list);
+    const label=make('p',null,'Sensibilidad actual: '+this.touch.cameraSensitivity.toFixed(1)+'×',this.list);
+    const slider=make('input',null,undefined,this.list);
+    slider.type='range';slider.min='0.8';slider.max='2.4';slider.step='0.1';
+    slider.value=String(this.touch.cameraSensitivity);
+    slider.setAttribute('aria-label','Sensibilidad de cámara');
+    slider.style.cssText='width:100%;height:30px;accent-color:#7bccff;touch-action:pan-x;margin:6px 0';
+    slider.addEventListener('input',()=>{
+      this.touch.setCameraSensitivity(slider.value);
+      label.textContent='Sensibilidad actual: '+this.touch.cameraSensitivity.toFixed(1)+'×';
+    });
+    make('p',null,'Original: 1.2× · Recomendado: 1.5×',this.list);
+    make('h3',null,'CONTROL',this.detail);
+    make('p',null,'Deslizá sobre la mitad derecha del mundo para girar la cámara.',this.detail);
+    make('p',null,'El cambio queda guardado en este navegador.',this.detail);
+    make('p',null,'Si no te convence, volvé a 1.2× desde este mismo menú.',this.detail);
+  }
   renderQuests(){
     const list=this.game.quests.list(),active=list.filter(q=>q.state!=='locked');
     for(const q of active){
