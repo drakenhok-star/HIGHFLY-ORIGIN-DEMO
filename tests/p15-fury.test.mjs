@@ -54,7 +54,7 @@ for(const [name,result] of [
  ['P15 isolated branch flag',src['src/main.js'].includes('this.p15Enabled=this.p14Enabled')],
  ['removed playtest parkour teleports',src['src/ui/p810-ui.js'].includes('this.game.p14Enabled && !this.game.p15Enabled')],
  ['combat uses contextual profile',src['src/combat/combat.js'].includes('strikeProfile(step,context)')],
- ['dash queue uses recovery window',src['src/ui/premium-hud-p5.js'].includes('canCancelAction({kind:')],
+ ['dash queue uses recovery window',src['src/ui/premium-hud-p5.js'].includes('g.combat?.canCancelDash()') && src['src/combat/combat.js'].includes('canCancelAction({kind:')],
  ['queued dash executes',src['src/player/player.js'].includes('g.touch?.premium?.tryDash()')],
  ['attack clip crossfade respects context',src['src/player/player.js'].includes('this.game.p15Enabled?this._attackFade')],
  ['projectile segment projection avoids clone',src['src/combat/combat.js'].includes('this._v3.copy(c).sub(this._segmentA)')],
