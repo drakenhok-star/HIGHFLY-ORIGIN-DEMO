@@ -23,6 +23,11 @@ const QUEST_ES = {
 const PRESET_STYLE = [
   '#hf-touch{font-family:system-ui,Arial,sans-serif!important}',
   'body.hf-p5 #hud .hud-bar,body.hf-p5 #hud .hud-shoutcd{display:none!important}',
+  'body.hf-p5 #hud .hud-compass-wrap{display:none!important}',
+  'body.hf-p5 #hf-audit{left:calc(min(254px,38vw) + 23px);top:max(8px,env(safe-area-inset-top));transform:scale(.82);transform-origin:top left}',
+  'body.hf-p5 #hf-p2-switch{left:calc(min(254px,38vw) + 23px);top:max(43px,env(safe-area-inset-top) + 36px);transform:scale(.84);transform-origin:top left;min-width:105px}',
+  'body.hf-p5 #hf-p2-note{display:none!important}',
+  'body.hf-p5 #hf-fullscreen{right:calc(max(12px,env(safe-area-inset-right)) + 174px);transform:scale(.86);transform-origin:top right}',
   'body.hf-p5 #hud .hud-notify-stack{top:58px;right:calc(min(140px,34vh) + 25px);width:min(215px,23vw)}',
   'body.hf-p5 #hud .hud-notify{font-size:11px;letter-spacing:0;padding:5px 7px}',
   'body.hf-p5 #hf-worldmini{transform:scale(.79);transform-origin:top right;top:max(48px,env(safe-area-inset-top) + 44px)}',
