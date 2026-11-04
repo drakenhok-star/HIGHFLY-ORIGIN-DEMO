@@ -7,6 +7,13 @@ import { PremiumHudP5 } from './premium-hud-p5.js';
 export class TouchControls {
   constructor(game) {
     this.game = game;
+    this.cameraSensitivity = 1.5; // +25% versus original mobile value 1.2
+    try {
+      const stored = window.localStorage.getItem('hf_camera_sensitivity');
+      if (stored !== null && Number.isFinite(Number(stored))) {
+        this.cameraSensitivity = Math.max(0.8, Math.min(2.4, Number(stored)));
+      }
+    } catch (_) { /* storage may be unavailable in private browsing */ }
     this.enabled = ((navigator.maxTouchPoints || 0) > 0) ||
       (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches) ||
       new URLSearchParams(location.search).has('hf_touch');
@@ -140,6 +147,14 @@ export class TouchControls {
   }
   key(code){this.game.input.justPressed.add(code);}
 
+  setCameraSensitivity(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return;
+    this.cameraSensitivity = Math.round(Math.max(0.8, Math.min(2.4, n)) * 10) / 10;
+    try { window.localStorage.setItem('hf_camera_sensitivity', String(this.cameraSensitivity)); }
+    catch (_) { /* save is best effort; current session still responds */ }
+  }
+
   camera() {
     const canvas=this.game.renderer.domElement;
     canvas.addEventListener('pointerdown',e=>{
@@ -152,8 +167,8 @@ export class TouchControls {
     canvas.addEventListener('pointermove',e=>{
       if(e.pointerId!==this.cameraId)return;
       e.preventDefault();
-      this.game.input.mouse.dx+=(e.clientX-this.lastX)*1.2;
-      this.game.input.mouse.dy+=(e.clientY-this.lastY)*1.2;
+      this.game.input.mouse.dx+=(e.clientX-this.lastX)*this.cameraSensitivity;
+      this.game.input.mouse.dy+=(e.clientY-this.lastY)*this.cameraSensitivity;
       this.lastX=e.clientX;this.lastY=e.clientY;
     });
     const end=e=>{if(e.pointerId===this.cameraId)this.cameraId=null;};
