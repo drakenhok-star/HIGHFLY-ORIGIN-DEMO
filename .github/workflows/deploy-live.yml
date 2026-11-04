@@ -132,6 +132,29 @@ jobs:
           echo "P812 pinned CI-green c57d29353bee3b391ab233f2a56ea867f3190c76"
           echo "Pages: stable / · /p6/ · /p7/ · /p810/ · /p812/"
 
+      - name: Add P13 FURY playable parkour (preserve stable and prior versions)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags --depth=1 origin refs/heads/p13-fury-movement-engine-20261104
+          test "$(git rev-parse FETCH_HEAD)" = "1890b3ac1644429fedc98cc96406c1519d732793"
+          mkdir -p .site/p13
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets | tar -x -C .site/p13
+          test -s .site/p13/index.html
+          test -s .site/p13/src/player/fury-surfaces-p13.js
+          test -s .site/p13/src/player/fury-traversal-p13.js
+          test -s .site/p13/src/world/obstacles-p7.js
+          test -s .site/p13/src/combat/combat.js
+          test -s .site/p13/assets/models/player_barbarian.glb
+          find .site/p13/src -type f -name '*.js' -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+          if find .site/p13 -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
+            echo "Restricted material detected"; exit 1
+          fi
+          echo "P13 pinned to verified green commit 1890b3ac1644429fedc98cc96406c1519d732793"
+          echo "Pages: / stable · /p6/ · /p7/ · /p810/ · /p812/ · /p13/"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
