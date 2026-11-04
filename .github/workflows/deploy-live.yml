@@ -53,6 +53,20 @@ jobs:
           cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets .site/
           touch .site/.nojekyll
 
+      - name: Add P6 playable preview beside stable Pages build (public assets only)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags --depth=1 origin refs/heads/p6-integral-combate-20261104
+          mkdir -p .site/p6
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets | tar -x -C .site/p6
+          test -s .site/p6/index.html
+          test -s .site/p6/src/combat/targeting-p6.js
+          test -s .site/p6/assets/models/player_barbarian.glb
+          node --input-type=module --check < .site/p6/src/main.js
+          node --input-type=module --check < .site/p6/src/combat/combat.js
+          echo "Pages stable: / ; P6 preview: /p6/ (main gameplay unchanged)"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
