@@ -1,0 +1,8 @@
+/** P14 HUD: consistent card spacing and combo visibility. */
+export function installP14Polish(game){
+ if(!game.p14Enabled)return;
+ document.body.classList.add('hf-p14');
+ const el=document.createElement('style');el.id='hf-p14-polish';
+ el.textContent="\n/* P14: the P812 minmax(89px,1fr) rows were shorter than the 120px cards. */\nbody.hf-p14 .hf-p5-list:has(.p7-grid){overflow:hidden!important;min-height:0!important}\nbody.hf-p14 .p7-grid{\n display:grid!important;grid-auto-flow:row!important;\n grid-auto-rows:minmax(107px,max-content)!important;\n row-gap:12px!important;column-gap:9px!important;\n align-content:start!important;align-items:stretch!important;\n padding:8px 9px 14px!important;\n overflow-y:auto!important;overflow-x:hidden!important;\n overscroll-behavior:contain!important;scrollbar-width:thin;\n scrollbar-color:#bf78ff #1c1132;\n}\nbody.hf-p14 .p7-grid>.p7-cell{\n min-height:107px!important;max-height:none!important;\n height:auto!important;aspect-ratio:auto!important;\n box-sizing:border-box!important;padding:9px 4px!important;\n display:flex!important;flex-direction:column!important;justify-content:center!important;\n}\nbody.hf-p14 .p7-grid>.p7-cell.empty{opacity:.48}\nbody.hf-p14 #hf-p810-combo:empty{\n visibility:hidden!important;min-height:0!important;\n padding:0!important;border:0!important;box-shadow:none!important;\n}\nbody.hf-p14 #hf-p810-combo:not(:empty){\n border-radius:9px!important;font:800 11px system-ui!important;\n padding:4px 9px!important;\n}\n@media(max-height:430px){\n body.hf-p14 .p7-grid{grid-auto-rows:minmax(101px,max-content)!important;\n  row-gap:11px!important;padding-bottom:16px!important}\n body.hf-p14 .p7-grid>.p7-cell{min-height:101px!important}\n}\n";
+ document.head.appendChild(el);
+}
