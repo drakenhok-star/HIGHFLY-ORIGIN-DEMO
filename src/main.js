@@ -27,6 +27,8 @@ import { MobileAudit } from './ui/mobile-audit.js'; // HIGHFLY_AUDIT_P1
 import { PerformanceP2 } from './ui/performance-p2.js'; // HIGHFLY_P2_20261104
 import { WorldMapP34 } from './ui/world-map-p34.js'; // HIGHFLY_WORLD_MAP_P34
 import { TouchControls } from './ui/touch-controls.js'; // HIGHFLY_TOUCH_PATCH_V1
+import { TargetingP6 } from './combat/targeting-p6.js';
+import { PerfProbeP6 } from './ui/perf-probe-p6.js';
 
 class Game {
   constructor(assets) {
@@ -34,6 +36,7 @@ class Game {
     this.worldSeed = 1337;
     this.state = 'menu';
     this.time = { elapsed: 0, dayTime: 0.35, dayLength: 600 };
+    this.p6Enabled=!new URLSearchParams(location.search).has('hf_p6_off');
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     // P1 quality HIGH baseline: restore original render scale on Android.
@@ -80,6 +83,7 @@ class Game {
     this.effects = new Effects(this);
     this.combat = new Combat(this);
     this.enemies = new Enemies(this);
+    this.targeting=this.p6Enabled?new TargetingP6(this):null;
     this.npcs = new NPCs(this);
     this.audio = new AudioSys(this);
     this.saveSys = new SaveSys(this);
@@ -87,6 +91,7 @@ class Game {
     this.menus = new Menus(this);
     this.touch = new TouchControls(this);
     this.mobileAudit = new MobileAudit(this);
+    this.p6Perf = new PerfProbeP6(this);
     this.performanceP2 = new PerformanceP2(this);
     this.worldMapP34 = null;
     if (!new URLSearchParams(location.search).has('hf_no_map')) {
@@ -154,6 +159,7 @@ class Game {
     this.enemies.reset();
     this.player.reset();
     this.combat.reset();
+    if(this.targeting)this.targeting.cancel();
     // 室内重开新游戏/读档：立即恢复户外状态，不等 interiors.update 的远距自愈
     this.interiors.forceOutside();
     // Effects 无 reset()：用大 dt 走 update 的到期路径，移除并 dispose 跨局残留粒子
@@ -285,6 +291,7 @@ let splashHidden = false;
 function loop() {
   requestAnimationFrame(loop);
   game.mobileAudit.begin();
+  game.p6Perf.begin();
   const dt = Math.min(clock.getDelta(), 0.05);
   game.time.elapsed += dt;
 
@@ -296,10 +303,14 @@ function loop() {
   game.terrain.update(dt);
   game.structures.update(dt);
   game.interiors.update(dt);
+  game.p6Perf.mark('world');
 
   if (game.state === 'playing') {
     game.player.update(dt);
+    game.p6Perf.mark('player');
+    if(game.targeting)game.targeting.update(dt);
     game.combat.update(dt);
+    game.p6Perf.mark('combat');
     game.effects.update(dt);
     game.enemies.update(dt);
     game.npcs.update(dt);
@@ -308,6 +319,7 @@ function loop() {
     game.hud.update(dt);
     game.audio.update(dt);
     game.saveSys.update(dt);
+    game.p6Perf.mark('entities');
   }
 
   if (game.state === 'menu') {
@@ -321,6 +333,8 @@ function loop() {
   }
 
   game.composer.render();
+  game.p6Perf.mark('render');
+  game.p6Perf.end();
   game.mobileAudit.end();
 
   if (!splashHidden) {

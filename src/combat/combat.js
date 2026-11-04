@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { ABILITIES_P6, abilityForShout, spendAbilityResource } from './abilities-p6.js';
+import { hasLineOfSight, insideBlockingObject } from './targeting-p6.js';
 
 const MELEE_CD = 0.5;
 const CAST_CD = 0.6;
@@ -6,6 +8,13 @@ const MELEE_HIT_DELAY = 0.15;
 const COS_MELEE = Math.cos(THREE.MathUtils.degToRad(45));
 const COS_SHOUT = Math.cos(THREE.MathUtils.degToRad(35));
 const COS_FROST = Math.cos(THREE.MathUtils.degToRad(40));
+const COMBO_BONUS=[1,1.07,1.17,1.65];
+const COMBO_CLIPS=[
+  '1H_Melee_Attack_Slice_Diagonal',
+  '1H_Melee_Attack_Slice_Horizontal',
+  '1H_Melee_Attack_Stab',
+  '1H_Melee_Attack_Slice_Vertical'
+];
 
 export class Combat {
   constructor(game) {
@@ -23,6 +32,10 @@ export class Combat {
     this.shoutCd = 0;
     this.shoutCdMax = 15;
     this.meleeHitT = -1;
+    this.comboStep=0;
+    this.comboTimer=0;
+    this.attackBuffer=0;
+    this._meleeStep=1;
     this.projectiles = [];
     this.projGeo = new THREE.SphereGeometry(0.22, 10, 8);
     this.projMat = new THREE.MeshStandardMaterial({
@@ -40,6 +53,12 @@ export class Combat {
     this._v2 = new THREE.Vector3();
     this._v3 = new THREE.Vector3();
     this._fwd = new THREE.Vector3();
+    this._aimPoint=new THREE.Vector3();
+    this._aimRay=new THREE.Vector3();
+    this._muzzle=new THREE.Vector3();
+    this._camRay=new THREE.Vector3();
+    this._segmentA=new THREE.Vector3();
+    this._segmentDelta=new THREE.Vector3();
   }
 
   collectTargets() {
@@ -60,6 +79,11 @@ export class Combat {
   update(dt) {
     this.meleeCd = Math.max(0, this.meleeCd - dt);
     this.castCd = Math.max(0, this.castCd - dt);
+    if(this.game.p6Enabled){
+      this.comboTimer=Math.max(0,this.comboTimer-dt);
+      if(this.comboTimer<=0)this.comboStep=0;
+      this.attackBuffer=Math.max(0,this.attackBuffer-dt);
+    }
     for (const id in this.shoutCooldowns) {
       this.shoutCooldowns[id] = Math.max(0, this.shoutCooldowns[id] - dt);
     }
@@ -79,10 +103,19 @@ export class Combat {
     this.updateWordWalls();
 
     const input = this.game.input;
+    if(this.game.p6Enabled && this.attackBuffer>0 && this.meleeCd===0){
+      this.attackBuffer=0;this.melee();
+    }
     if (input.leftClick) this.melee();
     if (input.rightClick) this.cast();
     if (input.justPressed.has('KeyF')) this.shout();
     if (input.justPressed.has('KeyQ')) this.cycleShout();
+    if(this.game.p6Enabled){
+      if(input.justPressed.has('Digit1'))this.cast();
+      if(input.justPressed.has('Digit2'))this.shout('fus');
+      if(input.justPressed.has('Digit3'))this.shout('frost');
+      if(input.justPressed.has('Digit4'))this.shout('wuld');
+    }
   }
 
   shoutDef(id) {
@@ -122,22 +155,42 @@ export class Combat {
   }
 
   melee() {
-    if (this.meleeCd > 0) return;
-    const g = this.game;
-    if (!g.stats.useStamina(6)) {
-      g.hud.notify('耐力不足');
+    const g=this.game;
+    if(this.meleeCd>0){
+      if(g.p6Enabled && this.meleeCd<0.18)this.attackBuffer=0.19;
       return;
     }
-    this.meleeCd = MELEE_CD;
-    g.player.attackT = 0;
+    const step=g.p6Enabled ? (this.comboTimer>0 ? this.comboStep%4+1 : 1) : 1;
+    const cost=g.p6Enabled && step===4 ? 10 : g.p6Enabled && step===3 ? 7 : 6;
+    if(!g.stats.useStamina(cost)){
+      g.hud.notify('Energía insuficiente');return;
+    }
+    this.comboStep=step;
+    this._meleeStep=step;
+    this.comboTimer=0.92;
+    this.meleeCd=g.p6Enabled ? (step===4?0.47:0.32) : MELEE_CD;
+    this.attackBuffer=0;
+    g.player.attackT=0;
+    g.player._attackAnimStarted=false;
+    if(g.p6Enabled){
+      const rig=g.player.rig;
+      g.player.attackClip=rig.clips.has(COMBO_CLIPS[step-1])?COMBO_CLIPS[step-1]:COMBO_CLIPS[0];
+      g.player.actionDuration=step===4?0.43:0.32;
+    }
     g.audio.play('swing');
-    this.meleeHitT = MELEE_HIT_DELAY;
+    this.meleeHitT=g.p6Enabled ? 0.13 : MELEE_HIT_DELAY;
   }
 
   resolveMelee() {
     const g = this.game;
     const player = g.player;
-    const forward = this._fwd.copy(player.getForward());
+    const locked=g.p6Enabled && g.targeting?g.targeting.get(4.8):null;
+    const forward=this._fwd.copy(player.getForward());
+    if(locked){
+      forward.copy(locked.group.position).sub(player.pos);
+      forward.y=0;if(forward.lengthSq()>0.001)forward.normalize();
+      else forward.copy(player.getForward());
+    }
     const targets = this.collectTargets();
     for (let i = 0; i < targets.length; i++) {
       const e = targets[i];
@@ -147,39 +200,61 @@ export class Combat {
       if (to.lengthSq() < 1e-6) to.copy(forward);
       to.normalize();
       if (to.dot(forward) < COS_MELEE) continue;
-      const dmg = g.inventory.weaponDamage() * (1 + (g.stats.level - 1) * 0.05);
-      e.takeDamage(dmg, forward.clone().multiplyScalar(3));
+      if(g.p6Enabled && !hasLineOfSight(g,{x:player.pos.x,y:player.pos.y+1.25,z:player.pos.z},
+          {x:e.group.position.x,y:e.group.position.y+Math.min(1.3,e.hitRadius||1),z:e.group.position.z})) continue;
+      const bonus=g.p6Enabled?COMBO_BONUS[this._meleeStep-1]:1;
+      const dmg = g.inventory.weaponDamage() * (1 + (g.stats.level - 1) * 0.05)*bonus;
+      e.takeDamage(dmg, forward.clone().multiplyScalar(g.p6Enabled&&this._meleeStep===4?5:3));
       g.audio.play('hit');
       g.hud.showEnemyHP(e);
       const chest = this._v2.copy(e.group.position);
       chest.y += Math.min(1.2, Math.max(0.8, e.hitRadius));
-      g.effects.spawnBurst(chest, '#b03030', 8);
+      g.effects.spawnBurst(chest,g.p6Enabled&&this._meleeStep===4?'#ffd09c':'#b03030',
+        g.p6Enabled?this._meleeStep===4?12:6:8);
     }
   }
 
   cast() {
-    if (this.castCd > 0) return;
-    const g = this.game;
-    if (!g.stats.useMagicka(18)) {
-      g.hud.notify('法力不足');
-      return;
+    if(this.castCd>0)return;
+    const g=this.game,def=ABILITIES_P6.S1;
+    if(g.p6Enabled ? !spendAbilityResource(g.stats,def) : !g.stats.useMagicka(18)){
+      g.hud.notify('MP insuficiente');return;
     }
-    this.castCd = CAST_CD;
-    g.player.castT = 0;
+    this.castCd=CAST_CD;
+    g.player.castT=0;
+    g.player._castAnimStarted=false;
     g.audio.play('cast');
-    const aim = this._v1.copy(g.player.getAimDir());
-    const mesh = new THREE.Mesh(this.projGeo, this.projMat);
-    mesh.position.copy(g.player.pos);
-    mesh.position.y += g.player.eyeHeight;
-    mesh.position.addScaledVector(aim, 1.2);
-    mesh.add(this.projLight);
-    this._lightHolder = mesh;
+    const muzzle=this._muzzle.copy(g.player.pos);
+    muzzle.y+=g.player.eyeHeight;
+    const aim=this._aimRay;
+    if(g.p6Enabled){
+      const lock=g.targeting && g.targeting.get(def.range);
+      if(lock){
+        this._aimPoint.copy(lock.group.position);
+        this._aimPoint.y+=Math.min(1.3,Math.max(0.6,lock.hitRadius||1));
+      }else{
+        const ray=g.camera.getWorldDirection(this._camRay);
+        const origin=g.camera.position;
+        this._aimPoint.copy(origin).addScaledVector(ray,def.range);
+        for(let dist=2;dist<=def.range;dist+=2){
+          const x=origin.x+ray.x*dist,y=origin.y+ray.y*dist,z=origin.z+ray.z*dist;
+          if(y<g.terrain.getHeight(x,z)+0.25 || insideBlockingObject(g,x,y,z,0.05)){
+            this._aimPoint.set(x,y,z);break;
+          }
+        }
+      }
+      aim.copy(this._aimPoint).sub(muzzle);
+      if(aim.lengthSq()<0.001)aim.copy(g.player.getAimDir());
+      aim.normalize();
+    }else aim.copy(g.player.getAimDir());
+    if(this.projectiles.length>=8)this.removeProjectile(0);
+    const mesh=new THREE.Mesh(this.projGeo,this.projMat);
+    mesh.position.copy(muzzle).addScaledVector(aim,0.55);
+    const lightAllowed=!g.p6Enabled || !g.performanceP2 ||
+      (g.performanceP2.preset!=='FLUID' && g.performanceP2.preset!=='BALANCED');
+    if(lightAllowed){mesh.add(this.projLight);this._lightHolder=mesh;}
     g.scene.add(mesh);
-    this.projectiles.push({
-      mesh,
-      vel: aim.clone().multiplyScalar(34),
-      life: 3
-    });
+    this.projectiles.push({mesh,vel:aim.clone().multiplyScalar(34),life:3});
   }
 
   updateProjectiles(dt) {
@@ -187,8 +262,10 @@ export class Combat {
     for (let i = this.projectiles.length - 1; i >= 0; i--) {
       const p = this.projectiles[i];
       p.life -= dt;
+      this._segmentA.copy(p.mesh.position);
       p.mesh.position.addScaledVector(p.vel, dt);
       const pos = p.mesh.position;
+      this._segmentDelta.copy(pos).sub(this._segmentA);
       let hit = false;
 
       const targets = this.collectTargets();
@@ -196,7 +273,12 @@ export class Combat {
         const e = targets[j];
         const c = this._v1.copy(e.group.position);
         c.y += Math.min(1.0, e.hitRadius);
-        if (pos.distanceTo(c) < 1.2 + e.hitRadius) {
+        const segLen2=this._segmentDelta.lengthSq();
+        const t=segLen2>1e-5?Math.max(0,Math.min(1,
+          c.clone().sub(this._segmentA).dot(this._segmentDelta)/segLen2)):0;
+        const nearest=this._v2.copy(this._segmentA).addScaledVector(this._segmentDelta,t);
+        if (nearest.distanceTo(c) < 1.0 + e.hitRadius &&
+          (!g.p6Enabled || hasLineOfSight(g,this._segmentA,nearest))) {
           const dmg = 24 + g.stats.level;
           e.takeDamage(dmg, p.vel.clone().normalize().multiplyScalar(4));
           g.effects.spawnBurst(pos, '#ff8c3a', 14);
@@ -208,6 +290,9 @@ export class Combat {
       }
 
       if (!hit) {
+        if(g.p6Enabled && !hasLineOfSight(g,this._segmentA,pos)){
+          g.effects.spawnBurst(pos,'#ff8c3a',8);hit=true;
+        }
         const groundY = g.terrain.getHeight(pos.x, pos.z);
         if (pos.y < groundY + 0.2) {
           g.effects.spawnBurst(pos, '#ff8c3a', 18);
@@ -238,13 +323,21 @@ export class Combat {
     }
   }
 
-  shout() {
+  shout(id=null) {
     const g = this.game;
-    const def = this.shoutDef(this.equippedShout) || this.shouts[0];
+    const def=this.shoutDef(id||this.equippedShout)||this.shouts[0];
+    if(!this.learnedShouts.includes(def.id)){
+      g.hud.notify('Habilidad todavía bloqueada');return;
+    }
     if (this.shoutCooldowns[def.id] > 0) {
-      g.hud.notify('龙吼尚未恢复');
+      g.hud.notify('Habilidad recargando');return;
+    }
+    const ability=abilityForShout(def.id);
+    if(g.p6Enabled && !spendAbilityResource(g.stats,ability)){
+      g.hud.notify(ability && ability.resource==='mp'?'MP insuficiente':'Energía insuficiente');
       return;
     }
+    this.equippedShout=def.id;
     this.shoutCooldowns[def.id] = def.cd;
     this.shoutCd = def.cd;
     this.shoutCdMax = def.cd;
@@ -258,7 +351,9 @@ export class Combat {
     g.audio.play('shout');
     g.hud.shoutText('FUS · RO · DAH');
     g.player.addShake(0.5);
-    const forward = this._fwd.copy(g.player.getForward());
+    const target=g.p6Enabled && g.targeting ? g.targeting.get(14) : null;
+    const forward=this._fwd.copy(g.player.getForward());
+    if(target){forward.copy(target.group.position).sub(g.player.pos).setY(0).normalize();}
     const burstPos = this._v1.copy(g.player.pos).addScaledVector(forward, 2);
     burstPos.y += 1.4;
     g.effects.spawnBurst(burstPos, '#cfe8ff', 26, 14, 0.5, 0.3);
@@ -271,6 +366,7 @@ export class Combat {
       if (to.lengthSq() < 1e-6) to.copy(forward);
       to.normalize();
       if (to.dot(forward) < COS_SHOUT) continue;
+      if(g.p6Enabled && !hasLineOfSight(g,g.targeting.origin(),g.targeting.center(e)))continue;
       e.takeDamage(12, new THREE.Vector3(to.x * 22, 6, to.z * 22));
       g.hud.showEnemyHP(e);
     }
@@ -294,7 +390,9 @@ export class Combat {
         1.2
       );
     }
-    const forward = this._fwd.copy(player.getForward());
+    const target=g.p6Enabled && g.targeting ? g.targeting.get(15) : null;
+    const forward=this._fwd.copy(player.getForward());
+    if(target)forward.copy(target.group.position).sub(player.pos).setY(0).normalize();
     const targets = this.collectTargets();
     for (let i = 0; i < targets.length; i++) {
       const e = targets[i];
@@ -304,6 +402,7 @@ export class Combat {
       if (to.lengthSq() < 1e-6) to.copy(forward);
       to.normalize();
       if (to.dot(forward) < COS_FROST) continue;
+      if(g.p6Enabled && !hasLineOfSight(g,g.targeting.origin(),g.targeting.center(e)))continue;
       e.takeDamage(20);
       if (e.applySlow) e.applySlow(0.45, 4);
       g.hud.showEnemyHP(e);
@@ -314,7 +413,7 @@ export class Combat {
     const g = this.game;
     g.audio.play('dash');
     g.hud.shoutText('WULD · NAH · KEST');
-    if (g.player.startDash) g.player.startDash();
+    if (g.player.startDash) g.player.startDash(g.p6Enabled?{speed:44,duration:0.30}:{});
     const burstPos = this._v1.copy(g.player.pos);
     burstPos.y += 1;
     g.effects.spawnBurst(burstPos, '#f0f6ff', 16, 8, 0.4, 0.22);
@@ -351,6 +450,7 @@ export class Combat {
     this.shoutCd = 0;
     this.shoutCdMax = 15;
     this.meleeHitT = -1;
+    this.comboStep=0;this.comboTimer=0;this.attackBuffer=0;this._meleeStep=1;
     for (const id in this.shoutCooldowns) this.shoutCooldowns[id] = 0;
     this.learnedShouts = ['fus'];
     this.equippedShout = 'fus';

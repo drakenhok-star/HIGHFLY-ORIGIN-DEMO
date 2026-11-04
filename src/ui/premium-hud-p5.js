@@ -48,6 +48,10 @@ const PRESET_STYLE = [
   'body.hf-p5 .hf-actions .hf-p5-s3{right:34px;bottom:144px;border-color:#a781ff}',
   'body.hf-p5 .hf-actions .hf-p5-s4{right:0;bottom:102px;border-color:#a781ff}',
   'body.hf-p5 .hf-actions .hf-p5-locked{opacity:.4;filter:grayscale(.8)}',
+   'body.hf-p5 .hf-actions .hf-p6-lock{right:194px;bottom:95px;width:44px;height:44px;font-size:9px;border-color:#f6cf80}',
+   'body.hf-p5 .hf-actions .hf-p6-next{right:241px;bottom:95px;width:43px;height:43px;font-size:10px;border-color:#f6cf80}',
+   'body.hf-p5 .hf-actions .hf-p6-clear{right:241px;bottom:144px;width:35px;height:35px;font-size:12px;border-color:#f6cf80}',
+   'body.hf-p5 .hf-p6-target{margin-top:4px;font-size:10px;color:#ffe3a6;max-width:230px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}',
   'body.hf-p5 .hf-p5-run{position:fixed!important;left:max(136px,calc(env(safe-area-inset-left) + 132px));bottom:max(23px,env(safe-area-inset-bottom));width:54px;height:54px;border-radius:50%;font-size:10px;background:#102c4bd9}',
   'body.hf-p5 .hf-menu{width:42px;height:35px;font-size:11px;top:max(9px,env(safe-area-inset-top));right:calc(max(12px,env(safe-area-inset-right)) + 120px);border-radius:8px}',
   'body.hf-p5 #hf-p5-header{position:absolute;left:max(9px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top));width:min(254px,38vw);pointer-events:none;color:#f5faff;text-shadow:0 1px 4px #000}',
@@ -132,11 +136,16 @@ export class PremiumHudP5 {
       return actions.lastElementChild;
     };
     add('DASH','dash',()=>this.tryDash());
-    add('S1\nMAGIA','s1',()=>{this.game.input.rightClick=true;});
-    add('S2\nFUS','s2',()=>this.shout('fus'));
+    this.fireButton=add('S1\nMAGIA','s1',()=>{this.game.input.rightClick=true;});
+    this.fusButton=add('S2\nFUS','s2',()=>this.shout('fus'));
     this.frostButton=add('S3\nHIELO','s3',()=>this.shout('frost'));
     this.wuldButton=add('S4\nWULD','s4',()=>this.shout('wuld'));
     this.skillButtons = [this.frostButton,this.wuldButton];
+    if(this.game.p6Enabled){
+      add('FIJAR','p6-lock',()=>this.game.input.justPressed.add('KeyL'));
+      add('SIG.','p6-next',()=>this.game.input.justPressed.add('KeyR'));
+      add('✕','p6-clear',()=>this.game.input.justPressed.add('KeyX'));
+    }
     // No imaginary buttons: skills 3/4 activate only when the original quests unlock them.
   }
   makeHeader() {
@@ -163,6 +172,7 @@ export class PremiumHudP5 {
     inventory.type='button';
     const bag=make('button',null,'♧ BOLSA',links);
     bag.type='button';
+    this.targetLine=make('div','hf-p6-target','',head);
     for(const [btn,tab] of [[inventory,'all'],[bag,'bag']]) {
       btn.addEventListener('pointerdown',e=>{
         e.preventDefault();e.stopPropagation();
@@ -215,6 +225,18 @@ export class PremiumHudP5 {
     const learned=(g.combat&&g.combat.learnedShouts)||[];
     this.frostButton.classList.toggle('hf-p5-locked',!learned.includes('frost'));
     this.wuldButton.classList.toggle('hf-p5-locked',!learned.includes('wuld'));
+    if(g.p6Enabled && g.targeting){
+      const lock=g.targeting.locked,soft=g.targeting.soft,target=lock||soft;
+      this.targetLine.textContent=target?(lock?'◎ FIJADO: ':'◌ CERCA: ')+target.name:'';
+      this.targetLine.style.display=target?'block':'none';
+      const remaining=[g.combat.castCd,g.combat.shoutCooldowns.fus,
+        g.combat.shoutCooldowns.frost,g.combat.shoutCooldowns.wuld];
+      const labels=['MAGIA','FUS','HIELO','WULD'];
+      for(let i=0;i<4;i++){
+        const button=[this.fireButton,this.fusButton,this.frostButton,this.wuldButton][i];
+        button.textContent='S'+(i+1)+'\n'+(remaining[i]>0.1?remaining[i].toFixed(1)+'s':labels[i]);
+      }
+    }else this.targetLine.style.display='none';
   }
   shout(id) {
     const combat=this.game.combat;
@@ -224,11 +246,15 @@ export class PremiumHudP5 {
   }
   tryDash() {
     const g=this.game,now=performance.now();
-    if(now-this.lastDash<3000){g.hud.notify('Dash recargando');return;}
-    if(!g.player.onGround||g.player.dashT>=0){g.hud.notify('Dash no disponible ahora');return;}
+    if(now-this.lastDash<(g.p6Enabled?2200:3000)){g.hud.notify('Dash recargando');return;}
+    if(g.player.dashT>=0 || (g.p6Enabled && !g.player.onGround && g.player._airDashUsed) ||
+      (!g.p6Enabled && !g.player.onGround)){g.hud.notify('Dash no disponible ahora');return;}
     if(!g.stats.useStamina(16)){g.hud.notify('Falta energía');return;}
     this.lastDash=now;
-    g.player.startDash(); // Existing Tianjie5 dash; directional improvements belong to P3/P4.
+    if(g.p6Enabled){
+      if(!g.player.onGround)g.player._airDashUsed=true;
+      g.player.startDash({speed:26,duration:0.24});
+    }else g.player.startDash();
   }
   render() {
     if(!this.open)return;
