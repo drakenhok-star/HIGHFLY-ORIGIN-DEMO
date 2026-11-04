@@ -40,6 +40,10 @@ class Game {
     this.p7Enabled=!new URLSearchParams(location.search).has('hf_p7_off');
     this.p810Enabled=!new URLSearchParams(location.search).has('hf_p810_off');
     this.p812Enabled=!new URLSearchParams(location.search).has('hf_p812_off');
+    this.p812Eco=false;
+    if(this.p812Enabled){
+      try{this.p812Eco=localStorage.getItem('hf_p812_eco')==='1';}catch(err){}
+    }
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     // P1 quality HIGH baseline: restore original render scale on Android.
@@ -311,9 +315,16 @@ window.game = game;
 
 const clock = new THREE.Clock();
 let splashHidden = false;
+let lastEcoFrame=0;
 
-function loop() {
+function loop(time) {
   requestAnimationFrame(loop);
+  if(game.p812Enabled && game.p812Eco && game.touch?.enabled){
+    // Skip world and GPU render together, never run physics with a fake tiny dt.
+    // 30 fps saves energy while the existing 30-40 fps phone cannot sustain 60.
+    if(time-lastEcoFrame<1000/30-0.8)return;
+    lastEcoFrame=time;
+  }
   game.mobileAudit.begin();
   game.p6Perf.begin();
   const dt = Math.min(clock.getDelta(), 0.05);
@@ -356,7 +367,11 @@ function loop() {
     game.camera.lookAt(0, 8, 40);
   }
 
-  game.composer.render();
+  if(game.p812Enabled && game.performanceP2?.preset==='FLUID'){
+    // FLUID mode does not require a full-screen postprocessing composer pass.
+    // Renderer already owns SRGB output and ACES tone mapping.
+    game.renderer.render(game.scene,game.camera);
+  }else game.composer.render();
   if(game.touch?.premium?.p7Inventory)game.touch.premium.p7Inventory.update(dt);
   if(game.touch?.premium?.p810)game.touch.premium.p810.update(dt);
   game.p6Perf.mark('render');

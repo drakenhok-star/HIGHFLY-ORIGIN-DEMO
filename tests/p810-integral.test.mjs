@@ -4,11 +4,11 @@ import {readFile} from 'node:fs/promises';
 const source=async p=>readFile(new URL('../'+p,import.meta.url),'utf8');
 const importSource=async p=>import('data:text/javascript;base64,'+Buffer.from(await source(p)).toString('base64'));
 const {HUD_LAYOUT_KEY,HUD_IDS,HUD_DEFAULTS,sanitizeHudLayout,placeHudItem}=await importSource('src/ui/p10-layout.js');
-assert.equal(HUD_LAYOUT_KEY,'hf_p10_hud_layout_v1');
+assert.equal(HUD_LAYOUT_KEY,'hf_p812_hud_layout_v2');
 assert.ok(HUD_IDS.includes('radar')&&HUD_IDS.includes('atk')&&HUD_IDS.includes('combo'));
 const defaults=sanitizeHudLayout();
 const comboPlace=placeHudItem(defaults.combo,915,412,1,true);
-assert.ok(comboPlace.top>360,'combo notification remains at bottom, not mid-screen');
+assert.ok(comboPlace.top<50,'combo notification moves to the upper center, away from controls');
 const sequence=['run','jump','dash','use','s1','atk'];
 assert.deepEqual(sequence,sequence.toSorted((a,b)=>defaults[a].x-defaults[b].x),
  'primary row is CORRER / SALTO / DASH / USAR / S1 / ATK');

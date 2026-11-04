@@ -58,6 +58,13 @@ export class HudEditorP10{
   node('strong',null,'✦ EDITOR DE INTERFAZ',title);
   const x=node('button',null,'TERMINAR',title);
   x.type='button';x.addEventListener('click',()=>this.stop(true));
+  if(this.game.p812Enabled){
+   this.miniBtn=node('button',null,'MINIMIZAR',title);this.miniBtn.type='button';
+   this.miniBtn.addEventListener('click',()=>{
+    const mini=this.panel.classList.toggle('hf-p812-mini');
+    this.miniBtn.textContent=mini?'EXPANDIR':'MINIMIZAR';
+   });
+  }
   const row=node('div','hf-p10-editor-row',undefined,this.panel);
   const label=node('label',null,'Botón: ',row);
   this.select=node('select',null,undefined,label);
@@ -106,6 +113,7 @@ export class HudEditorP10{
   this.game.input.leftClick=false;this.game.input.rightClick=false;
   this.game.touch?.reset?.();
   this.panel.style.display='block';
+  if(this.game.p812Enabled){this.panel.classList.add('hf-p812-mini');this.miniBtn.textContent='EXPANDIR';}
   document.body.classList.add('hf-p10-editing');
   this.apply();this.choose(this.selected);
   document.addEventListener('pointerdown',this.onDown,true);
@@ -138,7 +146,7 @@ export class HudEditorP10{
   if(!this.editing)return;
   if(save)this.persist();
   this.editing=false;this.drag=null;this.game.input.hudEditing=false;
-  this.panel.style.display='none';document.body.classList.remove('hf-p10-editing');
+  this.panel.style.display='none';this.panel.classList.remove('hf-p812-mini');document.body.classList.remove('hf-p10-editing');
   document.removeEventListener('pointerdown',this.onDown,true);
   document.removeEventListener('pointermove',this.onMove,true);
   document.removeEventListener('pointerup',this.onUp,true);

@@ -237,6 +237,14 @@ export class HighflyPanelsP9 {
    });
   }else if(st==='graphics'){
    el('p','hf-p9-muted','El modo FLUIDO reduce el costo de render. No altera las misiones ni el combate.',content);
+   if(g.p812Enabled){
+    click(g.p812Eco?'✔ AHORRO TÉRMICO ACTIVO · 30 FPS':'○ ACTIVAR AHORRO TÉRMICO · 30 FPS',()=>{
+     g.p812Eco=!g.p812Eco;
+     try{localStorage.setItem('hf_p812_eco',g.p812Eco?'1':'0');}catch(err){}
+     g.performanceP2.apply('FLUID');this.renderSettings();
+    });
+    el('p','hf-p9-muted','Ahorro térmico: limita la tasa de cuadros y baja resolución interna. No mide temperatura ni garantiza que el equipo no se caliente.',content);
+   }
    const wrap=el('div','hf-p9-meta',undefined,content);
    for(const [id,label] of [['FLUID','FLUIDO'],['BALANCED','EQUILIBRADO+'],['WATER','AGUA'],['HIGH','ALTA']]){
     const button=el('button',null,(g.performanceP2?.preset===id?'● ':'○ ')+label,wrap);
