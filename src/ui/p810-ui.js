@@ -28,6 +28,8 @@ export class HighflyP810{
  }
  mountHud(){
   const root=this.touch.root;
+  const nativePause=root.querySelector('.hf-menu');
+  if(nativePause)nativePause.style.setProperty('display','none','important');
   const joy=root.querySelector('.hf-joy');
   this.editor.register('joy',joy);
   for(const [id,sel] of BUTTONS){

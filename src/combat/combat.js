@@ -166,6 +166,12 @@ export class Combat {
       else if(g.p6Enabled && this.meleeCd<0.18)this.attackBuffer=0.19;
       return;
     }
+    if(g.p810Enabled && g.player.dashT>=0){
+      // A short no-cancel startup preserves directional feel; later ATK can
+      // cancel the dodge recovery cleanly without changing camera yaw.
+      if(g.player.dashT<0.065){this.attackBuffer=Math.max(this.attackBuffer,.18);return;}
+      g.player.dashT=-1;
+    }
     const step=g.p7Enabled ? comboStep(this.comboStep,this.comboTimer>0)
       : g.p6Enabled ? (this.comboTimer>0 ? this.comboStep%4+1 : 1) : 1;
     const cost=g.p6Enabled && step===4 ? 10 : g.p6Enabled && step===3 ? 7 : 6;
