@@ -1,3 +1,5 @@
+import { PremiumInventoryP7 } from './inventory-p7.js';
+
 /**
  * HIGHFLY P5-A - HUD mobile premium, built on Tianjie5's REAL stats/inventory.
  * No images or private assets. MIT extension. Disable with ?hf_classic_hud=1.
@@ -117,6 +119,27 @@ export class PremiumHudP5 {
     this.makeControls();
     this.makeHeader();
     this.makeOverlay();
+    if(this.game.p7Enabled){
+      this.p7Inventory=new PremiumInventoryP7(this);
+      const style=make('style',null, [
+        'body.hf-p7 #hf-touch .hf-actions{width:min(362px,70vw);height:min(190px,60vh)}',
+        'body.hf-p7 #hf-touch .hf-actions>.hf-p5-atk{right:0;bottom:0;width:78px;height:78px}',
+        'body.hf-p7 #hf-touch .hf-actions>.hf-p5-s1{right:83px;bottom:0;width:48px;height:48px}',
+        'body.hf-p7 #hf-touch .hf-actions>.hf-p5-use{right:136px;bottom:0;width:47px;height:47px}',
+        'body.hf-p7 #hf-touch .hf-actions>.hf-p5-dash{right:190px;bottom:0;width:47px;height:47px}',
+        'body.hf-p7 #hf-touch .hf-actions>.hf-p5-jump{right:244px;bottom:0;width:47px;height:47px}',
+        'body.hf-p7 #hf-touch .hf-p5-run{position:fixed!important;left:auto!important;right:calc(max(10px,env(safe-area-inset-right)) + 298px)!important;bottom:max(10px,env(safe-area-inset-bottom))!important;width:42px;height:42px;font-size:8px}',
+        'body.hf-p7 #hf-touch .hf-actions>.hf-p5-s2{right:103px;bottom:94px}',
+        'body.hf-p7 #hf-touch .hf-actions>.hf-p5-s3{right:56px;bottom:133px}',
+        'body.hf-p7 #hf-touch .hf-actions>.hf-p5-s4{right:0;bottom:111px}',
+        'body.hf-p7 #hf-touch .hf-actions>.hf-p6-lock{right:220px;bottom:80px}',
+        'body.hf-p7 #hf-touch .hf-actions>.hf-p6-next{right:269px;bottom:88px}',
+        'body.hf-p7 #hf-touch .hf-actions>.hf-p6-clear{right:313px;bottom:109px}',
+        'body.hf-p7 #hf-touch .hf-p6-target{font-size:11px;color:#ffdb90;font-weight:700}',
+        '@media(max-height:390px){body.hf-p7 #hf-touch .hf-actions{transform:scale(.86);transform-origin:bottom right}body.hf-p7 #hf-touch .hf-p5-run{transform:scale(.82);transform-origin:bottom right}}'
+      ].join('\n'),document.head);
+      style.id='highfly-p7-hud-style';
+    }
     this.refreshHeader();
     this.refreshTimer = window.setInterval(() => this.refreshHeader(),300);
   }
@@ -227,8 +250,9 @@ export class PremiumHudP5 {
     this.wuldButton.classList.toggle('hf-p5-locked',!learned.includes('wuld'));
     if(g.p6Enabled && g.targeting){
       const lock=g.targeting.locked,soft=g.targeting.soft,target=lock||soft;
-      this.targetLine.textContent=target?(lock?'◎ FIJADO: ':'◌ CERCA: ')+target.name:'';
-      this.targetLine.style.display=target?'block':'none';
+      const combo=g.p7Enabled && g.combat?.comboTimer>0?'⚔ COMBO '+g.combat.comboStep+'/4 · ':'';
+      this.targetLine.textContent=combo+(target?(lock?'◎ FIJADO: ':'◌ CERCA: ')+target.name:'');
+      this.targetLine.style.display=(target||combo)?'block':'none';
       const remaining=[g.combat.castCd,g.combat.shoutCooldowns.fus,
         g.combat.shoutCooldowns.frost,g.combat.shoutCooldowns.wuld];
       const labels=['MAGIA','FUS','HIELO','WULD'];
@@ -246,12 +270,16 @@ export class PremiumHudP5 {
   }
   tryDash() {
     const g=this.game,now=performance.now();
-    if(now-this.lastDash<(g.p6Enabled?2200:3000)){g.hud.notify('Dash recargando');return;}
-    if(g.player.dashT>=0 || (g.p6Enabled && !g.player.onGround && g.player._airDashUsed) ||
+    if(now-this.lastDash<(g.p7Enabled?420:g.p6Enabled?2200:3000)){g.hud.notify('Dash recargando');return;}
+    if(g.player.dashT>=0 || (g.p7Enabled && !g.player.onGround && g.player._airDashCount>=2) ||
+      (!g.p7Enabled && g.p6Enabled && !g.player.onGround && g.player._airDashUsed) ||
       (!g.p6Enabled && !g.player.onGround)){g.hud.notify('Dash no disponible ahora');return;}
     if(!g.stats.useStamina(16)){g.hud.notify('Falta energía');return;}
     this.lastDash=now;
-    if(g.p6Enabled){
+    if(g.p7Enabled){
+      if(!g.player.onGround)g.player._airDashCount++;
+      g.player.startDash({speed:20,duration:0.15,style:'dodge'});
+    }else if(g.p6Enabled){
       if(!g.player.onGround)g.player._airDashUsed=true;
       g.player.startDash({speed:26,duration:0.24,style:'dodge'});
     }else g.player.startDash();
@@ -262,6 +290,7 @@ export class PremiumHudP5 {
     this.list.replaceChildren();this.detail.replaceChildren();
     if(this.tab==='quests')return this.renderQuests();
     if(this.tab==='settings')return this.renderSettings();
+    if(this.p7Inventory)return this.p7Inventory.render(this.tab);
     const inv=this.game.inventory,all=Array.from(inv.slots.entries()).filter(([,n])=>n>0);
     const filtered=all.filter(([id])=>{
       const type= id.includes('sword')?'weapon':id.includes('armor')?'armor':
