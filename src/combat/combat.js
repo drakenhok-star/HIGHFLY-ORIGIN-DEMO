@@ -3,7 +3,8 @@ import { ABILITIES_P6, abilityForShout, spendAbilityResource } from './abilities
 import { hasLineOfSight, insideBlockingObject } from './targeting-p6.js';
 import { comboStep } from './motion-p7.js';
 import {AIR_CHAIN_P14,advanceComboClock,airStrikeProfile} from './air-chain-p14.js';
-import {strikeProfile,resolveCombatContext,reactionPolicy,pickMeleeTarget} from './fury-combat-p15.js';
+import {strikeProfile,resolveCombatContext,reactionPolicy,pickMeleeTarget,
+  canCancelAction,FURY_CANCEL_P15} from './fury-combat-p15.js';
 
 const MELEE_CD = 0.5;
 const CAST_CD = 0.6;
@@ -84,6 +85,14 @@ export class Combat {
     if (d && d.alive && out.indexOf(d) === -1) out.push(d);
     return out;
   }
+
+  canCancelDash(){
+    const p=this.game.player;
+    return canCancelAction({kind:p.attackT>=0?'attack':'idle',
+      elapsed:p.attackT>=0?p.attackT*p.actionDuration:0,
+      step:this._meleeStep,request:'dash',grounded:p.onGround});
+  }
+  dashQueueSeconds(){return FURY_CANCEL_P15.dashQueue;}
 
   keepAirCombo(action){
     if(!this.game.p14Enabled || this.comboStep<1 || this.comboTimer<=0)return false;
