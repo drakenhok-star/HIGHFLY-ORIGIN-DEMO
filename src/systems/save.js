@@ -1,12 +1,13 @@
 const LEGACY_KEY = 'tianjie5_save';
 const KEY = 'highfly_p7_save';
 const KEY_P810 = 'highfly_p810_save';
+const KEY_P812 = 'highfly_p812_save';
 
 export class SaveSys {
   constructor(game) {
     this.game = game;
     this.autosaveTimer = 0;
-    this.key=game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
+    this.key=game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
   }
 
   save() {
@@ -35,6 +36,7 @@ export class SaveSys {
 
   hasSave() {
     return localStorage.getItem(this.key) !== null ||
+      (this.game.p812Enabled && localStorage.getItem(KEY_P810)!==null) ||
       (this.game.p810Enabled && (localStorage.getItem(KEY)!==null || localStorage.getItem(LEGACY_KEY)!==null)) ||
       (this.game.p7Enabled && localStorage.getItem(LEGACY_KEY)!==null);
   }
@@ -42,6 +44,7 @@ export class SaveSys {
   loadRaw() {
     // First P7 visit reads P6 progress, but writes ONLY P7: original never overwritten.
     const raw = localStorage.getItem(this.key) ||
+      (this.game.p812Enabled?localStorage.getItem(KEY_P810):null) ||
       (this.game.p810Enabled?localStorage.getItem(KEY):null) ||
       (this.game.p7Enabled?localStorage.getItem(LEGACY_KEY):null);
     if (!raw) return null;
@@ -102,7 +105,7 @@ export class SaveSys {
     if (this.autosaveTimer >= 60) {
       this.autosaveTimer = 0;
       this.save();
-      this.game.hud.notify('已自动保存');
+      this.game.hud.notify('Guardado automático');
     }
   }
 }

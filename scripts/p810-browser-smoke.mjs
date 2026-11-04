@@ -81,7 +81,7 @@ try{
  });
  assert.ok(await page.locator('#hf-p810-quick').isVisible(),'quick menu really expands');
  await page.locator('#hf-p810-quick button').filter({hasText:'GUARDAR'}).click();
- assert.ok(await page.evaluate(()=>localStorage.getItem('highfly_p810_save')!==null),'P810 saves separately from P7');
+ assert.ok(await page.evaluate(()=>localStorage.getItem(window.game.p812Enabled?'highfly_p812_save':'highfly_p810_save')!==null),'P812 and P810 save separately from P7');
  await mkdir('audit-output',{recursive:true});
  await page.screenshot({path:'audit-output/p810-mobile-landscape.png',fullPage:true,timeout:30000});
  // A failed optional WebGL preview is graceful; actual JS exceptions are not.

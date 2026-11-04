@@ -97,7 +97,7 @@ export class NPCs {
       if (s1 === 'active') {
         return {
           name: npc.name,
-          text: '¿Cuántos lobos eliminaste? (' + this._questProgress('q1') + '/5）',
+          text: '¿Cuántos lobos eliminaste? (' + this._questProgress('q1') + '/5)',
           options: [bye],
         };
       }
