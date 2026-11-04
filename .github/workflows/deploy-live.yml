@@ -86,6 +86,29 @@ jobs:
           echo "P7 checked: 55c631cc39dae9b8fb4aab819bf8176ea62d6fc9"
           echo "Public: / stable · /p6 prior · /p7 FURY 360"
 
+      - name: Add CI-green integrated P8 P9 P10 playtest (preserve stable P6 P7)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags --depth=1 origin refs/heads/p8-p9-p10-fury-ui-editor-20261104
+          test "$(git rev-parse FETCH_HEAD)" = "25d5a421521aef6172a8b5a0efb0a03db77c811b"
+          mkdir -p .site/p810
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets | tar -x -C .site/p810
+          test -s .site/p810/index.html
+          test -s .site/p810/src/ui/p810-ui.js
+          test -s .site/p810/src/ui/p9-panels.js
+          test -s .site/p810/src/ui/p10-hud-editor.js
+          test -s .site/p810/src/combat/combat.js
+          test -s .site/p810/assets/models/player_barbarian.glb
+          find .site/p810/src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+          if find .site/p810 -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
+            echo "Restricted media detected"; exit 1
+          fi
+          echo "P810 preview pinned to 25d5a421521aef6172a8b5a0efb0a03db77c811b"
+          echo "Public site: / stable · /p6 · /p7 · /p810"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
