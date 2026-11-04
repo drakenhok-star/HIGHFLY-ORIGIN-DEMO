@@ -1,0 +1,55 @@
+name: HIGHFLY P8-P9-P10 · FURY CORE + PREMIUM UI + HUD EDITOR
+on:
+  push:
+    branches: [p8-p9-p10-fury-ui-editor-20261104]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify every first-party game module syntax
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -type f -name '*.js' -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+      - name: Run historical gameplay and new P8/P9/P10 rules
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          node tests/premium-hud.test.mjs
+          node tests/p6-integral.test.mjs
+          node tests/p7-fury.test.mjs
+          node tests/p810-integral.test.mjs
+      - name: Inspect real GLB animation availability
+        run: node scripts/audit_animation_p6.mjs
+      - name: Validate publicly redistributable package boundaries
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -s LICENSE
+          test -s PROVENANCE.md
+          test -s src/ui/p810-ui.js
+          test -s src/ui/p9-panels.js
+          test -s src/ui/p10-hud-editor.js
+          test -s assets/models/player_barbarian.glb
+          if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
+            echo "ERROR: restricted asset matched"; exit 1
+          fi
+      - name: Upload GLB inspection for review
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: highfly-p810-audit
+          path: audit-output/animation_inventory_p6.json
+          if-no-files-found: ignore
+          retention-days: 14
