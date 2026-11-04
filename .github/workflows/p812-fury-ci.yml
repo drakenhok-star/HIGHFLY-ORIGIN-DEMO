@@ -1,0 +1,69 @@
+name: HIGHFLY P812 · FURY Polish + Quest Radar + Mobile Thermal
+on:
+  push:
+    branches: [p812-fury-polish-20261104]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Parse every first-party JS module
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+      - name: Historical regression tests and P812 contracts
+        run: |
+          node tests/premium-hud.test.mjs
+          node tests/p6-integral.test.mjs
+          node tests/p7-fury.test.mjs
+          node tests/p810-integral.test.mjs
+          node tests/p812-polish.test.mjs
+      - name: Inspect public GLB animation inventory
+        run: node scripts/audit_animation_p6.mjs
+      - name: Ensure no proprietary SOURCE kits
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -s LICENSE
+          test -s PROVENANCE.md
+          test -s src/ui/p812-polish.js
+          test -s assets/models/player_barbarian.glb
+          ! find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .
+  browser:
+    runs-on: ubuntu-latest
+    needs: validate
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium automation in disposable GitHub runner
+        run: |
+          printf '{"private":true,"type":"module"}\n' > package.json
+          npm install --no-save --no-package-lock playwright-core@1.58.0
+          command -v google-chrome || command -v chromium
+      - name: Android landscape simulated gameplay/panels/editor smoke
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m http.server 8957 --bind 127.0.0.1 > /tmp/p812-http.log 2>&1 &
+          CHROME_PATH="$(command -v google-chrome || command -v chromium)" node scripts/p810-browser-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: highfly-p812-chromium-landscape
+          path: audit-output/p810-mobile-landscape.png
+          if-no-files-found: ignore
+          retention-days: 10
