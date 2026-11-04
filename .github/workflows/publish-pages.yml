@@ -38,6 +38,10 @@ jobs:
           git add LICENSE index.html styles.css server.mjs src lib assets .nojekyll
           if ! git diff --cached --quiet; then
             git commit -m "feat(public): materialize runnable MIT/CC0 HIGHFLY demo"
+            # The source repo may receive new commits while this job builds.
+            # Rebase the generated game onto latest main; never force-push.
+            git fetch origin main
+            git rebase origin/main
             git push origin HEAD:main
           else
             echo "Original assets and game source already current"
