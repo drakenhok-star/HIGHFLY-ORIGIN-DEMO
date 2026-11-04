@@ -1,0 +1,65 @@
+name: HIGHFLY P16 · Super Aim / VFX / ClaudeCraft game lab
+on:
+  push:
+    branches: [p16-aim-vfx-claudecraft-20261104]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate syntax for ALL original and lab JavaScript modules
+        run: |
+          set -Eeuo pipefail
+          find src -type f -name '*.js' -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+          node --input-type=module --check < scripts/p16-browser-smoke.mjs
+      - name: FURY P5 through P16 full regression checks
+        run: |
+          set -Eeuo pipefail
+          node tests/premium-hud.test.mjs
+          node tests/p6-integral.test.mjs
+          node tests/p7-fury.test.mjs
+          node tests/p810-integral.test.mjs
+          node tests/p812-polish.test.mjs
+          node tests/p13-fury.test.mjs
+          node tests/p14-air-chain.test.mjs
+          node tests/p15-skill-lab.test.mjs
+          node tests/p16-aim-claude.test.mjs
+      - name: Strict source and public media audit
+        run: |
+          set -Eeuo pipefail
+          test -s LICENSE
+          test -s PROVENANCE.md
+          test -s assets/models/player_barbarian.glb
+          test -s src/skillslab/aim-guide-p16.js
+          test -s src/skillslab/claudecraft-kit-p16.js
+          if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
+            echo 'Restricted material detected'; exit 1
+          fi
+  simulated-phone:
+    needs: source-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright + system browser driver
+        run: |
+          printf '{"private":true,"type":"module"}\n' > package.json
+          npm install --no-save --no-package-lock playwright-core@1.58.0
+          command -v google-chrome || command -v chromium
+      - name: Run P16 gameplay in full Three.js WebGL Android landscape
+        run: |
+          set -Eeuo pipefail
+          python3 -m http.server 8957 --bind 127.0.0.1 > /tmp/p16-http.log 2>&1 &
+          CHROME_PATH="$(command -v google-chrome || command -v chromium)" node scripts/p16-browser-smoke.mjs
