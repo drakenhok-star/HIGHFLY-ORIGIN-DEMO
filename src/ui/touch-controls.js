@@ -18,8 +18,14 @@ export class TouchControls {
     if (!this.enabled) return;
     this.build();
     this.camera();
-    this.premium = !new URLSearchParams(location.search).has('hf_classic_hud')
-      ? new PremiumHudP5(this) : null;
+    this.premium = null;
+    if (!new URLSearchParams(location.search).has('hf_classic_hud')) {
+      try { this.premium = new PremiumHudP5(this); }
+      catch (err) {
+        console.error('[HIGHFLY HUD] Recuperando HUD clásico:', err);
+        document.body.classList.remove('hf-p5');
+      }
+    }
     this.setState(game.state);
     window.addEventListener('blur', () => this.reset());
     document.addEventListener('visibilitychange', () => { if (document.hidden) this.reset(); });
