@@ -68,8 +68,9 @@ export class TianjieMobaSkillsLab {
     // Keep original melee(), movement, WULD/dash, quests and HUD intact.
     g.combat.cast=(...args)=>this.cast(1,null,'keyboard')||undefined;
     g.combat.shout=(id,...args)=>{
-      if(id==='fus')return this.cast(2,null,'keyboard');
-      if(id==='frost')return this.cast(3,null,'keyboard');
+      const selected=id||g.combat.equippedShout;
+      if(selected==='fus')return this.cast(2,null,'keyboard');
+      if(selected==='frost')return this.cast(3,null,'keyboard');
       return originalShout(id,...args); // S4 WULD remains Tianjie.
     };
     g.combat.update=(dt)=>{
@@ -436,12 +437,12 @@ export class TianjieMobaSkillsLab {
   attachTouchButtons(){
     for(let slot=1;slot<=3;slot++){
       const b=document.querySelector('.hf-p5-s'+slot);
-      if(!b||b.dataset.hfLabBound)return; // idempotent per element
+      if(!b||b.dataset.hfLabBound)continue; // idempotent per element
       b.dataset.hfLabBound='1';
       b.addEventListener('pointerdown',e=>{
         if(this.game.state!=='playing')return;
-        e.preventDefault();e.stopImmediatePropagation();
         if(this.game.input.hudEditing)return;
+        e.preventDefault();e.stopImmediatePropagation();
         this.cancelAim();
         b.setPointerCapture(e.pointerId);
         this.aim={slot,id:e.pointerId,x:e.clientX,y:e.clientY,dragged:false,button:b,dir:null};
