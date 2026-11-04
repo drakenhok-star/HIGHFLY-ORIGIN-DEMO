@@ -40,3 +40,19 @@ resource mp/energy, aim melee/line/cone/circle/self/target, cost, cooldown, allo
 ## Pruebas CI
 P5, P6, P7, P810, P812, P13, P14, P15, inventario GLB, sintaxis y navegador mobile-landscape.
 URL de Pages solo si el SHA de la rama coincide con el SHA verde exacto.
+
+
+## Nuevo remate direccional del cuarto golpe (P15)
+El cuarto ATK almacena la dirección del joystick **cuando comienza el golpe**, no cuando impacta.
+- ↑ (joystick arriba): elevación física vertical del enemigo (velocidad vertical ~9.2).
+- ← / →: empuje lateral relativo a cámara, sin girar la cámara.
+- ↓: empuje frontal fuerte y breve aturdimiento; **NO es todavía una animación real de derribo**.
+- Joystick neutro: remate frontal.
+- Diagonales: se respeta el eje dominante; un movimiento diagonal con componente hacia arriba dominante lanza verticalmente.
+- Mantiene el consumo normal de Energía del cuarto golpe. No añade botón ni nuevo VFX de alto coste.
+- No aplica control direccional a dragones, jefes, enemigos demasiado grandes, inmunes o que explícitamente bloqueen/defiendan.
+- El juego NO tiene todavía un sistema general de bloqueo/parry; las propiedades blocking/defending son puertos para futuras IA.
+- Las animaciones siguen siendo las cuatro secuencias reales verificadas; **la reacción física es nueva, no hay animaciones específicas de launch lateral o derribo**.
+
+CI: \`tests/p15-finisher.test.mjs\` verifica las cuatro direcciones, orientación con cámara, diagonales, umbral neutro, inmunidades y snapshot.
+Browser: prueba la cuarta entrada real \`combat.melee()\` con joystick arriba, coste de Energía y captura de elevación.

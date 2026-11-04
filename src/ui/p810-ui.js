@@ -146,7 +146,7 @@ export class HighflyP810{
   if(this.combo){
    const c=this.game.combat;
    this.combo.textContent=visible&&(c?.comboTimer>0||this.editor.editing)
-      ?'⚔ COMBO '+(c?.comboStep||1)+' / 4'+(c?.comboStep===4?' ✦ FINAL':''):'';
+      ?'⚔ COMBO '+(c?.comboStep||1)+' / 4'+(c?.comboStep===4?' ✦ FINAL'+(this.game.p15Enabled&&c?._finisher?' '+c._finisher.arrow:''):''):'';
    // P14 fixes the inline !important display previously left by the HUD editor.
    if(this.game.p14Enabled)this.combo.style.setProperty('display',
       this.combo.textContent?'block':'none','important');

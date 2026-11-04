@@ -34,6 +34,7 @@ jobs:
           node tests/p13-fury.test.mjs
           node tests/p14-air-chain.test.mjs
           node tests/p15-fury.test.mjs
+          node tests/p15-finisher.test.mjs
       - name: Scan mountain heightfield for real parkour exploration
         run: node scripts/p14-mountain-scan.mjs
       - name: Validate source glTF animations and private kit safety

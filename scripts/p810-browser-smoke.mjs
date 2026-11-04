@@ -50,6 +50,23 @@ try{
   assert.equal(p15.saveKey,'highfly_p15_save','save is separate from P14');
   assert.ok(!p15.menuText.includes('PROBAR PARKOUR')&&!p15.menuText.includes('MESETA MONTAÑOSA'),
    'temporary P14 teleport tools removed from player menu');
+  const finisher=await page.evaluate(()=>{
+   const g=window.game,c=g.combat;
+   const before=g.stats.sp;
+   g.stats.sp=Math.max(20,before);
+   c.comboStep=3;c.comboTimer=.85;c.meleeCd=0;
+   g.input.touchMove.x=0;g.input.touchMove.y=-1;
+   c.melee();
+   const sample={step:c.comboStep,mode:c._finisher?.mode,vy:c._finisher?.vy,
+      energySpent:g.stats.sp<Math.max(20,before)};
+   g.input.touchMove.x=0;g.input.touchMove.y=0;
+   c.meleeHitT=-1;c.meleeCd=0;c.comboStep=0;c.comboTimer=0;c._finisher=null;
+   g.player.attackT=-1;
+   return sample;
+  });
+  assert.equal(finisher.step,4,'fourth hit triggers from an existing chain');
+  assert.equal(finisher.mode,'launch','UP joystick is captured as fourth-hit launch');
+  assert.ok(finisher.vy>8.5 && finisher.energySpent,'launcher has real vertical physics and usual attack cost');
  }
  if(await page.evaluate(()=>window.game.p13Enabled)){
    const ready=await page.evaluate(()=>({
