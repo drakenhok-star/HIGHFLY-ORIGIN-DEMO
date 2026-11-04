@@ -20,6 +20,8 @@ export class WorldMapP34 {
     this.atlas = document.createElement("canvas");
     this.atlas.width = this.atlas.height = 128;
     this.atlasReady = false;
+    this.pinnedQuestId=null;
+    this.pinnedLabel='';
     this.atlasStarted = false;
     this.opened = false;
     this.mount();
@@ -126,11 +128,40 @@ export class WorldMapP34 {
       ctx.lineWidth=3;ctx.strokeStyle="#06141a";ctx.fillStyle="#fff";
       ctx.strokeText(name,px+8,py);ctx.fillText(name,px+8,py);
     }
+    const quest=this.game.p812Enabled?this.missionPosition():null;
+    if(quest){
+      const qx=at(quest.x),qy=at(quest.z);
+      this.dot(ctx,qx,qy,9,'#ffd36d');
+      ctx.fillStyle='#ffe9a4';ctx.font='bold 14px system-ui';
+      ctx.fillText('✦ '+this.pinnedLabel,qx+10,qy-10);
+    }
     const p=this.game.player.pos,px=at(p.x),py=at(p.z);
     if(px>=0&&px<n&&py>=0&&py<n)this.dot(ctx,px,py,7,"#52ffd8");
     ctx.fillStyle="#fff";ctx.font="bold 18px system-ui";ctx.fillText("N ↑",12,20);
     ctx.font="12px system-ui";ctx.fillText("X "+Math.round(p.x)+" · Z "+Math.round(p.z),12,n-14);
     if(!this.atlasReady)ctx.fillText("Calculando relieve...",n-170,n-14);
+  }
+  trackQuest(id){
+    if(!['q1','q2','q3'].includes(id))return false;
+    const state=this.game.quests.getState(id);
+    if(state==='done'||state==='locked')return false;
+    this.pinnedQuestId=id;
+    this.pinnedLabel=({q1:'Lobos',q2:'Espada ancestral',q3:'Dragón'})[id];
+    this.drawMini();return true;
+  }
+  missionPosition(){
+    const id=this.pinnedQuestId,g=this.game;
+    if(!id)return null;
+    const state=g.quests.getState(id);
+    if(state==='done'||state==='locked')return null;
+    if(state==='complete'){
+      const npcId=id==='q2'?'sigrid':'olaf';
+      const npc=g.npcs.list.find(n=>n.id===npcId);
+      return npc?.group.position||null;
+    }
+    if(id==='q1')return g.quests._wolfMarkerPos();
+    if(id==='q2')return g.structures.chests[0]?.pos||null;
+    return g.enemies.dragon?.group.position||null;
   }
   drawMini() {
     const n=this.miniCanvas.width,ctx=this.miniCanvas.getContext("2d"),p=this.game.player.pos;
@@ -149,6 +180,19 @@ export class WorldMapP34 {
       const px=n/2+(x-p.x)*scale,py=n/2+(z-p.z)*scale;
       if(px<6||py<6||px>n-6||py>n-6)continue;
       this.dot(ctx,px,py,4,color);
+    }
+    if(this.game.p812Enabled){
+      const quest=this.missionPosition();
+      if(quest){
+        const dx=(quest.x-p.x)*scale,dz=(quest.z-p.z)*scale;
+        const limit=n/2-14,len=Math.hypot(dx,dz);
+        const t=len>limit?limit/len:1;
+        const px=n/2+dx*t,py=n/2+dz*t;
+        ctx.save();ctx.shadowColor='#ffcc72';ctx.shadowBlur=12;
+        ctx.strokeStyle='#ffe5a1';ctx.fillStyle='#f1a22b';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px,py-9);ctx.lineTo(px+7,py);ctx.lineTo(px,py+9);ctx.lineTo(px-7,py);ctx.closePath();ctx.fill();ctx.stroke();
+        ctx.restore();
+      }
     }
     ctx.save();ctx.translate(n/2,n/2);ctx.rotate(-this.game.player.yaw);
     ctx.beginPath();ctx.moveTo(0,-12);ctx.lineTo(8,10);ctx.lineTo(0,5);ctx.lineTo(-8,10);ctx.closePath();

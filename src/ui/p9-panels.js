@@ -94,7 +94,11 @@ export class HighflyPanelsP9 {
   line('Daño del equipo',inv.weaponDamage()+inv.offhandDamage());
   line('Armadura',inv.armorValue());
   const skillCount=g.combat.learnedShouts.length;
-  line('Habilidades aprendidas',skillCount);
+  if(!g.p812Enabled)line('Habilidades aprendidas',skillCount);
+  if(g.p812Enabled){
+   const btn=el('button',null,'✦ VER ESTADÍSTICAS DETALLADAS',info);
+   btn.addEventListener('click',()=>{this.settingsSection='stats';this.hud.show('settings');});
+  }
  }
  enhanceBag(){
   const inv=this.game.inventory,list=this.hud.list;
@@ -153,7 +157,10 @@ export class HighflyPanelsP9 {
    el('small',null,status+' · '+Math.min(q.need,q.progress)+' / '+q.need,b);
    const meter=el('div','hf-p9-progress',undefined,b);
    const fill=el('span',null,undefined,meter);fill.style.width=(100*Math.min(1,q.progress/Math.max(1,q.need)))+'%';
-   b.addEventListener('click',()=>{this.selectedQuest=q.id;this.renderQuests();});
+   b.addEventListener('click',()=>{
+    this.selectedQuest=q.id;this.renderQuests();
+    if(this.game.worldMapP34?.trackQuest(q.id))this.game.hud.notify('✦ Misión marcada en el radar: '+q.name);
+   });
   }
   if(!visible.length)el('p','hf-p9-muted','No hay misiones en este filtro.',center);
   const q=quests.find(x=>x.id===this.selectedQuest) || visible[0];
@@ -176,6 +183,7 @@ export class HighflyPanelsP9 {
   else el('p','hf-p9-muted','Seguimiento del objetivo disponible en el mapa.',detail);
   const b=el('button','hf-p9-mission-action','◎ VER EN EL MAPA',detail);b.type='button';
   b.addEventListener('click',()=>{
+   this.game.worldMapP34?.trackQuest(q.id);
    this.hud.hide();this.game.worldMapP34?.toggle(true);
   });
   el('p','hf-p9-suggest','No se conceden recompensas desde este panel: se respeta la entrega con NPC.',detail);
@@ -186,7 +194,7 @@ export class HighflyPanelsP9 {
   const nav=el('div','hf-p9-settings-menu',undefined,list);
   const content=el('div','hf-p9-settings-rows',undefined,list);
   list.style.display='flex';list.style.flexDirection='row';list.style.gap='12px';
-  const items=[['camera','◎ Cámara'],['graphics','◈ Gráficos'],['hud','✥ Interfaz / HUD'],
+  const items=[['camera','◎ Cámara'],['graphics','◈ Gráficos'],['stats','✦ Estadísticas'],['hud','✥ Interfaz / HUD'],
     ['controls','✦ Controles'],['audio','♫ Audio']];
   for(const [id,name] of items){
    const b=el('button',this.settingsSection===id?'active':'',name,nav);
@@ -194,7 +202,7 @@ export class HighflyPanelsP9 {
   }
   const g=this.game,st=this.settingsSection;
   const title=({camera:'CÁMARA',graphics:'RENDIMIENTO',hud:'PERSONALIZAR INTERFAZ',
-   controls:'CONTROLES DE JUEGO',audio:'AUDIO'})[st];
+   controls:'CONTROLES DE JUEGO',audio:'AUDIO',stats:'ESTADÍSTICAS REALES'})[st];
   el('h3',null,title,content);
   const slider=(name,min,max,step,value,cb)=>{
    const row=el('label',null,undefined,content),text=el('span',null,name,row);
@@ -208,7 +216,15 @@ export class HighflyPanelsP9 {
    const b=el('button',null,label,content);b.type='button';
    b.addEventListener('click',()=>{callback();});return b;
   };
-  if(st==='camera'){
+  if(st==='stats'){
+   const s=g.stats,inv=g.inventory;
+   const lines=[['Nivel',s.level],['EXP',s.xp+'/'+s.xpNext()],
+    ['Vida',Math.ceil(s.hp)+'/'+s.maxHp],['Maná',Math.ceil(s.mp)+'/'+s.maxMp],
+    ['Energía',Math.ceil(s.sp)+'/'+s.maxSp],['Ataque equipado',inv.weaponDamage()+inv.offhandDamage()],
+    ['Defensa equipada',inv.armorValue()],['Habilidades aprendidas',g.combat.learnedShouts.length]];
+   for(const [k,v] of lines){const row=el('label',null,undefined,content);
+    el('span',null,k,row);el('strong',null,String(v),row);}
+  }else if(st==='camera'){
    slider('Sensibilidad táctil',.8,2.4,.1,this.hud.touch.cameraSensitivity,v=>this.hud.touch.setCameraSensitivity(v));
    slider('Distancia',2.5,12,.5,g.player.camDist,v=>{
     g.player.camDist=v;try{localStorage.setItem('hf_p9_cam_dist',String(v));}catch(err){}

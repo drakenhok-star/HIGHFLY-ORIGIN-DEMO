@@ -39,6 +39,7 @@ class Game {
     this.p6Enabled=!new URLSearchParams(location.search).has('hf_p6_off');
     this.p7Enabled=!new URLSearchParams(location.search).has('hf_p7_off');
     this.p810Enabled=!new URLSearchParams(location.search).has('hf_p810_off');
+    this.p812Enabled=!new URLSearchParams(location.search).has('hf_p812_off');
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     // P1 quality HIGH baseline: restore original render scale on Android.

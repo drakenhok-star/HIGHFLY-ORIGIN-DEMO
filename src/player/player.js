@@ -399,9 +399,9 @@ export class Player {
     const groundHere = terrain.getHeight(this.group.position.x, this.group.position.z);
     const inWater = groundHere < terrain.waterY - 0.6;
 
-    let speed = 6;
-    if (moving && (input.keys.has('ShiftLeft') || input.touchSprint) && stats.useStamina(12 * dt)) {
-      speed = 10;
+    let speed = g.p812Enabled?7.5:6;
+    if (moving && (input.keys.has('ShiftLeft') || input.touchSprint) && stats.useStamina((g.p812Enabled?10:12) * dt)) {
+      speed = g.p812Enabled?11.2:10;
     }
     if (inWater) speed *= 0.55;
 
@@ -418,7 +418,7 @@ export class Player {
       this._moveDir.set(tx,0,tz).normalize();
       this._lastMoveDir.copy(this._moveDir);
     } else this._moveDir.set(0,0,0);
-    const k = 1 - Math.exp(-10 * dt);
+    const k = 1 - Math.exp(-(g.p812Enabled?17:10) * dt);
     this.vel.x += (tx - this.vel.x) * k;
     this.vel.z += (tz - this.vel.z) * k;
 
@@ -430,7 +430,7 @@ export class Player {
       this.vel.x = fwd.x * this._dashSpeed;
       this.vel.z = fwd.z * this._dashSpeed;
       if(!g.p7Enabled || this.onGround)this.vel.y = 0;
-      if (this._dashTrailFallback && g.effects) {
+      if (this._dashTrailFallback && g.effects && (!g.p812Enabled || this.dashT<0.05 || this.dashT>0.11)) {
         g.effects.spawnBurst(
           _tmpV1.set(this.group.position.x, this.group.position.y + 1.0, this.group.position.z),
           '#eef4f8', 5, 2.5, 0.35, 0.14
@@ -706,7 +706,7 @@ export class Player {
         const d = _tmpV3.copy(npc.group.position).sub(p).length();
         if (d < 3.5 && d < bestDist) {
           bestDist = d;
-          best = { text: 'E 与' + npc.name + '交谈', exec: () => g.npcs.startDialogue(npc) };
+          best = { text: 'Hablar con '+npc.name, exec: () => g.npcs.startDialogue(npc) };
         }
       }
     }

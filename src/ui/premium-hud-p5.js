@@ -278,7 +278,7 @@ export class PremiumHudP5 {
   }
   tryDash() {
     const g=this.game,now=performance.now();
-    if(now-this.lastDash<(g.p7Enabled?420:g.p6Enabled?2200:3000)){g.hud.notify('Dash recargando');return;}
+    if(now-this.lastDash<(g.p812Enabled?340:g.p7Enabled?420:g.p6Enabled?2200:3000)){g.hud.notify('Dash recargando');return;}
     if(g.player.dashT>=0 || (g.p7Enabled && !g.player.onGround && g.player._airDashCount>=2) ||
       (!g.p7Enabled && g.p6Enabled && !g.player.onGround && g.player._airDashUsed) ||
       (!g.p6Enabled && !g.player.onGround)){g.hud.notify('Dash no disponible ahora');return;}
@@ -286,7 +286,7 @@ export class PremiumHudP5 {
     this.lastDash=now;
     if(g.p7Enabled){
       if(!g.player.onGround)g.player._airDashCount++;
-      g.player.startDash({speed:20,duration:0.15,style:'dodge'});
+      g.player.startDash(g.p812Enabled?{speed:18,duration:0.155,style:'dodge'}:{speed:20,duration:0.15,style:'dodge'});
     }else if(g.p6Enabled){
       if(!g.player.onGround)g.player._airDashUsed=true;
       g.player.startDash({speed:26,duration:0.24,style:'dodge'});

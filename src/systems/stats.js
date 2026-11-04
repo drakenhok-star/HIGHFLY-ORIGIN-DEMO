@@ -63,7 +63,7 @@ export class Stats {
 
   addXP(n) {
     this.xp += n;
-    this.game.hud.notify('+' + n + ' 经验');
+    this.game.hud.notify('+' + n + ' EXP');
     let need = this.xpNext();
     while (this.xp >= need) {
       this.xp -= need;
@@ -74,7 +74,7 @@ export class Stats {
       this.hp = this.maxHp;
       this.mp = this.maxMp;
       this.sp = this.maxSp;
-      this.game.hud.questBanner('等级提升 — ' + this.level + ' 级');
+      this.game.hud.questBanner('¡NIVEL '+this.level+'!');
       this.game.audio.play('levelup');
       need = this.xpNext();
     }

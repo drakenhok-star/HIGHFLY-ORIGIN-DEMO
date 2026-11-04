@@ -22,6 +22,7 @@ export class TouchControls {
     this.joystickId = null;
     this.cameraId = null;
     this.runIds = new Set();
+    this.runToggle = false;
     if (!this.enabled) return;
     this.build();
     this.camera();
@@ -106,10 +107,18 @@ export class TouchControls {
     this.addButton(actions,'USAR','',()=>this.key('KeyE'));
     this.addButton(actions,'MAGIA','hf-btn-magic',()=>{this.game.input.rightClick=true;});
     this.addButton(actions,'SALTO','',()=>this.key('Space'));
-    this.addButton(actions,'CORRER','',()=>{},(pressed,id)=>{
+    this.addButton(actions,'CORRER','',()=>{
+      if(this.game.p812Enabled){
+        this.runToggle=!this.runToggle;
+        this.game.input.touchSprint=this.runToggle;
+        this.runButton?.classList.toggle('hf-p812-running',this.runToggle);
+      }
+    },(pressed,id)=>{
+      if(this.game.p812Enabled)return;
       if(pressed)this.runIds.add(id);else this.runIds.delete(id);
       this.game.input.touchSprint=this.runIds.size>0;
     });
+    this.runButton=actions.lastElementChild;
     this.addButton(actions,'ATK','hf-btn-atk',()=>{this.game.input.leftClick=true;});
     this.addButton(actions,'GRITO','',()=>this.key('KeyF'));
     const pause = document.createElement('button');
@@ -182,6 +191,7 @@ export class TouchControls {
   reset() {
     this.game.input.touchMove.x=0;this.game.input.touchMove.y=0;
     this.game.input.touchSprint=false;this.runIds.clear();
+    if(this.game.p812Enabled){this.runToggle=false;this.runButton?.classList.remove('hf-p812-running');}
     this.joystickId=null;this.cameraId=null;
     if(this.knob)this.knob.style.transform='translate(-50%,-50%)';
   }

@@ -144,6 +144,11 @@ export class HighflyP810{
   const fps=Math.max(1,Math.min(240,Math.round(1000/this.ms)));
   const profile=this.game.performanceP2?.preset||'—';
   // Browser WebGL does not provide reliable GPU utilization %. Do not invent it.
-  this.perf.textContent='FPS '+fps+' · GPU — · '+profile;
+  if(this.game.p812Enabled){
+    const measured=this.game.mobileAudit;
+    const real=Number.isFinite(measured?.fps)?measured.fps:fps;
+    const p95=Number.isFinite(measured?.p95)?Math.round(measured.p95):null;
+    this.perf.textContent='FPS '+real+(p95?' · P95 '+p95+'ms':'');
+  }else this.perf.textContent='FPS '+fps+' · GPU — · '+profile;
  }
 }

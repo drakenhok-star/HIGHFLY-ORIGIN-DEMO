@@ -119,7 +119,7 @@ export class PerformanceP2 {
     game.renderer.shadowMap.enabled = isLight ? false : this.originalShadow;
     // Pixel resolution is the key GPU fill-rate diagnostic. Full original quality
     // is recoverable at any moment by pressing the preset button.
-    const targetDpr = isFluid ? Math.min(window.devicePixelRatio || 1, 1.0)
+    const targetDpr = isFluid ? Math.min(window.devicePixelRatio || 1, game.p812Enabled?.88:1.0)
       : isBalanced ? Math.min(window.devicePixelRatio || 1, 1.15) : this.defaultDpr;
     game.renderer.setPixelRatio(targetDpr);
     game.onResize();

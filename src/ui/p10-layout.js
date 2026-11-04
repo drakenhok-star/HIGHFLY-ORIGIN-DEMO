@@ -1,6 +1,6 @@
 /** Normalized landscape HUD positions; same contract across phone sizes. */
-export const HUD_LAYOUT_KEY='hf_p10_hud_layout_v1';
-export const HUD_LAYOUT_VERSION=1;
+export const HUD_LAYOUT_KEY='hf_p812_hud_layout_v2';
+export const HUD_LAYOUT_VERSION=2;
 export const HUD_DEFAULTS=Object.freeze({
  joy:{x:.025,y:.66,size:122},run:{x:.43,y:.75,size:54},
  jump:{x:.51,y:.75,size:58},dash:{x:.59,y:.75,size:58},
@@ -8,7 +8,7 @@ export const HUD_DEFAULTS=Object.freeze({
  s2:{x:.75,y:.625,size:51},s3:{x:.825,y:.52,size:51},s4:{x:.905,y:.555,size:51},
  lock:{x:.61,y:.57,size:43},next:{x:.665,y:.49,size:42},clear:{x:.72,y:.445,size:37},
  radar:{x:.845,y:.014,size:122},bag:{x:.855,y:.395,size:50},
- menu:{x:.925,y:.395,size:50},combo:{x:.35,y:.924,size:245},
+ menu:{x:.925,y:.395,size:50},combo:{x:.405,y:.022,size:180},
  perf:{x:.81,y:.34,size:158},header:{x:.015,y:.018,size:232}
 });
 export const HUD_IDS=Object.freeze(Object.keys(HUD_DEFAULTS));

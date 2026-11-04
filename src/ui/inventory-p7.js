@@ -56,7 +56,7 @@ export class PremiumInventoryP7 {
     (!this.query||label(id).toLowerCase().includes(this.query.toLowerCase())));
    items.sort((a,b)=>this.sort==='value'?ITEM_DB[b[0]].value-ITEM_DB[a[0]].value:
     this.sort==='type'?ITEM_DB[a[0]].type.localeCompare(ITEM_DB[b[0]].type):label(a[0]).localeCompare(label(b[0])));
-   for(let i=0;i<Math.max(18,Math.ceil(items.length/6)*6);i++){
+   for(let i=0;i<Math.max(18,Math.ceil(items.length/(this.game.p812Enabled?4:6))*(this.game.p812Enabled?4:6));i++){
     if(!items[i]){make('div','p7-cell empty','✧',grid);continue;}
     const [id,n]=items[i],db=ITEM_DB[id];
     const btn=make('button','p7-cell '+(RARITY[id]||'')+(this.hud.selected===id?' selected':''),undefined,grid);
@@ -132,7 +132,22 @@ export class PremiumInventoryP7 {
     inv.useOrEquip(id);if(!inv.has(id))this.hud.selected=null;
    });
   }
-  act(this.game.player.torchOn?'🔥 APAGAR ANTORCHA':'🔥 ENCENDER ANTORCHA',()=>this.game.player.toggleTorch());
+  if(this.game.p812Enabled && this.tab==='equipment' && !db && this.selectedSlot){
+   const slot=this.selectedSlot;
+   const desired=slot==='weapon'||slot==='offhand'?'weapon':slot==='armor'?'armor':null;
+   make('p',null,desired?'Podés elegir un objeto compatible desde Mochila.':'Este espacio está preparado para equipamiento futuro.',p);
+   if(desired){
+    const matches=Array.from(inv.slots.entries()).filter(([item,n])=>n>0&&ITEM_DB[item]?.type===desired);
+    if(matches.length){
+     const suggested=make('button',null,'ABRIR MOCHILA · '+matches.length+' OPCIONES',p);
+     suggested.type='button';suggested.addEventListener('click',()=>{
+      this.filter=desired;this.hud.show('bag');
+     });
+    }
+   }
+  }
+  if(!this.game.p812Enabled || this.tab!=='equipment')
+   act(this.game.player.torchOn?'🔥 APAGAR ANTORCHA':'🔥 ENCENDER ANTORCHA',()=>this.game.player.toggleTorch());
  }
  initPreview(){
   if(this.previewReady)return;this.previewReady=true;
