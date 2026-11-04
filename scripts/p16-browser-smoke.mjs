@@ -107,7 +107,33 @@ try {
    assert(ground?.target&&l.aimGuide.profile.kind==='zone',
      'Aerial S2 previews a GROUND CIRCLE before impact');
    l.aimGuide.clear();
+
+   // Dispatch REAL native button pointer events through the existing P14 HUD
+   // handler, not just a direct call to the aim geometry class.
+   const b=document.querySelector('.hf-p5-s2');
+   const a=b.getBoundingClientRect();
+   const centerX=a.x+a.width*.5,centerY=a.y+a.height*.5;
+   const leftMp=g.stats.mp;
+   const leftCd=l.cooldown(2);
+   const ev=(type,dx=0,dy=0)=>new PointerEvent(type,{
+     pointerId:87,pointerType:'touch',isPrimary:true,
+     clientX:centerX+dx,clientY:centerY+dy,bubbles:true,cancelable:true
+   });
+   b.dispatchEvent(ev('pointerdown'));
+   assert(l.aim?.slot===2&&l.aimGuide.root.visible,
+     'touch hold must show actual ground circle');
+   const beforeTarget=l.aim?.target?.clone();
+   b.dispatchEvent(ev('pointermove',70,-38));
+   assert(!!l.aim?.target,'touch drag must pick 3D landing destination');
+   const moved=beforeTarget?.distanceTo(l.aim.target)||0;
+   assert(moved>1.5,'touch movement must reposition the target circle: '+moved);
+   b.dispatchEvent(ev('pointercancel',70,-38));
+   assert(!l.aim&&!l.aimGuide.root.visible,
+     'pointer cancellation must remove aiming indicator');
+   assert(g.stats.mp===leftMp&&l.cooldown(2)===leftCd,
+     'cancelled aim must not spend MP or trigger cooldown');
    return {styles:5,skills:15,shapes:[...new Set(shapes)],pre,post,
+     touchDragMeters:moved,cancelWithoutCost:true,
      resources:{fireballMana:20,backstabEnergy:17},
      rig:g.player.rig.clips.size,canvas:g.renderer.domElement.tagName};
  });
