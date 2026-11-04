@@ -50,7 +50,7 @@ python3 install_worldmap_p34.py
 for f in src/main.js src/player/player.js src/entities/enemies.js \
   src/ui/touch-controls.js src/ui/mobile-audit.js \
   src/ui/performance-p2.js src/ui/world-map-p34.js; do
-  node --check "$f"
+  node --input-type=module --check < "$f"
 done
 
 rm -rf .touch-backups .audit-backups .p2-backups .p34-backups
