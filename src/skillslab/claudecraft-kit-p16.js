@@ -33,6 +33,7 @@ export function castClaudeSkill(lab,slot,direction,target=null){
         .clone();
       center.y=g.terrain.getHeight(center.x,center.z);
       fx.meteorWarning(center,4.15);
+      fx.fallingMeteor(center,.75);
       // Visible wind-up + falling meteor; resolves once, at destination,
       // not instantly on button release.
       lab.schedule(.75,()=>{
