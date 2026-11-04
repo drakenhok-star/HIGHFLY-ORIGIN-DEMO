@@ -2,6 +2,8 @@
  * Tianjie5 Android touch controller for HIGHFLY isolated lab.
  * MIT: code extension; upstream: https://github.com/zexadev/tianjie5
  */
+import { PremiumHudP5 } from './premium-hud-p5.js';
+
 export class TouchControls {
   constructor(game) {
     this.game = game;
@@ -16,6 +18,8 @@ export class TouchControls {
     if (!this.enabled) return;
     this.build();
     this.camera();
+    this.premium = !new URLSearchParams(location.search).has('hf_classic_hud')
+      ? new PremiumHudP5(this) : null;
     this.setState(game.state);
     window.addEventListener('blur', () => this.reset());
     document.addEventListener('visibilitychange', () => { if (document.hidden) this.reset(); });
@@ -159,6 +163,7 @@ export class TouchControls {
   setState(s) {
     if(!this.enabled)return;
     this.root.style.display=s==='playing'?'block':'none';
+    if(this.premium)this.premium.setState(s);
     if(s!=='playing')this.reset();
   }
 }
