@@ -62,6 +62,8 @@ for(const label of ['USAR','MAGIA','SALTO','CORRER','ATK','GRITO']){
 const oldRun=actions.children[3];
 const touch={
   game,root,enabled:true,
+  cameraSensitivity:1.5,
+  setCameraSensitivity(v){this.cameraSensitivity=Number(v);},
   addButton(parent,label,cls,action){
     const el=new FakeNode('button');
     el.className='hf-btn '+cls;el.textContent=label;el.listeners.action=action;
@@ -91,6 +93,13 @@ premium.tab='bag';premium.render();
 assert.equal(premium.list.children.at(-1).children.length,2,'bag filters materials/potions');
 premium.tab='quests';premium.render();
 assert.equal(premium.list.children.length,1,'mission list renders');
+premium.tab='settings';premium.render();
+const sensitivitySlider=premium.list.children.find(n=>n.tagName==='input');
+assert.ok(sensitivitySlider,'settings camera slider exists');
+assert.equal(sensitivitySlider.value,'1.5','default sensitivity +25%');
+sensitivitySlider.value='1.7';
+sensitivitySlider.listeners.input();
+assert.equal(touch.cameraSensitivity,1.7,'slider updates live camera speed');
 
 premium.hide();
 assert.equal(game.state,'playing');
