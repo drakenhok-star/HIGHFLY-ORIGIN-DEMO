@@ -111,6 +111,10 @@ export class Combat {
       this.attackBuffer=0;this.melee();
     }
     if (input.leftClick) this.melee();
+    // Mobile ARPG: a sustained ATK touch chains the existing four real GLB
+    // strikes. Nothing in the left-hand joystick can set touchAttackHold.
+    if(this.game.p812Enabled && input.touchAttackHold && !input.leftClick &&
+       this.meleeCd===0 && this.game.stats.sp>=12)this.melee();
     if (input.rightClick) this.cast();
     if (input.justPressed.has('KeyF')) this.shout();
     if (input.justPressed.has('KeyQ')) this.cycleShout();

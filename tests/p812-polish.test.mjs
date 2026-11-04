@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 const read=async p=>readFile(new URL('../'+p,import.meta.url),'utf8');
 const src=Object.fromEntries(await Promise.all([
- 'src/main.js','src/player/player.js','src/ui/touch-controls.js','src/ui/p810-ui.js',
+ 'src/main.js','src/player/player.js','src/ui/touch-controls.js','src/combat/combat.js','src/ui/p810-ui.js',
  'src/ui/p9-panels.js','src/ui/p10-hud-editor.js','src/ui/p812-polish.js',
  'src/ui/inventory-p7.js','src/ui/world-map-p34.js','src/ui/performance-p2.js',
  'src/systems/save.js','src/systems/stats.js','src/entities/npc.js'
@@ -12,6 +12,7 @@ const checks=[
  ['sprint 11.2',src['src/player/player.js'].includes('g.p812Enabled?11.2:10')],
  ['velocity smoothing faster',src['src/player/player.js'].includes('g.p812Enabled?17:10')],
  ['run toggles on touch',src['src/ui/touch-controls.js'].includes('this.runToggle=!this.runToggle')],
+ ['hold ATK chains',src['src/combat/combat.js']?.includes('input.touchAttackHold')],
  ['run button stays visible',src['src/ui/touch-controls.js'].includes("this.runButton?.classList.toggle('hf-p812-running'")],
  ['thermal saving DPR',src['src/ui/performance-p2.js'].includes('game.p812Eco?.72:.88')],
  ['thermal FPS cap',src['src/main.js'].includes('time-lastEcoFrame<1000/30')],

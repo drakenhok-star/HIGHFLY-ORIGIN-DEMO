@@ -119,7 +119,9 @@ export class TouchControls {
       this.game.input.touchSprint=this.runIds.size>0;
     });
     this.runButton=actions.lastElementChild;
-    this.addButton(actions,'ATK','hf-btn-atk',()=>{this.game.input.leftClick=true;});
+    this.addButton(actions,'ATK','hf-btn-atk',()=>{this.game.input.leftClick=true;},(pressed)=>{
+      if(this.game.p812Enabled)this.game.input.touchAttackHold=pressed;
+    });
     this.addButton(actions,'GRITO','',()=>this.key('KeyF'));
     const pause = document.createElement('button');
     pause.type='button'; pause.className='hf-btn hf-menu'; pause.textContent='PAUSA';
@@ -191,6 +193,7 @@ export class TouchControls {
   reset() {
     this.game.input.touchMove.x=0;this.game.input.touchMove.y=0;
     this.game.input.touchSprint=false;this.runIds.clear();
+    if(this.game.p812Enabled)this.game.input.touchAttackHold=false;
     if(this.game.p812Enabled){this.runToggle=false;this.runButton?.classList.remove('hf-p812-running');}
     this.joystickId=null;this.cameraId=null;
     if(this.knob)this.knob.style.transform='translate(-50%,-50%)';
