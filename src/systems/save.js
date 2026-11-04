@@ -1,11 +1,12 @@
 const LEGACY_KEY = 'tianjie5_save';
 const KEY = 'highfly_p7_save';
+const KEY_P810 = 'highfly_p810_save';
 
 export class SaveSys {
   constructor(game) {
     this.game = game;
     this.autosaveTimer = 0;
-    this.key=game.p7Enabled?KEY:LEGACY_KEY;
+    this.key=game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
   }
 
   save() {
@@ -16,7 +17,9 @@ export class SaveSys {
     const yaw = g.interiors && typeof g.interiors.saveYaw === 'function' ? g.interiors.saveYaw() : g.player.yaw;
     const data = {
       dayTime: g.time.dayTime,
-      player: { x: pos.x, y: pos.y, z: pos.z, yaw, torchOn:!!g.player.torchOn },
+      player: { x: pos.x, y: pos.y, z: pos.z, yaw,
+        torchOn:!!g.player.torchOn,
+        torchStashedOffhand:g.player._torchStashedOffhand||null },
       stats: g.stats.serialize(),
       inv: g.inventory.serialize(),
       quests: g.quests.serialize(),
@@ -31,12 +34,16 @@ export class SaveSys {
   }
 
   hasSave() {
-    return localStorage.getItem(this.key) !== null || (this.game.p7Enabled && localStorage.getItem(LEGACY_KEY)!==null);
+    return localStorage.getItem(this.key) !== null ||
+      (this.game.p810Enabled && (localStorage.getItem(KEY)!==null || localStorage.getItem(LEGACY_KEY)!==null)) ||
+      (this.game.p7Enabled && localStorage.getItem(LEGACY_KEY)!==null);
   }
 
   loadRaw() {
     // First P7 visit reads P6 progress, but writes ONLY P7: original never overwritten.
-    const raw = localStorage.getItem(this.key) || (this.game.p7Enabled?localStorage.getItem(LEGACY_KEY):null);
+    const raw = localStorage.getItem(this.key) ||
+      (this.game.p810Enabled?localStorage.getItem(KEY):null) ||
+      (this.game.p7Enabled?localStorage.getItem(LEGACY_KEY):null);
     if (!raw) return null;
     // 持久化数据是外部边界，损坏存档按无存档处理
     try {
@@ -72,9 +79,15 @@ export class SaveSys {
     }
     if (d.player) {
       g.player.pos.set(d.player.x, d.player.y, d.player.z);
-      if(this.game.p7Enabled){g.player.torchOn=!!d.player.torchOn;
-        if(g.inventory.equipped.offhand)g.player.torchOn=false;
-        g.player.updateTorch();}
+      if(this.game.p7Enabled){
+        g.player.torchOn=!!d.player.torchOn;
+        if(this.game.p810Enabled && g.player.torchOn){
+          g.player._torchStashedOffhand=d.player.torchStashedOffhand || g.inventory.equipped.offhand || null;
+          g.inventory.equipped.offhand=null;
+          g.player.currentOffhand=null;g.player.updateOffhandVisual();
+        }else if(g.inventory.equipped.offhand)g.player.torchOn=false;
+        g.player.updateTorch();
+      }
       if (typeof d.player.yaw === 'number') {
         g.player.yaw = d.player.yaw;
         // 同步身体朝向，避免读档后第一帧身体从重置朝向转过来

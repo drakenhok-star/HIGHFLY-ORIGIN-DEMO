@@ -66,6 +66,8 @@ export class Player {
     this._lastMoveDir = new THREE.Vector3(0,0,0);
     this._airDashCount=0;
     this._jumpBufferT=0;
+    this._torchStashedOffhand=null;
+    this._secondJumpVfxT=0;
     this._jumpCount = 0;
     this._airDashUsed = false;
     this._cameraReady = false;
@@ -284,10 +286,26 @@ export class Player {
   }
 
   toggleTorch(){
-    if(!this.torchOn && this.game.p7Enabled && this.game.inventory.equipped.offhand){
-      this.game.hud.notify('Desequipá la espada secundaria para usar antorcha');return false;
+    const inventory=this.game.inventory;
+    if(!this.torchOn){
+      if(this.game.p810Enabled){
+        this._torchStashedOffhand=inventory.equipped.offhand||null;
+        inventory.equipped.offhand=null;
+        this.currentOffhand=null;
+        this.updateOffhandVisual();
+      }else if(this.game.p7Enabled && inventory.equipped.offhand){
+        this.game.hud.notify('Desequipá la espada secundaria para usar antorcha');return false;
+      }
+      this.torchOn=true;
+    }else{
+      this.torchOn=false;
+      if(this.game.p810Enabled){
+        const weapon=this._torchStashedOffhand;
+        inventory.equipped.offhand=weapon&&inventory.has(weapon)?weapon:null;
+        this._torchStashedOffhand=null;
+        this.updateOffhandVisual();
+      }
     }
-    this.torchOn=!this.torchOn;
     this.updateTorch();
     this.game.hud.notify(this.torchOn?'Antorcha encendida':'Antorcha apagada');
     if(this.torchOn)this.game.audio.play('cast');
@@ -431,7 +449,12 @@ export class Player {
         this.vel.y=9.5;this.onGround=false;this._jumpCount=1;this._jumpBufferT=0;
       }else if(g.p6Enabled && !this.onGround && this._jumpCount===1 && stats.useStamina(12)){
         this.vel.y=8.8;this._jumpCount=2;this._jumpBufferT=0;
-        this._jumpAnimT=0.34;this._jumpAnimStarted=false;
+        if(g.p810Enabled){
+          // Keep a steady airborne pose. Jump_Full_Short on a second impulse
+          // makes the head snap on the KayKit rig at mobile frame rates.
+          this._jumpAnimT=0;this._jumpAnimStarted=false;
+          this._secondJumpVfxT=0.18;
+        }else{this._jumpAnimT=0.34;this._jumpAnimStarted=false;}
       }else if(g.p7Enabled&&this._jumpCount>=2)this._jumpBufferT=0;
     }
 
@@ -502,6 +525,12 @@ export class Player {
     }
 
     if(this.onGround){this._jumpCount=0;this._airDashUsed=false;this._airDashCount=0;}
+    if(g.p810Enabled&&this._secondJumpVfxT>0){
+      this._secondJumpVfxT=Math.max(0,this._secondJumpVfxT-dt);
+      if(this._secondJumpVfxT>0.11 && this._secondJumpVfxT-dt<=0.11 && g.effects){
+        g.effects.spawnBurst(_tmpV2.copy(this.pos).add(new THREE.Vector3(0,0.35,0)),'#83e1ff',5,1.1,0.22,0.13);
+      }
+    }
     const horizSpeed = Math.hypot(this.vel.x, this.vel.z);
 
     // 水花钩子：入水/出水溅起、游动涟漪
@@ -756,6 +785,7 @@ export class Player {
     this._dashSpeed=DASH_SPEED;
     this._dashDuration=DASH_DURATION;
     this._moveDir.set(0,0,0);this._lastMoveDir.set(0,0,0);
+    this._torchStashedOffhand=null;this._secondJumpVfxT=0;
     this._airDashCount=0;this._jumpBufferT=0;
     this._jumpCount=0;this._airDashUsed=false;this._cameraReady=false;
     this.attackClip=ATTACK_CLIP;this.actionDuration=ACTION_DURATION;

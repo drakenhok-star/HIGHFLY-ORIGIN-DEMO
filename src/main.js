@@ -38,6 +38,7 @@ class Game {
     this.time = { elapsed: 0, dayTime: 0.35, dayLength: 600 };
     this.p6Enabled=!new URLSearchParams(location.search).has('hf_p6_off');
     this.p7Enabled=!new URLSearchParams(location.search).has('hf_p7_off');
+    this.p810Enabled=!new URLSearchParams(location.search).has('hf_p810_off');
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     // P1 quality HIGH baseline: restore original render scale on Android.
@@ -136,7 +137,18 @@ class Game {
     }
   }
 
+  enterImmersive(){
+    if(!this.p810Enabled || !this.touch?.enabled)return;
+    // Must happen synchronously INSIDE the user's Enter/Continue gesture.
+    const root=document.documentElement;
+    try {
+      const result=root.requestFullscreen?.({navigationUI:'hide'});
+      if(result?.then)result.then(()=>screen.orientation?.lock?.('landscape').catch(()=>{})).catch(()=>{});
+    }catch(err){console.info('[HIGHFLY] Fullscreen requires explicit browser permission',err);}
+  }
+
   newGame() {
+    this.enterImmersive();
     this.resetAll();
     this.setState('playing');
     this.hud.questBanner('¡Bienvenido a HIGHFLY!');
@@ -144,6 +156,7 @@ class Game {
   }
 
   continueGame() {
+    this.enterImmersive();
     this.resetAll();
     this.saveSys.applyLoaded();
     this.setState('playing');
@@ -195,7 +208,8 @@ class Game {
     });
 
     window.addEventListener('mousedown', (e) => {
-      if (this.state !== 'playing') return;
+      if (this.state !== 'playing' || (this.p810Enabled && this.touch?.enabled)) return;
+      // Synthetic mouse clicks from touch must never activate global ATK.
       if (e.button === 0) input.leftClick = true;
       else if (e.button === 2) input.rightClick = true;
     });
@@ -234,6 +248,7 @@ class Game {
     }
     if (jp.has('Tab')) {
       if (this.state === 'playing') {
+        if(this.p810Enabled&&this.touch?.premium){this.touch.premium.show('equipment');return;}
         this.menus.refreshInventory();
         this.setState('inventory');
       } else if (this.state === 'inventory') {
@@ -242,6 +257,7 @@ class Game {
     }
     if (jp.has('KeyJ')) {
       if (this.state === 'playing') {
+        if(this.p810Enabled&&this.touch?.premium){this.touch.premium.show('quests');return;}
         this.menus.refreshQuests();
         this.setState('quests');
       } else if (this.state === 'quests') {
@@ -335,6 +351,7 @@ function loop() {
 
   game.composer.render();
   if(game.touch?.premium?.p7Inventory)game.touch.premium.p7Inventory.update(dt);
+  if(game.touch?.premium?.p810)game.touch.premium.p810.update(dt);
   game.p6Perf.mark('render');
   game.p6Perf.end();
   game.mobileAudit.end();

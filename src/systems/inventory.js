@@ -77,7 +77,11 @@ export class Inventory {
         this.game.hud.notify('La otra mano ya usa esa única espada.');return false;
       }
       this.equipped[targetSlot] = id;
-      if(targetSlot==='offhand'&&this.game.player){this.game.player.torchOn=false;this.game.player.updateTorch();}
+      if(targetSlot==='offhand'&&this.game.player){
+        this.game.player.torchOn=false;
+        if(this.game.p810Enabled)this.game.player._torchStashedOffhand=null;
+        this.game.player.updateTorch();
+      }
       this.game.hud.notify('Equipado: ' + item.name+(targetSlot==='offhand'?' (mano secundaria)':''));
     }
     return true;

@@ -114,9 +114,13 @@ export class TouchControls {
     this.addButton(actions,'GRITO','',()=>this.key('KeyF'));
     const pause = document.createElement('button');
     pause.type='button'; pause.className='hf-btn hf-menu'; pause.textContent='PAUSA';
+    if(this.game.p810Enabled){pause.textContent='☷';pause.setAttribute('aria-label','Menú de HIGHFLY');}
     pause.addEventListener('pointerdown',e=>{
       e.preventDefault();e.stopPropagation();
-      if(this.game.state==='playing')this.game.setState('paused');
+      if(this.game.state==='playing'){
+        if(this.game.p810Enabled && this.premium?.p810)this.premium.p810.toggleQuickMenu();
+        else this.game.setState('paused');
+      }
     });
     root.appendChild(pause);
     const hint=document.createElement('div');
@@ -133,8 +137,8 @@ export class TouchControls {
       e.preventDefault();e.stopPropagation();
       b.setPointerCapture(e.pointerId);
       active.add(e.pointerId);b.classList.add('hf-down');
-      action();
-      if(hold)hold(true,e.pointerId);
+      if(!this.game.p810Enabled||!this.game.input?.hudEditing)action();
+      if(hold && (!this.game.p810Enabled||!this.game.input?.hudEditing))hold(true,e.pointerId);
     });
     const end=e=>{
       if(!active.has(e.pointerId))return;
