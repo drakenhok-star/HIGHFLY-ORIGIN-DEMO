@@ -1,0 +1,77 @@
+name: HIGHFLY P13 FURY · parkour, combat and collision CI
+on:
+  push:
+    branches: [p13-fury-movement-engine-20261104]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check every first-party JS module
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+      - name: Historical regressions and P13 actual movement math
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          node tests/premium-hud.test.mjs
+          node tests/p6-integral.test.mjs
+          node tests/p7-fury.test.mjs
+          node tests/p810-integral.test.mjs
+          node tests/p812-polish.test.mjs
+          node tests/p13-fury.test.mjs
+      - name: Verify embedded player/enemy GLB animations
+        run: node scripts/audit_animation_p6.mjs
+      - name: Keep proprietary materials out of the public demo
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -s LICENSE
+          test -s PROVENANCE.md
+          test -s src/player/fury-traversal-p13.js
+          test -s src/player/fury-surfaces-p13.js
+          test -s assets/models/player_barbarian.glb
+          if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
+            echo 'Restricted material found'; exit 1
+          fi
+  mobile-browser:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright core on disposable runner, not Codespaces
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          printf '{"private":true,"type":"module"}\n' > package.json
+          npm install --no-save --no-package-lock playwright-core@1.58.0
+          command -v google-chrome || command -v chromium
+      - name: Exercise touch controls, menus, editor, P13 save and active world
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m http.server 8957 --bind 127.0.0.1 > /tmp/p13-http.log 2>&1 &
+          CHROME_PATH="$(command -v google-chrome || command -v chromium)" node scripts/p810-browser-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: highfly-p13-landscape-optional
+          path: audit-output/p810-mobile-landscape.png
+          if-no-files-found: ignore
+          retention-days: 7

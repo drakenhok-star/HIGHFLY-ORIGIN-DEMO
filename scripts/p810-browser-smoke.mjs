@@ -34,6 +34,16 @@ try{
  await page.locator('#btn-new').click({timeout:30000});
  await page.waitForFunction(()=>window.game?.state==='playing',null,{timeout:12000});
  assert.ok(await page.locator('#hf-p810-bag').isVisible(),'bag shortcut visible');
+ if(await page.evaluate(()=>window.game.p13Enabled)){
+   const ready=await page.evaluate(()=>({
+     traversal:!!window.game.player.fury,
+     trees:window.game.scatter.obstacles?.count||0,
+     clipReady:window.game.player.rig.clips.has('Jump_Idle'),
+     collision:window.game.scatter.obstacles?.blocked(9999,0,9999)===false
+   }));
+   assert.ok(ready.traversal&&ready.trees>200&&ready.clipReady&&ready.collision,
+     'P13 traversal and world colliders load in real WebGL scene');
+ }
  assert.ok(await page.locator('#hf-p810-menu').isVisible(),'four-tile menu visible');
  await page.locator('#hf-worldmini').waitFor({state:'visible',timeout:10000}).catch(async err=>{
   const why=await page.evaluate(()=>{
@@ -93,7 +103,7 @@ try{
  });
  assert.ok(await page.locator('#hf-p810-quick').isVisible(),'quick menu really expands');
  await page.locator('#hf-p810-quick button').filter({hasText:'GUARDAR'}).click();
- assert.ok(await page.evaluate(()=>localStorage.getItem(window.game.p812Enabled?'highfly_p812_save':'highfly_p810_save')!==null),'P812 and P810 save separately from P7');
+ assert.ok(await page.evaluate(()=>localStorage.getItem(window.game.p13Enabled?'highfly_p13_save':window.game.p812Enabled?'highfly_p812_save':'highfly_p810_save')!==null),'P812 and P810 save separately from P7');
  await mkdir('audit-output',{recursive:true});
  if(process.env.HF_CAPTURE==='1'){
   try{await page.screenshot({path:'audit-output/p810-mobile-landscape.png',animations:'disabled',fullPage:false,timeout:15000});}
