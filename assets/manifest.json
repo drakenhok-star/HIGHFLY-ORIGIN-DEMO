@@ -1,0 +1,2670 @@
+{
+  "assets": [
+    {
+      "role": "player",
+      "file": "assets/models/player_barbarian.glb",
+      "license": "CC0",
+      "source": "https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0",
+      "animations": [
+        {
+          "name": "1H_Melee_Attack_Chop",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Melee_Attack_Slice_Diagonal",
+          "sec": 1
+        },
+        {
+          "name": "1H_Melee_Attack_Slice_Horizontal",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "1H_Ranged_Aiming",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Ranged_Reload",
+          "sec": 1.17
+        },
+        {
+          "name": "1H_Ranged_Shoot",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Ranged_Shooting",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Melee_Attack_Chop",
+          "sec": 1.63
+        },
+        {
+          "name": "2H_Melee_Attack_Slice",
+          "sec": 1.1
+        },
+        {
+          "name": "2H_Melee_Attack_Spin",
+          "sec": 2.4
+        },
+        {
+          "name": "2H_Melee_Attack_Spinning",
+          "sec": 0.67
+        },
+        {
+          "name": "2H_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Melee_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "2H_Ranged_Aiming",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Ranged_Reload",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Ranged_Shoot",
+          "sec": 1.07
+        },
+        {
+          "name": "2H_Ranged_Shooting",
+          "sec": 1.07
+        },
+        {
+          "name": "Block",
+          "sec": 1.07
+        },
+        {
+          "name": "Block_Attack",
+          "sec": 1.07
+        },
+        {
+          "name": "Block_Hit",
+          "sec": 1.07
+        },
+        {
+          "name": "Blocking",
+          "sec": 1.07
+        },
+        {
+          "name": "Cheer",
+          "sec": 1.67
+        },
+        {
+          "name": "Death_A",
+          "sec": 0.8
+        },
+        {
+          "name": "Death_A_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Death_B",
+          "sec": 2.63
+        },
+        {
+          "name": "Death_B_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Dodge_Backward",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Forward",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Left",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Right",
+          "sec": 0.4
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Chop",
+          "sec": 1.27
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Slice",
+          "sec": 1.17
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "Hit_A",
+          "sec": 0.67
+        },
+        {
+          "name": "Hit_B",
+          "sec": 0.87
+        },
+        {
+          "name": "Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Interact",
+          "sec": 1.3
+        },
+        {
+          "name": "Jump_Full_Long",
+          "sec": 2.33
+        },
+        {
+          "name": "Jump_Full_Short",
+          "sec": 1.17
+        },
+        {
+          "name": "Jump_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Jump_Land",
+          "sec": 0.67
+        },
+        {
+          "name": "Jump_Start",
+          "sec": 0.6
+        },
+        {
+          "name": "Lie_Down",
+          "sec": 3
+        },
+        {
+          "name": "Lie_Idle",
+          "sec": 2.67
+        },
+        {
+          "name": "Lie_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Lie_StandUp",
+          "sec": 2.33
+        },
+        {
+          "name": "PickUp",
+          "sec": 1.3
+        },
+        {
+          "name": "Running_A",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_B",
+          "sec": 1.07
+        },
+        {
+          "name": "Running_Strafe_Left",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_Strafe_Right",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Chair_Down",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Chair_Idle",
+          "sec": 3.6
+        },
+        {
+          "name": "Sit_Chair_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Sit_Chair_StandUp",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Floor_Down",
+          "sec": 1
+        },
+        {
+          "name": "Sit_Floor_Idle",
+          "sec": 4
+        },
+        {
+          "name": "Sit_Floor_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Sit_Floor_StandUp",
+          "sec": 1.13
+        },
+        {
+          "name": "Spellcast_Long",
+          "sec": 2.53
+        },
+        {
+          "name": "Spellcast_Raise",
+          "sec": 2.1
+        },
+        {
+          "name": "Spellcast_Shoot",
+          "sec": 0.93
+        },
+        {
+          "name": "Spellcasting",
+          "sec": 0.67
+        },
+        {
+          "name": "T-Pose",
+          "sec": 0
+        },
+        {
+          "name": "Throw",
+          "sec": 1.37
+        },
+        {
+          "name": "Unarmed_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Kick",
+          "sec": 0.93
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Punch_A",
+          "sec": 1.47
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Punch_B",
+          "sec": 1.67
+        },
+        {
+          "name": "Unarmed_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Use_Item",
+          "sec": 1.6
+        },
+        {
+          "name": "Walking_A",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_B",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_Backwards",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_C",
+          "sec": 1.6
+        }
+      ],
+      "bones": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "upperarml",
+        "lowerarml",
+        "wristl",
+        "handl",
+        "handslotl",
+        "upperarmr",
+        "lowerarmr",
+        "wristr",
+        "handr",
+        "handslotr",
+        "head",
+        "upperlegl",
+        "lowerlegl",
+        "footl",
+        "toesl",
+        "upperlegr",
+        "lowerlegr",
+        "footr",
+        "toesr",
+        "kneeIKl",
+        "control-toe-rolll",
+        "control-heel-rolll",
+        "control-foot-rolll",
+        "heelIKl",
+        "IK-footl",
+        "IK-toel",
+        "kneeIKr",
+        "control-toe-rollr",
+        "control-heel-rollr",
+        "control-foot-rollr",
+        "heelIKr",
+        "IK-footr",
+        "IK-toer",
+        "elbowIKl",
+        "handIKl",
+        "elbowIKr"
+      ],
+      "bbox": {
+        "x": 2.97,
+        "y": 2.56,
+        "z": 1.85
+      },
+      "vertexCount": 5922,
+      "notes": "KayKit Adventurers Barbarian. Rig boneCount=41 (inspector bones list truncated at 40). Weapon attachment bones: handslotr (right) / handslotl (offhand), lowercase. Ships with toggleable prop meshes parented to slots (1H_Axe, 1H_Axe_Offhand, 2H_Axe, Barbarian_Round_Shield, Mug, Barbarian_Hat, Barbarian_Cape) - set .visible=false on unwanted props at load. Clip mapping: idle=Idle, walk=Walking_A/B/C, run=Running_A/B, melee=1H/2H/Unarmed_Melee_Attack_*, death=Death_A (0.8s)/Death_B (2.63s) with _Pose end states. Faces +Z; bbox x inflated by T-pose arms."
+    },
+    {
+      "role": "weapon_sword",
+      "file": "assets/models/weapon_sword.glb",
+      "license": "CC0",
+      "source": "https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0",
+      "animations": [],
+      "bones": [],
+      "bbox": {
+        "x": 0.5,
+        "y": 1.78,
+        "z": 0.13
+      },
+      "vertexCount": 358,
+      "notes": "Static sword prop (no animations/bones), repacked from pack gltf+bin to self-contained glb. Blade points +Y, grip at origin - parent directly under a KayKit handslotr bone with identity transform; native scale matches the character pack."
+    },
+    {
+      "role": "npc",
+      "file": "assets/models/npc_chief_mage.glb",
+      "license": "CC0",
+      "source": "https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0",
+      "animations": [
+        {
+          "name": "1H_Melee_Attack_Chop",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Melee_Attack_Slice_Diagonal",
+          "sec": 1
+        },
+        {
+          "name": "1H_Melee_Attack_Slice_Horizontal",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "1H_Ranged_Aiming",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Ranged_Reload",
+          "sec": 1.17
+        },
+        {
+          "name": "1H_Ranged_Shoot",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Ranged_Shooting",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Melee_Attack_Chop",
+          "sec": 1.63
+        },
+        {
+          "name": "2H_Melee_Attack_Slice",
+          "sec": 1.1
+        },
+        {
+          "name": "2H_Melee_Attack_Spin",
+          "sec": 2.4
+        },
+        {
+          "name": "2H_Melee_Attack_Spinning",
+          "sec": 0.67
+        },
+        {
+          "name": "2H_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Melee_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "2H_Ranged_Aiming",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Ranged_Reload",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Ranged_Shoot",
+          "sec": 1.07
+        },
+        {
+          "name": "2H_Ranged_Shooting",
+          "sec": 1.07
+        },
+        {
+          "name": "Block",
+          "sec": 1.07
+        },
+        {
+          "name": "Block_Attack",
+          "sec": 1.07
+        },
+        {
+          "name": "Block_Hit",
+          "sec": 1.07
+        },
+        {
+          "name": "Blocking",
+          "sec": 1.07
+        },
+        {
+          "name": "Cheer",
+          "sec": 1.67
+        },
+        {
+          "name": "Death_A",
+          "sec": 0.8
+        },
+        {
+          "name": "Death_A_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Death_B",
+          "sec": 2.63
+        },
+        {
+          "name": "Death_B_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Dodge_Backward",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Forward",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Left",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Right",
+          "sec": 0.4
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Chop",
+          "sec": 1.27
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Slice",
+          "sec": 1.17
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "Hit_A",
+          "sec": 0.67
+        },
+        {
+          "name": "Hit_B",
+          "sec": 0.87
+        },
+        {
+          "name": "Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Interact",
+          "sec": 1.3
+        },
+        {
+          "name": "Jump_Full_Long",
+          "sec": 2.33
+        },
+        {
+          "name": "Jump_Full_Short",
+          "sec": 1.17
+        },
+        {
+          "name": "Jump_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Jump_Land",
+          "sec": 0.67
+        },
+        {
+          "name": "Jump_Start",
+          "sec": 0.6
+        },
+        {
+          "name": "Lie_Down",
+          "sec": 3
+        },
+        {
+          "name": "Lie_Idle",
+          "sec": 2.67
+        },
+        {
+          "name": "Lie_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Lie_StandUp",
+          "sec": 2.33
+        },
+        {
+          "name": "PickUp",
+          "sec": 1.3
+        },
+        {
+          "name": "Running_A",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_B",
+          "sec": 1.07
+        },
+        {
+          "name": "Running_Strafe_Left",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_Strafe_Right",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Chair_Down",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Chair_Idle",
+          "sec": 3.6
+        },
+        {
+          "name": "Sit_Chair_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Sit_Chair_StandUp",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Floor_Down",
+          "sec": 1
+        },
+        {
+          "name": "Sit_Floor_Idle",
+          "sec": 4
+        },
+        {
+          "name": "Sit_Floor_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Sit_Floor_StandUp",
+          "sec": 1.13
+        },
+        {
+          "name": "Spellcast_Long",
+          "sec": 2.53
+        },
+        {
+          "name": "Spellcast_Raise",
+          "sec": 2.1
+        },
+        {
+          "name": "Spellcast_Shoot",
+          "sec": 0.93
+        },
+        {
+          "name": "Spellcasting",
+          "sec": 0.67
+        },
+        {
+          "name": "T-Pose",
+          "sec": 0
+        },
+        {
+          "name": "Throw",
+          "sec": 1.37
+        },
+        {
+          "name": "Unarmed_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Kick",
+          "sec": 0.93
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Punch_A",
+          "sec": 1.47
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Punch_B",
+          "sec": 1.67
+        },
+        {
+          "name": "Unarmed_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Use_Item",
+          "sec": 1.6
+        },
+        {
+          "name": "Walking_A",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_B",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_Backwards",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_C",
+          "sec": 1.6
+        }
+      ],
+      "bones": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "upperarml",
+        "lowerarml",
+        "wristl",
+        "handl",
+        "handslotl",
+        "upperarmr",
+        "lowerarmr",
+        "wristr",
+        "handr",
+        "handslotr",
+        "head",
+        "upperlegl",
+        "lowerlegl",
+        "footl",
+        "toesl",
+        "upperlegr",
+        "lowerlegr",
+        "footr",
+        "toesr",
+        "kneeIKl",
+        "control-toe-rolll",
+        "control-heel-rolll",
+        "control-foot-rolll",
+        "heelIKl",
+        "IK-footl",
+        "IK-toel",
+        "kneeIKr",
+        "control-toe-rollr",
+        "control-heel-rollr",
+        "control-foot-rollr",
+        "heelIKr",
+        "IK-footr",
+        "IK-toer",
+        "elbowIKl",
+        "handIKl",
+        "elbowIKr"
+      ],
+      "bbox": {
+        "x": 2.43,
+        "y": 3.18,
+        "z": 2.54
+      },
+      "vertexCount": 5279,
+      "notes": "KayKit Adventurers Mage as old-man chief. boneCount=41 (bones list truncated at 40). Hide prop meshes Spellbook, Spellbook_open, 1H_Wand, 2H_Staff for civilian look. Use Idle + Walking_A. bbox inflated by attached props (hat/cape/staff). Faces +Z."
+    },
+    {
+      "role": "npc",
+      "file": "assets/models/npc_blacksmith_knight.glb",
+      "license": "CC0",
+      "source": "https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0",
+      "animations": [
+        {
+          "name": "1H_Melee_Attack_Chop",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Melee_Attack_Slice_Diagonal",
+          "sec": 1
+        },
+        {
+          "name": "1H_Melee_Attack_Slice_Horizontal",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "1H_Ranged_Aiming",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Ranged_Reload",
+          "sec": 1.17
+        },
+        {
+          "name": "1H_Ranged_Shoot",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Ranged_Shooting",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Melee_Attack_Chop",
+          "sec": 1.63
+        },
+        {
+          "name": "2H_Melee_Attack_Slice",
+          "sec": 1.1
+        },
+        {
+          "name": "2H_Melee_Attack_Spin",
+          "sec": 2.4
+        },
+        {
+          "name": "2H_Melee_Attack_Spinning",
+          "sec": 0.67
+        },
+        {
+          "name": "2H_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Melee_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "2H_Ranged_Aiming",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Ranged_Reload",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Ranged_Shoot",
+          "sec": 1.07
+        },
+        {
+          "name": "2H_Ranged_Shooting",
+          "sec": 1.07
+        },
+        {
+          "name": "Block",
+          "sec": 1.07
+        },
+        {
+          "name": "Block_Attack",
+          "sec": 1.07
+        },
+        {
+          "name": "Block_Hit",
+          "sec": 1.07
+        },
+        {
+          "name": "Blocking",
+          "sec": 1.07
+        },
+        {
+          "name": "Cheer",
+          "sec": 1.67
+        },
+        {
+          "name": "Death_A",
+          "sec": 0.8
+        },
+        {
+          "name": "Death_A_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Death_B",
+          "sec": 2.63
+        },
+        {
+          "name": "Death_B_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Dodge_Backward",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Forward",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Left",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Right",
+          "sec": 0.4
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Chop",
+          "sec": 1.27
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Slice",
+          "sec": 1.17
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "Hit_A",
+          "sec": 0.67
+        },
+        {
+          "name": "Hit_B",
+          "sec": 0.87
+        },
+        {
+          "name": "Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Interact",
+          "sec": 1.3
+        },
+        {
+          "name": "Jump_Full_Long",
+          "sec": 2.33
+        },
+        {
+          "name": "Jump_Full_Short",
+          "sec": 1.17
+        },
+        {
+          "name": "Jump_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Jump_Land",
+          "sec": 0.67
+        },
+        {
+          "name": "Jump_Start",
+          "sec": 0.6
+        },
+        {
+          "name": "Lie_Down",
+          "sec": 3
+        },
+        {
+          "name": "Lie_Idle",
+          "sec": 2.67
+        },
+        {
+          "name": "Lie_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Lie_StandUp",
+          "sec": 2.33
+        },
+        {
+          "name": "PickUp",
+          "sec": 1.3
+        },
+        {
+          "name": "Running_A",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_B",
+          "sec": 1.07
+        },
+        {
+          "name": "Running_Strafe_Left",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_Strafe_Right",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Chair_Down",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Chair_Idle",
+          "sec": 3.6
+        },
+        {
+          "name": "Sit_Chair_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Sit_Chair_StandUp",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Floor_Down",
+          "sec": 1
+        },
+        {
+          "name": "Sit_Floor_Idle",
+          "sec": 4
+        },
+        {
+          "name": "Sit_Floor_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Sit_Floor_StandUp",
+          "sec": 1.13
+        },
+        {
+          "name": "Spellcast_Long",
+          "sec": 2.53
+        },
+        {
+          "name": "Spellcast_Raise",
+          "sec": 2.1
+        },
+        {
+          "name": "Spellcast_Shoot",
+          "sec": 0.93
+        },
+        {
+          "name": "Spellcasting",
+          "sec": 0.67
+        },
+        {
+          "name": "T-Pose",
+          "sec": 0
+        },
+        {
+          "name": "Throw",
+          "sec": 1.37
+        },
+        {
+          "name": "Unarmed_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Kick",
+          "sec": 0.93
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Punch_A",
+          "sec": 1.47
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Punch_B",
+          "sec": 1.67
+        },
+        {
+          "name": "Unarmed_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Use_Item",
+          "sec": 1.6
+        },
+        {
+          "name": "Walking_A",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_B",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_Backwards",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_C",
+          "sec": 1.6
+        }
+      ],
+      "bones": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "upperarml",
+        "lowerarml",
+        "wristl",
+        "handl",
+        "handslotl",
+        "upperarmr",
+        "lowerarmr",
+        "wristr",
+        "handr",
+        "handslotr",
+        "head",
+        "upperlegl",
+        "lowerlegl",
+        "footl",
+        "toesl",
+        "upperlegr",
+        "lowerlegr",
+        "footr",
+        "toesr",
+        "kneeIKl",
+        "control-toe-rolll",
+        "control-heel-rolll",
+        "control-foot-rolll",
+        "heelIKl",
+        "IK-footl",
+        "IK-toel",
+        "kneeIKr",
+        "control-toe-rollr",
+        "control-heel-rollr",
+        "control-foot-rollr",
+        "heelIKr",
+        "IK-footr",
+        "IK-toer",
+        "elbowIKl",
+        "handIKl",
+        "elbowIKr"
+      ],
+      "bbox": {
+        "x": 2.69,
+        "y": 2.63,
+        "z": 2.58
+      },
+      "vertexCount": 7024,
+      "notes": "KayKit Adventurers Knight as blacksmith (distinct from player Barbarian). boneCount=41 (bones list truncated at 40). Hide prop meshes 1H_Sword, 1H_Sword_Offhand, 2H_Sword, Badge_Shield, Rectangle_Shield, Round_Shield, Spike_Shield; optionally hide Knight_Helmet to show head. Interact (1.3s) works as hammering placeholder."
+    },
+    {
+      "role": "npc",
+      "file": "assets/models/npc_villager_rogue.glb",
+      "license": "CC0",
+      "source": "https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0",
+      "animations": [
+        {
+          "name": "1H_Melee_Attack_Chop",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Melee_Attack_Slice_Diagonal",
+          "sec": 1
+        },
+        {
+          "name": "1H_Melee_Attack_Slice_Horizontal",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "1H_Ranged_Aiming",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Ranged_Reload",
+          "sec": 1.17
+        },
+        {
+          "name": "1H_Ranged_Shoot",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Ranged_Shooting",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Melee_Attack_Chop",
+          "sec": 1.63
+        },
+        {
+          "name": "2H_Melee_Attack_Slice",
+          "sec": 1.1
+        },
+        {
+          "name": "2H_Melee_Attack_Spin",
+          "sec": 2.4
+        },
+        {
+          "name": "2H_Melee_Attack_Spinning",
+          "sec": 0.67
+        },
+        {
+          "name": "2H_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Melee_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "2H_Ranged_Aiming",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Ranged_Reload",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Ranged_Shoot",
+          "sec": 1.07
+        },
+        {
+          "name": "2H_Ranged_Shooting",
+          "sec": 1.07
+        },
+        {
+          "name": "Block",
+          "sec": 1.07
+        },
+        {
+          "name": "Block_Attack",
+          "sec": 1.07
+        },
+        {
+          "name": "Block_Hit",
+          "sec": 1.07
+        },
+        {
+          "name": "Blocking",
+          "sec": 1.07
+        },
+        {
+          "name": "Cheer",
+          "sec": 1.67
+        },
+        {
+          "name": "Death_A",
+          "sec": 0.8
+        },
+        {
+          "name": "Death_A_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Death_B",
+          "sec": 2.63
+        },
+        {
+          "name": "Death_B_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Dodge_Backward",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Forward",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Left",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Right",
+          "sec": 0.4
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Chop",
+          "sec": 1.27
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Slice",
+          "sec": 1.17
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "Hit_A",
+          "sec": 0.67
+        },
+        {
+          "name": "Hit_B",
+          "sec": 0.87
+        },
+        {
+          "name": "Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Interact",
+          "sec": 1.3
+        },
+        {
+          "name": "Jump_Full_Long",
+          "sec": 2.33
+        },
+        {
+          "name": "Jump_Full_Short",
+          "sec": 1.17
+        },
+        {
+          "name": "Jump_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Jump_Land",
+          "sec": 0.67
+        },
+        {
+          "name": "Jump_Start",
+          "sec": 0.6
+        },
+        {
+          "name": "Lie_Down",
+          "sec": 3
+        },
+        {
+          "name": "Lie_Idle",
+          "sec": 2.67
+        },
+        {
+          "name": "Lie_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Lie_StandUp",
+          "sec": 2.33
+        },
+        {
+          "name": "PickUp",
+          "sec": 1.3
+        },
+        {
+          "name": "Running_A",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_B",
+          "sec": 1.07
+        },
+        {
+          "name": "Running_Strafe_Left",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_Strafe_Right",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Chair_Down",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Chair_Idle",
+          "sec": 3.6
+        },
+        {
+          "name": "Sit_Chair_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Sit_Chair_StandUp",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Floor_Down",
+          "sec": 1
+        },
+        {
+          "name": "Sit_Floor_Idle",
+          "sec": 4
+        },
+        {
+          "name": "Sit_Floor_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Sit_Floor_StandUp",
+          "sec": 1.13
+        },
+        {
+          "name": "Spellcast_Long",
+          "sec": 2.53
+        },
+        {
+          "name": "Spellcast_Raise",
+          "sec": 2.1
+        },
+        {
+          "name": "Spellcast_Shoot",
+          "sec": 0.93
+        },
+        {
+          "name": "Spellcasting",
+          "sec": 0.67
+        },
+        {
+          "name": "T-Pose",
+          "sec": 0
+        },
+        {
+          "name": "Throw",
+          "sec": 1.37
+        },
+        {
+          "name": "Unarmed_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Kick",
+          "sec": 0.93
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Punch_A",
+          "sec": 1.47
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Punch_B",
+          "sec": 1.67
+        },
+        {
+          "name": "Unarmed_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Use_Item",
+          "sec": 1.6
+        },
+        {
+          "name": "Walking_A",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_B",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_Backwards",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_C",
+          "sec": 1.6
+        }
+      ],
+      "bones": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "upperarml",
+        "lowerarml",
+        "wristl",
+        "handl",
+        "handslotl",
+        "upperarmr",
+        "lowerarmr",
+        "wristr",
+        "handr",
+        "handslotr",
+        "head",
+        "upperlegl",
+        "lowerlegl",
+        "footl",
+        "toesl",
+        "upperlegr",
+        "lowerlegr",
+        "footr",
+        "toesr",
+        "kneeIKl",
+        "control-toe-rolll",
+        "control-heel-rolll",
+        "control-foot-rolll",
+        "heelIKl",
+        "IK-footl",
+        "IK-toel",
+        "kneeIKr",
+        "control-toe-rollr",
+        "control-heel-rollr",
+        "control-foot-rollr",
+        "heelIKr",
+        "IK-footr",
+        "IK-toer",
+        "elbowIKl",
+        "handIKl",
+        "elbowIKr"
+      ],
+      "bbox": {
+        "x": 2.94,
+        "y": 1.79,
+        "z": 1.48
+      },
+      "vertexCount": 5901,
+      "notes": "KayKit Adventurers Rogue (no hood) as generic villager. boneCount=41 (bones list truncated at 40). Hide prop meshes Knife, Knife_Offhand, 1H_Crossbow, 2H_Crossbow, Throwable for commoner look."
+    },
+    {
+      "role": "draugr",
+      "file": "assets/models/draugr_skeleton_warrior.glb",
+      "license": "CC0",
+      "source": "https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Skeletons-1.0",
+      "animations": [
+        {
+          "name": "1H_Melee_Attack_Chop",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Melee_Attack_Jump_Chop",
+          "sec": 1.33
+        },
+        {
+          "name": "1H_Melee_Attack_Slice_Diagonal",
+          "sec": 1
+        },
+        {
+          "name": "1H_Melee_Attack_Slice_Horizontal",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "1H_Ranged_Aiming",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Ranged_Reload",
+          "sec": 1.17
+        },
+        {
+          "name": "1H_Ranged_Shoot",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Ranged_Shooting",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Melee_Attack_Chop",
+          "sec": 1.63
+        },
+        {
+          "name": "2H_Melee_Attack_Slice",
+          "sec": 1.1
+        },
+        {
+          "name": "2H_Melee_Attack_Spin",
+          "sec": 2.4
+        },
+        {
+          "name": "2H_Melee_Attack_Spinning",
+          "sec": 0.67
+        },
+        {
+          "name": "2H_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Melee_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "2H_Ranged_Aiming",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Ranged_Reload",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Ranged_Shoot",
+          "sec": 1.07
+        },
+        {
+          "name": "2H_Ranged_Shooting",
+          "sec": 1.07
+        },
+        {
+          "name": "Block",
+          "sec": 1.07
+        },
+        {
+          "name": "Block_Attack",
+          "sec": 1.07
+        },
+        {
+          "name": "Block_Hit",
+          "sec": 1.07
+        },
+        {
+          "name": "Blocking",
+          "sec": 1.07
+        },
+        {
+          "name": "Cheer",
+          "sec": 1.67
+        },
+        {
+          "name": "Death_A",
+          "sec": 0.8
+        },
+        {
+          "name": "Death_A_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Death_B",
+          "sec": 2.63
+        },
+        {
+          "name": "Death_B_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Death_C_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Death_C_Skeletons",
+          "sec": 2
+        },
+        {
+          "name": "Death_C_Skeletons_Resurrect",
+          "sec": 2.7
+        },
+        {
+          "name": "Dodge_Backward",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Forward",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Left",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Right",
+          "sec": 0.4
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Chop",
+          "sec": 1.27
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Slice",
+          "sec": 1.17
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "Hit_A",
+          "sec": 0.67
+        },
+        {
+          "name": "Hit_B",
+          "sec": 0.87
+        },
+        {
+          "name": "Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Idle_B",
+          "sec": 2.13
+        },
+        {
+          "name": "Idle_Combat",
+          "sec": 4.27
+        },
+        {
+          "name": "Interact",
+          "sec": 1.3
+        },
+        {
+          "name": "Jump_Full_Long",
+          "sec": 2.33
+        },
+        {
+          "name": "Jump_Full_Short",
+          "sec": 1.17
+        },
+        {
+          "name": "Jump_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Jump_Land",
+          "sec": 0.67
+        },
+        {
+          "name": "Jump_Start",
+          "sec": 0.6
+        },
+        {
+          "name": "Lie_Down",
+          "sec": 3
+        },
+        {
+          "name": "Lie_Idle",
+          "sec": 2.67
+        },
+        {
+          "name": "Lie_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Lie_StandUp",
+          "sec": 2.33
+        },
+        {
+          "name": "PickUp",
+          "sec": 1.3
+        },
+        {
+          "name": "Running_A",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_B",
+          "sec": 1.07
+        },
+        {
+          "name": "Running_C",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_Strafe_Left",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_Strafe_Right",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Chair_Down",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Chair_Idle",
+          "sec": 3.6
+        },
+        {
+          "name": "Sit_Chair_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Sit_Chair_StandUp",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Floor_Down",
+          "sec": 1
+        },
+        {
+          "name": "Sit_Floor_Idle",
+          "sec": 4
+        },
+        {
+          "name": "Sit_Floor_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Sit_Floor_StandUp",
+          "sec": 1.13
+        },
+        {
+          "name": "Skeleton_Inactive_Standing_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Skeletons_Awaken_Floor",
+          "sec": 2.3
+        },
+        {
+          "name": "Skeletons_Awaken_Floor_Long",
+          "sec": 3.83
+        },
+        {
+          "name": "Skeletons_Awaken_Standing",
+          "sec": 1
+        },
+        {
+          "name": "Skeletons_Inactive_Floor_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Spawn_Air",
+          "sec": 1.3
+        },
+        {
+          "name": "Spawn_Ground",
+          "sec": 1.3
+        },
+        {
+          "name": "Spawn_Ground_Skeletons",
+          "sec": 3.57
+        },
+        {
+          "name": "Spellcast_Long",
+          "sec": 2.53
+        },
+        {
+          "name": "Spellcast_Raise",
+          "sec": 2.1
+        },
+        {
+          "name": "Spellcast_Shoot",
+          "sec": 0.93
+        },
+        {
+          "name": "Spellcast_Summon",
+          "sec": 4.3
+        },
+        {
+          "name": "Spellcasting",
+          "sec": 0.67
+        },
+        {
+          "name": "T-Pose",
+          "sec": 0
+        },
+        {
+          "name": "Taunt",
+          "sec": 1.03
+        },
+        {
+          "name": "Taunt_Longer",
+          "sec": 3
+        },
+        {
+          "name": "Throw",
+          "sec": 1.37
+        },
+        {
+          "name": "Unarmed_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Kick",
+          "sec": 0.93
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Punch_A",
+          "sec": 1.47
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Punch_B",
+          "sec": 1.67
+        },
+        {
+          "name": "Unarmed_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Use_Item",
+          "sec": 1.6
+        },
+        {
+          "name": "Walking_A",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_B",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_Backwards",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_C",
+          "sec": 1.6
+        },
+        {
+          "name": "Walking_D_Skeletons",
+          "sec": 1.6
+        }
+      ],
+      "bones": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "upperarml",
+        "lowerarml",
+        "wristl",
+        "handl",
+        "handslotl",
+        "upperarmr",
+        "lowerarmr",
+        "wristr",
+        "handr",
+        "handslotr",
+        "head",
+        "upperlegl",
+        "lowerlegl",
+        "footl",
+        "toesl",
+        "upperlegr",
+        "lowerlegr",
+        "footr",
+        "toesr",
+        "kneeIKl",
+        "control-toe-rolll",
+        "control-heel-rolll",
+        "control-foot-rolll",
+        "heelIKl",
+        "IK-footl",
+        "IK-toel",
+        "kneeIKr",
+        "control-toe-rollr",
+        "control-heel-rollr",
+        "control-foot-rollr",
+        "heelIKr",
+        "IK-footr",
+        "IK-toer",
+        "elbowIKl",
+        "handIKl",
+        "elbowIKr"
+      ],
+      "bbox": {
+        "x": 1.52,
+        "y": 2.7,
+        "z": 1.46
+      },
+      "vertexCount": 6117,
+      "notes": "KayKit Skeleton Warrior, 95 embedded clips. boneCount=41 (bones list truncated at 40). Mapping: idle=Idle/Idle_Combat, walk=Walking_A or shamble Walking_D_Skeletons, attack=1H_Melee_Attack_Slice_Diagonal/Chop, death=Death_A/Death_B; flavor: Skeletons_Awaken_Floor spawn, Death_C_Skeletons_Resurrect. ~2.7 units tall (scale ~0.6-0.7 vs 1.8m humans). Faces +Z. No weapon mesh embedded - attach draugr_weapon_skeleton_blade.glb to handslotr."
+    },
+    {
+      "role": "draugr",
+      "file": "assets/models/draugr_skeleton_mage.glb",
+      "license": "CC0",
+      "source": "https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Skeletons-1.0",
+      "animations": [
+        {
+          "name": "1H_Melee_Attack_Chop",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Melee_Attack_Jump_Chop",
+          "sec": 1.33
+        },
+        {
+          "name": "1H_Melee_Attack_Slice_Diagonal",
+          "sec": 1
+        },
+        {
+          "name": "1H_Melee_Attack_Slice_Horizontal",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "1H_Ranged_Aiming",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Ranged_Reload",
+          "sec": 1.17
+        },
+        {
+          "name": "1H_Ranged_Shoot",
+          "sec": 1.07
+        },
+        {
+          "name": "1H_Ranged_Shooting",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Melee_Attack_Chop",
+          "sec": 1.63
+        },
+        {
+          "name": "2H_Melee_Attack_Slice",
+          "sec": 1.1
+        },
+        {
+          "name": "2H_Melee_Attack_Spin",
+          "sec": 2.4
+        },
+        {
+          "name": "2H_Melee_Attack_Spinning",
+          "sec": 0.67
+        },
+        {
+          "name": "2H_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Melee_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "2H_Ranged_Aiming",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Ranged_Reload",
+          "sec": 1.6
+        },
+        {
+          "name": "2H_Ranged_Shoot",
+          "sec": 1.07
+        },
+        {
+          "name": "2H_Ranged_Shooting",
+          "sec": 1.07
+        },
+        {
+          "name": "Block",
+          "sec": 1.07
+        },
+        {
+          "name": "Block_Attack",
+          "sec": 1.07
+        },
+        {
+          "name": "Block_Hit",
+          "sec": 1.07
+        },
+        {
+          "name": "Blocking",
+          "sec": 1.07
+        },
+        {
+          "name": "Cheer",
+          "sec": 1.67
+        },
+        {
+          "name": "Death_A",
+          "sec": 0.8
+        },
+        {
+          "name": "Death_A_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Death_B",
+          "sec": 2.63
+        },
+        {
+          "name": "Death_B_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Death_C_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Death_C_Skeletons",
+          "sec": 2
+        },
+        {
+          "name": "Death_C_Skeletons_Resurrect",
+          "sec": 2.7
+        },
+        {
+          "name": "Dodge_Backward",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Forward",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Left",
+          "sec": 0.4
+        },
+        {
+          "name": "Dodge_Right",
+          "sec": 0.4
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Chop",
+          "sec": 1.27
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Slice",
+          "sec": 1.17
+        },
+        {
+          "name": "Dualwield_Melee_Attack_Stab",
+          "sec": 1.6
+        },
+        {
+          "name": "Hit_A",
+          "sec": 0.67
+        },
+        {
+          "name": "Hit_B",
+          "sec": 0.87
+        },
+        {
+          "name": "Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Idle_B",
+          "sec": 2.13
+        },
+        {
+          "name": "Idle_Combat",
+          "sec": 4.27
+        },
+        {
+          "name": "Interact",
+          "sec": 1.3
+        },
+        {
+          "name": "Jump_Full_Long",
+          "sec": 2.33
+        },
+        {
+          "name": "Jump_Full_Short",
+          "sec": 1.17
+        },
+        {
+          "name": "Jump_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Jump_Land",
+          "sec": 0.67
+        },
+        {
+          "name": "Jump_Start",
+          "sec": 0.6
+        },
+        {
+          "name": "Lie_Down",
+          "sec": 3
+        },
+        {
+          "name": "Lie_Idle",
+          "sec": 2.67
+        },
+        {
+          "name": "Lie_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Lie_StandUp",
+          "sec": 2.33
+        },
+        {
+          "name": "PickUp",
+          "sec": 1.3
+        },
+        {
+          "name": "Running_A",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_B",
+          "sec": 1.07
+        },
+        {
+          "name": "Running_C",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_Strafe_Left",
+          "sec": 0.8
+        },
+        {
+          "name": "Running_Strafe_Right",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Chair_Down",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Chair_Idle",
+          "sec": 3.6
+        },
+        {
+          "name": "Sit_Chair_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Sit_Chair_StandUp",
+          "sec": 0.8
+        },
+        {
+          "name": "Sit_Floor_Down",
+          "sec": 1
+        },
+        {
+          "name": "Sit_Floor_Idle",
+          "sec": 4
+        },
+        {
+          "name": "Sit_Floor_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Sit_Floor_StandUp",
+          "sec": 1.13
+        },
+        {
+          "name": "Skeleton_Inactive_Standing_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Skeletons_Awaken_Floor",
+          "sec": 2.3
+        },
+        {
+          "name": "Skeletons_Awaken_Floor_Long",
+          "sec": 3.83
+        },
+        {
+          "name": "Skeletons_Awaken_Standing",
+          "sec": 1
+        },
+        {
+          "name": "Skeletons_Inactive_Floor_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Spawn_Air",
+          "sec": 1.3
+        },
+        {
+          "name": "Spawn_Ground",
+          "sec": 1.3
+        },
+        {
+          "name": "Spawn_Ground_Skeletons",
+          "sec": 3.57
+        },
+        {
+          "name": "Spellcast_Long",
+          "sec": 2.53
+        },
+        {
+          "name": "Spellcast_Raise",
+          "sec": 2.1
+        },
+        {
+          "name": "Spellcast_Shoot",
+          "sec": 0.93
+        },
+        {
+          "name": "Spellcast_Summon",
+          "sec": 4.3
+        },
+        {
+          "name": "Spellcasting",
+          "sec": 0.67
+        },
+        {
+          "name": "T-Pose",
+          "sec": 0
+        },
+        {
+          "name": "Taunt",
+          "sec": 1.03
+        },
+        {
+          "name": "Taunt_Longer",
+          "sec": 3
+        },
+        {
+          "name": "Throw",
+          "sec": 1.37
+        },
+        {
+          "name": "Unarmed_Idle",
+          "sec": 1.07
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Kick",
+          "sec": 0.93
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Punch_A",
+          "sec": 1.47
+        },
+        {
+          "name": "Unarmed_Melee_Attack_Punch_B",
+          "sec": 1.67
+        },
+        {
+          "name": "Unarmed_Pose",
+          "sec": 0
+        },
+        {
+          "name": "Use_Item",
+          "sec": 1.6
+        },
+        {
+          "name": "Walking_A",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_B",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_Backwards",
+          "sec": 1.07
+        },
+        {
+          "name": "Walking_C",
+          "sec": 1.6
+        },
+        {
+          "name": "Walking_D_Skeletons",
+          "sec": 1.6
+        }
+      ],
+      "bones": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "upperarml",
+        "lowerarml",
+        "wristl",
+        "handl",
+        "handslotl",
+        "upperarmr",
+        "lowerarmr",
+        "wristr",
+        "handr",
+        "handslotr",
+        "head",
+        "upperlegl",
+        "lowerlegl",
+        "footl",
+        "toesl",
+        "upperlegr",
+        "lowerlegr",
+        "footr",
+        "toesr",
+        "kneeIKl",
+        "control-toe-rolll",
+        "control-heel-rolll",
+        "control-foot-rolll",
+        "heelIKl",
+        "IK-footl",
+        "IK-toel",
+        "kneeIKr",
+        "control-toe-rollr",
+        "control-heel-rollr",
+        "control-foot-rollr",
+        "heelIKr",
+        "IK-footr",
+        "IK-toer",
+        "elbowIKl",
+        "handIKl",
+        "elbowIKr"
+      ],
+      "bbox": {
+        "x": 1.79,
+        "y": 2.79,
+        "z": 1.74
+      },
+      "vertexCount": 4056,
+      "notes": "KayKit Skeleton Mage, same 95-clip rig as warrior (verified identical by inspector). boneCount=41 (bones list truncated at 40). Mapping: idle=Idle, walk=Walking_A, attack=Spellcast_Shoot (or Spellcast_Long/Spellcast_Summon), death=Death_A/Death_B. Same scale/orientation as warrior."
+    },
+    {
+      "role": "draugr_weapon",
+      "file": "assets/models/draugr_weapon_skeleton_blade.glb",
+      "license": "CC0",
+      "source": "https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Skeletons-1.0",
+      "animations": [],
+      "bones": [],
+      "bbox": {
+        "x": 0.57,
+        "y": 1.5,
+        "z": 0.22
+      },
+      "vertexCount": 541,
+      "notes": "Static Skeleton_Blade prop (no animations/bones), repacked to self-contained glb. Attach as child of skeleton handslotr bone with identity transform."
+    },
+    {
+      "role": "wolf",
+      "file": "assets/models/wolf_quaternius.glb",
+      "license": "CC0",
+      "source": "https://poly.pizza/m/P1gU3Qkr9r",
+      "animations": [
+        {
+          "name": "Attack",
+          "sec": 1.33
+        },
+        {
+          "name": "Death",
+          "sec": 1.04
+        },
+        {
+          "name": "Eating",
+          "sec": 2.5
+        },
+        {
+          "name": "Gallop",
+          "sec": 0.54
+        },
+        {
+          "name": "Gallop_Jump",
+          "sec": 0.92
+        },
+        {
+          "name": "Idle_HitReact_Left",
+          "sec": 0.67
+        },
+        {
+          "name": "Idle_HitReact_Right",
+          "sec": 0.67
+        },
+        {
+          "name": "Jump_ToIdle",
+          "sec": 1.33
+        },
+        {
+          "name": "Walk",
+          "sec": 1.04
+        },
+        {
+          "name": "Idle_2_HeadLow",
+          "sec": 4
+        },
+        {
+          "name": "Idle_2",
+          "sec": 3.33
+        },
+        {
+          "name": "Idle",
+          "sec": 3.33
+        },
+        {
+          "name": "AnimalArmature|Attack",
+          "sec": 1.33
+        },
+        {
+          "name": "AnimalArmature|Death",
+          "sec": 1.04
+        },
+        {
+          "name": "AnimalArmature|Eating",
+          "sec": 2.5
+        },
+        {
+          "name": "AnimalArmature|Gallop",
+          "sec": 0.54
+        },
+        {
+          "name": "AnimalArmature|Gallop_Jump",
+          "sec": 0.92
+        },
+        {
+          "name": "AnimalArmature|Idle",
+          "sec": 3.33
+        },
+        {
+          "name": "AnimalArmature|Idle_2",
+          "sec": 3.33
+        },
+        {
+          "name": "AnimalArmature|Idle_2_HeadLow",
+          "sec": 4
+        },
+        {
+          "name": "AnimalArmature|Idle_HitReact_Left",
+          "sec": 0.67
+        },
+        {
+          "name": "AnimalArmature|Idle_HitReact_Right",
+          "sec": 0.67
+        },
+        {
+          "name": "AnimalArmature|Jump_ToIdle",
+          "sec": 1.33
+        },
+        {
+          "name": "AnimalArmature|Walk",
+          "sec": 1.04
+        }
+      ],
+      "bones": [
+        "Body",
+        "Back",
+        "Torso",
+        "Torso2",
+        "Torso3",
+        "Neck1",
+        "Neck2",
+        "Neck3",
+        "Head",
+        "Ear1L",
+        "Ear2L",
+        "Ear3L",
+        "Ear4L",
+        "Ear1R",
+        "Ear2R",
+        "Ear3R",
+        "Ear4R",
+        "FrontShoulderL",
+        "FrontUpperLegL",
+        "FrontLowerLegL",
+        "FrontShoulderR",
+        "FrontUpperLegR",
+        "FrontLowerLegR",
+        "BackShoulderL",
+        "BackLegL",
+        "BackUpperLegL",
+        "BackLowerLegL",
+        "BackShoulderR",
+        "BackLegR",
+        "BackUpperLegR",
+        "BackLowerLegR",
+        "Tail1",
+        "Tail2",
+        "Tail3",
+        "Tail4",
+        "Tail5",
+        "Tail6",
+        "Tail7",
+        "Tail8",
+        "PoleTargetBackL"
+      ],
+      "bbox": {
+        "x": 105.66,
+        "y": 527.23,
+        "z": 270.1
+      },
+      "vertexCount": 3994,
+      "notes": "Quaternius wolf. CM-SCALE EXPORT: bbox ~270 units long, scale ~0.01 for meters; bbox.y=527 inflated by rest-pose bone extents. boneCount=51 (bones list truncated at 40). Every clip exists twice (plain + AnimalArmature| prefix, same data) - 24 clips total, use either set. run=Gallop, attack=Attack, death=Death."
+    },
+    {
+      "role": "dragon",
+      "file": "assets/models/dragon_evolved_quaternius.glb",
+      "license": "CC0",
+      "source": "https://poly.pizza/m/LlwD0QNUPj",
+      "animations": [
+        {
+          "name": "CharacterArmature|Death",
+          "sec": 0.67
+        },
+        {
+          "name": "CharacterArmature|Fast_Flying",
+          "sec": 0.83
+        },
+        {
+          "name": "CharacterArmature|Flying_Idle",
+          "sec": 1.5
+        },
+        {
+          "name": "CharacterArmature|Headbutt",
+          "sec": 1.5
+        },
+        {
+          "name": "CharacterArmature|HitReact",
+          "sec": 0.67
+        },
+        {
+          "name": "CharacterArmature|No",
+          "sec": 1.17
+        },
+        {
+          "name": "CharacterArmature|Punch",
+          "sec": 1.33
+        },
+        {
+          "name": "CharacterArmature|Yes",
+          "sec": 1.17
+        }
+      ],
+      "bones": [
+        "Root",
+        "Torso",
+        "Neck",
+        "Head",
+        "ShoulderL",
+        "UpperArmL",
+        "LowerArmL",
+        "Middle1L",
+        "Middle2L",
+        "Middle3L",
+        "Pinky1L",
+        "Pinky2L",
+        "Pinky3L",
+        "Index1L",
+        "Index2L",
+        "Index3L",
+        "Thumb1L",
+        "Thumb2L",
+        "Thumb3L",
+        "Wing1L",
+        "Wing2L",
+        "Wing3L",
+        "Wing4L",
+        "ShoulderR",
+        "UpperArmR",
+        "LowerArmR",
+        "Middle1R",
+        "Middle2R",
+        "Middle3R",
+        "Pinky1R",
+        "Pinky2R",
+        "Pinky3R",
+        "Index1R",
+        "Index2R",
+        "Index3R",
+        "Thumb1R",
+        "Thumb2R",
+        "Thumb3R",
+        "Wing1R",
+        "Wing2R"
+      ],
+      "bbox": {
+        "x": 492.26,
+        "y": 247.16,
+        "z": 283.45
+      },
+      "vertexCount": 4350,
+      "notes": "Quaternius Dragon Evolved boss. All clip names prefixed CharacterArmature|. CM-SCALE: ~492 units wide, apply scale ~0.01-0.02. boneCount=46 (bones list truncated at 40). Mapping: hover=Flying_Idle, flight=Fast_Flying, attacks=Headbutt/Punch, HitReact, Death. Faces +Z. Earlier 0-byte download was replaced; current file validates ok."
+    },
+    {
+      "role": "env",
+      "file": "assets/models/env_pine_01.glb",
+      "license": "CC0",
+      "source": "https://poly.pizza/m/igSu0cPoBz",
+      "animations": [],
+      "bones": [],
+      "bbox": {
+        "x": 6.42,
+        "y": 8.72,
+        "z": 6.22
+      },
+      "vertexCount": 1621,
+      "notes": "Stylized pine, 8.7 units tall, roughly meter-scale, usable near 1:1. Embedded texture, 2 materials."
+    },
+    {
+      "role": "env",
+      "file": "assets/models/env_pine_02.glb",
+      "license": "CC0",
+      "source": "https://poly.pizza/m/699sFuLCN2",
+      "animations": [],
+      "bones": [],
+      "bbox": {
+        "x": 3.61,
+        "y": 7.39,
+        "z": 4
+      },
+      "vertexCount": 3576,
+      "notes": "Stylized pine, 7.4 units tall, narrower silhouette than pine_01 for shape variety."
+    },
+    {
+      "role": "env",
+      "file": "assets/models/env_pine_snow.glb",
+      "license": "CC0",
+      "source": "https://poly.pizza/m/17vQv2X5rh",
+      "animations": [],
+      "bones": [],
+      "bbox": {
+        "x": 1.25,
+        "y": 3.34,
+        "z": 1.39
+      },
+      "vertexCount": 3395,
+      "notes": "Snow-capped pine for nordic look. Only 3.3 units tall - smaller native scale, scale up ~2x to match other pines."
+    },
+    {
+      "role": "env",
+      "file": "assets/models/env_rock_01.glb",
+      "license": "CC0",
+      "source": "https://poly.pizza/m/RtLRqYjfMs",
+      "animations": [],
+      "bones": [],
+      "bbox": {
+        "x": 0.62,
+        "y": 0.57,
+        "z": 0.7
+      },
+      "vertexCount": 780,
+      "notes": "Small boulder ~0.6 units - scale up 2-4x for scatter rocks."
+    },
+    {
+      "role": "env",
+      "file": "assets/models/env_rock_large.glb",
+      "license": "CC0",
+      "source": "https://poly.pizza/m/54jZKTAt5p",
+      "animations": [],
+      "bones": [],
+      "bbox": {
+        "x": 7.67,
+        "y": 3.29,
+        "z": 7.33
+      },
+      "vertexCount": 310,
+      "notes": "Large flat-ish boulder ~7.7 units wide - landmark/cover rock."
+    }
+  ],
+  "missing": []
+}
