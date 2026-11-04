@@ -22,7 +22,16 @@ try{
  page.on('console',m=>{if(m.type()==='error')errors.push('console: '+m.text().slice(0,300));});
  await page.goto('http://127.0.0.1:8957/',{waitUntil:'domcontentloaded',timeout:30000});
  await page.waitForFunction(()=>!!window.game?.touch?.premium?.p810,null,{timeout:90000});
- await page.locator('#btn-new').click({timeout:12000});
+ await page.waitForFunction(()=>document.getElementById('asset-splash')===null,null,{timeout:60000}).catch(async err=>{
+   const info=await page.evaluate(()=>{
+    const splash=document.querySelector('#asset-splash'),menu=document.querySelector('#btn-new');
+    return {splash:!!splash,state:window.game?.state,gameReady:!!window.game,
+      menuDisplay:menu?getComputedStyle(menu).display:null,menuBounds:menu?.getBoundingClientRect().toJSON()};
+   });
+   throw new Error('Splash still blocking entry: '+JSON.stringify(info)+' ERR '+err.message+
+       ' JS '+errors.slice(0,4).join(', '));
+ });
+ await page.locator('#btn-new').click({timeout:30000});
  await page.waitForFunction(()=>window.game?.state==='playing',null,{timeout:12000});
  assert.ok(await page.locator('#hf-p810-bag').isVisible(),'bag shortcut visible');
  assert.ok(await page.locator('#hf-p810-menu').isVisible(),'four-tile menu visible');
