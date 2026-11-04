@@ -89,8 +89,8 @@ export class TargetingP6 {
   }
   get(maxRange=this.range){
     if(this.valid(this.locked,maxRange,true))return this.locked;
-    if(this.valid(this.soft,maxRange,false))return this.soft;
-    return this.acquire(maxRange);
+    if(this.valid(this.soft,maxRange,!!this.game.p7Enabled))return this.soft;
+    return this.game.p7Enabled?this.acquireAny(Math.min(maxRange,16)):this.acquire(maxRange);
   }
   toggle(){
     if(this.locked){this.locked=null;this.game.hud.notify('Objetivo libre');return;}
@@ -108,7 +108,12 @@ export class TargetingP6 {
   update(dt){
     if(this.locked && !this.valid(this.locked,this.range,true))this.locked=null;
     this.scanT-=dt;
-    if(this.scanT<=0){this.scanT=0.16;this.soft=this.acquire();}
+    if(this.scanT<=0){
+      this.scanT=0.16;
+      const attack=this.game.combat?._attackTarget;
+      this.soft=this.game.p7Enabled && this.game.combat?.comboTimer>0 && this.valid(attack,5,true)
+        ? attack:this.game.p7Enabled?this.acquireAny(16):this.acquire();
+    }
     const jp=this.game.input.justPressed;
     if(jp.has('KeyL'))this.toggle();
     if(jp.has('KeyR'))this.next();

@@ -372,6 +372,7 @@ export class Combat {
     g.hud.shoutText('FUS · RO · DAH');
     g.player.addShake(0.5);
     const target=g.p7Enabled?g.targeting?.attackTarget(14):g.p6Enabled && g.targeting ? g.targeting.get(14) : null;
+    if(g.p7Enabled){this._castTarget=target;g.player.castT=0;g.player._castAnimStarted=false;}
     const forward=this._fwd.copy(g.p7Enabled?g.player.getCombatForward():g.player.getForward());
     if(target){forward.copy(target.group.position).sub(g.player.pos).setY(0).normalize();}
     const burstPos = this._v1.copy(g.player.pos).addScaledVector(forward, 2);
@@ -399,6 +400,7 @@ export class Combat {
     g.hud.shoutText('FO · KRAH · DIIN');
     player.addShake(0.3);
     const target=g.p7Enabled?g.targeting?.attackTarget(15):g.p6Enabled && g.targeting ? g.targeting.get(15) : null;
+    if(g.p7Enabled){this._castTarget=target;g.player.castT=0;g.player._castAnimStarted=false;}
     const frostForward=this._frostForward||(this._frostForward=new THREE.Vector3());
     frostForward.copy(g.p7Enabled?player.getCombatForward():player.getForward());
     if(target)frostForward.copy(target.group.position).sub(player.pos).setY(0).normalize();
