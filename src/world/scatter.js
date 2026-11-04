@@ -116,7 +116,9 @@ export class Scatter {
       p.set(t.x, t.y - 0.2, t.z);
       sc.set(scale, scale, scale);
       variants[key].push(new THREE.Matrix4().compose(p, q, sc));
-      if(this.obstacles)this.obstacles.register(t.x,t.z, key==='pine_snow'?0.9:Math.max(0.45,scale*0.48),t.y-0.8,t.y+10,'tree');
+      if(this.obstacles)this.obstacles.register(t.x,t.z,
+        this.game.p13Enabled ? Math.max(.64,key==='pine_snow'?1.08:scale*.59)
+          : key==='pine_snow'?.9:Math.max(.45,scale*.48),t.y-.8,t.y+10,'tree');
     }
 
     for (const key of Object.keys(variants)) {
@@ -158,7 +160,10 @@ export class Scatter {
         const base = 0.7 + (s - 0.5) * 0.3;
         sc.set(base * jx, base * jy, base * jz);
         large.push(new THREE.Matrix4().compose(p, q, sc));
-        if(this.obstacles)this.obstacles.register(x,z,Math.max(0.8,Math.min(1.7,base*1.12)),y-0.7,y+2.2,'large-rock');
+        if(this.obstacles)this.obstacles.register(x,z,
+          this.game.p13Enabled?Math.max(1.05,Math.min(2.3,base*Math.max(jx,jz)*1.16))
+            :Math.max(.8,Math.min(1.7,base*1.12)),y-.7,
+          this.game.p13Enabled?y+Math.max(1.6,base*jy*1.8):y+2.2,'large-rock');
       } else {
         e.set(rx, ry, rz);
         q.setFromEuler(e);
@@ -166,7 +171,10 @@ export class Scatter {
         // rock1 原生仅 0.6u，旧 1u 十二面体的 3 倍补齐体量。
         sc.set(s * jx * 3, s * jy * 3, s * jz * 3);
         small.push(new THREE.Matrix4().compose(p, q, sc));
-        if(this.obstacles)this.obstacles.register(x,z,Math.max(0.38,Math.min(1.4,s*0.41)),y-0.6,y+1.9,'rock');
+        if(this.obstacles)this.obstacles.register(x,z,
+          this.game.p13Enabled?Math.max(.53,Math.min(2.55,s*Math.max(jx,jz)*.86))
+            :Math.max(.38,Math.min(1.4,s*.41)),y-.6,
+          this.game.p13Enabled?y+Math.max(.65,Math.min(3.8,s*jy*1.48)):y+1.9,'rock');
       }
     }
 

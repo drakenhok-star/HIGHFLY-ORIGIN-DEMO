@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { cameraSafeFraction } from '../combat/targeting-p6.js';
 import { resolveDashDirection,relativeDodgeClip,worldMove,angleTo,wrapAngle } from '../combat/motion-p7.js';
+import { FuryTraversalP13 } from './fury-traversal-p13.js';
+import { landingRock } from './fury-surfaces-p13.js';
 
 const _tmpV1 = new THREE.Vector3();
 const _tmpV2 = new THREE.Vector3();
@@ -82,6 +84,8 @@ export class Player {
     this.group = new THREE.Group();
     this.rig = game.assets.spawn('player');
     this.group.add(this.rig.root);
+    this.fury=game.p13Enabled ? new FuryTraversalP13(game,this) : null;
+    if(this.fury)this.rig.root.rotation.order='YXZ';
     const sx = 8, sz = 70;
     this.group.position.set(sx, game.terrain.getHeight(sx, sz), sz);
     game.scene.add(this.group);
@@ -315,6 +319,7 @@ export class Player {
   // P6 directional evasion and existing WULD share the same movement primitive.
   startDash(opts = {}) {
     this.dashT = 0;
+    if(this.fury && this.fury.mode!=='AIR')this.fury.stop('dash');
     const direction=opts.direction || (this.game.p7Enabled
       ? resolveDashDirection(this.game.input.touchMove,this.yaw,this._lastMoveDir,this.bodyYaw)
       : (this.game.p6Enabled && this._moveDir.lengthSq()>0.1 ? this._moveDir : this.getForward()));
@@ -444,11 +449,20 @@ export class Player {
       this._jumpBufferT=Math.max(0,this._jumpBufferT-dt);
     }
     const wantJump=g.p7Enabled?this._jumpBufferT>0:input.justPressed.has('Space');
-    if(wantJump && !inWater && !dashing){
+    let furyHandledJump=false;
+    if(wantJump && !inWater && !dashing && this.fury &&
+       (this.fury.isHolding() || this.fury.isRunning())){
+      furyHandledJump=this.fury.jumpFromWall();
+      // A failed wall-climb cannot fall through to a cheaper double jump.
+      if(!furyHandledJump){this._jumpBufferT=0;furyHandledJump=true;}
+      if(furyHandledJump)this._jumpBufferT=0;
+    }
+    if(wantJump && !furyHandledJump && !inWater && !dashing){
       if(this.onGround && stats.useStamina(8)){
         this.vel.y=9.5;this.onGround=false;this._jumpCount=1;this._jumpBufferT=0;
       }else if(g.p6Enabled && !this.onGround && this._jumpCount===1 && stats.useStamina(12)){
         this.vel.y=8.8;this._jumpCount=2;this._jumpBufferT=0;
+        if(this.fury)this.fury.beginFlip(mx,mz);
         if(g.p810Enabled){
           // Keep a steady airborne pose. Jump_Full_Short on a second impulse
           // makes the head snap on the KayKit rig at mobile frame rates.
@@ -458,7 +472,9 @@ export class Player {
       }else if(g.p7Enabled&&this._jumpCount>=2)this._jumpBufferT=0;
     }
 
-    if (!dashing) this.vel.y -= 26 * dt;
+    if(this.fury && !inWater)this.fury.update(dt,moving,this._moveDir.x,this._moveDir.z);
+    if (!dashing && !this.fury?.isHolding()) this.vel.y -= 26 * dt;
+    const previousFootY=this.group.position.y;
     // Small collision steps prevent dash from tunnelling through buildings/well.
     const steps = g.p6Enabled ? Math.max(1,Math.ceil(Math.hypot(this.vel.x*dt,this.vel.z*dt)/0.35)) : 1;
     for(let step=0;step<steps;step++){
@@ -515,8 +531,13 @@ export class Player {
     const fallSpeed = Math.max(0, -this.vel.y);
 
     const ground = terrain.getHeight(this.group.position.x, this.group.position.z);
-    const floor = ground < terrain.waterY - 0.6 ? terrain.waterY - 0.4 : ground;
-    if (this.group.position.y <= floor) {
+    const baseFloor = ground < terrain.waterY - 0.6 ? terrain.waterY - 0.4 : ground;
+    const platform=this.fury && this.vel.y<=0 && !this.fury.isHolding()
+      ?landingRock(g,this.group.position.x,this.group.position.z,previousFootY,this.group.position.y):null;
+    const floor=platform?Math.max(baseFloor,platform.top):baseFloor;
+    if(this.fury?.isHolding()){
+      this.vel.y=0;this.onGround=false;
+    }else if (this.group.position.y <= floor) {
       this.group.position.y = floor;
       this.vel.y = 0;
       this.onGround = true;
@@ -524,7 +545,10 @@ export class Player {
       this.onGround = this.group.position.y - floor < 0.02;
     }
 
-    if(this.onGround){this._jumpCount=0;this._airDashUsed=false;this._airDashCount=0;}
+    if(this.onGround){
+      this._jumpCount=0;this._airDashUsed=false;this._airDashCount=0;
+      if(this.fury && this.fury.flipT>=0)this.fury.flipT=-1;
+    }
     if(g.p810Enabled&&this._secondJumpVfxT>0){
       this._secondJumpVfxT=Math.max(0,this._secondJumpVfxT-dt);
       if(this._secondJumpVfxT>0.11 && this._secondJumpVfxT-dt<=0.11 && g.effects){
@@ -634,6 +658,10 @@ export class Player {
         this.rig.play('Jump_Full_Short',{once:true,fade:0.06,
           timeScale:clip.duration/0.34});
       }
+    } else if(this.fury?.isHolding()){
+      this.rig.play('Jump_Idle');
+    } else if(this.fury?.isRunning()){
+      this.rig.play('Running_A',{timeScale:1.15});
     } else if (!this.onGround) {
       this.rig.play('Jump_Idle');
     } else if (horizSpeed > 7) {
@@ -646,6 +674,7 @@ export class Player {
     }
 
     this.rig.update(dt);
+    if(this.fury)this.fury.animate(dt);
   }
 
   updateCamera(dt) {
@@ -796,6 +825,7 @@ export class Player {
     this.faceVillage();
     this.bodyYaw = this.yaw;
     this.rig.root.rotation.y = this.bodyYaw + MODEL_YAW_OFFSET;
+    if(this.fury)this.fury.reset();
     this.rig.root.visible = true;
     this.rig.play('Idle', { fade: 0 });
     this.currentWeapon = null;

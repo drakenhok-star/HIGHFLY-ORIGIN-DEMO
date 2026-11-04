@@ -21,12 +21,15 @@ export class NatureObstaclesP7 {
   return out;
  }
  collide(position,radius=0.42,footY=null){
-  for(const o of this.query(position.x,position.z,radius+2.4)){
+  const neighbors=this.query(position.x,position.z,radius+3);
+  // Two passes converge when rock/tree radii overlap, without a global mesh raycast.
+  for(let pass=0;pass<2;pass++)for(const o of neighbors){
    if(footY!==null && (footY>o.maxY||footY+1.4<o.minY))continue;
-   const dx=position.x-o.x,dz=position.z-o.z,limit=radius+o.r,dist=Math.hypot(dx,dz);
-   if(dist>=limit)continue;
-   if(dist>1e-6){position.x=o.x+dx*limit/dist;position.z=o.z+dz*limit/dist;}
-   else {position.x=o.x+limit;}
+   const dx=position.x-o.x,dz=position.z-o.z,limit=radius+o.r;
+   const dist2=dx*dx+dz*dz;
+   if(dist2>=limit*limit)continue;
+   if(dist2>1e-12){const scale=limit/Math.sqrt(dist2);position.x=o.x+dx*scale;position.z=o.z+dz*scale;}
+   else position.x=o.x+limit;
   }
   return position;
  }
