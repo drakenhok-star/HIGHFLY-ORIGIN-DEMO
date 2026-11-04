@@ -189,7 +189,7 @@ export class Combat {
       this._attackTarget=g.targeting?.valid(g.targeting.locked,4.7,true)?g.targeting.locked
         :stillValid?previous:g.targeting?.attackTarget(4.5)||null;
       if(this._attackTarget && !g.targeting.locked)g.targeting.soft=this._attackTarget;
-      if(!g.p810Enabled)g.hud.notify('COMBO '+step+'/4'+(step===4?' · ¡GOLPE FINAL!':'');
+      if(!g.p810Enabled)g.hud.notify('COMBO '+step+'/4'+(step===4?' · ¡GOLPE FINAL!':''));
     }
     g.player.attackT=0;
     g.player._attackAnimStarted=false;
