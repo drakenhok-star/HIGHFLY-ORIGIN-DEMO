@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {hasLineOfSight} from '../combat/targeting-p6.js';
 import {chooseLaunchVector} from './projectile-aim-p19.js';
-import {lockedLaunchDirection22} from './aerial-aim-l22.js';
+import {lockedLaunchDirection22,isFlying22} from './aerial-aim-l22.js';
 
 // Mechanics adapted for HIGHFLY from World of ClaudeCraft v0.44.7 MIT code:
 // commit 493c35a108cef6c8aa290e8793107b1cd117886e
@@ -26,7 +26,11 @@ export function castClaudeSkill(lab,slot,direction,target=null,options={}){
       // From a hill, aim at the enemy chest instead of firing horizontally.
       const visible=(e,p)=>hasLineOfSight(g,
         {x:muzzle.x,y:muzzle.y,z:muzzle.z},{x:p.x,y:p.y,z:p.z});
-      const targets=g.combat.collectTargets().filter(e=>e.alive&&e.group)
+      // Soft target may only acquire flying enemies. Ground enemies
+      // never redirect a Fireball: against them the player must aim.
+      const terrain=(x,z)=>g.terrain.getHeight(x,z);
+      const targets=g.combat.collectTargets()
+        .filter(e=>e.alive&&e.group&&isFlying22(e,terrain))
         .map(e=>({enemy:e,alive:e.alive,
           position:{x:e.group.position.x,
             y:e.group.position.y+Math.min(1.3,Math.max(.75,e.hitRadius||.9)),
@@ -34,7 +38,8 @@ export function castClaudeSkill(lab,slot,direction,target=null,options={}){
       // Manual gesture owns full 3D elevation; no near-ground auto-assist steals a sky shot.
       // Priority: intentional manual drag > explicitly selected lock > 17-degree soft aim.
       const locked=!options.manualAim&&g.targeting?.locked;
-      const explicit=locked&&g.targeting.valid(locked,22,true)?
+      const explicit=locked&&isFlying22(locked,terrain)&&
+        g.targeting.valid(locked,22,true)?
         lockedLaunchDirection22(muzzle,locked,{range:22,visible:(e,point)=>visible(e,point)}):null;
       const chosen=options.manualAim?
         {direction:{x:direction.x,y:direction.y,z:direction.z},target:null}:
