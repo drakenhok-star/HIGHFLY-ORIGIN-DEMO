@@ -113,7 +113,7 @@ export class TianjieCameraLabP18 {
   panel.hidden=true;
   panel.setAttribute('aria-label','Ajustes de cámara y sensibilidad HIGHFLY');
   panel.innerHTML=`<header class="hf-p18-head">
-   <div><strong>SUPER AIM + CÁMARA · P18</strong>
+   <div><strong>SUPER AIM + CÁMARA · L21</strong>
    <small>Modificá los valores mientras jugás · se guardan automáticamente</small></div>
    <button type="button" id="hf-p18-close" aria-label="Cerrar ajustes">✕</button>
   </header>
