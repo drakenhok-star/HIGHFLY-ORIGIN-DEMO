@@ -300,6 +300,9 @@ export class Menus {
       const name = el('div', 'menu-quest-name', card, q.name);
       el('span', 'menu-quest-progress', name, q.state === 'complete' ? 'Lista para entregar' : q.progress + ' / ' + q.need);
       el('div', 'menu-quest-desc', card, q.desc);
+      if(q.secret)el('div','menu-quest-desc',card,'Recompensa: ? (misión secreta)');
+      else if(Number.isFinite(q.rewardGold)||Number.isFinite(q.rewardXp))
+        el('div','menu-quest-desc',card,'Recompensa: '+(q.rewardGold??'—')+' oro · '+(q.rewardXp??'—')+' XP');
     }
     el('div', 'menu-section-title', this.questBody, 'Completadas');
     const done = list.filter((q) => q.state === 'done');
@@ -308,6 +311,9 @@ export class Menus {
       const card = el('div', 'menu-quest-card menu-quest-card-done', this.questBody);
       el('div', 'menu-quest-name', card, q.name);
       el('div', 'menu-quest-desc', card, q.desc);
+      if(q.secret)el('div','menu-quest-desc',card,'Recompensa: ? (misión secreta)');
+      else if(Number.isFinite(q.rewardGold)||Number.isFinite(q.rewardXp))
+        el('div','menu-quest-desc',card,'Recompensa: '+(q.rewardGold??'—')+' oro · '+(q.rewardXp??'—')+' XP');
     }
   }
 
