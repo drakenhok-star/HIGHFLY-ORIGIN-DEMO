@@ -1,3 +1,4 @@
+import { ecologyCampsP183c,ecologyNearbyP183c,ecologyRadarSummaryP183c,ECO_COLORS_P183C } from './ecology-radar-p183c.js';
 import { FRONTIER_ZONES_P181, FRONTIER_QUEST_ID_P181,
   frontierQuestTargetsP181, nearestFrontierTargetP181 } from './frontier-tracking-p181.js';
 /**
@@ -59,9 +60,16 @@ export class WorldMapP34 {
     this.miniCanvas = document.createElement("canvas");
     this.miniCanvas.width = this.miniCanvas.height = 192;
     mini.appendChild(this.miniCanvas);
+    if(this.game.p183cEnabled){
+      mini.style.height='182px';
+      mini.style.gap='1px';
+      this.ecologyLine=document.createElement('div');
+      this.ecologyLine.style.cssText='font:700 9px/12px system-ui;color:#d4f3fc;text-align:center;white-space:normal;max-height:27px;overflow:hidden';
+    }
     const coords = document.createElement("div");
     coords.id = "hf-worldcoords"; mini.appendChild(coords);
     this.coords = coords;
+    if(this.ecologyLine)mini.appendChild(this.ecologyLine);
     mini.addEventListener("click", e => {e.preventDefault(); e.stopPropagation();this.toggle(true)});
     document.body.appendChild(mini); this.mini = mini;
 
@@ -204,6 +212,16 @@ export class WorldMapP34 {
         ctx.fillText(z.label,px+10,py-12);
       }
     }
+    if(this.game.p183cEnabled){
+      for(const c of ecologyCampsP183c(this.game)){
+        const x=at(c.x),y=at(c.z);
+        if(x<0||x>n||y<0||y>n)continue;
+        this.dot(ctx,x,y,5,c.color);
+        ctx.strokeStyle='#10202b';ctx.lineWidth=2;ctx.fillStyle='#fff';ctx.font='bold 11px system-ui';
+        const label=c.name+' ('+c.alive+')';
+        ctx.strokeText(label,x+8,y-6);ctx.fillText(label,x+8,y-6);
+      }
+    }
     const p=this.game.player.pos,px=at(p.x),py=at(p.z);
     if(px>=0&&px<n&&py>=0&&py<n)
       this.hunterArrow(ctx,px,py,this.game.player.bodyYaw??this.game.player.yaw,10);
@@ -291,6 +309,24 @@ export class WorldMapP34 {
         ctx.beginPath();ctx.moveTo(px,py-9);ctx.lineTo(px+7,py);ctx.lineTo(px,py+9);ctx.lineTo(px-7,py);ctx.closePath();ctx.fill();ctx.stroke();
         ctx.restore();
       }
+    }
+    if(this.game.p183cEnabled){
+      for(const e of ecologyNearbyP183c(this.game,p,radius+8)){
+        const pos=e.group.position,px=n/2+(pos.x-p.x)*scale,py=n/2+(pos.z-p.z)*scale;
+        if(px<8||py<8||px>n-8||py>n-8)continue;
+        const color=ECO_COLORS_P183C[e.speciesId]||ECO_COLORS_P183C[e.type]||'#ae8eed';
+        this.dot(ctx,px,py,4,color);
+      }
+      const guide=this.game.p183cTracking;
+      if(guide){
+        const dx=(guide.x-p.x)*scale,dz=(guide.z-p.z)*scale;
+        const d=Math.hypot(dx,dz),limit=n/2-16,f=d>limit?limit/Math.max(1,d):1;
+        const px=n/2+dx*f,py=n/2+dz*f;
+        ctx.strokeStyle='#faf0ff';ctx.fillStyle='#9e55f6';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px,py-8);ctx.lineTo(px+7,py+5);ctx.lineTo(px-7,py+5);ctx.closePath();ctx.fill();ctx.stroke();
+      }
+      const note=ecologyRadarSummaryP183c(this.game,p);
+      if(this.ecologyLine)this.ecologyLine.textContent=note.zone+' · '+(note.creatures.join(' / ')||'Sin criaturas cercanas');
     }
     this.hunterArrow(ctx,n/2,n/2,this.game.player.bodyYaw??this.game.player.yaw,12);
     ctx.fillStyle="#eaffff";ctx.font="bold 14px system-ui";ctx.fillText("N",n/2-4,16);
