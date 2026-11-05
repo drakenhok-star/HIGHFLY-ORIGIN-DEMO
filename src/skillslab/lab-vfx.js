@@ -124,6 +124,24 @@ export class TianjieSkillVfx {
     }
     this.sparks(world.clone().add(new THREE.Vector3(0,.55,0)),p[2],38,1.8,.7,.16);
   }
+  tornado(world,radius=4,style=0,life=2.15){
+    // Original volumetric-looking spiral, no external proprietary texture.
+    // Mesh has LOCAL points, so it rotates around the real player, not world (0,0).
+    const pts=[],turns=4.5,steps=90;
+    for(let i=0;i<=steps;i++){
+      const t=i/steps,a=turns*2*Math.PI*t;
+      const r=radius*(.28+.65*t);
+      pts.push(new THREE.Vector3(Math.cos(a)*r, .12+5.3*t, Math.sin(a)*r));
+    }
+    const geo=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),steps,.13,5,false);
+    const mat=new THREE.MeshBasicMaterial({color:this.palette(style)[0],transparent:true,
+      opacity:.87,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending});
+    const mesh=new THREE.Mesh(geo,mat);
+    mesh.position.copy(world);mesh.frustumCulled=false;
+    this.add(mesh,life,'tornado');
+    this.orbit(world,radius*.83,style,.8);
+    return mesh;
+  }
   crown(world,style=0,radius=3){
     const verts=[],n=this.quality===2?14:10;
     const terrain=this.game.terrain;
@@ -284,6 +302,7 @@ export class TianjieSkillVfx {
         a.mesh.scale.setScalar(scale);
         a.mesh.rotation.z+=dt*.32;
       }
+      if(a.kind==='tornado'){a.mesh.rotation.y+=dt*3.6;}
       if(a.kind==='meteor'){
         a.mesh.position.y=a.landingY+a.fallHeight*Math.pow(1-t,1.35);
         a.mesh.rotation.y+=dt*2.7;
