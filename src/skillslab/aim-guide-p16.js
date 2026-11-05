@@ -24,7 +24,16 @@ export class TianjieAimGuide {
   this.root.visible=false;this.path.visible=false;
   this.pathEnabled=false;
   this._lastCenter=vec(1e6,0,0);this._lastYaw=1e6;
-  this._lastRefresh=-1;this.lastArcPoint=null;
+  this._lastRefresh=-1;this.lastArcPoint=null;this.lastArcOrigin=null;
+  // Floating 3D reticle for aerial targets; ground corridor remains a projection.
+  this.aerialBeam=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,1,7),
+    new THREE.MeshBasicMaterial({color:0xc591ff,transparent:true,opacity:.88,
+      depthWrite:false,blending:THREE.AdditiveBlending}));
+  this.aerialBeam.visible=false;game.scene.add(this.aerialBeam);
+  this.aerialTip=new THREE.Mesh(new THREE.SphereGeometry(.18,9,7),
+    new THREE.MeshBasicMaterial({color:0xf8f5ff,transparent:true,opacity:.75,
+      depthWrite:false,blending:THREE.AdditiveBlending}));
+  this.aerialTip.visible=false;game.scene.add(this.aerialTip);
  }
  surface(triangles,color,opacity=.3,parent=this.root){
   // X,Z triangulation stays unchanged. Y samples its OWN mountain height.
@@ -127,7 +136,8 @@ export class TianjieAimGuide {
   this.clearGroup(this.root);this.clearGroup(this.path);
   this.root.visible=false;this.path.visible=false;
   this._lastCenter.set(1e6,0,0);this._lastYaw=1e6;this._lastRefresh=-1;
-  this.lastArcPoint=null;
+  this.lastArcPoint=null;this.lastArcOrigin=null;
+  this.aerialBeam.visible=false;this.aerialTip.visible=false;
  }
  begin(style,slot,override=null){
   this.clear();this.profile=override||AIM_PROFILES[style]?.[slot-1]||AIM_PROFILES[0][0];
@@ -141,6 +151,8 @@ export class TianjieAimGuide {
   // A curved destination arrow makes sense for GUINEVERE S2 jump ONLY;
   // Meteorite, projectiles, dashes, self ultimates do NOT draw fake arcs.
   this.pathEnabled=(style===0&&slot===2&&pr.kind==='zone');
+  this.airborneLine=(style===0||style===3)&&slot===1&&pr.kind==='line';
+  this.aerialBeam.material.color.setHex(color);
   this.root.visible=true;this.path.visible=this.pathEnabled;
  }
  conform(center,yaw){
@@ -178,7 +190,19 @@ export class TianjieAimGuide {
  updateAim(direction,target=null){
   if(!this.profile)return null;
   const q=this.profile,g=this.game,origin=g.player.pos;
-  const dir=direction?.clone()?.setY(0)?.normalize()||g.player.getForward();
+  const trueDir=direction?.clone()?.normalize()||g.player.getForward();
+  const dir=trueDir.clone().setY(0).normalize();
+  if(this.airborneLine){
+    const from=origin.clone().add(new THREE.Vector3(0,1.25,0));
+    const to=from.clone().addScaledVector(trueDir,q.range);
+    const beamDelta=to.clone().sub(from),length=beamDelta.length();
+    this.aerialBeam.position.copy(from).addScaledVector(beamDelta,.5);
+    this.aerialBeam.scale.set(1,length,1);
+    this.aerialBeam.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),
+      beamDelta.normalize());
+    this.aerialBeam.visible=true;this.aerialTip.visible=true;
+    this.aerialTip.position.copy(to);
+  }else{this.aerialBeam.visible=false;this.aerialTip.visible=false;}
   if(dir.lengthSq()<.001)dir.set(0,0,-1);
   const yaw=Math.atan2(-dir.x,-dir.z);
   let center=origin.clone();
@@ -210,8 +234,10 @@ export class TianjieAimGuide {
       Math.abs(turn-this._lastYaw)>.02||now-this._lastRefresh>.15){
    this.conform(center,turn);
    if(this.pathEnabled &&
-     (!this.lastArcPoint||this.lastArcPoint.distanceToSquared(center)>.045)){
+     (!this.lastArcPoint||this.lastArcPoint.distanceToSquared(center)>.045||
+      !this.lastArcOrigin||this.lastArcOrigin.distanceToSquared(origin)>.035)){
     this.makePath(origin,center);this.lastArcPoint=center.clone();
+    this.lastArcOrigin=origin.clone();
    }
    this._lastCenter.copy(center);this._lastYaw=turn;this._lastRefresh=now;
   }
