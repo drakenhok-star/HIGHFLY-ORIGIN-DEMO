@@ -222,7 +222,13 @@ export class Terrain {
 
   _updateBudgetedTerrain(ccx, ccz) {
     let job = this._p161ChunkJob;
-    if (job && Math.max(Math.abs(job.cx - ccx), Math.abs(job.cz - ccz)) > VIEW_RADIUS + 1) {
+    // If player crosses into a not-yet-built chunk, it must take priority
+    // over an unfinished distant chunk; this avoids extending near-field gaps.
+    const centerMissing = !this.chunks.has(ccx + ',' + ccz);
+    if (job && (
+      Math.max(Math.abs(job.cx - ccx), Math.abs(job.cz - ccz)) > VIEW_RADIUS + 1 ||
+      (centerMissing && (job.cx !== ccx || job.cz !== ccz))
+    )) {
       // Teleports cancel unfinished geometry so stale work never leaks resources.
       job.geo.dispose();
       this._p161ChunkJob = null;
