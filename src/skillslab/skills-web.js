@@ -3,6 +3,7 @@ import { hasLineOfSight, insideBlockingObject } from '../combat/targeting-p6.js'
 import { TianjieSkillVfx } from './lab-vfx.js';
 import { TianjieAimGuide, AIM_PROFILES } from './aim-guide-p16.js';
 import { castClaudeSkill } from './claudecraft-kit-p16.js';
+import {aerialDirection22,enemyChest22,directionToTarget22,targetWithinSkillVolume22,isCancelDrop22} from './aerial-aim-l22.js';
 
 // FURY P16 hit-confirm and ATK gesture are authoritative for movement and combat.
 // This skill lab never replaces g.combat.melee or g.player.update.
@@ -52,7 +53,8 @@ export class TianjieMobaSkillsLab {
     this.lastHud=-1;
     this.lastSpawn=-1;
     this.lastPlay=false;
-    this.quality=1;
+    this.quality=2;
+    this.fx.setQuality(2); // Premium default; optimize implementations, not quality slider.
     this.installCombatBridge();
     this.installHud();
     this.bindKeyboard();
@@ -101,7 +103,12 @@ export class TianjieMobaSkillsLab {
   }
 
   aimDirection(request,maxRange=17){
-    if(request&&request.lengthSq()>0.01)return request.clone().setY(0).normalize();
+    // Preserve actual elevation for projectile skills; all others stay terrain-facing.
+    if(request&&request.lengthSq()>0.01){
+      if((this.style===0||this.style===3)&&request.y!==undefined)
+        return request.clone().normalize();
+      return request.clone().setY(0).normalize();
+    }
     const g=this.game,p=g.player;
     const target=g.targeting?.get(maxRange);
     if(target?.alive){
@@ -111,13 +118,13 @@ export class TianjieMobaSkillsLab {
     const f=p.getCombatForward();
     return f.lengthSq()>0.01?f.normalize():p.getForward();
   }
-  candidates(center,range,dir=null,halfAngle=180){
+  candidates(center,range,dir=null,halfAngle=180,verticalRange=2.6){
     const g=this.game,origin={x:center.x,y:center.y+1.2,z:center.z};
     return g.combat.collectTargets().filter(e=>{
       if(!e?.alive||!e.group)return false;
       const diff=e.group.position.clone().sub(center);
       diff.y=0;
-      if(diff.length()>range+(e.hitRadius||.6))return false;
+      if(!targetWithinSkillVolume22(center,e,range,verticalRange))return false;
       if(dir&&diff.lengthSq()>.01 && diff.normalize().dot(dir)<Math.cos(halfAngle*Math.PI/180))return false;
       if(!hasLineOfSight(g,origin,{x:e.group.position.x,y:e.group.position.y+1.1,z:e.group.position.z}))return false;
       return true;
@@ -140,7 +147,7 @@ export class TianjieMobaSkillsLab {
     return true;
   }
   hitSphere(center,radius,damage,opts={}){
-    const enemies=this.candidates(center,radius);
+    const enemies=this.candidates(center,radius,null,180,opts.height??radius);
     for(const e of enemies){
       const direction=e.group.position.clone().sub(center).setY(0).normalize();
       this.struck(e,damage,direction,opts);
@@ -148,7 +155,7 @@ export class TianjieMobaSkillsLab {
     return enemies.length;
   }
   hitCone(center,dir,radius,halfAngle,damage,opts={}){
-    const enemies=this.candidates(center,radius,dir,halfAngle);
+    const enemies=this.candidates(center,radius,dir,halfAngle,opts.height??2.6);
     for(const e of enemies)this.struck(e,damage,dir,opts);
     return enemies.length;
   }
@@ -610,6 +617,7 @@ export class TianjieMobaSkillsLab {
           slot,id:e.pointerId,x:e.clientX,y:e.clientY,
           dragged:false,button:b,dir:null,target:null,
           startOrigin:p.pos.clone(),baseForward:p.getForward(),
+          pointerX:e.clientX,pointerY:e.clientY,cancelHovered:false,
           valid:true
         };
         this.cancelBtn.hidden=false;
@@ -619,6 +627,10 @@ export class TianjieMobaSkillsLab {
         if(!this.aim||this.aim.id!==e.pointerId)return;
         e.preventDefault();e.stopImmediatePropagation();
         const a=this.aim,dx=e.clientX-a.x,dy=e.clientY-a.y;
+        a.pointerX=e.clientX;a.pointerY=e.clientY;
+        a.cancelHovered=isCancelDrop22(e.clientX,e.clientY,this.cancelBtn.getBoundingClientRect());
+        this.cancelBtn.classList.toggle('hf-cancel-hover',a.cancelHovered);
+        if(a.cancelHovered)return;
         if(Math.hypot(dx,dy)>(this.aimDragThreshold??4))a.dragged=true;
         if(!a.dragged)return;
         const pr=this.aimGuide.profile||AIM_PROFILES[this.style][slot-1];
@@ -632,10 +644,13 @@ export class TianjieMobaSkillsLab {
           const delta=right.multiplyScalar(dx*sensitivity)
             .addScaledVector(forward,clamp(forwardDist-dy*sensitivity,.2,pr.range));
           if(delta.length()>pr.range)delta.setLength(pr.range);
-          const target=a.startOrigin.clone().add(delta);
+          const target=this.game.player.pos.clone().add(delta);
           target.y=this.game.terrain.getHeight(target.x,target.z);
           a.target=target;
           if(delta.lengthSq()>.001)a.dir=delta.normalize();
+        }else if(pr.kind==='line'&&(this.style===0||this.style===3)&&slot===1){
+          const v=aerialDirection22(forward,dx,dy,(this.aimSensitivity??.145)/.145);
+          a.dir=vec(v.x,v.y,v.z);
         }else{
           const aimScale=(this.aimSensitivity??.145)/.145;
           const delta=right.multiplyScalar(dx*1.35*aimScale)
@@ -648,7 +663,10 @@ export class TianjieMobaSkillsLab {
         if(!this.aim||this.aim.id!==e.pointerId)return;
         e.preventDefault();e.stopImmediatePropagation();
         const a=this.aim,dir=a.dir,target=a.target,valid=this.aimGuide.valid;
+        // Pointer captured by skill button; coordinates still reach the top-right X.
+        const shouldCancel=isCancelDrop22(e.clientX,e.clientY,this.cancelBtn.getBoundingClientRect());
         this.cancelAim();
+        if(shouldCancel)return; // zero resource, zero cooldown
         if(!valid){
           this.announce('Apuntado bloqueado: elegí un lugar libre');
           return; // no cooldown, no resource spent
@@ -668,7 +686,14 @@ export class TianjieMobaSkillsLab {
     const recastProfile=recast?{kind:'dash',range:4.4,width:2.7,radius:0}:null;
     this.aimGuide.begin(this.style,slot,recastProfile);
     this.preview=this.aimGuide.root;
-    const dir=this.aimDirection(null,this.aimGuide.profile.range||17);
+    let dir=this.aimDirection(null,this.aimGuide.profile.range||17);
+    if((this.style===0||this.style===3)&&slot===1){
+      const e=this.game.targeting?.get(this.aimGuide.profile.range||17);
+      const p=this.game.player.pos,enemy=e?enemyChest22(e):null;
+      const launch={x:p.x,y:p.y+1.25,z:p.z};
+      const v=directionToTarget22(launch,enemy);
+      if(v)dir=vec(v.x,v.y,v.z);
+    }
     this.aim.dir=dir;
     this.refreshPreview();
   }
@@ -696,7 +721,7 @@ export class TianjieMobaSkillsLab {
   }
   cancelAim(){
     this.aim=null;
-    if(this.cancelBtn)this.cancelBtn.hidden=true;
+    if(this.cancelBtn){this.cancelBtn.hidden=true;this.cancelBtn.classList.remove('hf-cancel-hover');}
     this.preview=null;
     this.aimGuide?.clear();
   }
