@@ -105,6 +105,44 @@ class Rig {
     this._currentName = '';
     this._finishListener = null;
     this._warned = new Set();
+    this._upperMixer=null;
+    this._upperCache=new Map();
+    this._upperCurrent=null;
+  }
+
+  _upperClip(name){
+    if(this._upperCache.has(name))return this._upperCache.get(name);
+    const clip=this.clips.get(name);
+    if(!clip){this._upperCache.set(name,null);return null;}
+    // Use actual animated upper-body bones; hips and legs remain locomotion-owned.
+    const tracks=clip.tracks.filter(t=>{
+      const n=t.name.toLowerCase();
+      return /(spine|chest|shoulder|clavicle|upper.?arm|lower.?arm|fore.?arm|hand|wrist|neck|head|arm[_ .|])/.test(n)
+        && !/(hips|pelvis|thigh|calf|leg|foot|toe|root\.position)/.test(n);
+    });
+    const layer=tracks.length>=2?new THREE.AnimationClip('hf-upper-'+name,clip.duration,tracks):null;
+    this._upperCache.set(name,layer);
+    return layer;
+  }
+
+  supportsUpperBody(name){return !!this._upperClip(name);}
+  playUpperBody(name,opts={}){
+    const clip=this._upperClip(name);if(!clip)return false;
+    if(!this._upperMixer)this._upperMixer=new THREE.AnimationMixer(this.root);
+    const action=this._upperMixer.clipAction(clip);
+    if(this._upperCurrent&&this._upperCurrent!==action)this._upperCurrent.fadeOut(.04);
+    action.reset();action.setLoop(THREE.LoopOnce,1);
+    action.clampWhenFinished=false;
+    action.setEffectiveTimeScale(opts.timeScale||1);
+    action.setEffectiveWeight(1);
+    action.fadeIn(opts.fade||.045);action.play();
+    this._upperCurrent=action;return true;
+  }
+  stopUpperBody(fade=.065){
+    if(!this._upperCurrent)return;
+    if(fade<=0)this._upperCurrent.stop();
+    else this._upperCurrent.fadeOut(fade);
+    this._upperCurrent=null;
   }
 
   get currentName() {
@@ -167,6 +205,7 @@ class Rig {
 
   update(dt) {
     this.mixer.update(dt);
+    if(this._upperMixer)this._upperMixer.update(dt);
   }
 }
 
