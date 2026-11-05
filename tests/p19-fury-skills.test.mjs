@@ -96,7 +96,7 @@ assert.ok(lab.includes('this.aimSensitivity??.145'));
 assert.ok(lab.includes('Segundo golpe EN EL LUGAR')&&lab.includes('finishGuardianPull(){'));
 assert.ok(cl.includes('chooseLaunchVector')&&cl.includes('fx.energyBolt(3)'),
  'one-shot ballistic aim and original plasma FX integrated');
-assert.ok(fx.includes('new THREE.ShaderMaterial')&&fx.includes("this.add(mesh,.28,'crown')"),
+assert.ok(fx.includes('new THREE.ShaderMaterial')&&fx.includes("this.add(obj,.28,'crown')"),
  'genuine animated original shader + volumetric impact');
 assert.ok(aim.includes('this.conform(center,turn)')&&
  aim.includes('this.pathEnabled=(style===0&&slot===2'),
