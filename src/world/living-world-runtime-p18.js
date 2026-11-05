@@ -64,6 +64,8 @@ export class LivingWorldP18 {
         this.quest.progress=FRONTIER.need;
       if(this.quest.status==='active'&&this.quest.progress>=FRONTIER.need)
         this.quest.status='complete';
+      if(this.quest.status==='active'||this.quest.status==='complete')
+        this.game.worldMapP34?.trackQuest('p18_frontier');
     }
   }
   setVisible(yes){
@@ -88,9 +90,11 @@ export class LivingWorldP18 {
     this.quest.status='active';
     this.quest.progress=0;
     this.refreshLabel();
+    this.game.worldMapP34?.trackQuest('p18_frontier');
     this.game.hud.questBanner('Nueva misión: '+FRONTIER.name);
     this.game.hud.notify('Eliminá '+FRONTIER.need+' lobos de frontera y volvé con Bjorn');
-    this.game.saveSys.save();
+    // Preserve the quest immediately without creating a black save-notification card.
+    this.game.saveSys.save({silent:true});
     return true;
   }
   onEnemyKilled(enemy){
@@ -103,7 +107,8 @@ export class LivingWorldP18 {
       this.refreshLabel();
       this.game.hud.questBanner('Patrulla completa · Volvé con Bjorn');
     }
-    this.game.saveSys.save();
+    // Preserve the quest immediately without creating a black save-notification card.
+    this.game.saveSys.save({silent:true});
     return true;
   }
   turnInFrontier(){
@@ -114,7 +119,8 @@ export class LivingWorldP18 {
     this.game.stats.addXP(FRONTIER.rewardXp);
     this.world=applyWorldEventP18(this.world,{type:'questCompleted',id:FRONTIER.id});
     this.game.hud.questBanner('Recompensa: '+FRONTIER.rewardGold+' oro + '+FRONTIER.rewardXp+' XP');
-    this.game.saveSys.save();
+    // Preserve the quest immediately without creating a black save-notification card.
+    this.game.saveSys.save({silent:true});
     return true;
   }
   update(dt){
