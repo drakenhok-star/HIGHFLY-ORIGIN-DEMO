@@ -64,6 +64,8 @@ export class LivingWorldP18 {
         this.quest.status='complete';
       if(this.quest.status==='active'||this.quest.status==='complete')
         this.game.worldMapP34?.trackQuest('p18_frontier');
+      else if(this.quest.status==='done')
+        this.game.worldMapP34?.clearTrackedQuest('p18_frontier');
     }
   }
   setVisible(yes){
@@ -113,6 +115,8 @@ export class LivingWorldP18 {
   turnInFrontier(){
     if(this.quest.status!=='complete')return false;
     this.quest.status='done';
+    // No stale yellow POI or pinned quest after the reward is claimed.
+    this.game.worldMapP34?.clearTrackedQuest('p18_frontier');
     this.refreshLabel();
     this.game.inventory.gold+=FRONTIER.rewardGold;
     this.game.stats.addXP(FRONTIER.rewardXp);
