@@ -39,7 +39,7 @@ export class HudEditorP10{
     ['opacity',String(it.opacity)],['display',it.hidden?'none':(id==='combo'&&this.game.p14Enabled&&!el.textContent?'none':(id==='header'||id==='combo'||id==='perf'||id==='joy'?'block':'flex'))]]){
     el.style.setProperty(k,v,'important');
   }
-  if(['radar','joy','run','jump','dash','use','s1','atk','s2','s3','s4','lock','next','clear','bag','menu'].includes(id)){
+  if(['radar','joy','run','jump','dash','use','s1','atk','s2','s3','s4','lock','next','clear','bag','menu','focus'].includes(id)){
    el.style.setProperty('width',p.size+'px','important');
    el.style.setProperty('height',p.size+'px','important');
   }else if(id==='combo'||id==='perf'||id==='header'){
@@ -71,7 +71,7 @@ export class HudEditorP10{
   const NAMES={joy:'JOYSTICK',run:'CORRER',jump:'SALTO',dash:'DASH',use:'USAR',
    s1:'S1 MAGIA',s2:'S2 FUS',s3:'S3 HIELO',s4:'S4 WULD',atk:'ATK',
    lock:'FIJAR',next:'SIGUIENTE',clear:'CANCELAR',radar:'RADAR',perf:'FPS/GPU',
-   bag:'MOCHILA',menu:'MENÚ',combo:'COMBO',header:'HP / MP'};
+   bag:'MOCHILA',menu:'MENÚ',focus:'ENFOCAR VOLADOR',combo:'COMBO',header:'HP / MP'};
   for(const id of HUD_IDS){
    const opt=node('option',null,NAMES[id]||id,this.select);opt.value=id;
   }
