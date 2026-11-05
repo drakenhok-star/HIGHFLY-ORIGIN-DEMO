@@ -224,15 +224,15 @@ export class NPCs {
       const frontier=game.livingWorld.quest;
       if(frontier.status==='available') return {
         name:npc.name,
-        text:'Los lobos centinela acechan los senderos del este y del oeste. ¿Podés ayudarnos a proteger los caminos?',
+        text:'Los lobos centinela acechan los senderos del este y del oeste. Eliminá 3. Recompensa: 75 oro y 60 XP. ¿Nos ayudás?',
         options:[
-          {label:'Aceptar: Centinelas de la frontera',action:()=>{game.livingWorld.acceptFrontier();close();}},
+          {label:'Aceptar: Lobo centinela · 75 oro + 60 XP',action:()=>{game.livingWorld.acceptFrontier();close();}},
           bye
         ]
       };
       if(frontier.status==='active')return {
         name:npc.name,
-        text:'Eliminá 3 lobos de las patrullas fronterizas y volvé. ('+frontier.progress+'/3).',
+        text:'Eliminá 3 lobos centinela de las patrullas del este u oeste. ('+frontier.progress+'/3). Recompensa: 75 oro + 60 XP.',
         options:[bye]
       };
       if(frontier.status==='complete')return {
