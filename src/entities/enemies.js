@@ -738,7 +738,9 @@ export class Enemies {
     const decay = Math.exp(-5 * dt);
     e.kbVel.x *= decay;
     e.kbVel.z *= decay;
-    const ground = this._groundAt(pos.x, pos.z);
+    // P18.3: wading creatures stand on the lakebed, not on an invisible
+    // water-surface clamp. All permitted steps are depth-checked already.
+    const ground = g.p183Enabled ? g.terrain.getHeight(pos.x, pos.z) : this._groundAt(pos.x, pos.z);
     if (e.kbVel.y > 0 || pos.y > ground + 0.02) {
       pos.y += e.kbVel.y * dt;
       e.kbVel.y -= 26 * dt;
