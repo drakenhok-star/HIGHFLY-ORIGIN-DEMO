@@ -254,6 +254,10 @@ class Game {
   routeKeys() {
     const jp = this.input.justPressed;
     if (jp.has('Escape')) {
+      if (this.state === 'training') {
+        this.menus.training?.close();
+        return;
+      }
       if (this.state === 'playing') {
         this.setState('paused');
       } else if (this.state === 'paused' || this.state === 'inventory' || this.state === 'quests') {
