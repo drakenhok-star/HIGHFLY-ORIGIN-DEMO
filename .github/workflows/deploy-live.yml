@@ -702,6 +702,40 @@ jobs:
           test -s .site/p183d/index.html
           echo "P18.3d REUSE FIRST prairie at /p183d/; all prior snapshots preserved"
 
+      - name: Publish P18.3e creature calibration and Spanish interactions · isolated world
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags --depth=1 origin refs/heads/p183e-creature-scale-ui-20261105
+          test "$(git rev-parse FETCH_HEAD)" = "517e22a97a29b0602ead83fcffdd965fefa2c5bb"
+          mkdir -p .p183e-validate .site/p183e
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets tests scripts docs basis | tar -x -C .p183e-validate
+          (
+            cd .p183e-validate
+            test -s assets/models/yetialt_quaternius_cc0.glb
+            test -s tests/p183e-creature-calibration.test.mjs
+            test -s docs/P183E_PORTAL_REGIONS_BLUEPRINT.md
+            bash scripts/fetch_gobkit_boar_p183b.sh
+            export HF_REQUIRE_BOAR=1
+            find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+              node --input-type=module --check < "$file"
+            done
+            for test in tests/*.test.mjs; do node "$test"; done
+            if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' -o -iname '*Sketchfab*' -o -iname '*Meshy*' \) | grep -q .; then
+              echo "P18.3e blocked: restricted assets" >&2
+              exit 1
+            fi
+            cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets basis ../.site/p183e/
+          )
+          touch .site/p183e/.nojekyll
+          for previous in p16 p161 p163 p18 p181 p182 p1821 p183 p183b p183c p183d; do
+            test -s ".site/$previous/index.html"
+          done
+          test -s .site/p183e/assets/models/yetialt_quaternius_cc0.glb
+          test -s .site/p183e/assets/models/boar_gobkit_cc0.glb
+          test -s .site/p183e/index.html
+          echo "P18.3e model calibration and Spanish interactions at /p183e/; prior builds preserved"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
