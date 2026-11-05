@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {hasLineOfSight} from '../combat/targeting-p6.js';
 import {chooseLaunchVector} from './projectile-aim-p19.js';
+import {lockedLaunchDirection22} from './aerial-aim-l22.js';
 
 // Mechanics adapted for HIGHFLY from World of ClaudeCraft v0.44.7 MIT code:
 // commit 493c35a108cef6c8aa290e8793107b1cd117886e
@@ -31,9 +32,14 @@ export function castClaudeSkill(lab,slot,direction,target=null,options={}){
             y:e.group.position.y+Math.min(1.3,Math.max(.75,e.hitRadius||.9)),
             z:e.group.position.z}}));
       // Manual gesture owns full 3D elevation; no near-ground auto-assist steals a sky shot.
+      // Priority: intentional manual drag > explicitly selected lock > 17-degree soft aim.
+      const locked=!options.manualAim&&g.targeting?.locked;
+      const explicit=locked&&g.targeting.valid(locked,22,true)?
+        lockedLaunchDirection22(muzzle,locked,{range:22,visible:(e,point)=>visible(e,point)}):null;
       const chosen=options.manualAim?
         {direction:{x:direction.x,y:direction.y,z:direction.z},target:null}:
-        chooseLaunchVector({origin:muzzle,forward:direction,targets,range:22,halfAngle:17,visible});
+        explicit||chooseLaunchVector({origin:muzzle,forward:direction,
+          targets,range:22,halfAngle:17,visible});
       const shot=new THREE.Vector3(chosen.direction.x,chosen.direction.y,
         chosen.direction.z).normalize();
       const mesh=fx.energyBolt(3);
