@@ -9,7 +9,7 @@ import {
 
 assert.equal(WORLD_P18_SCHEMA,18);
 assert.equal(WORLD_P18_CELL_METERS,200,'matches P16.3 terrain chunk');
-assert.equal(WORLD_REGIONS_P18.length,9);
+assert.equal(WORLD_REGIONS_P18.length,11);
 assert.equal(new Set(WORLD_REGIONS_P18.map(r=>r.id)).size,WORLD_REGIONS_P18.length,'zone IDs unique');
 assert.equal(worldCellP18(0,40).key,'0,0');
 assert.equal(worldCellP18(-.01,-.01).key,'-1,-1');
@@ -17,6 +17,8 @@ assert.equal(worldCellP18(200,-200).key,'1,-1');
 assert.throws(()=>worldCellP18(Infinity,1),/Invalid/);
 assert.throws(()=>worldCellP18(2,3,0),/Invalid/);
 assert.equal(regionAtP18(0,40).id,'village_01');
+assert.equal(regionAtP18(110,95).id,'wolf_edge_east_01');
+assert.equal(regionAtP18(-112,76).id,'wolf_edge_west_01');
 assert.equal(worldIsSafeP18(0,40),true);
 assert.equal(worldIsSafeP18(120,160),false);
 assert.equal(regionAtP18(-220,-180).id,'stones_01');
@@ -74,4 +76,4 @@ const save=await readFile(new URL('../src/systems/save.js',import.meta.url),'utf
 assert.match(save,/highfly_p16_save/,'original save remains untouched');
 const p17=await readFile(new URL('../src/rpg/highfly-rpg-core-p17.js',import.meta.url),'utf8');
 assert.match(p17,/applyReputationEvent/,'P17 source reused, not reinvented');
-console.log('HIGHFLY P18 W0 PASS: 9 existing zones, map-cell alignment, 3 NPC routines, immutable persisted world events, save/skills/combat isolation');
+console.log('HIGHFLY P18 W0 PASS: 11 regions including two playable frontier areas, map-cell alignment, 3 NPC routines, immutable persisted world events, save/skills/combat isolation');
