@@ -173,6 +173,7 @@ export class PerfFoundationP161 {
       visibility: typeof document === 'undefined' ? null : document.visibilityState,
       peakRenderStats: { ...this._peaks },
       resourceCounts: this._resources,
+      experimentalGrass: this.game.scatter?.p161GrassStats ? { ...this.game.scatter.p161GrassStats } : null,
       timingsMs: timings
     };
   }
