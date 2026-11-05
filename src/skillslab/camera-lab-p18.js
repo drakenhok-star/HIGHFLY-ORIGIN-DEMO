@@ -107,13 +107,15 @@ export class TianjieCameraLabP18 {
    <span id="hf-p18-live-mini" aria-live="off">6.0u · −9°</span>`;
   const message=top.querySelector('#hf-lab-message');
   top.insertBefore(dock,message);
+  // L22: native P9 AJUSTES > CÁMARA owns the controls; no world-screen dock.
+  dock.hidden=true;dock.style.display='none';
   this.dock=dock;
   const panel=document.createElement('section');
   panel.id='hf-p18-camera-panel';
   panel.hidden=true;
   panel.setAttribute('aria-label','Ajustes de cámara y sensibilidad HIGHFLY');
   panel.innerHTML=`<header class="hf-p18-head">
-   <div><strong>SUPER AIM + CÁMARA · L21</strong>
+   <div><strong>SUPER AIM + CÁMARA · L22</strong>
    <small>Modificá los valores mientras jugás · se guardan automáticamente</small></div>
    <button type="button" id="hf-p18-close" aria-label="Cerrar ajustes">✕</button>
   </header>
