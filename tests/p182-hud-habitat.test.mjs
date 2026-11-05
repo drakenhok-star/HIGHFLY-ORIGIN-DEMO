@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {makeNoise2D,fbm} from '../src/core/noise.js';
 import {worldIsSafeP18} from '../src/world/world-registry-p18.js';
+import {SaveSys} from '../src/systems/save.js';
 import {
  landCellP182,dryPackCenterP182,groundedStepP182,
  HABITAT_P182_CLEARANCE,HABITAT_P182_RADII
@@ -85,4 +86,26 @@ assert.match(runtime,/MISIÓN ACTIVA · CENTINELAS/);
 assert.match(runtime,/MISIÓN LISTA · VOLVÉ CON BJORN/);
 assert.doesNotMatch(runtime,/this\.node\.textContent='P18/,'no P18 village-safe debug banner');
 assert.match(runtime,/top:max\(9px/,'mission centered near top, not below radar');
+const savedP18='{"schemaVersion":18,"frontier":"claimed-P181"}';
+const savedP16='{"legacy":"safe-P16"}';
+const store=new Map([['highfly_p18_save',savedP18],['highfly_p16_save',savedP16]]);
+globalThis.localStorage={getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)};
+const saveGame={
+ p182Build:true,p18Build:true,p18Enabled:true,p16Enabled:true,state:'playing',
+ time:{dayTime:.2},player:{pos:{x:0,y:4,z:40},yaw:0},
+ stats:{serialize:()=>({})},inventory:{serialize:()=>({})},
+ quests:{serialize:()=>({})},combat:null,
+ structures:{chests:[]},enemies:{dragon:{alive:true}},interiors:{inside:null},
+ livingWorld:{serialize:()=>({schemaVersion:18,frontier:{status:'done',progress:3}})},
+ hud:{notify(){}}
+};
+const saver=new SaveSys(saveGame);
+assert.equal(saver.key,'highfly_p182_save','new test version owns its own save');
+assert.deepEqual(saver.loadRaw(),{schemaVersion:18,frontier:'claimed-P181'},
+ 'P18.1 bounty loads read-only into P18.2 slot');
+saver.save({silent:true});
+assert.ok(store.has('highfly_p182_save'));
+assert.equal(store.get('highfly_p18_save'),savedP18,'old completed mission preserved');
+assert.equal(store.get('highfly_p16_save'),savedP16,'P16 remains frozen');
+
 console.log('P18.2 PASS: procedural 6/6 land packs, shoreline collision, cached FPS sampling, chest arrow, top-only mission HUD, no radar label');
