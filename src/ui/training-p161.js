@@ -39,7 +39,7 @@ export class TrainingPreviewP161 {
    if(game.state!=='training')return;
    if(this.model.rest&&!isResting(this.model)){this.model.rest=null;save(this.model);this.render();}
    const label=this.screen.querySelector('[data-hf-tr-clock]');
-   if(label)label.textContent=clock(((this.model.rest&&this.model.rest.until)||0-Date.now())/1000);
+   if(label)label.textContent=clock((this.model.rest.until-Date.now())/1000);
    const elapsed=this.screen.querySelector('[data-hf-tr-elapsed]');
    if(elapsed)elapsed.textContent=clock(this.model.startedAt?(Date.now()-this.model.startedAt)/1000:0);
   },500);
@@ -143,7 +143,7 @@ export class TrainingPreviewP161 {
    center+'<p class="hf-tr-message" data-hf-tr-message aria-live="polite">'+h(this.message)+'</p></main>'+
    '<aside class="hf-tr-panel hf-tr-right"><div class="hf-tr-caption">HUNTER · CORE STATS</div>'+
    '<div class="hf-tr-stats">'+STATS.map(s=>'<div><strong>'+s+'</strong><b>—</b><small>SIN CALIBRAR</small></div>').join('')+'</div>'+
-   '<div class="hf-tr-caption">RESUMEN</div><div class="hf-tr-summary">'+metric('TIEMPO','<span data-hf-tr-elapsed>'+clock(m.startedAt?(Date.now()-m.startedAt)/1000:0)+'</span>')+
+   '<div class="hf-tr-caption">RESUMEN</div><div class="hf-tr-summary">'+'<div class="hf-tr-metric"><small>TIEMPO</small><strong data-hf-tr-elapsed>'+clock(m.startedAt?(Date.now()-m.startedAt)/1000:0)+'</strong></div>'+
    metric('SERIES',done+'/'+count)+metric('DÍAS',finished+'/5')+metric('XP / CALORÍAS','—')+'</div>'+
    '<p class="hf-tr-footer">e1RM, adaptación, Performance Gate y puente Fitness ↔ RPG: conectores pendientes. Solo se registra evidencia local.</p>'+
    '</aside></div></div>';
