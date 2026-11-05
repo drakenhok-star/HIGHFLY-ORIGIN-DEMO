@@ -74,9 +74,9 @@ try {
  assert.equal(hud.saved.x,.65);
  assert.equal(hud.saved.y,.76);
  assert.ok(Math.abs(hud.after.left-hud.before.left)>20,
-  'ENFOCAR actually moves in the editable HUD');
+  'ENFOCAR actually moves in the editable HUD: before='+JSON.stringify(hud.before)+' after='+JSON.stringify(hud.after));
  assert.ok(hud.after.width>hud.before.width,
-  'ENFOCAR actually changes rendered size');
+  'ENFOCAR actually changes rendered size: before='+JSON.stringify(hud.before)+' after='+JSON.stringify(hud.after));
  assert.ok(hud.previousCallbackActive,'original P16 melee bridge available');
  const effects=await page.evaluate(()=>{
    const g=window.game,lab=window.highflySkillsLab;
