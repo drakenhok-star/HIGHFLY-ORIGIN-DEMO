@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import {hasLineOfSight} from '../combat/targeting-p6.js';
-import {chooseLaunchVector} from './projectile-aim-p19.js';
-import {lockedLaunchDirection22,isFlying22} from './aerial-aim-l22.js';
+import {focusedFlightShot23} from './monster-focus-l23.js';
 
 // Mechanics adapted for HIGHFLY from World of ClaudeCraft v0.44.7 MIT code:
 // commit 493c35a108cef6c8aa290e8793107b1cd117886e
@@ -22,29 +21,16 @@ export function castClaudeSkill(lab,slot,direction,target=null,options={}){
       fx.launch(pos,direction,3);
       const muzzle=pos.clone().add(vec(0,1.25,0))
         .addScaledVector(direction,.65);
-      // Only an INITIAL aim correction; never steer after launch.
-      // From a hill, aim at the enemy chest instead of firing horizontally.
-      const visible=(e,p)=>hasLineOfSight(g,
-        {x:muzzle.x,y:muzzle.y,z:muzzle.z},{x:p.x,y:p.y,z:p.z});
-      // Soft target may only acquire flying enemies. Ground enemies
-      // never redirect a Fireball: against them the player must aim.
-      const terrain=(x,z)=>g.terrain.getHeight(x,z);
-      const targets=g.combat.collectTargets()
-        .filter(e=>e.alive&&e.group&&isFlying22(e,terrain))
-        .map(e=>({enemy:e,alive:e.alive,
-          position:{x:e.group.position.x,
-            y:e.group.position.y+Math.min(1.3,Math.max(.75,e.hitRadius||.9)),
-            z:e.group.position.z}}));
-      // Manual gesture owns full 3D elevation; no near-ground auto-assist steals a sky shot.
-      // Priority: intentional manual drag > explicitly selected lock > 17-degree soft aim.
-      const locked=!options.manualAim&&g.targeting?.locked;
-      const explicit=locked&&isFlying22(locked,terrain)&&
-        g.targeting.valid(locked,22,true)?
-        lockedLaunchDirection22(muzzle,locked,{range:22,visible:(e,point)=>visible(e,point)}):null;
-      const chosen=options.manualAim?
-        {direction:{x:direction.x,y:direction.y,z:direction.z},target:null}:
-        explicit||chooseLaunchVector({origin:muzzle,forward:direction,
-          targets,range:22,halfAngle:17,visible});
+      // L23: ONLY user-selected flying monsters receive an elevated shot.
+      // Ground mobs, even selected in the monster list, remain PURE manual AIM.
+      const selected=focusedFlightShot23(muzzle,lab.focusTarget,
+        (x,z)=>g.terrain.getHeight(x,z),{
+          range:22,manualGesture:!!options.manualAim,
+          visible:(_e,q)=>hasLineOfSight(g,
+            {x:muzzle.x,y:muzzle.y,z:muzzle.z},q)
+        });
+      const chosen=selected||
+        {direction:{x:direction.x,y:direction.y,z:direction.z},target:null};
       const shot=new THREE.Vector3(chosen.direction.x,chosen.direction.y,
         chosen.direction.z).normalize();
       const mesh=fx.energyBolt(3);
