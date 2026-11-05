@@ -26,17 +26,17 @@ const game={
 const w=new LivingWorldP18(game);game.livingWorld=w;
 assert.equal(w.quest.status,'available');
 w.setVisible(true);
-assert.equal(w.node.style.display,'block');
+assert.equal(w.node.style.display,'none','no permanent P18/region label before quest acceptance');
 w.update(.40);
 assert.equal(w.zone.id,'village_01');
-assert.equal(w.node.dataset.safe,'yes');
+assert.doesNotMatch(w.node.textContent,/P18|Aldea inicial|SEGURA/,'internal zone does not pollute top HUD');
 assert.equal(w.world.visited.village_01,true);
 assert.ok(w.report().npcRoutines.sigrid.includes('smithy'));
 assert.equal(w.report().frontierPacks,2);
 game.player.pos.x=110;game.player.pos.z=95;
 w.update(.40);
 assert.equal(w.zone.id,'wolf_edge_east_01');
-assert.equal(w.node.dataset.safe,'no');
+assert.equal(w.node.style.display,'none','exploration remains tracked silently');
 assert.equal(worldIsSafeP18(110,95),false);
 assert.equal(worldIsSafeP18(0,40),true);
 assert.equal(regionAtP18(-112,76).id,'wolf_edge_west_01');
@@ -45,7 +45,7 @@ w.onNpcTalk('bjorn');
 assert.equal(w.world.npcTalks.bjorn,1);
 assert.equal(w.acceptFrontier(),true);
 assert.equal(w.acceptFrontier(),false,'accept once');
-assert.match(w.node.textContent,/Centinelas 0\/3/);
+assert.match(w.node.textContent,/MISIÓN ACTIVA · CENTINELAS 0\/3/);
 assert.equal(events.save.length,1);
 assert.equal(w.onEnemyKilled({p18Frontier:false}),false,'old wolves do not count');
 for(let i=1;i<=3;i++){
@@ -54,7 +54,7 @@ for(let i=1;i<=3;i++){
  assert.equal(w.quest.progress,i);
 }
 assert.equal(w.quest.status,'complete');
-assert.match(w.node.textContent,/Volvé con Bjorn/);
+assert.match(w.node.textContent,/VOLVÉ CON BJORN/);
 assert.equal(w.onEnemyKilled({p18Frontier:true}),false,'no farming after objective');
 assert.equal(game.stats.xp,0,'no bounty XP granted before turn-in');
 assert.equal(game.inventory.gold,10);
