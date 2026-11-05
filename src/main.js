@@ -33,6 +33,7 @@ import { PerfProbeP6 } from './ui/perf-probe-p6.js';
 import { PerfFoundationP161 } from './ui/performance-p161.js';
 import { PerfGovernorP163 } from './ui/performance-p163.js';
 import { LivingWorldP18 } from './world/living-world-runtime-p18.js';
+import { installP186Combat } from './combat/skill-bridge-p186.js';
 
 class Game {
   constructor(assets) {
@@ -134,6 +135,8 @@ class Game {
     }
 
     this.wireInput();
+    // Isolated P186 mechanics only: P185 world, AI, joystick and P16 combat remain owners.
+    this.p186Skills=new URLSearchParams(location.search).has('hf_p186_off')?null:installP186Combat(this);
     window.addEventListener('resize', () => this.onResize());
   }
 
@@ -400,6 +403,8 @@ function loop(time) {
     if (perf161) perf161.endSection('effects');
     if (perf161) perf161.startSection('enemies');
     game.enemies.update(dt);
+    // Run after native enemy AI: 4 confirmed aerial shots use its existing landing FSM.
+    game.p186Skills?.update(dt);
     if (perf161) perf161.endSection('enemies');
     if (perf161) perf161.startSection('npcs');
     game.npcs.update(dt);
