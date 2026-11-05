@@ -7,7 +7,7 @@ import { P183_PENDING_SPECIES, speciesReadyP183 } from '../world/species-gate-p1
 import { P183B_CAMPS,P183B_COAST_TEMPLATE,resolveBiomeCampP183b,resolveCoastSitesP183b,biomeValidP183b } from '../world/biome-families-p183b.js';
 import { realForestP183c } from '../world/habitat-p183c.js';
 
-const P183_SPIDER_DENS = [{x:-210,z:420},{x:-220,z:432}]; // independent spawn / no quest ownership
+const P183_SPIDER_DENS = [{x:-210,z:420},{x:-220,z:432},{x:-196,z:436},{x:-230,z:414},{x:-201,z:405}]; // 5 WOC-inspired Sableweb spiders // independent spawn / no quest ownership
 const WOLF_PACK_HOMES = [
   { x: 120, z: 160 },
   { x: -150, z: 120 },
@@ -346,8 +346,28 @@ export class Enemies {
       }
       let count=0;
       for(let k=0;k<spec.count;k++){
-        const x=site.x+(k%2)*4.1,z=site.z+(k?3.3:0);
-        if(!biomeValidP183b(t,x,z,spec.biome,allow))continue;
+        let x=site.x+(k%2)*4.1,z=site.z+(k?3.3:0);
+        if(this.game.p183dEnabled){
+          // Classic ClaudeCraft uses spaced camp discs rather than a vertical
+          // list of near-overlapping mobs. Existing k=0/1 are unchanged.
+          const offsets=spec.biome==='road'
+            ?[[0,0],[-15,2],[-31,5],[14,9],[29,19]]
+            :[[0,0],[4.1,3.3],[-12,9],[13,-10],[-6,-14],[17,13]];
+          let found=false;
+          const preferred=offsets[k]||[Math.cos(k*2.4)*17,Math.sin(k*2.4)*17];
+          const probes=[preferred,[preferred[0]*.6,preferred[1]*.6],[0,0]];
+          for(const [dx,dz] of probes){
+            const cx=site.x+dx,cz=site.z+dz;
+            if(!biomeValidP183b(t,cx,cz,spec.biome,allow))continue;
+            // The short dirt track is the actual bandit habitat, not grassland.
+            if(spec.biome==='road'&&this.game.p183dEnabled){
+              const roadOk=Math.hypot(cx-215,cz+112)<34;
+              if(!roadOk)continue;
+            }
+            x=cx;z=cz;found=true;break;
+          }
+          if(!found)continue;
+        }else if(!biomeValidP183b(t,x,z,spec.biome,allow))continue;
         if(this._spawnBiomeMobP183b(spec,x,z))count++;
       }
       if(count)this.p183bSites.push({spec,site,spawned:count});
@@ -383,20 +403,31 @@ export class Enemies {
         y:+e.group.position.y.toFixed(1),meshes,visibleMeshes:visible,skins,
         model:e.p183bSpec?.model||'spider'};
     });
-    return {version:'P18.3c',models:this.p183cSpawnAudit.slice(),creatures};
+    return {version:this.game.p183dEnabled?'P18.3d':'P18.3c',models:this.p183cSpawnAudit.slice(),creatures,
+      assetScale:this.game.assets.p183dAssets,loadErrors:this.game.assets.loadErrors};
   }
   _spawnBiomeMobP183b(spec,x,z){
     if(!this.game.p183bEnabled||!this.game.assets.has(spec.model))return null;
     const names={boar:'Jabalí salvaje',crab:'Cangrejo costero',goblin:'Goblin del bosque',
       bandit:'Bandido del camino',orc:'Orco de las ruinas',yeti:'Yeti',
-      stag:'Ciervo',fox:'Zorro del bosque',snow_alpha:'Lobo alfa helado',forest_wolf:'Lobo forestal'};
+      stag:'Ciervo',fox:'Zorro del bosque',snow_alpha:'Lobo alfa helado',forest_wolf:'Lobo forestal',prairie_wolf:'Lobo común (ClaudeCraft)',prairie_alpha:'Lobo alfa Greyjaw'};
     const e=this._base(spec.type,names[spec.type]||spec.type,spec.hp,
       spec.type==='orc'?1.2:spec.type==='crab'?.70:.85,x,z);
     e.speciesId=spec.type;e.p183bSpec=spec;
     e.dmg=spec.dmg;e.speed=spec.speed;e.aggroR=spec.aggro;
     e.attackRange=spec.attackRange;e.attackCd=spec.attackCd;
+    if(this.game.p183dEnabled&&(spec.type==='prairie_wolf'||spec.type==='prairie_alpha')){
+      e.p183dBaseAttackCd=e.attackCd;
+      e.p183dFrenzyT=0;
+      if(spec.type==='prairie_alpha'){
+        e.name='Lobo Alfa · Greyjaw';e.hitRadius=1.4;
+        e.rarity='rare';
+      }
+    }
     e.passive=!spec.aggressive;e.chargeCd=0;e.chargeT=0;
     this._attachRig(e,spec.model);
+    if(this.game.p183dEnabled&&spec.type==='prairie_alpha')
+      e.rig.root.scale.multiplyScalar(1.45); // unmistakable 2.32u silhouette versus 1.6u wolves
     if(spec.tint){
       const tint=new THREE.Color(spec.tint);
       for(const m of e.mats)if(m.m.color)m.m.color.lerp(tint,.28);
@@ -544,15 +575,20 @@ export class Enemies {
     if(e.p183bSpec && e.hp>0){
       if(e.passive || (e.type==='bandit' && e.hp<e.maxHp*.35)){
         e.state='flee';e.fleeT=5.5;
-      }else if(e.type==='bandit'||e.type==='goblin'||e.type==='forest_wolf'){
+      }else if(e.type==='bandit'||e.type==='goblin'||e.type==='forest_wolf'||e.type==='prairie_wolf'){
         let alerted=0;
         for(const other of this.list){
           if(other===e||!other.alive||other.type!==e.type||other.state!=='idle')continue;
           if(other.group.position.distanceToSquared(e.group.position)>28*28)continue;
           other.state='chase';other.aggroT=6;
+          if(this.game.p183dEnabled&&other.type==='prairie_wolf')other.p183dFrenzyT=8;
           if(++alerted>=2)break;
         }
       }
+    }
+    if(this.game.p183dEnabled&&e.type==='prairie_alpha'&&e.hp>0&&Math.random()<.25){
+      e.p183dFrenzyT=8;
+      this.game.hud?.notify?.('¡Greyjaw entra en frenesí!');
     }
     if (e.hp <= 0) {
       e.hp = 0;
@@ -732,6 +768,10 @@ export class Enemies {
     }
 
     if (e.cdT > 0) e.cdT -= dt;
+    if(this.game.p183dEnabled&&e.p183dBaseAttackCd){
+      e.p183dFrenzyT=Math.max(0,(e.p183dFrenzyT||0)-dt);
+      e.attackCd=e.p183dFrenzyT>0?e.p183dBaseAttackCd/1.3:e.p183dBaseAttackCd;
+    }
     if(e.chargeCd>0)e.chargeCd-=dt;
     if (e.aggroT > 0) e.aggroT -= dt;
     if (e.hitPending >= 0) {
@@ -740,10 +780,16 @@ export class Enemies {
         e.hitPending = -1;
         if(dist<e.attackRange+0.9){
           g.stats.damage(e.dmg);
-          if(g.p183Enabled&&e.type==='spider'&&Math.random()<.3){
-            this.p183VenomTicks=Math.max(this.p183VenomTicks,3);
-            this.p183VenomTime=1;
-            g.hud.notify('Envenenado: 3 pulsos');
+          if(g.p183Enabled&&e.type==='spider'){
+            if(Math.random() < (g.p183dEnabled?.35:.30)){
+              this.p183VenomTicks=Math.max(this.p183VenomTicks,g.p183dEnabled?5:3);
+              this.p183VenomTime=1;
+              g.hud.notify('Envenenado por araña');
+            }
+            if(g.p183dEnabled&&Math.random()<.25){
+              g.player.p183dSnareT=3;
+              g.hud.notify('Telaraña: movimiento ralentizado 3 s');
+            }
           }
         }
       }
@@ -1227,6 +1273,16 @@ export class Enemies {
       const dz = p.z - e.group.position.z;
       if (dx * dx + dz * dz > 260 * 260) continue;
       this._updateGround(e, dt, p);
+    }
+    if(g.p183dEnabled){
+      // Proximity-based visibility: disabled-frustum skinned models must NOT
+      // draw across a 1.4 km world. Keep full AI only within existing 260u.
+      for(const e of this.list){
+        if(!e.rig||e.type==='dragon'||e.training)continue;
+        const dx=e.group.position.x-p.x,dz=e.group.position.z-p.z;
+        const close=dx*dx+dz*dz < 285*285;
+        if(e.rig.root.visible!==close)e.rig.root.visible=close;
+      }
     }
     if (purge) this.list = this.list.filter((e) => !e.removed);
   }

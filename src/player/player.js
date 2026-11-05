@@ -435,12 +435,14 @@ export class Player {
       }
     }
     if(g.p15Enabled)this.dodgeInvulnT=Math.max(0,this.dodgeInvulnT-dt);
+    if(g.p183dEnabled&&this.p183dSnareT>0)this.p183dSnareT=Math.max(0,this.p183dSnareT-dt);
     let speed = g.p812Enabled?7.5:6;
     if (moving && (input.keys.has('ShiftLeft') || input.touchSprint) &&
         (g.p14Enabled || stats.useStamina((g.p812Enabled?10:12) * dt))) {
       speed = g.p812Enabled?11.2:10;
     }
     if (inWater) speed *= 0.55;
+    if(g.p183dEnabled&&this.p183dSnareT>0)speed*=.55; // WOC-inspired snare, movement only, not aim
 
     const sin = Math.sin(this.yaw), cos = Math.cos(this.yaw);
     let tx = 0, tz = 0;

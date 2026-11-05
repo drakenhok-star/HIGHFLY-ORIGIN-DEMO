@@ -319,6 +319,9 @@ export class Combat {
       const beforeHP=e.hp;
       e.takeDamage(dmg,this._hitImpulse);
       const realHit=confirmedDamage(beforeHP,e.hp);
+      if(realHit&&g.p183dEnabled&&e.type==='boar'){
+        g.stats.damage(2); // WOC Wild Boar: bristled hide reflects only direct melee
+      }
       if(g.p16Enabled && !realHit)continue;
       connected=connected||realHit;
       if(g.p15Enabled&&e.alive){

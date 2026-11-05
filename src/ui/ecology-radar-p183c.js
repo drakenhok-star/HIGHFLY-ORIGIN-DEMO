@@ -2,12 +2,12 @@
 import { realForestP183c,banditTrailP183c } from '../world/habitat-p183c.js';
 export const ECO_NAMES_P183C=Object.freeze({
  boar:'Jabalí',crab:'Cangrejo',goblin:'Goblin',orc:'Orco',fox:'Zorro',stag:'Ciervo',
- forest_wolf:'Lobo forestal',snow_alpha:'Lobo alfa',yeti:'Yeti',
+ forest_wolf:'Lobo forestal',prairie_wolf:'Lobo común',prairie_alpha:'Lobo alfa Greyjaw',snow_alpha:'Lobo alfa',yeti:'Yeti',
  bandit:'Bandido',forest_spider:'Araña'
 });
 export const ECO_COLORS_P183C=Object.freeze({
  boar:'#cfb27b',crab:'#58d3e9',goblin:'#eca96a',orc:'#ff787b',fox:'#e2b85f',
- stag:'#9cda9f',forest_wolf:'#b2b2ff',snow_alpha:'#9ee3ff',
+ stag:'#9cda9f',forest_wolf:'#b2b2ff',prairie_wolf:'#bdb6a9',prairie_alpha:'#ffd286',snow_alpha:'#9ee3ff',
  yeti:'#e2d2fa',bandit:'#ee8a8a',forest_spider:'#b693e8'
 });
 export function liveEcologyP183c(game){

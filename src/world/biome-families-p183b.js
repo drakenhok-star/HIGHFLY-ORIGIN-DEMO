@@ -19,12 +19,20 @@ const camp=(id,type,biome,x,z,count,opts={})=>Object.freeze({id,type,biome,x,z,c
 });
 const q=(model,clips={idle:'Idle',walk:'Walk',attack:'Attack',death:'Death'})=>({model,clips});
 export const P183B_CAMPS=Object.freeze([
-  camp('pradera_jabali','boar','prairie',207,153,2,{family:'beast',hp:56,dmg:11,speed:5.2,aggro:16,
+  camp('pradera_jabali','boar','prairie',207,153,3,{family:'beast',hp:56,dmg:11,speed:5.2,aggro:16,
     behavior:'charge',xp:33,drop:'boar_hide',gold:10,respawn:115,
     clips:{idle:'idle',walk:'walk',attack:'attack',death:'dead'}}),
-  camp('pradera_jabali_2','boar','prairie',272,65,1,{family:'beast',hp:49,dmg:10,speed:4.8,aggro:15,
+  camp('pradera_jabali_2','boar','prairie',272,65,3,{family:'beast',hp:49,dmg:10,speed:4.8,aggro:15,
     behavior:'charge',xp:30,drop:'boar_meat',gold:8,respawn:130,
     clips:{idle:'idle',walk:'walk',attack:'attack',death:'dead'}}),
+  // Original Quaternius CC0 wolf.glb from ClaudeCraft, independent of HIGHFLY wolf packs.
+  camp('pradera_lobos_claude','prairie_wolf','prairie',-320,135,5,{model:'wolf_claude',family:'beast',hp:49,dmg:9,speed:7.7,aggro:20,
+    behavior:'pack_frenzy',xp:29,drop:'wolf_pelt',gold:8,respawn:105,tint:0x827a6d,
+    clips:{idle:'Idle',walk:'Gallop',attack:'Attack',death:'Death'}}),
+  // Greyjaw is an MIT BEHAVIOUR inspiration, NOT the project-only Tripo asset.
+  camp('pradera_alfa','prairie_alpha','prairie',-420,72,1,{model:'wolf_claude',family:'beast',hp:165,dmg:16,speed:8.1,aggro:25,
+    behavior:'old_greyjaw_frenzy',xp:105,drop:'greyjaw_fang',gold:46,respawn:215,tint:0x555d60,
+    clips:{idle:'Idle',walk:'Gallop',attack:'Attack',death:'Death'}}),
   camp('bosque_goblins','goblin','forest',-190,505,2,{family:'goblinoid',hp:40,dmg:9,speed:5.1,
     behavior:'social',xp:32,drop:'goblin_token',gold:11,respawn:125,
     clips:q('goblin',{idle:'Idle',walk:'Run',attack:'Attack',death:'Death'}).clips}),
@@ -43,7 +51,7 @@ export const P183B_CAMPS=Object.freeze([
   camp('nieve_yeti','yeti','snow',505,-238,1,{family:'mountain',hp:140,dmg:19,speed:3.2,aggro:18,
     range:2.3,cd:2.5,xp:110,drop:'yeti_fur',gold:40,respawn:220,
     clips:{idle:'Idle',walk:'Walk',attack:'Bite_Front',death:'Death'}}),
-  camp('camino_bandidos','bandit','road',215,-112,2,{model:'npc_rogue',family:'humanoid',hp:63,dmg:11,speed:4.9,
+  camp('camino_bandidos','bandit','road',215,-112,5,{model:'npc_rogue',family:'humanoid',hp:63,dmg:11,speed:4.9,
     behavior:'social',xp:46,drop:'bandit_emblem',gold:22,respawn:150,
     clips:{idle:'Idle',walk:'Walking_A',attack:'1H_Melee_Attack_Chop',death:'Death_A'}}),
   camp('ruinas_orco','orc','ruins',-470,-300,1,{family:'goblinoid',hp:98,dmg:17,speed:3.5,aggro:17,
