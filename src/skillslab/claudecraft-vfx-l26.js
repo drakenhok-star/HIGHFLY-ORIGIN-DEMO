@@ -13,7 +13,7 @@
  *
  * All geometry/materials original THREE primitives, no textures/SFX/GLB,
  * controlled through the existing 48-active-mesh FX lifetime cap.
- * Damage/cooldowns never live here. No Unity/CraftPix/copied proprietary art.
+ * Damage/cooldowns never live here. No imported commercial media.
  */
 import * as THREE from 'three';
 
