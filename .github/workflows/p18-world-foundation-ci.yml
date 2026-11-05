@@ -50,6 +50,8 @@ jobs:
         run: node tests/p17-rpg-core.test.mjs
       - name: P18 world registry, safe zones and persistent events
         run: node tests/p18-world-registry.test.mjs
+      - name: P18 ecosystem mob/loot license gates and mobile budgets
+        run: node tests/p18-living-ecology.test.mjs
       - name: Terrain and public asset checks
         shell: bash
         run: |
