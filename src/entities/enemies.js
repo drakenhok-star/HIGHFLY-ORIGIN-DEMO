@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { worldIsSafeP18 } from '../world/world-registry-p18.js';
+import { dryPackCenterP182, groundedStepP182 } from '../world/terrestrial-habitat-p182.js';
 
 const WOLF_PACK_HOMES = [
   { x: 120, z: 160 },
@@ -159,6 +160,21 @@ export class Enemies {
   _spawnPack(pi) {
     const pack = this.packs[pi];
     const offs = pack.p18 ? P18_FRONTIER_OFFSETS : pack.ice ? ICE_WOLF_OFFSETS : WOLF_OFFSETS;
+    if(this.game.p18Enabled){
+      // Single shared land choice for the whole pack; never float wolves on
+      // waterY+0.3 (the legacy _groundAt clamp only concealed underwater ground).
+      // Cache this home so timed respawn never rescans or causes a frame spike.
+      if(!pack.p182DryHome){
+        pack.p182DryHome=dryPackCenterP182(this.game.terrain,pack.home,offs,
+          (x,z)=>!worldIsSafeP18(x,z) &&
+            offs.every(([ox,oz])=>!worldIsSafeP18(x+ox,z+oz)));
+        if(pack.p182DryHome)pack.home={x:pack.p182DryHome.x,z:pack.p182DryHome.z};
+      }
+      if(!pack.p182DryHome){
+        pack.members=[];pack.respawnT=30;
+        return; // no valid terrestrial habitat: do not spawn anything
+      }
+    }
     pack.members = offs.map((o,j) => this._spawnWolf(
       pack.home.x + o[0], pack.home.z + o[1], pi, pack.ice,
       pack.p18 ? (j===0?'alpha':'scout') : null
@@ -176,6 +192,7 @@ export class Enemies {
       BARROW_ORIGIN.z + BARROW_BOSS_OFFSET.dz,
       'warrior'
     );
+    if(!boss)return; // dry-habitat guard, only relevant to future dungeon layouts
     boss.boss = true;
     boss.name = 'Señor draugr';
     boss.hp = boss.maxHp = 150;
@@ -283,6 +300,12 @@ export class Enemies {
   }
 
   _spawnDraugr(x, z, variant = 'warrior') {
+    if(this.game.p18Enabled){
+      const dry=dryPackCenterP182(this.game.terrain,{x,z},[[0,0]],
+        (nx,nz)=> Math.abs(x)>2000 || !worldIsSafeP18(nx,nz));
+      if(!dry)return null; // never build a terrestrial rig in deep water
+      x=dry.x;z=dry.z;
+    }
     const e = this._base('draugr', variant === 'mage' ? 'Draugr mago' : 'Draugr', 60, 1.0, x, z);
     e.dmg = 14; e.speed = 4.2; e.aggroR = 20; e.attackRange = 2.6; e.attackCd = 1.6;
     e.variant = variant;
@@ -669,8 +692,25 @@ export class Enemies {
 
     if (e.slowT > 0) sp *= e.slowFactor; // 凛冬之息减速（动画速率随 sp 同步变慢）
 
-    pos.x += (mx * sp + e.kbVel.x) * dt;
-    pos.z += (mz * sp + e.kbVel.z) * dt;
+    const stepX=(mx * sp + e.kbVel.x) * dt;
+    const stepZ=(mz * sp + e.kbVel.z) * dt;
+    if(g.p18Enabled){
+      // All ground mobs (wolf/draugr) stay on land even when aggro, wandering
+      // or being knocked back. Slide along shore if only one axis is valid.
+      const prevX=pos.x,prevZ=pos.z;
+      const next=groundedStepP182(g.terrain,prevX,prevZ,stepX,stepZ);
+      pos.x=next.x;pos.z=next.z;
+      if(next.blocked){
+        e.kbVel.x=0;e.kbVel.z=0;
+        if(e.state==='chase'&&next.x===prevX&&next.z===prevZ &&
+           Math.abs(stepX)+Math.abs(stepZ)>0.01){
+          e.state='return';e.aggroT=0;sp=0;
+        }
+      }
+    }else{
+      pos.x += stepX;
+      pos.z += stepZ;
+    }
     const decay = Math.exp(-5 * dt);
     e.kbVel.x *= decay;
     e.kbVel.z *= decay;
