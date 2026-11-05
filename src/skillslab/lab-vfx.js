@@ -84,7 +84,8 @@ export class TianjieSkillVfx {
     const p=this.palette(style);
     this.ring(world,1.7,p[0],.4);
     this.ring(world,2.6,p[1],.65);
-    this.arc(world,dir,2.5,p[2],.38);
+    // Do not draw fictitious curved launch lines behind straight projectiles.
+    if(style!==0&&style!==3)this.arc(world,dir,2.5,p[2],.38);
     this.sparks(world.clone().add(new THREE.Vector3(0,1,0)),p[0],28,3.2,.55);
   }
   projectile(world,style){
