@@ -61,3 +61,43 @@ export function applyP186FilmedHudIfNew(editor){
  if(explicit)editor.persist();
  return true;
 }
+
+/** Explicit cross-origin handoff from the isolated L27 lab.
+ * Query parameters are untrusted; sanitize all numeric values and IDs.
+ * Never overwrite an existing HUD unless user clicked LAB transfer link.
+ */
+export function consumeP186TransferFromUrl(){
+ const token=new URLSearchParams(location.search).get('hf_p186_transfer');
+ if(!token||token.length>12000)return false;
+ let data;try{data=JSON.parse(token);}catch(_){return false;}
+ if(!data||data.version!==1||typeof data!=='object')return false;
+ const safeCamera={};
+ const limits={distance:[2.5,12],pitch:[-80,15],height:[.3,3.5],
+  fov:[40,110],aim:[.08,.25],deadZone:[1,35]};
+ for(const [key,interval] of Object.entries(limits)){
+  const n=Number(data.camera?.[key]);
+  if(Number.isFinite(n))safeCamera[key]=Math.max(interval[0],Math.min(interval[1],n));
+ }
+ const allowed=['joy','run','jump','dash','use','s1','atk','s2','s3','s4',
+   'lock','next','clear','radar','bag','menu','combo','perf','header','focus'];
+ const safeHud={};
+ for(const id of allowed){
+  const it=data.hud?.[id];if(!it||typeof it!=='object')continue;
+  const raw={};
+  for(const [name,a,c] of [['x',0,.98],['y',0,.98],['size',26,350],['opacity',.25,1]]){
+   const n=Number(it[name]);if(Number.isFinite(n))raw[name]=Math.max(a,Math.min(c,n));
+  }
+  raw.hidden=it.hidden===true;
+  safeHud[id]=raw;
+ }
+ try{
+  if(Object.keys(safeCamera).length)localStorage.setItem(KEY,JSON.stringify(safeCamera));
+  if(Object.keys(safeHud).length)localStorage.setItem('hf_p812_hud_layout_v2',
+   JSON.stringify({version:2,layout:safeHud}));
+  // Replace the one-shot URL, so reloading does not reset later HUD edits.
+  history.replaceState(history.state,'',location.pathname+
+   (location.search.replace(/([?&])hf_p186_transfer=[^&]*&?/,'$1').replace(/[?&]$/,''))+
+   location.hash);
+  return true;
+ }catch(_){return false;}
+}
