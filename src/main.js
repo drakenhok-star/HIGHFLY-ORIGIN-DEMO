@@ -29,6 +29,7 @@ import { WorldMapP34 } from './ui/world-map-p34.js'; // HIGHFLY_WORLD_MAP_P34
 import { TouchControls } from './ui/touch-controls.js'; // HIGHFLY_TOUCH_PATCH_V1
 import { TargetingP6 } from './combat/targeting-p6.js';
 import { PerfProbeP6 } from './ui/perf-probe-p6.js';
+import { PerfFoundationP161 } from './ui/performance-p161.js';
 
 class Game {
   constructor(assets) {
@@ -104,6 +105,7 @@ class Game {
     this.mobileAudit = new MobileAudit(this);
     this.p6Perf = new PerfProbeP6(this);
     this.performanceP2 = new PerformanceP2(this);
+    this.perf161 = new PerfFoundationP161(this);
     this.worldMapP34 = null;
     if (!new URLSearchParams(location.search).has('hf_no_map')) {
       try { this.worldMapP34 = new WorldMapP34(this); }
@@ -331,30 +333,48 @@ function loop(time) {
   }
   game.mobileAudit.begin();
   game.p6Perf.begin();
+  const perf161 = game.perf161.enabled ? game.perf161 : null;
+  if (perf161) perf161.beginFrame(time);
   const dt = Math.min(clock.getDelta(), 0.05);
   game.time.elapsed += dt;
 
   game.routeKeys();
 
   game.sky.update(dt);
+  if (perf161) perf161.startSection('water');
   game.water.update(dt);
+  if (perf161) perf161.endSection('water');
   game.ambience.update(dt);
+  if (perf161) perf161.startSection('terrain');
   game.terrain.update(dt);
+  if (perf161) perf161.endSection('terrain');
   game.structures.update(dt);
   game.interiors.update(dt);
   game.p6Perf.mark('world');
 
   if (game.state === 'playing') {
+    if (perf161) perf161.startSection('player');
     game.player.update(dt);
+    if (perf161) perf161.endSection('player');
     game.p6Perf.mark('player');
     if(game.targeting)game.targeting.update(dt);
+    if (perf161) perf161.startSection('combat');
     game.combat.update(dt);
+    if (perf161) perf161.endSection('combat');
     game.p6Perf.mark('combat');
+    if (perf161) perf161.startSection('effects');
     game.effects.update(dt);
+    if (perf161) perf161.endSection('effects');
+    if (perf161) perf161.startSection('enemies');
     game.enemies.update(dt);
+    if (perf161) perf161.endSection('enemies');
+    if (perf161) perf161.startSection('npcs');
     game.npcs.update(dt);
+    if (perf161) perf161.endSection('npcs');
     game.stats.update(dt);
+    if (perf161) perf161.startSection('scatter');
     game.scatter.update(dt);
+    if (perf161) perf161.endSection('scatter');
     game.hud.update(dt);
     game.audio.update(dt);
     game.saveSys.update(dt);
@@ -371,6 +391,7 @@ function loop(time) {
     game.camera.lookAt(0, 8, 40);
   }
 
+  if (perf161) perf161.startSection('render');
   if(game.p812Enabled && (game.state==='inventory'||game.state==='quests')){
     // Keep the scene frozen while inventory/quest overlays cover it; preview 3D
     // renders separately and can update at a low frame rate.
@@ -379,10 +400,12 @@ function loop(time) {
     // Renderer already owns SRGB output and ACES tone mapping.
     game.renderer.render(game.scene,game.camera);
   }else game.composer.render();
+  if (perf161) perf161.endSection('render');
   if(game.touch?.premium?.p7Inventory)game.touch.premium.p7Inventory.update(dt);
   if(game.touch?.premium?.p810)game.touch.premium.p810.update(dt);
   game.p6Perf.mark('render');
   game.p6Perf.end();
+  if (perf161) perf161.endFrame();
   game.mobileAudit.end();
 
   if (!splashHidden) {
