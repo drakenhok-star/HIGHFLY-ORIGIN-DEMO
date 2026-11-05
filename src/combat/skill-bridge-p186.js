@@ -463,6 +463,12 @@ export class P186CombatBridge{
   this.focusButton.classList.toggle('active',!!active);
   this.focusButton.textContent=active?'◎ DRAGÓN':'◎ ENFOCAR';
  }
+ enterPlaying(){
+  if(this.prevState==='playing')return;
+  applyP186VideoCamera(this.game);
+  this.prevState='playing';
+  this.ensureHud();
+ }
  reset(){
   this.recast=null;this.focus=null;
   this.airHits={enemy:null,count:0,lastAt:-999};
@@ -474,10 +480,7 @@ export class P186CombatBridge{
  update(dt){
   const g=this.game;
   if(g.state!=='playing'){this.prevState=g.state;return;}
-  if(this.prevState!=='playing'){
-   applyP186VideoCamera(g);
-   this.prevState='playing';
-  }
+  if(this.prevState!=='playing')this.enterPlaying();
   this._uiRefresh+=dt;
   if(this._uiRefresh>.35){
    this._uiRefresh=0;this.ensureHud();this.renderFocus();
