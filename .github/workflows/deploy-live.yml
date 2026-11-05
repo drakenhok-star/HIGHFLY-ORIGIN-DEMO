@@ -629,6 +629,42 @@ jobs:
           done
           echo "P18.3b CI-green families + QA biome tour at /p183b/; prior snapshots preserved"
 
+      - name: Publish P18.3c REAL HABITATS + live ecology radar as isolated playable preview
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          # Strictly pin CI-approved commit to avoid publishing untested mutable branches.
+          git fetch --no-tags --depth=1 origin refs/heads/p183c-habitats-radar-world-20261105
+          test "$(git rev-parse FETCH_HEAD)" = "3ed3798f232794b9140bd15f60c5834fb2444ea8"
+          mkdir -p .p183c-validate .site/p183c
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets tests scripts docs basis | tar -x -C .p183c-validate
+          (
+            cd .p183c-validate
+            test -s src/world/habitat-p183c.js
+            test -s src/ui/ecology-radar-p183c.js
+            test -s src/ui/biome-tour-p183c.js
+            test -s tests/p183c-habitat-radar.test.mjs
+            bash scripts/fetch_gobkit_boar_p183b.sh
+            export HF_REQUIRE_BOAR=1
+            find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+              node --input-type=module --check < "$file"
+            done
+            for test in tests/*.test.mjs; do node "$test"; done
+            if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' -o -iname '*Sketchfab*' \) | grep -q .; then
+              echo "P18.3c blocked: restricted assets" >&2
+              exit 1
+            fi
+            cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets basis ../.site/p183c/
+          )
+          touch .site/p183c/.nojekyll
+          for previous in p16 p161 p163 p18 p181 p182 p1821 p183 p183b; do
+            test -s ".site/$previous/index.html"
+          done
+          test -s .site/p183c/assets/models/crab_quaternius_cc0.glb
+          test -s .site/p183c/assets/models/boar_gobkit_cc0.glb
+          test -s .site/p183c/index.html
+          echo "P18.3c REAL HABITATS at /p183c/; all previous builds preserved"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
