@@ -55,7 +55,7 @@ export function castClaudeSkill(lab,slot,direction,target=null,options={}){
       // not instantly on button release.
       lab.schedule(.75,()=>{
         const hit=lab.hitSphere(center,4.15,138,{height:2.15});
-        fx.meteorImpact(center,4.15);
+        // No generic impact: dedicated skybeam + fissure + fire detonation.
         lab.claudeFx.meteorDetonate(center);
         for(const enemy of lab.candidates(center,4.15,null,180,2.15)){
           enemy.applySlow?.(.57,1.2);
@@ -92,7 +92,7 @@ export function castClaudeSkill(lab,slot,direction,target=null,options={}){
         lab.struck(enemy,behind?130:72,direction);
         lab.claudeFx.backstabContact(enemy,direction,behind);
       }
-      fx.backstab(pos,direction);
+      // Backstab's source MIT grammar is a silent contact thrust (no AoE ring).
       if(critical)lab.announce('¡ATAQUE POR LA ESPALDA! Daño crítico');
       return;
     }
@@ -107,14 +107,15 @@ export function castClaudeSkill(lab,slot,direction,target=null,options={}){
           enemy.hitPending=-1;
         }
       }
-      fx.slash(pos,direction,4);
+      // Only a confirmed control hit produces the vertical blood crescent.
+      if(foes.length)fx.signature.crescent(pos,direction,'#d9547d',.28,.72);
       if(foes.length)lab.announce('¡GOLPE BAJO! Control breve');
       return;
     }
     if(slot===3){
       p.startDash({direction:{x:direction.x,z:direction.z},
         speed:22,duration:.36,style:'dodge'});
-      fx.launch(pos,direction,4);
+      // Onrush has speedlines at start; its ground ring belongs at contact.
       lab.claudeFx.chargeWindup(pos,direction);
       lab.schedule(.37,()=>{
         const hits=lab.hitCone(p.pos,direction,3.3,65,82,{
