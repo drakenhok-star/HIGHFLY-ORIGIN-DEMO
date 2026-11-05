@@ -517,7 +517,23 @@ export class TianjieMobaSkillsLab {
       this.lastSpawn=now;
       this.training=g.enemies.list.filter(e=>e.training&&e.alive);
       this.trainingCount=g.enemies.trainingCount||1;
-      this.syncTrainingUI();
+  
+    root.querySelector('#hf-l27-transfer').addEventListener('click',async e=>{
+      e.preventDefault();e.stopPropagation();
+      const camera=window.highflyCameraLab?.config||{};
+      const hud=this.game.touch?.premium?.p810?.editor?.layout||{};
+      const payload=JSON.stringify({version:1,camera:{...camera},hud});
+      const url=new URL('https://drakenhok-star.github.io/HIGHFLY-ORIGIN-DEMO/p186/');
+      url.searchParams.set('hf_p186_transfer',payload);
+      try{
+        await navigator.clipboard.writeText(url.toString());
+        this.announce('PERFIL COPIADO: pegá el enlace para entrar a DEMO P186 con TU cámara y HUD');
+      }catch(_){
+        this.announce('El navegador impidió copiar: seleccioná el enlace en el cuadro');
+        window.prompt?.('Copiá el enlace de transferencia a P186:',url.toString());
+      }
+    });
+    this.syncTrainingUI();
     }
     this.updateLeap();
     this.updateGuardianDash();
@@ -621,7 +637,7 @@ export class TianjieMobaSkillsLab {
     root.id='hf-tianjie-skills-lab';
     root.setAttribute('translate','no');
     root.innerHTML=`<div class="hf-lab-top">
-      <strong class="hf-lab-title">HIGHFLY <span>FURY P16 · LAB L26 ÚNICO · VFX RECUPERADOS · HUD EDITABLE</span></strong>
+      <strong class="hf-lab-title">HIGHFLY <span>FURY P16 · LAB L27 · TU CÁMARA/HUD · VFX EXPERIMENTALES</span></strong>
       <div class="hf-lab-modes">
         <button type="button" data-style="0">✦ AÉREA</button>
         <button type="button" data-style="1">⚔ ABISAL</button>
@@ -633,6 +649,7 @@ export class TianjieMobaSkillsLab {
         <span id="hf-lab-readout">S1 · S2 · S3 NUEVAS | S4 WULD ORIGINAL</span>
         <button type="button" id="hf-lab-train">3 BLANCOS + 🐉</button>
         <button type="button" id="hf-lab-reset">REINICIAR</button>
+         <button type="button" id="hf-l27-transfer" title="Copiar cámara y HUD exactos a la demo P186">COPIAR HUD A DEMO</button>
         <button type="button" id="hf-l23-focus" aria-expanded="false" aria-label="Enfocar monstruo volador">◎ ENFOCAR</button>
 
         <button type="button" id="hf-lab-cancel" hidden>CANCELAR</button>
