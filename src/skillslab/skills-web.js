@@ -648,7 +648,11 @@ export class TianjieMobaSkillsLab {
     this.focusPanel=root.querySelector('#hf-l23-target-panel');
     // Move X outside the transformed top dock: CSS fixed must anchor to screen.
     root.appendChild(this.cancelBtn);
-    root.appendChild(this.focusBtn);
+    // The control must live beside ATK/USAR in the NATIVE touch HUD.
+    // Keeping it under the lab overlay leaves a zero-size hidden ancestor
+    // on some mobile boot/selection frames and defeats editing.
+    this.focusBtn.classList.add('hf-p810-control','hf-p810-icon','hf-l26-focus');
+    this.game.touch.root.appendChild(this.focusBtn);
     for(const b of root.querySelectorAll('[data-style]'))
       b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();this.setStyle(Number(b.dataset.style));});
     root.querySelector('#hf-lab-train').addEventListener('pointerdown',e=>{
