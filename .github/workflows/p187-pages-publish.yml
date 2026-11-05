@@ -1,0 +1,89 @@
+name: HIGHFLY P187 · Publicar demo en GitHub Pages
+on:
+  push:
+    branches:
+      - p187-inicios-fury-integration-20261105
+    paths:
+      - "src/**"
+      - "assets/**"
+      - "lib/**"
+      - "index.html"
+      - "styles.css"
+      - "tests/**"
+      - ".github/workflows/p187-pages-publish.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "highfly-pages"
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: P187 check that all assets and public licensing files exist
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -s LICENSE
+          test -s PROVENANCE.md
+          test -s index.html
+          test -s styles.css
+          test -s assets/manifest.json
+          test -s assets/models/player_barbarian.glb
+          test -s lib/three.module.js
+          test -s src/main.js
+          test -s src/combat/skill-bridge-p186.js
+          test -s src/ui/quick-nav-p187.js
+          test -s src/world/inicios-v2-p186.js
+          test -s src/world/world-zones-p185.js
+          ! find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .
+          find src -name '*.js' -type f -print0 | while IFS= read -r -d '' f; do
+            node --input-type=module --check < "$f"
+          done
+          node --experimental-default-type=module tests/p185-world-portals.test.mjs
+          node --experimental-default-type=module tests/p186-inicios-v2.test.mjs
+          node --experimental-default-type=module tests/p186-skill-transfer.test.mjs
+          node --experimental-default-type=module tests/p187-integrated-contracts.test.mjs
+          node tests/premium-hud.test.mjs
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    timeout-minutes: 20
+    steps:
+      - name: Checkout reviewed P187 (do not change main or lab)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Assemble static HIGHFLY P187 as a root-relative GitHub Pages project
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p .site
+          cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets .site/
+          touch .site/.nojekyll
+          echo "P187 FURY + Pueblo de los Inicios 1–20" > .site/BUILD_P187.txt
+          test -s .site/src/ui/quick-nav-p187.js
+          test -s .site/src/combat/skill-bridge-p186.js
+          test -s .site/src/world/inicios-v2-p186.js
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: .site
+      - name: Publish P187 (existing public Pages URL, no changes to main)
+        id: deployment
+        uses: actions/deploy-pages@v4
