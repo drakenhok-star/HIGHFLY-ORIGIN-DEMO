@@ -113,6 +113,12 @@ class Game {
     this.performanceP2 = new PerformanceP2(this);
     this.perf161 = new PerfFoundationP161(this);
     this.perf163 = this.p163Enabled ? new PerfGovernorP163(this) : null;
+    // P18 telemetry joins the existing COPIAR DATOS performance report
+    // without adding per-frame CPU work.
+    if(this.livingWorld && this.mobileAudit){
+      const baseReport=this.mobileAudit.report.bind(this.mobileAudit);
+      this.mobileAudit.report=()=>({...baseReport(),p18:this.livingWorld.report()});
+    }
     this.worldMapP34 = null;
     if (!new URLSearchParams(location.search).has('hf_no_map')) {
       try { this.worldMapP34 = new WorldMapP34(this); }
@@ -177,6 +183,7 @@ class Game {
     this.resetAll();
     this.setState('playing');
     this.hud.questBanner('¡Bienvenido a HIGHFLY!');
+    if(this.p18Enabled)this.hud.notify('P18 · Hablá con Bjorn para explorar la frontera de lobos');
     this.audio.startAmbience();
   }
 
@@ -186,6 +193,7 @@ class Game {
     this.saveSys.applyLoaded();
     this.setState('playing');
     this.hud.questBanner('¡Bienvenido de nuevo!');
+    if(this.p18Enabled)this.hud.notify('P18 · Consultá a Bjorn y el diario de misiones');
     this.audio.startAmbience();
   }
 
