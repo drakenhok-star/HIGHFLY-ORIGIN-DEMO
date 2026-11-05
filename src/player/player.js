@@ -856,7 +856,9 @@ export class Player {
     this._castAnimStarted = false;
     this.shakeT = 0;
     this.firstPerson = false;
-    this.camDist = 6;
+    // P19 optional camera preference survives P16 resetAll() without changing
+    // native movement, collisions, aim yaw, save keys, or any gameplay flag.
+    this.camDist = this.hfCameraPresetDist ?? 6;
     this._inWater = false;
     this._rippleT = 0;
     this.dashT=-1;
