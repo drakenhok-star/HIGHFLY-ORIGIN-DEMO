@@ -1,8 +1,14 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { percentileFrameMs, decideDprP163, PerfGovernorP163 } from '../src/ui/performance-p163.js';
+import { includeGrassP163 } from '../src/world/grass-lod-p163.js';
 
 assert.equal(percentileFrameMs([10,20,30,40],.95),40);
+assert.equal(includeGrassP163(0,1),true,'near grass fully retained');
+assert.equal(includeGrassP163(899,1),true,'30m fully dense');
+assert.equal(includeGrassP163(9000,0),false,'unseen grass excluded');
+assert.equal(includeGrassP163(2200,.60),true,'mid-distance stable hash retained');
+assert.equal(includeGrassP163(2200,.80),false,'mid-distance stable hash reduced');
 assert.equal(percentileFrameMs([], .95),null);
 assert.equal(decideDprP163({fps:26,p95:44,current:.88,min:.70,max:.88}),.80);
 assert.equal(decideDprP163({fps:33,p95:31,current:.78,min:.70,max:.88}),.70);
@@ -20,6 +26,7 @@ const game={p163Enabled:true,touch:{enabled:true},renderer,state:'playing',p812E
   water:{mesh:{geometry:{id:'flat'}}},resizeCount:0,onResize(){this.resizeCount++;},
   mobileAudit:{report(){return {base:true};}}
 };
+game.water.mesh.geometry=game.performanceP2.flatWaterGeometry;
 const gov=new PerfGovernorP163(game);
 assert.equal(gov.enabled,true);
 const send=(ms,n,start=0)=>{let t=start;for(let i=0;i<n;i++){t+=ms;gov.update(t);}return t;};
@@ -79,4 +86,6 @@ const terrain=await readFile(new URL('../src/world/terrain.js',import.meta.url),
 const scatter=await readFile(new URL('../src/world/scatter.js',import.meta.url),'utf8');
 assert.match(terrain,/!!game\.p163Enabled/);
 assert.match(scatter,/!!game\.p163Enabled/);
+assert.match(scatter,/includeGrassP163\(/);
+assert.match(scatter,/lastInstances = job.used/);
 console.log('HIGHFLY P16.3 PASS: 98.85% flat water triangle reduction, HIGH rollback, no-bloom composer bypass, bounded DPR, ECO/visibility/mode gates, stats export and world flags');
