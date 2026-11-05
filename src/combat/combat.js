@@ -6,6 +6,7 @@ import {AIR_CHAIN_P14,advanceComboClock,airStrikeProfile} from './air-chain-p14.
 import {strikeProfile,resolveCombatContext,reactionPolicy,pickMeleeTarget,
   canCancelAction,FURY_CANCEL_P15} from './fury-combat-p15.js';
 import {finisherInput,finisherAllowed} from './fury-finisher-p15.js';
+import { acceptsAttackIntent } from './turn-attack-p162.js';
 import {nextSwing,confirmedDamage,commitConfirmedHit} from './hit-confirm-p16.js';
 
 const MELEE_CD = 0.5;
@@ -251,11 +252,23 @@ export class Combat {
     if(g.p7Enabled){
       const previous=this._attackTarget;
       const stillValid=previous && g.targeting?.valid(previous,4.7,true);
-      const proposed=g.p15Enabled?pickMeleeTarget(this.collectTargets(),g.player.pos,
-        stillValid?previous:null,g.targeting?.locked,4.5):null;
-      this._attackTarget=g.p15Enabled && proposed && g.targeting?.valid(proposed,4.7,true)
-        ?proposed:g.targeting?.valid(g.targeting.locked,4.7,true)?g.targeting.locked
-        :stillValid?previous:g.targeting?.attackTarget(4.5)||null;
+      const hardLock=g.targeting?.valid(g.targeting.locked,4.7,true)?g.targeting.locked:null;
+      if(g.p162Enabled && g.player._moveDir?.lengthSq()>0.04 && !hardLock){
+        // Treat a fresh joystick reversal as a new attack intent: the legacy
+        // nearest-target fallback could pick an enemy BEHIND the hunter.
+        const facing=g.player._moveDir;
+        const candidates=this.collectTargets().filter(e=>
+          acceptsAttackIntent(facing,g.player.pos,e));
+        const proposed=pickMeleeTarget(candidates,g.player.pos,
+          stillValid && acceptsAttackIntent(facing,g.player.pos,previous)?previous:null,
+          null,4.5);
+        this._attackTarget=proposed && g.targeting?.valid(proposed,4.7,true)?proposed:null;
+      }else{
+        const proposed=g.p15Enabled?pickMeleeTarget(this.collectTargets(),g.player.pos,
+          stillValid?previous:null,hardLock,4.5):null;
+        this._attackTarget=g.p15Enabled && proposed && g.targeting?.valid(proposed,4.7,true)
+          ?proposed:hardLock|| (stillValid?previous:g.targeting?.attackTarget(4.5)||null);
+      }
       if(this._attackTarget && !g.targeting.locked)g.targeting.soft=this._attackTarget;
       if(!g.p810Enabled)g.hud.notify('COMBO '+step+'/4'+(step===4?' · ¡GOLPE FINAL!':''));
     }
@@ -283,7 +296,8 @@ export class Combat {
     const locked=g.p7Enabled?this._attackTarget:
       g.p6Enabled && g.targeting?g.targeting.get(4.8):null;
     const forward=this._fwd.copy(g.p7Enabled?player.getCombatForward():player.getForward());
-    if(locked){
+    if(locked && (!g.p162Enabled || locked===g.targeting?.locked ||
+        acceptsAttackIntent(player._moveDir,player.pos,locked))){
       forward.copy(locked.group.position).sub(player.pos);
       forward.y=0;if(forward.lengthSq()>0.001)forward.normalize();
       else forward.copy(g.p7Enabled?player.getCombatForward():player.getForward());
