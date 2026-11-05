@@ -251,7 +251,8 @@ export class Combat {
     const step=g.p16Enabled?nextSwing(this.comboStep,this.comboTimer>0):
       g.p7Enabled ? comboStep(this.comboStep,this.comboTimer>0)
       : g.p6Enabled ? (this.comboTimer>0 ? this.comboStep%4+1 : 1) : 1;
-    const cost=g.p6Enabled && step===4 ? 10 : g.p6Enabled && step===3 ? 7 : 6;
+    // L22 LAB ONLY: normal ATK costs no stamina; original P16 stays unchanged.
+    const cost=g.enemies?.trainingLab?0:(g.p6Enabled && step===4 ? 10 : g.p6Enabled && step===3 ? 7 : 6);
     if(!g.stats.useStamina(cost)){
       g.hud.notify('Energía insuficiente');return;
     }
