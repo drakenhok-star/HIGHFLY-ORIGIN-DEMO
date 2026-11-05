@@ -54,9 +54,15 @@ export class Enemies {
     this.packs = [];
     this.pendingRespawns = [];
     // Active ONLY in /lab.html: no wandering packs, NPC attackers or bosses.
-    this.trainingLab = location.pathname.endsWith('/lab.html');
+    // Works at /lab.html AND the independent GitHub Pages /index.html root.
+    // The original main demo never includes the Skill Lab entrypoint.
+    this.trainingLab=!!document.querySelector(
+      'script[type="module"][src$="/src/skillslab/boot.js"]'
+    ) || location.pathname.endsWith('/lab.html');
+    // Default: THREE nonaggressive, real-damage skeletons.
+    // Optional QA query ?hf_targets=1 starts with a single bot.
     this.trainingCount = this.trainingLab &&
-      new URLSearchParams(location.search).get('hf_targets') === '3' ? 3 : 1;
+      new URLSearchParams(location.search).get('hf_targets') !== '1' ? 3 : 1;
     this.geoCache = new Map();
     this.sackMat = new THREE.MeshStandardMaterial({ color: 0x7a5c34, roughness: 0.8, metalness: 0, emissive: 0xc9a86a, emissiveIntensity: 0.45 });
     this.knotMat = new THREE.MeshStandardMaterial({ color: 0x5a4426, roughness: 1, metalness: 0 });
