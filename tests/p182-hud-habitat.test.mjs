@@ -69,13 +69,13 @@ const enemy=await readFile(new URL('../src/entities/enemies.js',import.meta.url)
 assert.match(enemy,/dryPackCenterP182\(this\.game\.terrain,pack\.home,offs/);
 assert.match(enemy,/pack\.respawnT=30/,'no safe terrain means no pack, retry later');
 assert.match(enemy,/groundedStepP182\(g\.terrain/,'chase + wander water avoidance');
-assert.match(enemy,/e\._p182Step\\|\\|/,'reuse output object');
+assert.ok(enemy.includes('e._p182Step||(e._p182Step='),'reuse output object');
 assert.match(enemy,/if\(!dry\)return null/,'draugr never spawn under water');
 const map=await readFile(new URL('../src/ui/world-map-p34.js',import.meta.url),'utf8');
 assert.doesNotMatch(map,/hf-p181-radar-target/,'no redundant label under radar');
-assert.match(map,/this\.hunterArrow\(ctx,px,py,this\.game\.player\.bodyYaw\\?\\?/,
+assert.ok(map.includes('this.hunterArrow(ctx,px,py,this.game.player.bodyYaw??'),
  'map arrow reflects torso heading, not camera');
-assert.match(map,/this\.hunterArrow\(ctx,n\/2,n\/2,this\.game\.player\.bodyYaw\\?\\?/,
+assert.ok(map.includes('this.hunterArrow(ctx,n/2,n/2,this.game.player.bodyYaw??'),
  'round radar arrow reflects torso too');
 const runtime=await readFile(new URL('../src/world/living-world-runtime-p18.js',import.meta.url),'utf8');
 assert.match(runtime,/MISIÓN ACTIVA · CENTINELAS/);
