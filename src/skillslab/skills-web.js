@@ -486,7 +486,9 @@ export class TianjieMobaSkillsLab {
       pr.mesh.position.addScaledVector(pr.dir,step);
       if(pr.mesh.material?.uniforms?.uTime)
         pr.mesh.material.uniforms.uTime.value+=dt;
-      pr.mesh.rotation.y+=dt*4;
+      pr.mesh.userData?.updateVfx?.(dt,pr.speed/30);
+      if(pr.style===3)pr.mesh.rotateZ(dt*1.8);
+      else pr.mesh.rotation.y+=dt*4;
       pr.remaining-=step;
       this.fx.projectile(pr.mesh.position.clone(),pr.style);
       let impact=false;
