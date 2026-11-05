@@ -537,7 +537,7 @@ export class TianjieMobaSkillsLab {
         <span id="hf-lab-readout">S1 · S2 · S3 NUEVAS | S4 WULD ORIGINAL</span>
         <button type="button" id="hf-lab-train">OBJ: 1 / 3</button>
         <button type="button" id="hf-lab-reset">REINICIAR</button>
-        <button type="button" id="hf-lab-quality">FX: MEDIO</button>
+
         <button type="button" id="hf-lab-cancel" hidden>CANCELAR</button>
       </div>
       <div id="hf-lab-message" role="status">FURY P16 intacto · Objetivos inmóviles · Daño real · Sin agresión</div>
@@ -557,12 +557,7 @@ export class TianjieMobaSkillsLab {
       e.preventDefault();e.stopPropagation();this.resetTraining();
     });
     this.syncTrainingUI();
-    root.querySelector('#hf-lab-quality').addEventListener('pointerdown',e=>{
-      e.preventDefault();e.stopPropagation();
-      this.quality=(this.quality+1)%3;
-      this.fx.setQuality(this.quality);
-      e.currentTarget.textContent='FX: '+['BAJO','MEDIO','ALTO'][this.quality];
-    });
+
     this.cancelBtn.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();this.cancelAim();});
     this.renderHud(true);
   }
