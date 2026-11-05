@@ -64,7 +64,14 @@ try {
  assert.equal(await page.locator('#hf-p186-styles .hf-p187-skill-cards article').count(),15,
   'all fifteen cards show in a compact scrollable mobile panel');
  await page.evaluate(()=>window.game.p186Skills.openStyleMenu());
- await page.waitForFunction(()=>!!window.game?.p187VillageGuide?.button,undefined,{timeout:15000});
+ const villageStatus=await page.evaluate(()=>{
+  const g=window.game;
+  g.p187VillageGuide.update(1);
+  return {gameState:g.state,menuReady:!!g.touch?.premium?.p810?.quick,
+   menuDomReady:!!document.getElementById('hf-p810-quick'),
+   buttonReady:!!g.p187VillageGuide?.button};
+ });
+ assert.ok(villageStatus.buttonReady,'Village guide must mount in the existing HUD: '+JSON.stringify(villageStatus));
  await page.evaluate(()=>window.game.p187VillageGuide.open());
  const villageCopy=await page.locator('#hf-p187-inicios-guide').innerText();
  assert.ok(villageCopy.includes('Minería')&&villageCopy.includes('Encantamiento')&&
