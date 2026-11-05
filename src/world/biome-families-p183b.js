@@ -61,11 +61,13 @@ export function biomeValidP183b(terrain,x,z,biome,allow=()=>true){
  if(!Number.isFinite(h)||h<water+.55)return false;
  if(biome==='snow' ? h<54 : biome!=='coast' && h>50)return false;
  if(biome==='coast'){
-   if(h>water+3.5)return false;
-   // True intertidal shore: water nearby, body on dry ground.
-   if(![[8,0],[-8,0],[0,8],[0,-8]].some(([dx,dz])=>terrain.getHeight(x+dx,z+dz)<water-.1))return false;
+   if(h>water+7.0)return false;
+   // Traverse shoreline: allow up to 24 m from water so a real shore
+   // never demands an impossibly steep 8m elevation drop.
+   if(![[24,0],[-24,0],[0,24],[0,-24],[17,17],[17,-17],[-17,17],[-17,-17]]
+      .some(([dx,dz])=>terrain.getHeight(x+dx,z+dz)<water-.03))return false;
  }
- if(typeof terrain.getSlope==='function'&&terrain.getSlope(x,z)>(biome==='snow'?.8:.65))return false;
+ if(typeof terrain.getSlope==='function'&&terrain.getSlope(x,z)>(biome==='snow'?.8:biome==='coast'?.95:.65))return false;
  return true;
 }
 export function resolveBiomeCampP183b(terrain,camp,allow=()=>true){
@@ -78,9 +80,9 @@ export function resolveBiomeCampP183b(terrain,camp,allow=()=>true){
 }
 export function resolveCoastSitesP183b(terrain,allow=()=>true){
  const spots=[];
- for(const radius of [125,155,190,240,310,380,470,590,740]){
-   for(let i=0;i<24;i++){
-     const theta=i*Math.PI/12,x=Math.round(Math.cos(theta)*radius),z=Math.round(40+Math.sin(theta)*radius);
+ for(const radius of [120,155,190,235,290,350,420,500,600,730,880,1040]){
+   for(let i=0;i<36;i++){
+     const theta=i*Math.PI/18,x=Math.round(Math.cos(theta)*radius),z=Math.round(40+Math.sin(theta)*radius);
      if(!biomeValidP183b(terrain,x,z,'coast',allow))continue;
      if(spots.every(s=>Math.hypot(s.x-x,s.z-z)>=75))spots.push({x,z,y:terrain.getHeight(x,z)});
      if(spots.length>=P183B_COAST_COUNT)return spots;
