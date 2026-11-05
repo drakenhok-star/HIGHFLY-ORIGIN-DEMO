@@ -736,6 +736,44 @@ jobs:
           test -s .site/p183e/index.html
           echo "P18.3e model calibration and Spanish interactions at /p183e/; prior builds preserved"
 
+      - name: Publish CI-green P186 combat + 15 skills inside REAL P185 world, keep all previous previews
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          # Independent, immutable preview: never replace the root demo or P18.* snapshots.
+          git fetch --no-tags --depth=1 origin refs/heads/p186-fury-skills-transfer-20261105
+          test "$(git rev-parse FETCH_HEAD)" = "be40c17ca98a8680a8cf523826f652b87a674555"
+          mkdir -p .p186-validate .site/p186
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets basis tests scripts docs | tar -x -C .p186-validate
+          (
+            cd .p186-validate
+            test -s src/combat/hit-confirm-p16.js
+            test -s src/world/world-zones-p185.js
+            test -s src/combat/skill-bridge-p186.js
+            test -s src/ui/p186-profile.js
+            test -s src/skillslab/claudecraft-vfx-l26.js
+            test -s src/skillslab/skill-catalog-export-l26.js
+            test -s assets/models/player_barbarian.glb
+            bash scripts/fetch_gobkit_boar_p183b.sh
+            node --experimental-default-type=module tests/p185-world-portals.test.mjs
+            node --experimental-default-type=module tests/p186-skill-transfer.test.mjs
+            find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+              node --input-type=module --check < "$file"
+            done
+            if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' -o -iname '*Sketchfab*' -o -iname '*Meshy*' \) | grep -q .; then
+              echo "P186 denied: restricted source media"; exit 1
+            fi
+            cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets basis ../.site/p186/
+          )
+          touch .site/p186/.nojekyll
+          test -s .site/p186/index.html
+          test -s .site/p186/src/combat/skill-bridge-p186.js
+          test -s .site/p186/assets/models/boar_gobkit_cc0.glb
+          for previous in p16 p161 p163 p18 p181 p182 p1821 p183 p183b p183c p183d p183e; do
+            test -s ".site/$previous/index.html"
+          done
+          echo "P186 immutable preview at /p186/ alongside P185 world and all prior versions"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
