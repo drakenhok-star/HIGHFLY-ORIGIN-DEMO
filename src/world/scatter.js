@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { makeNoise2D, mulberry32, fbm } from '../core/noise.js';
 import { NatureObstaclesP7 } from './obstacles-p7.js';
 import { GridDiskCursorP161 } from './grass-cursor-p161.js';
+import { includeGrassP163 } from './grass-lod-p163.js';
 
 const REGION = 700;
 const GRASS_COUNT = 36000;
@@ -40,6 +41,8 @@ export class Scatter {
     this.game = game;
     this.p161GrassEnabled = new URLSearchParams(location.search).get('hf_p161_grass') === '1' ||
       (!!game.p163Enabled && new URLSearchParams(location.search).get('hf_p161_grass') !== '0');
+    this.p163GrassLod = !!game.p163Enabled && this.p161GrassEnabled &&
+      new URLSearchParams(location.search).get('hf_p163_grass_lod') !== '0';
     this.meshes = [];
     this.obstacles = game.p7Enabled ? new NatureObstaclesP7(12) : null;
     this.forestNoise = makeNoise2D(1338);
@@ -457,6 +460,19 @@ export class Scatter {
     // The cursor has precisely the P16 iZ/iX traversal order and circular cutoff.
     while (job.used < GRASS_COUNT && job.cursor.next()) {
       const ix = job.cursor.ix, iz = job.cursor.iz;
+      if (this.p163GrassLod) {
+        const ddx = ix * GRASS_SPACING - job.anchor.x;
+        const ddz = iz * GRASS_SPACING - job.anchor.z;
+        if (!includeGrassP163(ddx * ddx + ddz * ddz, cellHash(ix, iz, 17))) {
+          worked++;
+          if (worked >= P161_GRASS_MAX_CELLS ||
+              ((worked & 31) === 0 && performance.now() - start >= P161_GRASS_STEP_MS)) {
+            this.p161GrassStats.lastStepMs = performance.now() - start;
+            return;
+          }
+          continue;
+        }
+      }
       const key = ix * 131072 + iz;
       let data = this._grassCache.get(key);
       if (data === undefined) {
@@ -498,6 +514,8 @@ export class Scatter {
     this.p161GrassStats.pending = false;
     this.p161GrassStats.completed++;
     this.p161GrassStats.lastCells = job.cursor.scanned;
+    this.p161GrassStats.lastInstances = job.used;
+    this.p161GrassStats.farLodActive = !!this.p163GrassLod;
     this.p161GrassStats.lastBuildMs = performance.now() - job.startedAt;
     this.p161GrassStats.lastStepMs = performance.now() - start;
   }
