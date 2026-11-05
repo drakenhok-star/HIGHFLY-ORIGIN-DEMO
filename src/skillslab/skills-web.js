@@ -73,6 +73,8 @@ export class TianjieMobaSkillsLab {
     this.bindingCheck=setInterval(()=>{
       this.attachTouchButtons();
       this.ensureFocusEditor(); // HUD P10 initializes asynchronously.
+      // Boot/start transitions can precede the first graphics update frame.
+      if(this.root)this.root.classList.toggle('playing',this.game.state==='playing');
     },700);
   }
   now(){return this.game.time.elapsed;}
