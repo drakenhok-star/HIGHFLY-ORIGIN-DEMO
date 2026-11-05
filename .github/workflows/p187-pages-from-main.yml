@@ -1,0 +1,84 @@
+name: HIGHFLY · Publicar P187 desde main sin fusionar gameplay
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/p187-pages-from-main.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "highfly-pages"
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout immutable P187 verified source, NOT main gameplay
+        uses: actions/checkout@v4
+        with:
+          ref: 580bfc1bb08204f6fc8797a018b15b1e902ed776
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check pinned commit, provenance, world, Fury and new quick menu
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "$(git rev-parse HEAD)" = "580bfc1bb08204f6fc8797a018b15b1e902ed776"
+          test -s LICENSE && test -s PROVENANCE.md
+          test -s index.html && test -s styles.css
+          test -s assets/manifest.json
+          test -s assets/models/player_barbarian.glb
+          test -s lib/three.module.js
+          test -s src/ui/quick-nav-p187.js
+          test -s src/combat/skill-bridge-p186.js
+          test -s src/world/inicios-v2-p186.js
+          test -s src/world/world-zones-p185.js
+          ! find src -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .
+          find src -name '*.js' -type f -print0 | while IFS= read -r -d '' f; do
+            node --input-type=module --check < "$f"
+          done
+          node --experimental-default-type=module tests/p185-world-portals.test.mjs
+          node --experimental-default-type=module tests/p186-inicios-v2.test.mjs
+          node --experimental-default-type=module tests/p186-skill-transfer.test.mjs
+          node --experimental-default-type=module tests/p187-integrated-contracts.test.mjs
+          node tests/premium-hud.test.mjs
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    timeout-minutes: 20
+    steps:
+      - name: Checkout pinned P187 (main source remains untouched)
+        uses: actions/checkout@v4
+        with:
+          ref: 580bfc1bb08204f6fc8797a018b15b1e902ed776
+          persist-credentials: false
+      - name: Assemble project-relative Pages static site
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p .site
+          cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets .site/
+          touch .site/.nojekyll
+          printf "P187 Inicios + FURY (commit %s)\n" "580bfc1bb08204f6fc8797a018b15b1e902ed776" > .site/BUILD_P187.txt
+          test -s .site/src/ui/quick-nav-p187.js
+          test -s .site/src/combat/skill-bridge-p186.js
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: .site
+      - name: Deploy verified P187 to GitHub Pages
+        uses: actions/deploy-pages@v4
+        id: deployment
