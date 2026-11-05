@@ -1,0 +1,61 @@
+name: HIGHFLY P18 · World Foundation W0 / 9 Zones / RPG contracts
+on:
+  push:
+    branches: [p18-living-village-world-foundation-20261105]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression-and-telemetry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check all first-party game modules
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+      - name: P5-P16 stable movement and combat regression
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          node tests/premium-hud.test.mjs
+          node tests/p6-integral.test.mjs
+          node tests/p7-fury.test.mjs
+          node tests/p810-integral.test.mjs
+          node tests/p812-polish.test.mjs
+          node tests/p13-fury.test.mjs
+          node tests/p14-air-chain.test.mjs
+          node tests/p15-fury.test.mjs
+          node tests/p15-finisher.test.mjs
+          node tests/p15-interruption.test.mjs
+          node tests/p16-hit-confirm.test.mjs
+      - name: P16.1 opt-in profiler tests
+        run: node tests/p161-performance.test.mjs
+      - name: P16.1 grass disk and atomic rebuild regressions
+        run: node tests/p161-grass-budget.test.mjs
+      - name: P16.1 exact terrain geometry and streaming regressions
+        run: node tests/p161-terrain-budget.test.mjs
+      - name: P16.1 five-day Training UI preview and mandatory rest
+        run: node tests/p161-training-ui.test.mjs
+      - name: P16.3 render and adaptive governor regression
+        run: node tests/p163-render-governor.test.mjs
+      - name: P17 level/training/reputation contracts are preserved
+        run: node tests/p17-rpg-core.test.mjs
+      - name: P18 world registry, safe zones and persistent events
+        run: node tests/p18-world-registry.test.mjs
+      - name: Terrain and public asset checks
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          node scripts/p14-mountain-scan.mjs
+          node scripts/audit_animation_p6.mjs
+          test -s docs/P161_PERFORMANCE_FOUNDATION.md
+          test -s src/ui/performance-p161.js
+          ! find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .
