@@ -30,15 +30,6 @@ export class WorldMapP34 {
     this.opened = false;
     this.mount();
     this.setState(game.state);
-    // On mobile P18.1, label the actual objective immediately under the round radar;
-    // the radar itself may be draggable/scaled by the P810 HUD editor.
-    this.frontierLabel=document.createElement('div');
-    this.frontierLabel.id='hf-p181-radar-target';
-    this.frontierLabel.style.cssText='position:fixed;z-index:51;display:none;pointer-events:none;'+
-      'border:1px solid #f9ba69;border-radius:7px;padding:3px 7px;'+
-      'background:#2b1942ea;color:#ffdd9c;font:800 9px system-ui;'+
-      'max-width:205px;white-space:nowrap;text-align:center;box-shadow:0 0 9px #f6a45e33';
-    document.body.appendChild(this.frontierLabel);
     this.timer = window.setInterval(() => this.tick(), 280);
     document.addEventListener("keydown", e => {
       if (this.opened && e.code === "Escape") {
@@ -79,7 +70,7 @@ export class WorldMapP34 {
     overlay.innerHTML = '<div id="hf-worldpanel" role="dialog" aria-modal="true" aria-label="Mapa de Tianjie5">'
       + '<div id="hf-worldhead"><span>HIGHFLY · MAPAMUNDI</span><button type="button" id="hf-worldclose">CERRAR</button></div>'
       + '<canvas id="hf-worldbig" width="512" height="512"></canvas>'
-      + '<div id="hf-worldlegend">Norte ↑ · Punto turquesa = cazador · Coordenadas reales del juego<br>'
+      + '<div id="hf-worldlegend">Norte ↑ · Flecha turquesa = orientación del pecho del cazador · Coordenadas reales<br>'
       + 'El terreno continúa fuera de este mapa. Zonas futuras todavía no representadas.</div></div>';
     document.body.appendChild(overlay);
     overlay.querySelector("#hf-worldclose").addEventListener("click", e => {e.preventDefault(); e.stopPropagation(); this.toggle(false)});
@@ -89,7 +80,6 @@ export class WorldMapP34 {
   }
   setState(s) {
     this.mini.style.display = s === "playing" ? "flex" : "none";
-    if(this.frontierLabel && s!=='playing')this.frontierLabel.style.display='none';
     if(s !== "playing")this.toggle(false);
   }
   toggle(open) {
@@ -138,22 +128,20 @@ export class WorldMapP34 {
     ctx.font='bold 9px system-ui';ctx.fillText('C',px,py+.5);
     ctx.restore();
   }
-  updateFrontierLabel(){
-    const status=this.game.p18Enabled?this.game.livingWorld?.quest?.status:null;
-    const q=this.game.livingWorld?.quest;
-    const playing=this.game.state==='playing';
-    const target=nearestFrontierTargetP181(this.game);
-    if(!playing||!target||(status!=='active'&&status!=='complete')){
-      this.frontierLabel.style.display='none';return;
-    }
-    const box=this.mini.getBoundingClientRect();
-    const text=status==='complete'?'↩ ENTREGAR · BJORN':
-      '✦ LOBO CENTINELA · '+(target.id.includes('east')?'ESTE':'OESTE')+
-        ' · '+q.progress+'/3';
-    this.frontierLabel.textContent=text;
-    this.frontierLabel.style.display='block';
-    this.frontierLabel.style.top=Math.min(window.innerHeight-23,box.bottom+3)+'px';
-    this.frontierLabel.style.right=Math.max(4,window.innerWidth-box.right)+'px';
+  // NORTH = -Z; bodyYaw is the real hunter torso facing, camera yaw is NOT.
+  hunterArrow(ctx,x,y,bodyYaw,size=10){
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(-bodyYaw);
+    ctx.beginPath();
+    ctx.moveTo(0,-size);
+    ctx.lineTo(size*.72,size*.7);
+    ctx.lineTo(0,size*.22);
+    ctx.lineTo(-size*.72,size*.7);
+    ctx.closePath();
+    ctx.fillStyle='#64ffe2';ctx.strokeStyle='#052b29';ctx.lineWidth=2;
+    ctx.fill();ctx.stroke();
+    ctx.restore();
   }
   dot(ctx,x,y,r,color) {
     ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
@@ -192,7 +180,8 @@ export class WorldMapP34 {
       }
     }
     const p=this.game.player.pos,px=at(p.x),py=at(p.z);
-    if(px>=0&&px<n&&py>=0&&py<n)this.dot(ctx,px,py,7,"#52ffd8");
+    if(px>=0&&px<n&&py>=0&&py<n)
+      this.hunterArrow(ctx,px,py,this.game.player.bodyYaw??this.game.player.yaw,10);
     ctx.fillStyle="#fff";ctx.font="bold 18px system-ui";ctx.fillText("N ↑",12,20);
     ctx.font="12px system-ui";ctx.fillText("X "+Math.round(p.x)+" · Z "+Math.round(p.z),12,n-14);
     if(!this.atlasReady)ctx.fillText("Calculando relieve...",n-170,n-14);
@@ -272,9 +261,7 @@ export class WorldMapP34 {
         ctx.restore();
       }
     }
-    ctx.save();ctx.translate(n/2,n/2);ctx.rotate(-this.game.player.yaw);
-    ctx.beginPath();ctx.moveTo(0,-12);ctx.lineTo(8,10);ctx.lineTo(0,5);ctx.lineTo(-8,10);ctx.closePath();
-    ctx.fillStyle="#64ffe2";ctx.fill();ctx.strokeStyle="#052b29";ctx.stroke();ctx.restore();
+    this.hunterArrow(ctx,n/2,n/2,this.game.player.bodyYaw??this.game.player.yaw,12);
     ctx.fillStyle="#eaffff";ctx.font="bold 14px system-ui";ctx.fillText("N",n/2-4,16);
     this.coords.textContent="X "+Math.round(p.x)+" · Z "+Math.round(p.z)+"  |  MAPA";
   }
@@ -282,6 +269,5 @@ export class WorldMapP34 {
     if(this.game.state!=="playing")return;
     this.drawMini();
     if(this.opened)this.drawBig();
-    if(this.game.p18Enabled)this.updateFrontierLabel();
   }
 }
