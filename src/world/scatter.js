@@ -1,12 +1,16 @@
 import * as THREE from 'three';
 import { makeNoise2D, mulberry32, fbm } from '../core/noise.js';
 import { NatureObstaclesP7 } from './obstacles-p7.js';
+import { GridDiskCursorP161 } from './grass-cursor-p161.js';
 
 const REGION = 700;
 const GRASS_COUNT = 36000;
 const GRASS_SPACING = 0.72;
 const GRASS_RADIUS = 68;
 const GRASS_REBUILD_DIST = 7;
+// Only on the experimental branch, only with ?hf_p161_grass=1.
+const P161_GRASS_STEP_MS = 2.0;
+const P161_GRASS_MAX_CELLS = 4096;
 const TUFT_W = 0.16;
 const TUFT_H = 0.46;
 const VILLAGE = { x: 0, z: 40, r: 78 };
@@ -34,6 +38,7 @@ function cellHash(ix, iz, salt) {
 export class Scatter {
   constructor(game) {
     this.game = game;
+    this.p161GrassEnabled = new URLSearchParams(location.search).get('hf_p161_grass') === '1';
     this.meshes = [];
     this.obstacles = game.p7Enabled ? new NatureObstaclesP7(12) : null;
     this.forestNoise = makeNoise2D(1338);
@@ -292,6 +297,29 @@ export class Scatter {
     mesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
     this.grassMesh = mesh;
     this.meshes.push(mesh);
+    // The active mesh stays visible while the next grass field is computed in
+    // small chunks into an invisible second mesh. Commit only when complete.
+    // Both meshes use exactly the P16 KayKit-style procedural grass geometry.
+    if (this.p161GrassEnabled) {
+      mesh.count = 0;
+      mesh.visible = false;
+      const spare = new THREE.InstancedMesh(geo, mat, GRASS_COUNT);
+      spare.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      spare.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(GRASS_COUNT * 3), 3);
+      spare.instanceColor.setUsage(THREE.DynamicDrawUsage);
+      spare.castShadow = false;
+      spare.receiveShadow = false;
+      spare.frustumCulled = false;
+      spare.count = 0;
+      spare.visible = false;
+      this._grassStandby = spare;
+      this.meshes.push(spare);
+      this._grassJob = null;
+      this.p161GrassStats = {
+        enabled: true, completed: 0, restarted: 0,
+        pending: false, lastCells: 0, lastBuildMs: 0, lastStepMs: 0
+      };
+    }
 
     // 与地形宏观色同种子同频率同偏移，草色随地表过渡
     this.macroNoise = makeNoise2D(1337);
@@ -400,12 +428,102 @@ export class Scatter {
     if (this._grassCache.size > 150000) this._grassCache.clear();
   }
 
+
+  // P16.1 EXPERIMENTAL: spreads CPU height/noise sampling over rAF frames.
+  // Double-buffering avoids rendering half-built grass; P16 path is unchanged.
+  _startGrassJob(anchor) {
+    const spare = this._grassStandby;
+    spare.visible = false;
+    spare.count = 0;
+    const copy = anchor.clone();
+    this._grassJob = {
+      anchor: copy,
+      cursor: new GridDiskCursorP161(copy.x, copy.z, GRASS_SPACING, GRASS_RADIUS),
+      used: 0,
+      startedAt: performance.now(),
+      excluded: this._grassExclusions()
+    };
+    this.p161GrassStats.pending = true;
+  }
+
+  _stepGrassJob() {
+    const job = this._grassJob;
+    if (!job) return;
+    const mesh = this._grassStandby;
+    const start = performance.now();
+    const m = this._gM, q = this._gQ, e = this._gE, p = this._gP, sc = this._gS, c = this._gC;
+    let worked = 0;
+    // The cursor has precisely the P16 iZ/iX traversal order and circular cutoff.
+    while (job.used < GRASS_COUNT && job.cursor.next()) {
+      const ix = job.cursor.ix, iz = job.cursor.iz;
+      const key = ix * 131072 + iz;
+      let data = this._grassCache.get(key);
+      if (data === undefined) {
+        data = this._computeGrassCell(ix, iz, job.excluded);
+        this._grassCache.set(key, data);
+      }
+      if (data !== null) {
+        e.set(0, data[3], 0);
+        q.setFromEuler(e);
+        p.set(data[0], data[1], data[2]);
+        sc.set(data[4], data[4], data[4]);
+        m.compose(p, q, sc);
+        mesh.setMatrixAt(job.used, m);
+        c.setRGB(data[5], data[6], data[7]);
+        mesh.setColorAt(job.used, c);
+        job.used++;
+      }
+      worked++;
+      if (worked >= P161_GRASS_MAX_CELLS ||
+          ((worked & 31) === 0 && performance.now() - start >= P161_GRASS_STEP_MS)) {
+        this.p161GrassStats.lastStepMs = performance.now() - start;
+        return;
+      }
+    }
+
+    // A single atomic visible-mesh swap. Only 'used' instances are rendered;
+    // no O(36k) writes of zero matrices to hide unused capacity.
+    mesh.count = job.used;
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.instanceColor.needsUpdate = true;
+    const previous = this.grassMesh;
+    previous.visible = false;
+    mesh.visible = job.used > 0;
+    this.grassMesh = mesh;
+    this._grassStandby = previous;
+    this._grassAnchor.copy(job.anchor);
+    this._grassJob = null;
+    if (this._grassCache.size > 150000) this._grassCache.clear();
+    this.p161GrassStats.pending = false;
+    this.p161GrassStats.completed++;
+    this.p161GrassStats.lastCells = job.cursor.scanned;
+    this.p161GrassStats.lastBuildMs = performance.now() - job.startedAt;
+    this.p161GrassStats.lastStepMs = performance.now() - start;
+  }
+
   update(dt) {
     this.grassMat.userData.uTime.value += dt;
     if (!this.game.structures) return;
     const p = this.game.player ? this.game.player.pos : this.game.camera.position;
     const dx = p.x - this._grassAnchor.x;
     const dz = p.z - this._grassAnchor.z;
-    if (dx * dx + dz * dz > GRASS_REBUILD_DIST * GRASS_REBUILD_DIST) this._rebuildGrass(p);
+    if (!this.p161GrassEnabled) {
+      if (dx * dx + dz * dz > GRASS_REBUILD_DIST * GRASS_REBUILD_DIST) this._rebuildGrass(p);
+      return;
+    }
+    // Teleports / rapid long traversal: discard stale invisible work safely.
+    if (this._grassJob) {
+      const jdx = p.x - this._grassJob.anchor.x;
+      const jdz = p.z - this._grassJob.anchor.z;
+      if (jdx * jdx + jdz * jdz > 35 * 35) {
+        this._grassJob = null;
+        this.p161GrassStats.restarted++;
+        this.p161GrassStats.pending = false;
+      }
+    }
+    if (!this._grassJob && dx * dx + dz * dz > GRASS_REBUILD_DIST * GRASS_REBUILD_DIST) {
+      this._startGrassJob(p);
+    }
+    if (this._grassJob) this._stepGrassJob();
   }
 }
