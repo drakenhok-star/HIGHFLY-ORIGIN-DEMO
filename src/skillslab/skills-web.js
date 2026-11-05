@@ -165,7 +165,7 @@ export class TianjieMobaSkillsLab {
     const def=this.styleDef(),price=def.cost[slot-1],stats=this.game.stats;
     return (this.style===0||this.style===3)?stats.useMagicka(price):stats.useStamina(price);
   }
-  cast(slot,requested=null,origin='touch',requestedTarget=null){
+  cast(slot,requested=null,origin='touch',requestedTarget=null,aimMode='auto'){
     const g=this.game;
     if(g.state!=='playing'||slot<1||slot>3)return false;
     if(g.stats.hp<=0)return false;
@@ -239,7 +239,7 @@ export class TianjieMobaSkillsLab {
     if(this.style===0)this.aerial(slot,dir,groundTarget);
     else if(this.style===1)this.rift(slot,dir);
     else if(this.style===2)this.guardian(slot,dir);
-    else castClaudeSkill(this,slot,dir,groundTarget);
+    else castClaudeSkill(this,slot,dir,groundTarget,{manualAim:aimMode==='manual'});
     this.animatePlayer(slot);
     this.renderHud(true);
     return true;
@@ -708,7 +708,7 @@ export class TianjieMobaSkillsLab {
           this.announce('Apuntado bloqueado: elegí un lugar libre');
           return; // no cooldown, no resource spent
         }
-        this.cast(slot,dir,'pointer',target);
+        this.cast(slot,dir,'pointer',target,a.dragged?'manual':'auto');
       },true);
       for(const type of ['pointercancel','lostpointercapture'])
         b.addEventListener(type,e=>{
