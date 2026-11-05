@@ -58,6 +58,7 @@ export class TianjieCameraLabP18 {
  }
  apply(){
   const g=this.game,p=g.player,c=this.config;
+  p.hfCameraPresetDist=c.distance; // survives native P16 reset
   p.camDist=c.distance;
   p.pitch=c.pitch*Math.PI/180;
   p.camTargetHeight=c.height;
