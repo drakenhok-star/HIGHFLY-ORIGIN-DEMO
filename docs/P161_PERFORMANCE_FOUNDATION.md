@@ -74,3 +74,30 @@ Cada experimento: **baseline -> una variable controlada -> 3 corridas -> delta P
 - ClaudeCraft 0.44.7 se consulta **solo** como biblioteca de módulos/código y activos de procedencia confirmada MIT/CC0. Recursos privados, "with project only" o KayKit SOURCE comercial no se suben a este repositorio público.
 
 **Hito para comenzar optimizaciones B–G:** informe BASELINE_P161_S23 con al menos 3 corridas por escenario, rango térmico y presentación de qué sector produce los 3 peores picos. Sin esto, cualquier mejora en FPS sería una conjetura.
+
+## 6. Primera implementación experimental P16.1 — progresiva, aislada y reversible
+
+**Implementada en la rama experimental, no desplegada en ninguna Pages.** Cada mejora se activa mediante URL del futuro **Pages de laboratorio** y no cambia el juego al abrir la página sin banderas:
+
+| Parámetro de la URL | Prueba | Qué cambia |
+|---|---|---|
+| `hf_p161_profile=1` | Solo telemetría | Añade P50/P95/P99 por sistema y reporte `experimentalGrass`/`experimentalTerrain`. |
+| `hf_p161_grass=1` | Césped por frames | Sustituye reconstrucción bloqueante por barrido de celdas temporizado con doble `InstancedMesh`, conservando césped anterior hasta intercambio completo. |
+| `hf_p161_terrain=1` | Chunks por frames | Calcula exactamente los mismos vértices/colores en lotes limitados; conserva chunk central inmediato y preprocesa vecinos en el menú. |
+
+Ejemplos de configuraciones **en la URL del futuro sitio experimental**, nunca en la P16 publicada:
+- BASE: `?hf_p161_profile=1`
+- CÉSPED: `?hf_p161_profile=1&hf_p161_grass=1`
+- TERRENO: `?hf_p161_profile=1&hf_p161_terrain=1`
+- AMBAS: `?hf_p161_profile=1&hf_p161_grass=1&hf_p161_terrain=1`
+
+**Comparación indispensable**: P16.1 BASE vs CÉSPED vs TERRENO vs AMBAS, mismo recorrido, misma calidad FLUIDO, ECO apagado, mínimo tres corridas. El benchmark en S23 decide si se conservan los cambios.
+
+Observaciones de ingeniería:
+- La reconstrucción del césped ahora usa dos buffers geométricos para evitar mostrar un campo a medio preparar. Aumenta memoria y puede demorar la aparición inicial del césped; se precalienta durante el menú y se cancela trabajo obsoleto ante teletransportes. El reporte informa recuento y duraciones.
+- El chunk de terreno central es inmediato; los restantes aparecen progresivamente. La generación de normales y la subida de buffers siguen siendo operaciones finales que pueden introducir picos: **no se declara rendimiento garantizado**.
+- Los valores `lastBuildMs` / `lastChunkMs` son duraciones de pared **incluyendo frames intermedios**, no sumas de CPU. Para trabajo de CPU por frame, comparar las secciones `scatter` y `terrain` en `timingsMs`.
+- Testeado mediante ejecución aislada de los algoritmos sin GPU: correspondencia del barrido de celdas, intercambio doble-buffer y coincidencia exacta de los 9409 vértices y colores por chunk. CI GitHub y S23 siguen pendientes de confirmación, no se afirma aprobación.
+- P16 `_rebuildGrass`, P16 `_buildChunk` y el límite de 3 chunks por frame permanecen en la ruta normal de ejecución.
+
+**Protección entre Pages:** el único deploy ya existente de la demo está asociado a `main`. P16.1 únicamente contiene código y CI. No crear un segundo deploy en el mismo repositorio ni publicar estos experimentos sobre P16; el sitio de laboratorio distinto debe tener su propio repositorio Pages.
