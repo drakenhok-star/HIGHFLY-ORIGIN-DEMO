@@ -17,6 +17,21 @@ const onAxis=a.aerialDirection22({x:1,y:0,z:0},0,0);
 assert.ok(onAxis.x>.99&&epsilon(onAxis.z,0),'zero Z must not become negative one');
 for(const dir of [straight,upward,downward,right,onAxis])
  assert.ok(epsilon(Math.hypot(dir.x,dir.y,dir.z),1),'every 3D fire vector unit length');
+const selected={
+  alive:true,group:{position:{x:0,y:9,z:-11}},hitRadius:.9
+};
+const muzzle={x:0,y:2,z:0};
+const locked=a.lockedLaunchDirection22(muzzle,selected,{range:22});
+assert.ok(locked&&locked.direction.y>.5,
+  'explicitly locked flying monster has upward 3D launch direction');
+assert.equal(a.lockedLaunchDirection22(muzzle,selected,{
+  range:22,visible:()=>false}),null,
+  'flying target behind geometry cannot bypass line-of-sight');
+assert.equal(a.lockedLaunchDirection22(muzzle,selected,{range:5}),null,
+  'out of range lock cannot bend a projectile toward the sky');
+assert.ok(a.lockedLaunchDirection22(muzzle,{
+  ...selected,alive:false},{range:22})===null,
+  'dead flying enemy cannot attract a locked projectile');
 const terrain=()=>2;
 const enemy={group:{position:{x:0,y:8,z:-8}},hitRadius:.9};
 const aim=a.enemyChest22(enemy);
@@ -43,6 +58,15 @@ for(const key of ['isCancelDrop22','targetWithinSkillVolume22','aerialDirection2
                   'directionToTarget22','enemyChest22'])assert.ok(skills.includes(key));
 assert.ok(skills.includes('root.appendChild(this.cancelBtn)'),'fixed X anchored to screen');
 assert.ok(skills.includes('if(shouldCancel)return'),'X cancel never triggers cast');
+assert.ok(skills.includes("aerial(slot,dir,groundTarget,{manualAim:aimMode==='manual'})"),
+  'explicit swipe mode passes through to aerial Guinevere');
+assert.ok(skills.includes('lockedLaunchDirection22(from,g.targeting.locked'),
+  'Guinevere honors explicit 3D lock over soft target');
+assert.ok(claude.includes('explicit||chooseLaunchVector'),
+  'Fireball locks first and falls back to soft aim only if no explicit lock');
+assert.ok(claude.includes('options.manualAim?'),
+  'a manual skyward gesture cannot be redirected to a nearby ground target');
+
 assert.ok(guide.includes('lastArcOrigin.distanceToSquared(origin)'),
  'Guinevere path must redraw when player moves while destination stays fixed');
 assert.ok(guide.includes('this.aerialBeam.visible=true'),'aerial tracer must visualize height');
