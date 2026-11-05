@@ -6,6 +6,7 @@ import {AIR_CHAIN_P14,advanceComboClock,airStrikeProfile} from './air-chain-p14.
 import {strikeProfile,resolveCombatContext,reactionPolicy,pickMeleeTarget,
   canCancelAction,FURY_CANCEL_P15} from './fury-combat-p15.js';
 import {finisherInput,finisherAllowed} from './fury-finisher-p15.js';
+import {nextSwing,confirmedDamage,commitConfirmedHit} from './hit-confirm-p16.js';
 
 const MELEE_CD = 0.5;
 const CAST_CD = 0.6;
@@ -47,6 +48,9 @@ export class Combat {
     this._meleeStep=1;
     this._meleeContext='ground';
     this._finisher=null;
+    this.lastConfirmedHit=false;
+    this.lastSwingStep=0;
+    this.lastSwingReason='';
     this.projectiles = [];
     this.projGeo = new THREE.SphereGeometry(0.22, 10, 8);
     this.projMat = new THREE.MeshStandardMaterial({
@@ -222,14 +226,16 @@ export class Combat {
       if(g.player.dashT<0.065){this.attackBuffer=Math.max(this.attackBuffer,.18);return;}
       g.player.dashT=-1;
     }
-    const step=g.p7Enabled ? comboStep(this.comboStep,this.comboTimer>0)
+    const step=g.p16Enabled?nextSwing(this.comboStep,this.comboTimer>0):
+      g.p7Enabled ? comboStep(this.comboStep,this.comboTimer>0)
       : g.p6Enabled ? (this.comboTimer>0 ? this.comboStep%4+1 : 1) : 1;
     const cost=g.p6Enabled && step===4 ? 10 : g.p6Enabled && step===3 ? 7 : 6;
     if(!g.stats.useStamina(cost)){
       g.hud.notify('Energía insuficiente');return;
     }
-    this.comboStep=step;
+    if(!g.p16Enabled)this.comboStep=step;
     this._meleeStep=step;
+    if(g.p16Enabled){this.lastSwingStep=step;this.lastConfirmedHit=false;this.lastSwingReason='swing-pending';}
     // Snapshot the joystick ON the fourth ATK, never on the delayed damage frame.
     this._finisher=g.p15Enabled && step===4?finisherInput(g.input,g.player.yaw):null;
     const context=g.p15Enabled?resolveCombatContext({grounded:g.player.onGround,
@@ -237,8 +243,8 @@ export class Combat {
       runSpeed:Math.hypot(g.player.vel.x,g.player.vel.z)}):'ground';
     const profile=g.p15Enabled?strikeProfile(step,context):null;
     this._meleeContext=context;
-    this.comboTimer=g.p14Enabled?1.65:g.p7Enabled?1.45:0.92;
-    if(g.p14Enabled && !g.player.onGround)this.keepAirCombo('air-attack');
+    if(!g.p16Enabled)this.comboTimer=g.p14Enabled?1.65:g.p7Enabled?1.45:0.92;
+    if(g.p14Enabled && !g.player.onGround && !g.p16Enabled)this.keepAirCombo('air-attack');
     this.meleeCd=profile?profile.cooldown:
       g.p7Enabled?(step===4?0.42:0.34):g.p6Enabled ? (step===4?0.47:0.32) : MELEE_CD;
     this.attackBuffer=0;
@@ -283,6 +289,8 @@ export class Combat {
       else forward.copy(g.p7Enabled?player.getCombatForward():player.getForward());
     }
     const targets = this.collectTargets();
+    const priorConfirmedStep=this.comboStep;
+    let connected=false;
     for (let i = 0; i < targets.length; i++) {
       const e = targets[i];
       const to = this._v1.copy(e.group.position).sub(player.pos);
@@ -308,7 +316,11 @@ export class Combat {
       }else{
         this._hitImpulse.copy(forward).multiplyScalar(g.p6Enabled&&this._meleeStep===4?5:3);
       }
+      const beforeHP=e.hp;
       e.takeDamage(dmg,this._hitImpulse);
+      const realHit=confirmedDamage(beforeHP,e.hp);
+      if(g.p16Enabled && !realHit)continue;
+      connected=connected||realHit;
       if(g.p15Enabled&&e.alive){
         const reaction=reactionPolicy({type:e.type,boss:!!e.boss,radius:e.hitRadius,
           step:this._meleeStep,airborne:aerial,remainingHp:e.hp});
@@ -331,6 +343,12 @@ export class Combat {
       const fluid=g.p15Enabled && g.performanceP2?.preset==='FLUID';
       g.effects.spawnBurst(chest,g.p6Enabled&&this._meleeStep===4?'#ffd09c':'#b03030',
         fluid?(this._meleeStep===4?7:4):(g.p6Enabled?this._meleeStep===4?12:6:8));
+    }
+    if(g.p16Enabled){
+      this.lastConfirmedHit=connected;
+      this.lastSwingReason=connected?'confirmed-damage':'miss';
+      this.comboStep=commitConfirmedHit(priorConfirmedStep,this._meleeStep,connected);
+      if(connected){this.comboTimer=1.60;this.airComboGrace=0;}
     }
   }
 
@@ -580,6 +598,7 @@ export class Combat {
     this.meleeHitT = -1;
     this.comboStep=0;this.comboTimer=0;this.airComboGrace=0;this.attackBuffer=0;this._meleeStep=1;this._meleeContext='ground';this._finisher=null;
     this._attackTarget=null;this._castTarget=null;
+    this.lastConfirmedHit=false;this.lastSwingStep=0;this.lastSwingReason='';
     for (const id in this.shoutCooldowns) this.shoutCooldowns[id] = 0;
     this.learnedShouts = ['fus'];
     this.equippedShout = 'fus';
