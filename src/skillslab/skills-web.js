@@ -3,7 +3,7 @@ import { hasLineOfSight, insideBlockingObject } from '../combat/targeting-p6.js'
 import { TianjieSkillVfx } from './lab-vfx.js';
 import { TianjieAimGuide, AIM_PROFILES } from './aim-guide-p16.js';
 import { castClaudeSkill } from './claudecraft-kit-p16.js';
-import {aerialDirection22,enemyChest22,directionToTarget22,targetWithinSkillVolume22,isCancelDrop22,sweptProjectileHit22,lockedLaunchDirection22} from './aerial-aim-l22.js';
+import {aerialDirection22,enemyChest22,directionToTarget22,targetWithinSkillVolume22,isCancelDrop22,sweptProjectileHit22,lockedLaunchDirection22,isFlying22,flyingAutoTarget22} from './aerial-aim-l22.js';
 
 // FURY P16 hit-confirm and ATK gesture are authoritative for movement and combat.
 // This skill lab never replaces g.combat.melee or g.player.update.
@@ -112,20 +112,24 @@ export class TianjieMobaSkillsLab {
       return request.clone().setY(0).normalize();
     }
     const g=this.game,p=g.player;
-    const target=g.targeting?.get(maxRange);
-    if(target?.alive){
-      if((this.style===0||this.style===3) &&
-         AIM_PROFILES[this.style][slot-1].kind==='line'){
-        const chest=enemyChest22(target);
-        const muzzle={x:p.pos.x,y:p.pos.y+1.25,z:p.pos.z};
-        const flight=directionToTarget22(muzzle,chest);
-        if(flight)return vec(flight.x,flight.y,flight.z);
-      }
-      const d=target.group.position.clone().sub(p.pos).setY(0);
-      if(d.lengthSq()>0.01)return d.normalize();
-    }
     const f=p.getCombatForward();
-    return f.lengthSq()>0.01?f.normalize():p.getForward();
+    const forward=f.lengthSq()>0.01?f.normalize():p.getForward();
+    const projectile=(this.style===0||this.style===3)&&
+      AIM_PROFILES[this.style][slot-1].kind==='line';
+    // NO automatic aim for ground enemies or ground-placed / melee skills.
+    if(projectile){
+      const muzzle={x:p.pos.x,y:p.pos.y+1.25,z:p.pos.z};
+      const terrain=(x,z)=>g.terrain.getHeight(x,z);
+      const visible=(_e,q)=>hasLineOfSight(g,muzzle,q);
+      const locked=g.targeting?.locked;
+      const explicit=locked&&isFlying22(locked,terrain)&&
+        g.targeting.valid(locked,maxRange,true)?
+        lockedLaunchDirection22(muzzle,locked,{range:maxRange,visible}):null;
+      const auto=explicit||flyingAutoTarget22(muzzle,forward,
+        g.combat.collectTargets(),terrain,{range:maxRange,visible});
+      if(auto)return vec(auto.direction.x,auto.direction.y,auto.direction.z);
+    }
+    return forward;
   }
   candidates(center,range,dir=null,halfAngle=180,verticalRange=2.6){
     const g=this.game,origin={x:center.x,y:center.y+1.2,z:center.z};
@@ -190,8 +194,8 @@ export class TianjieMobaSkillsLab {
     const pr=AIM_PROFILES[this.style]?.[slot-1];
     let groundTarget=null;
     if(pr?.kind==='zone' && !(slot===2&&this.canRecast())){
+      // Ground circles follow the player's AIM, never a locked ground enemy.
       const raw=requestedTarget?.clone() ||
-        this.game.targeting?.get(pr.range)?.group?.position?.clone() ||
         g.player.pos.clone().addScaledVector(dir,pr.range*.76);
       const delta=raw.clone().sub(g.player.pos).setY(0);
       if(delta.length()>pr.range)delta.setLength(pr.range);
@@ -754,13 +758,8 @@ export class TianjieMobaSkillsLab {
     this.aimGuide.begin(this.style,slot,recastProfile);
     this.preview=this.aimGuide.root;
     let dir=this.aimDirection(null,this.aimGuide.profile.range||17,slot);
-    if((this.style===0||this.style===3)&&slot===1){
-      const e=this.game.targeting?.get(this.aimGuide.profile.range||17);
-      const p=this.game.player.pos,enemy=e?enemyChest22(e):null;
-      const launch={x:p.x,y:p.y+1.25,z:p.z};
-      const v=directionToTarget22(launch,enemy);
-      if(v)dir=vec(v.x,v.y,v.z);
-    }
+    // Start with airborne-only lock/assist from aimDirection; never snap to
+    // the floor targets merely because they're currently targeted.
     this.aim.dir=dir;
     this.refreshPreview();
   }
@@ -771,9 +770,8 @@ export class TianjieMobaSkillsLab {
     const dir=a.dir||this.aimDirection(null,prof.range||17);
     let target=a.target;
     if(prof.kind==='zone'&&!target){
-      const lock=this.game.targeting?.get(prof.range);
-      if(lock?.alive&&lock.group)target=lock.group.position.clone();
-      else target=p.pos.clone().addScaledVector(dir,
+      // Terrain telegraphs always start from the player's own direction.
+      target=p.pos.clone().addScaledVector(dir,
         Math.min(prof.range*.76,prof.range<9?5.4:13));
     }
     const result=this.aimGuide.updateAim(dir,target);
