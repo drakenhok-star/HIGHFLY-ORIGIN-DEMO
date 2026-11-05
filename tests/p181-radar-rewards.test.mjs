@@ -23,7 +23,7 @@ const packs=[
 const game={
  p18Enabled:true,p812Enabled:true,p810Enabled:true,state:'playing',
  livingWorld:{quest:{status:'active',progress:1}},
- player:{pos:{x:0,z:40},yaw:0},
+ player:{pos:{x:65,z:70},yaw:0},
  enemies:{packs},npcs:{list:[{id:'bjorn',pos:{x:3,z:43},group:{position:{x:3,z:43}}}]},
  quests:{getState(id){return id==='p18_frontier'?game.livingWorld.quest.status:'active';}},
  worldMapP34:null
