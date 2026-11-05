@@ -59,13 +59,11 @@ export class Enemies {
     this.trainingLab=!!document.querySelector(
       'script[type="module"][src$="/src/skillslab/boot.js"]'
     ) || location.pathname.endsWith('/lab.html');
-    // Default: THREE nonaggressive, real-damage skeletons.
-    // Optional QA query ?hf_targets=1 starts with a single bot.
-    this.trainingCount = this.trainingLab &&
-      new URLSearchParams(location.search).get('hf_targets') !== '1' ? 3 : 1;
-    // Optional L22 aerial collision target: one real rig floats 4.5u above ground.
-    // It is a TRAINING SIMULATOR, not an animal or a world-spawning flying mob.
-    this.trainingFlight=this.trainingLab && new URLSearchParams(location.search).has('hf_fly');
+    // L24: ONE laboratory and ONE island scene, always 3 grounded skeleton
+    // training enemies on one side + ONE real flying Quaternius dragon opposite.
+    // No ?hf_fly toggle, no duplicate environments and no enemy AI or rewards.
+    this.trainingCount=this.trainingLab?3:0;
+    this.trainingFlight=false;
     this.geoCache = new Map();
     this.sackMat = new THREE.MeshStandardMaterial({ color: 0x7a5c34, roughness: 0.8, metalness: 0, emissive: 0xc9a86a, emissiveIntensity: 0.45 });
     this.knotMat = new THREE.MeshStandardMaterial({ color: 0x5a4426, roughness: 1, metalness: 0 });
@@ -126,8 +124,8 @@ export class Enemies {
   }
 
   spawnAll() {
-    // In training lab there are exactly 1 or 3 actual skeleton rig targets.
-    // P16 normal game at / is entirely unaffected.
+    // Only isolated Skills Lab: 3 grounded skeleton rigs + one actual dragon.
+    // Principal P16 world spawning at / remains entirely unaffected.
     if (this.trainingLab) {
       this.packs = [];
       this.configureTrainingTargets(this.trainingCount);
@@ -150,23 +148,31 @@ export class Enemies {
 
   configureTrainingTargets(count = 1) {
     if (!this.trainingLab) return false;
-    this.trainingCount = count === 3 ? 3 : 1;
+    this.trainingCount = 3; // Fixed unified four-enemy island setup.
     // Remove only training targets, never a shared enemy object or P16 world entity.
     for (const e of this.list) if (e.training && !e.removed) this._removeEnemy(e);
     this.list = this.list.filter(e => !e.training);
+    // Combat.collectTargets() must not keep a removed training dragon separately.
+    this.dragon=null;
     this.pendingRespawns.length = 0;
     this.bolts.length = 0;
     this.packs.length = 0;
     const p = this.game.player;
     const forward = p.getForward();
     const right = new THREE.Vector3(-forward.z, 0, forward.x);
-    const offsets = this.trainingCount === 1 ? [[6.7, 0]]
-      : [[6.8, -3.0], [7.2, 0], [6.8, 3.0]];
+    // Three separated dummies on the FRONT side of the SAME flat island.
+    const offsets=[[8.3,-3.8],[8.9,0],[8.3,3.8]];
     offsets.forEach(([distance,side],i) => {
-      const spot = p.pos.clone().addScaledVector(forward, distance)
-        .addScaledVector(right, side);
-      this._spawnTrainingDummy(spot.x, spot.z, i);
+      const spot=p.pos.clone().addScaledVector(forward,distance)
+        .addScaledVector(right,side);
+      this._spawnTrainingDummy(spot.x,spot.z,i);
     });
+    // Opposite side, still on the same island. 15m lateral separation from
+    // spawn keeps short 3D projectiles in range, while the two areas do not
+    // overlap. Spawn relative to original player for reproducible resets.
+    const dragonSpot=p.pos.clone().addScaledVector(forward,-14.3)
+      .addScaledVector(right,1.3);
+    this._spawnTrainingDragon(dragonSpot.x,dragonSpot.z,p.pos);
     return true;
   }
 
@@ -177,11 +183,8 @@ export class Enemies {
     const e=this._base('training','OBJETIVO '+(index+1)+' · COMBATE',2400,.9,px,pz);
     this._attachRig(e,'skeleton_warrior');
     e.training=true;e.aggroR=0;e.attackRange=0;e.speed=0;e.dmg=0;
-    e.trainingFlight=!!this.trainingFlight && index===2;
-    if(e.trainingFlight){
-      e.name='OBJETIVO AÉREO · PRUEBA 3D';
-      e.group.position.y+=4.5;e.home.y+=4.5;
-    }
+    // All three skeletons stay ON THE GROUND; no more fake airborne skeleton.
+    e.trainingFlight=false;e.flightOffset=0;
     e.hitPending=-1;e.boltPending=-1;e.attackCd=99;
     e.trainingLastHit=-1e6;e.hitstunT=0;
     e.rig.play('Idle');
@@ -200,6 +203,38 @@ export class Enemies {
         mat.m.emissive.setHex(0xff3030);mat.m.emissiveIntensity=.9;
       }
     };
+    return e;
+  }
+
+  _spawnTrainingDragon(x,z,face){
+    // Real pre-existing Quaternius Dragon Evolved GLB + Flying_Idle clip.
+    // Stays in the lab, is damageable, never chases, attacks, dies, drops loot
+    // or awards XP. NO placeholder geometry, no duplicate separate spawner.
+    const e=this._base('dragon','DRAGÓN VOLADOR · ENTRENAMIENTO',
+      8000,2.8,x,z);
+    this._attachRig(e,'dragon');
+    e.training=true;e.trainingDragon=true;e.trainingFlight=true;
+    e.flightOffset=7.0;
+    e.group.position.y=this._groundAt(x,z)+e.flightOffset;
+    e.home.copy(e.group.position);
+    e.yaw=Math.atan2(face.x-x,face.z-z);
+    e.group.rotation.y=e.yaw;
+    e.aggroR=0;e.attackRange=0;e.speed=0;e.dmg=0;
+    e.boss=true;e.hitPending=-1;e.boltPending=-1;e.attackCd=99;
+    e.trainingLastHit=-1e6;e.hitstunT=0;
+    e.rig.play('Flying_Idle',{timeScale:.45});
+    e.takeDamage=(amount,_impulse)=>{
+      const damage=Math.max(0,Math.min(8000,Number(amount)||0));
+      if(!Number.isFinite(damage)||damage<=0)return;
+      e.hp=Math.max(1,e.hp-damage);
+      e.trainingLastHit=this.game.time.elapsed;
+      e.flashT=.12;
+      e.hitstunT=.2;
+      for(const mat of e.mats){
+        mat.m.emissive.setHex(0xff3030);mat.m.emissiveIntensity=.9;
+      }
+    };
+    this.dragon=e;
     return e;
   }
 
@@ -979,7 +1014,7 @@ export class Enemies {
         e.hitPending=-1;e.boltPending=-1;
         const pos=e.group.position;
         pos.x+=e.kbVel.x*dt;pos.z+=e.kbVel.z*dt;
-        const ground=this._groundAt(pos.x,pos.z)+(e.trainingFlight?4.5:0);
+        const ground=this._groundAt(pos.x,pos.z)+(e.flightOffset||0);
         if(e.kbVel.y>0||pos.y>ground+.015){
           pos.y+=e.kbVel.y*dt;e.kbVel.y-=26*dt;
           if(pos.y<=ground){pos.y=ground;e.kbVel.y=0;}
@@ -994,7 +1029,10 @@ export class Enemies {
           pos.z+=(e.home.z-pos.z)*Math.min(1,2.8*dt);
           e.kbVel.set(0,0,0);
         }
-        if(e.hitstunT<=0)e.rig.play('Idle');
+        if(e.trainingDragon){
+          // Never stomp the airborne hover clip with a ground Idle animation.
+          if(e.hitstunT<=0)e.rig.play('Flying_Idle',{timeScale:.45});
+        }else if(e.hitstunT<=0)e.rig.play('Idle');
         e.rig.update(dt);
         continue;
       }
