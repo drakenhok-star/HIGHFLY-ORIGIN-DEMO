@@ -499,6 +499,65 @@ jobs:
           echo "P18.2 verified exact f964d0020e59dfbd77c377f38acb7125ee3e8b66 at /p182/"
           echo "All previous snapshots preserved, Skill Lab and Vercel untouched"
 
+      - name: Add P18.2.1 Quest Marker Lifecycle (preserve P18.2 and previous)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags --depth=1 origin refs/heads/p1821-quest-marker-lifecycle-20261105
+          test "$(git rev-parse FETCH_HEAD)" = "5fd9e844c313c7d856739e5fae20a1b924a3d31e"
+          mkdir -p .p1821-validate .site/p1821
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets tests scripts docs | tar -x -C .p1821-validate
+          (
+            cd .p1821-validate
+            test -s index.html
+            test -s src/ui/world-map-p34.js
+            test -s src/world/living-world-runtime-p18.js
+            test -s src/world/terrestrial-habitat-p182.js
+            test -s tests/p1821-quest-marker-lifecycle.test.mjs
+            test -s docs/P183_CLAUDECRAFT_ECOLOGY_DUNGEONS_CONTENT_AUDIT.md
+            find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+              node --input-type=module --check < "$file"
+            done
+            node tests/premium-hud.test.mjs
+            node tests/p6-integral.test.mjs
+            node tests/p7-fury.test.mjs
+            node tests/p810-integral.test.mjs
+            node tests/p812-polish.test.mjs
+            node tests/p13-fury.test.mjs
+            node tests/p14-air-chain.test.mjs
+            node tests/p15-fury.test.mjs
+            node tests/p15-finisher.test.mjs
+            node tests/p15-interruption.test.mjs
+            node tests/p16-hit-confirm.test.mjs
+            node tests/p161-performance.test.mjs
+            node tests/p161-grass-budget.test.mjs
+            node tests/p161-terrain-budget.test.mjs
+            node tests/p161-training-ui.test.mjs
+            node tests/p163-render-governor.test.mjs
+            node tests/p17-rpg-core.test.mjs
+            node tests/p18-world-registry.test.mjs
+            node tests/p18-living-ecology.test.mjs
+            node tests/p18-playable-integration.test.mjs
+            node tests/p181-radar-rewards.test.mjs
+            node tests/p182-hud-habitat.test.mjs
+            node tests/p1821-quest-marker-lifecycle.test.mjs
+            node scripts/p14-mountain-scan.mjs
+            node scripts/audit_animation_p6.mjs
+            if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
+              echo "Restricted assets found: abort P18.2.1";exit 1
+            fi
+            cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets ../.site/p1821/
+          )
+          touch .site/p1821/.nojekyll
+          test -s .site/p1821/index.html
+          test -s .site/p16/index.html
+          test -s .site/p161/index.html
+          test -s .site/p163/index.html
+          test -s .site/p18/index.html
+          test -s .site/p181/index.html
+          test -s .site/p182/index.html
+          echo "P18.2.1 marker fix pinned 5fd9e844c313c7d856739e5fae20a1b924a3d31e published at /p1821/, older games kept"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
