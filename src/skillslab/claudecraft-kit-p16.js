@@ -37,6 +37,7 @@ export function castClaudeSkill(lab,slot,direction,target=null){
         chosen.direction.z).normalize();
       const mesh=fx.energyBolt(3);
       mesh.position.copy(muzzle);
+      mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),shot);
       g.scene.add(mesh);
       lab.projectiles.push({
         mesh,dir:shot,speed:31,remaining:22,style:3,
