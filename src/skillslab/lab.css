@@ -5,6 +5,23 @@
   -webkit-user-select:none;user-select:none;touch-action:none;
 }
 #hf-tianjie-skills-lab.playing {display:block}
+/* L22 camera menu is moved to the NATIVE P9 settings overlay. */
+body.hf-skills-lab #hf-p18-camera-dock{display:none!important}
+/* The cancel drop is finger-operated while the skill owns pointer capture. */
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-cancel{
+ position:fixed;top:max(8px,env(safe-area-inset-top));
+ right:max(14px,env(safe-area-inset-right));left:auto;
+ transform:none;min-height:56px;min-width:66px;z-index:115;
+ font-size:0!important;border:2px solid #ff8fa4;border-radius:50%;
+ background:radial-gradient(circle,#ba365b,#451333 78%);box-shadow:0 0 19px #ff609677
+}
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-cancel::after{
+ content:'✕';font-size:29px;font-weight:900;line-height:1
+}
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-cancel.hf-cancel-hover{
+ background:#f05e84;transform:scale(1.12);box-shadow:0 0 28px #ffb6cb
+}
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-cancel[hidden]{display:none!important}
 #hf-tianjie-skills-lab .hf-lab-top {
   position:absolute;top:max(6px,env(safe-area-inset-top));left:50%;
   transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;
