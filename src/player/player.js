@@ -4,6 +4,7 @@ import { resolveDashDirection,relativeDodgeClip,worldMove,angleTo,wrapAngle } fr
 import { FuryTraversalP13 } from './fury-traversal-p13.js';
 import { landingRock } from './fury-surfaces-p13.js';
 import { canCancelAction } from '../combat/fury-combat-p15.js';
+import { P16_RESPONSE } from '../combat/hit-confirm-p16.js';
 
 const _tmpV1 = new THREE.Vector3();
 const _tmpV2 = new THREE.Vector3();
@@ -84,6 +85,7 @@ export class Player {
     this._dashFollowupT=0;
     this.dodgeInvulnT=0;
     this._attackFade=.06;
+    this._attackOverlay=false;
     this.torchOn = false;
 
     this.group = new THREE.Group();
@@ -329,6 +331,7 @@ export class Player {
       this.dodgeInvulnT=Math.max(this.dodgeInvulnT,Math.min(.125,opts.duration||.15));
     }
     if(this.game.p15Enabled){
+      if(this.game.p16Enabled)this.rig.stopUpperBody?.(.06);
       this._dashFollowupT=.36;
       // The hit marker has already resolved before recovery-cancel is permitted.
       if(this.attackT>=0){this.attackT=-1;this._attackAnimStarted=false;}
@@ -452,7 +455,7 @@ export class Player {
       this._moveDir.set(tx,0,tz).normalize();
       this._lastMoveDir.copy(this._moveDir);
     } else this._moveDir.set(0,0,0);
-    const k = 1 - Math.exp(-(g.p812Enabled?17:10) * dt);
+    const k = 1 - Math.exp(-(g.p16Enabled?P16_RESPONSE.acceleration:(g.p812Enabled?17:10)) * dt);
     this.vel.x += (tx - this.vel.x) * k;
     this.vel.z += (tz - this.vel.z) * k;
 
@@ -672,10 +675,20 @@ export class Player {
         this.rig.play(this.dashClip,{once:true,fade:0.04,timeScale:scale});
       }
     } else if (this.attackT >= 0 && this.attackT < 1) {
-      if (!this._attackAnimStarted) {
-        this._attackAnimStarted = true;
-        const name=this.rig.clips.has(this.attackClip) ? this.attackClip : ATTACK_CLIP;
-        this.rig.play(name,{once:true,fade:this.game.p15Enabled?this._attackFade:0.06,
+      const name=this.rig.clips.has(this.attackClip)?this.attackClip:ATTACK_CLIP;
+      const overlay=!!(this.game.p16Enabled && this.onGround && horizSpeed>0.85 &&
+        this.rig.supportsUpperBody?.(name));
+      if(overlay){
+        if(horizSpeed>7)this.rig.play('Running_A',{timeScale:Math.min(1.6,horizSpeed/9)});
+        else this.rig.play('Walking_A',{timeScale:Math.max(.8,horizSpeed/6)});
+      }
+      if(!this._attackAnimStarted || this._attackOverlay!==overlay){
+        this._attackAnimStarted=true;
+        if(this._attackOverlay && !overlay)this.rig.stopUpperBody?.(.06);
+        this._attackOverlay=overlay;
+        if(overlay)this.rig.playUpperBody(name,{fade:.045,
+          timeScale:this.actionTimeScale(name)});
+        else this.rig.play(name,{once:true,fade:this.game.p15Enabled?this._attackFade:.06,
           timeScale:this.actionTimeScale(name)});
       }
     } else if (this.castT >= 0 && this.castT < 1) {
@@ -705,6 +718,9 @@ export class Player {
       this.rig.play('Idle');
     }
 
+    if(this.game.p16Enabled && (this.attackT<0 || this.dashT>=0) && this._attackOverlay){
+      this.rig.stopUpperBody?.(.055);this._attackOverlay=false;
+    }
     this.rig.update(dt);
     if(this.fury)this.fury.animate(dt);
   }
@@ -853,6 +869,7 @@ export class Player {
     this.dashClip=null;this._dashAnimStarted=false;
     this._jumpAnimT=0;this._jumpAnimStarted=false;
     this._queuedDashT=0;this._dashFollowupT=0;this._attackFade=.06;this.dodgeInvulnT=0;
+    this._attackOverlay=false;this.rig.stopUpperBody?.(0);
     this.torchOn = false;
     this.updateTorch();
     this.faceVillage();
