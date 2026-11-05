@@ -6,12 +6,13 @@ const KEY_P13 = 'highfly_p13_save';
 const KEY_P14 = 'highfly_p14_save';
 const KEY_P15 = 'highfly_p15_save';
 const KEY_P16 = 'highfly_p16_save';
+const KEY_P18 = 'highfly_p18_save';
 
 export class SaveSys {
   constructor(game) {
     this.game = game;
     this.autosaveTimer = 0;
-    this.key=game.p16Enabled?KEY_P16:game.p15Enabled?KEY_P15:game.p14Enabled?KEY_P14:game.p13Enabled?KEY_P13:game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
+    this.key=game.p18Enabled?KEY_P18:game.p16Enabled?KEY_P16:game.p15Enabled?KEY_P15:game.p14Enabled?KEY_P14:game.p13Enabled?KEY_P13:game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
   }
 
   save() {
@@ -33,6 +34,7 @@ export class SaveSys {
         .map((c, i) => (c.opened ? i : -1))
         .filter((i) => i >= 0),
       dragonDead: !dragon || !dragon.alive,
+      ...(g.p18Enabled && g.livingWorld ? {livingWorld:g.livingWorld.serialize()} : {}),
     };
     localStorage.setItem(this.key, JSON.stringify(data));
     g.hud.notify('Partida guardada');
@@ -40,6 +42,7 @@ export class SaveSys {
 
   hasSave() {
     return localStorage.getItem(this.key) !== null ||
+      (this.game.p18Enabled && localStorage.getItem(KEY_P16)!==null) ||
       (this.game.p16Enabled && localStorage.getItem(KEY_P15)!==null) ||
       (this.game.p15Enabled && localStorage.getItem(KEY_P14)!==null) ||
       (this.game.p14Enabled && localStorage.getItem(KEY_P13)!==null) ||
@@ -52,6 +55,7 @@ export class SaveSys {
   loadRaw() {
     // First P7 visit reads P6 progress, but writes ONLY P7: original never overwritten.
     const raw = localStorage.getItem(this.key) ||
+      (this.game.p18Enabled?localStorage.getItem(KEY_P16):null) ||
       (this.game.p16Enabled?localStorage.getItem(KEY_P15):null) ||
       (this.game.p15Enabled?localStorage.getItem(KEY_P14):null) ||
       (this.game.p14Enabled?localStorage.getItem(KEY_P13):null) ||
@@ -76,6 +80,7 @@ export class SaveSys {
     g.stats.applyData(d.stats);
     g.inventory.applyData(d.inv);
     g.quests.applyData(d.quests);
+    if(g.p18Enabled)g.livingWorld?.applyData(d.livingWorld);
     if (g.combat && g.combat.applyData) g.combat.applyData(d.combat);
     for (const i of d.chestsOpened || []) {
       const chest = g.structures.chests[i];
