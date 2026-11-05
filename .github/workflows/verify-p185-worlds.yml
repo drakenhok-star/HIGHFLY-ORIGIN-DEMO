@@ -1,0 +1,26 @@
+name: HIGHFLY P18.5 World 2 Contracts
+on:
+  push:
+    branches:
+      - p185-multiworld-portals-gathering-20261105
+    paths:
+      - src/world/world-zones-p185.js
+      - tests/p185-world-portals.test.mjs
+      - docs/P185_MULTI_WORLD_PORTALS_GATHERING.md
+      - .github/workflows/verify-p185-worlds.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  world-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test distinct world + gated portal + gathering data
+        run: node --experimental-default-type=module tests/p185-world-portals.test.mjs
+      - name: Verify world module syntax
+        run: node --experimental-default-type=module --check src/world/world-zones-p185.js
