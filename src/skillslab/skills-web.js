@@ -624,7 +624,7 @@ export class TianjieMobaSkillsLab {
         <span id="hf-lab-readout">S1 · S2 · S3 NUEVAS | S4 WULD ORIGINAL</span>
         <button type="button" id="hf-lab-train">3 BLANCOS + 🐉</button>
         <button type="button" id="hf-lab-reset">REINICIAR</button>
-        <button type="button" id="hf-l23-focus" aria-expanded="false" aria-label="Enfocar monstruo volador">◎ AÉREO</button>
+        <button type="button" id="hf-l23-focus" aria-expanded="false" aria-label="Enfocar monstruo volador">◎ ENFOCAR</button>
 
         <button type="button" id="hf-lab-cancel" hidden>CANCELAR</button>
       </div>
@@ -704,7 +704,7 @@ export class TianjieMobaSkillsLab {
     if(e&&(!e.alive||!e.group||e.removed))this.focusTarget=null;
     const f=this.focusTarget;
     const flying=f&&this.airRupture.isFlyer(f);
-    this.focusBtn.textContent=f?(flying?'◎ AÉREO':'◎ EN TIERRA'):'◎ AÉREO';
+    this.focusBtn.textContent=f?(flying?'◎ DRAGÓN':'◎ TIERRA'):'◎ ENFOCAR';
     this.focusBtn.title=f?(flying?'ATK dispara al volador enfocado':'Dragón derribado: ATK terrestre FURY'):'Enfocar monstruo volador';
     this.focusBtn.classList.toggle('active',!!f);
     this.focusBtn.setAttribute('aria-expanded',String(!!this.focusPanelOpen));
