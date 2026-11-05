@@ -698,7 +698,8 @@ export class Enemies {
       // All ground mobs (wolf/draugr) stay on land even when aggro, wandering
       // or being knocked back. Slide along shore if only one axis is valid.
       const prevX=pos.x,prevZ=pos.z;
-      const next=groundedStepP182(g.terrain,prevX,prevZ,stepX,stepZ);
+      const next=groundedStepP182(g.terrain,prevX,prevZ,stepX,stepZ,
+        e._p182Step||(e._p182Step={x:prevX,z:prevZ,blocked:false}));
       pos.x=next.x;pos.z=next.z;
       if(next.blocked){
         e.kbVel.x=0;e.kbVel.z=0;
