@@ -84,12 +84,12 @@ export class ClaudeVfxL26{
  frostBind(enemy){
   if(!enemy?.group)return;
   const base=enemy.group.position.clone();
-  this.fx.signature.iceShards(base,.9,'#d1f7ff',1.5,6);
+  this.fx.signature.iceShards(base,.9,'#d1f7ff',1.8,6);
   const halo=new THREE.Mesh(new THREE.TorusGeometry(.83,.085,5,28),
     mat('#72cfff',.88));
   halo.position.copy(base).add(V(0,.39,0));
   halo.rotation.x=Math.PI*.5;
-  this.fx.add(halo,1.18,'l26-frost-halo');
+  this.fx.add(halo,1.8,'l26-frost-halo');
  }
 
  /** Fireball's launch already uses the actual ported ico core + flame shells. */
@@ -155,9 +155,9 @@ export class ClaudeVfxL26{
     hit.clone().addScaledVector(f,-.25).addScaledVector(right,-.12),
     hit.clone().addScaledVector(f,.65)
   ];
-  this.fx.signature.path(pts,critical?'#e5a2ff':'#92d5ff',.41,.13);
+  this.fx.signature.path(pts,critical?'#e5a2ff':'#a48de6',.41,.13);
   this.fx.signature.shadowStrike(enemy.group.position.clone(),forward,
-    critical?'#bb6bff':'#8ab7df',.48);
+    critical?'#bb6bff':'#6e599a',.48);
   this.fx.sparks(hit,critical?'#d08aff':'#cdeaff',critical?17:9,1.8,.31,.08);
  }
 
