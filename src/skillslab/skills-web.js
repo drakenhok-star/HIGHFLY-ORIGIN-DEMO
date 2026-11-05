@@ -49,6 +49,7 @@ export class TianjieMobaSkillsLab {
     this.guardianDash=null;
     this.focusTarget=null; // L23: only user-selected monster gets opt-in aerial focus.
     this.focusPanelOpen=false;
+    this.focusEditor=null;
     this.aim=null;
     this.preview=null;
     this.aimPoint=null;
@@ -679,6 +680,7 @@ export class TianjieMobaSkillsLab {
     const def=this.styleDef();
     for(const b of this.root.querySelectorAll('[data-style]'))
       b.classList.toggle('active',Number(b.dataset.style)===this.style);
+    this.ensureFocusEditor();
     this.syncControlAnchors();
     this.readout.textContent=def.name+' · '+((this.style===0||this.style===3)?'MANÁ':'ENERGÍA')+
       (this.style===2&&this.guardianPull?' · S3 SEGUNDA FASE DISPONIBLE':'')+
@@ -704,7 +706,7 @@ export class TianjieMobaSkillsLab {
     if(e&&(!e.alive||!e.group||e.removed))this.focusTarget=null;
     const f=this.focusTarget;
     const flying=f&&this.airRupture.isFlyer(f);
-    this.focusBtn.textContent=f?(flying?'◎ DRAGÓN':'◎ TIERRA'):'◎ ENFOCAR';
+    this.focusBtn.textContent=f?(flying?'◎ ENFOCADO':'◎ EN TIERRA'):'◎ ENFOCAR';
     this.focusBtn.title=f?(flying?'ATK dispara al volador enfocado':'Dragón derribado: ATK terrestre FURY'):'Enfocar monstruo volador';
     this.focusBtn.classList.toggle('active',!!f);
     this.focusBtn.setAttribute('aria-expanded',String(!!this.focusPanelOpen));
@@ -716,8 +718,30 @@ export class TianjieMobaSkillsLab {
         range:38,visible:(_enemy,q)=>hasLineOfSight(g,from,q)
       }).filter(item=>item.air);
   }
+  ensureFocusEditor(){
+    // L26: the ENFOCAR control participates in the real P10 editor, including
+    // drag, size, opacity, and persistent normalized coordinates. Never pin it
+    // to the ATK rect on every frame: that would undo the user's changes.
+    const editor=this.game.touch?.premium?.p810?.editor;
+    if(!editor||this.focusEditor===editor)return;
+    const hadSavedLayout=(()=>{
+      try{return !!localStorage.getItem('hf_p812_hud_layout_v2');}
+      catch(_){return true;}
+    })();
+    editor.register('focus',this.focusBtn);
+    this.focusEditor=editor;
+    if(!hadSavedLayout){
+      // Fresh LAB default:        ATK
+      //                     USAR     ENFOCAR
+      // Existing customized HUD layouts remain untouched.
+      Object.assign(editor.layout.atk,{x:.83,y:.535,size:83});
+      Object.assign(editor.layout.use,{x:.71,y:.835,size:49});
+      Object.assign(editor.layout.focus,{x:.91,y:.835,size:43});
+    }
+    editor.apply();
+  }
   syncControlAnchors(){
-    // Native HUD is editable; use current button bounds, never guessed pixels.
+    // CANCELAR is contextual and follows MOCHILA; ENFOCAR never follows ATK.
     const position=(button,anchor,size)=>{
       if(!button||!anchor)return;
       const r=anchor.getBoundingClientRect();
@@ -728,7 +752,6 @@ export class TianjieMobaSkillsLab {
       button.style.left=Math.max(5,x)+'px';
       button.style.top=y+'px';
     };
-    position(this.focusBtn,document.querySelector('#hf-touch .hf-p5-atk'),43);
     position(this.cancelBtn,document.querySelector('#hf-p810-bag'),46);
   }
   renderMonsterSelector(){
