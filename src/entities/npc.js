@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { npcRoutineP18 } from '../world/world-registry-p18.js';
 
 const BJORN_LINES = [
   'Dicen que vieron un dragón cerca de la torre de la montaña.',
@@ -67,6 +68,7 @@ export class NPCs {
   }
 
   startDialogue(npc) {
+    if(this.game.p18Enabled)this.game.livingWorld?.onNpcTalk(npc.id);
     this.game.setState('dialogue');
     this.game.menus.showDialogue(this.buildDialogue(npc));
   }
@@ -216,6 +218,34 @@ export class NPCs {
       };
     }
 
+    // P18 extra playable quest: Bjorn sends the hunter to the two new wolf
+    // frontier patrols. Does NOT change existing Olaf/Sigrid quest branches.
+    if (game.p18Enabled && game.livingWorld && npc.id==='bjorn') {
+      const frontier=game.livingWorld.quest;
+      if(frontier.status==='available') return {
+        name:npc.name,
+        text:'Los lobos centinela acechan los senderos del este y del oeste. ¿Podés ayudarnos a proteger los caminos?',
+        options:[
+          {label:'Aceptar: Centinelas de la frontera',action:()=>{game.livingWorld.acceptFrontier();close();}},
+          bye
+        ]
+      };
+      if(frontier.status==='active')return {
+        name:npc.name,
+        text:'Eliminá 3 lobos de las patrullas fronterizas y volvé. ('+frontier.progress+'/3).',
+        options:[bye]
+      };
+      if(frontier.status==='complete')return {
+        name:npc.name,
+        text:'¡Excelente! Los senderos estarán más seguros. Acá tenés tu recompensa.',
+        options:[
+          {label:'Entregar misión · 75 oro + 60 XP',action:()=>{
+            if(game.livingWorld.turnInFrontier())this.startDialogue(npc);
+          }},
+          bye
+        ]
+      };
+    }
     const text = BJORN_LINES[npc.flavorIdx % BJORN_LINES.length];
     npc.flavorIdx = (npc.flavorIdx + 1) % BJORN_LINES.length;
     return { name: npc.name, text, options: [bye] };
@@ -227,6 +257,7 @@ export class NPCs {
 
     for (let i = 0; i < this.list.length; i++) {
       const npc = this.list[i];
+      const schedule = game.p18Enabled ? npcRoutineP18(npc.id,game.time.dayTime) : null;
 
       let moving = false;
       let playerNear = false;
@@ -240,7 +271,7 @@ export class NPCs {
         }
       }
 
-      if (npc.wander && !playerNear) {
+      if (npc.wander && !playerNear && (!schedule || schedule.activity==='village_wander')) {
         const w = npc.wander;
         if (w.idleT > 0) {
           w.idleT -= dt;
@@ -272,7 +303,9 @@ export class NPCs {
       if (npc.hammer) {
         const h = npc.hammer;
         if (!h.busy) {
-          if (playerNear) {
+          if (schedule && schedule.activity!=='smithy_work') {
+            npc.rig.play('Idle');
+          } else if (playerNear) {
             npc.rig.play('Idle');
           } else {
             h.t -= dt;
