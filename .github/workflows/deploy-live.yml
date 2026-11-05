@@ -231,7 +231,7 @@ jobs:
           git fetch --no-tags --depth=1 origin refs/heads/p16-1-performance-foundation-20261105
           test "$(git rev-parse FETCH_HEAD)" = "de853a300416d4ac72a5e4d8279af410be3288ef"
           mkdir -p .p161-validate .site/p161
-          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets tests scripts | tar -x -C .p161-validate
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets tests scripts docs | tar -x -C .p161-validate
           cd .p161-validate
           test -s index.html
           test -s src/combat/hit-confirm-p16.js
