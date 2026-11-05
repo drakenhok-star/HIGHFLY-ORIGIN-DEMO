@@ -112,6 +112,8 @@ export class Quests {
         state: this.states[id],
         progress: this.progress[id],
         need: def.need,
+        rewardGold:def.rewardGold,rewardXp:def.rewardXp,
+        giver:GIVER_NAMES[def.giver],kind:id==='q2'?'secundaria':'principal',secret:false,
       };
     });
     // The P18 quest is owned by LivingWorldP18; expose it to the EXISTING
