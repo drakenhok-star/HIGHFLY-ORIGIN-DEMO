@@ -15,7 +15,7 @@ export class SaveSys {
     this.key=game.p18Build?KEY_P18:game.p16Enabled?KEY_P16:game.p15Enabled?KEY_P15:game.p14Enabled?KEY_P14:game.p13Enabled?KEY_P13:game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
   }
 
-  save() {
+  save({silent=false}={}) {
     const g = this.game;
     const dragon = g.enemies.dragon;
     // 室内存档时记录门外位置与离门朝向，读档永远落在户外（interiors.savePosition 契约）
@@ -37,7 +37,7 @@ export class SaveSys {
       ...(g.p18Enabled && g.livingWorld ? {livingWorld:g.livingWorld.serialize()} : {}),
     };
     localStorage.setItem(this.key, JSON.stringify(data));
-    g.hud.notify('Partida guardada');
+    if(!silent)g.hud.notify('Partida guardada');
   }
 
   hasSave() {
@@ -121,8 +121,8 @@ export class SaveSys {
     this.autosaveTimer += dt;
     if (this.autosaveTimer >= 60) {
       this.autosaveTimer = 0;
-      this.save();
-      this.game.hud.notify('Guardado automático');
+      // A silent autosave prevents two stacked black toast panels every 60s.
+      this.save({silent:true});
     }
   }
 }
