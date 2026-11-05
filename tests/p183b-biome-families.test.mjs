@@ -12,7 +12,7 @@ assert.equal(P183B_COAST_TEMPLATE.type,'crab');
 const campIds=new Set();
 for(const c of P183B_CAMPS){
  assert.ok(!campIds.has(c.id),'unique camp IDs');campIds.add(c.id);
- assert.ok(c.count<=2,'strict 2 per camp budget');assert.ok(c.respawn>85);
+ assert.ok(c.count<=5,'P18.3d cap: at most five per camp');assert.ok(c.respawn>85);
  assert.equal(ITEM_DB[c.drop].type,'misc','real inventory material '+c.type);
  assert.equal(ITEM_DB[c.drop].damage,undefined,'equipment does not affect Core');
  assert.equal(ITEM_DB[c.drop].armor,undefined,'material is not armor');
