@@ -1,0 +1,29 @@
+name: HIGHFLY P18.6 Pueblo de los Inicios 2.0
+on:
+  push:
+    branches:
+      - p186-inicios-20-profesiones-mapa-v2-20261105
+    paths:
+      - src/world/inicios-v2-p186.js
+      - src/world/inicios-site-planner-p186.js
+      - tests/p186-inicios-v2.test.mjs
+      - docs/P186_PUEBLO_INICIOS_2_MASTERPLAN.md
+      - .github/workflows/verify-p186-inicios.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check all professions and map placement safety
+        run: node --experimental-default-type=module tests/p186-inicios-v2.test.mjs
+      - name: Check module syntax
+        run: |
+          node --experimental-default-type=module --check src/world/inicios-v2-p186.js
+          node --experimental-default-type=module --check src/world/inicios-site-planner-p186.js
