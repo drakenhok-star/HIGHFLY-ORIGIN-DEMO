@@ -42,6 +42,8 @@ jobs:
         run: node tests/p161-grass-budget.test.mjs
       - name: P16.1 exact terrain geometry and streaming regressions
         run: node tests/p161-terrain-budget.test.mjs
+      - name: P16.1 five-day Training UI preview and mandatory rest
+        run: node tests/p161-training-ui.test.mjs
       - name: Terrain and public asset checks
         shell: bash
         run: |
