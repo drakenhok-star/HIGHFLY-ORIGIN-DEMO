@@ -518,21 +518,6 @@ export class TianjieMobaSkillsLab {
       this.training=g.enemies.list.filter(e=>e.training&&e.alive);
       this.trainingCount=g.enemies.trainingCount||1;
   
-    root.querySelector('#hf-l27-transfer').addEventListener('click',async e=>{
-      e.preventDefault();e.stopPropagation();
-      const camera=window.highflyCameraLab?.config||{};
-      const hud=this.game.touch?.premium?.p810?.editor?.layout||{};
-      const payload=JSON.stringify({version:1,camera:{...camera},hud});
-      const url=new URL('https://drakenhok-star.github.io/HIGHFLY-ORIGIN-DEMO/p186/');
-      url.searchParams.set('hf_p186_transfer',payload);
-      try{
-        await navigator.clipboard.writeText(url.toString());
-        this.announce('PERFIL COPIADO: pegá el enlace para entrar a DEMO P186 con TU cámara y HUD');
-      }catch(_){
-        this.announce('El navegador impidió copiar: seleccioná el enlace en el cuadro');
-        window.prompt?.('Copiá el enlace de transferencia a P186:',url.toString());
-      }
-    });
     this.syncTrainingUI();
     }
     this.updateLeap();
@@ -678,6 +663,22 @@ export class TianjieMobaSkillsLab {
     });
     root.querySelector('#hf-lab-reset').addEventListener('pointerdown',e=>{
       e.preventDefault();e.stopPropagation();this.resetTraining();
+    });
+
+    root.querySelector('#hf-l27-transfer').addEventListener('click',async e=>{
+      e.preventDefault();e.stopPropagation();
+      const camera=window.highflyCameraLab?.config||{};
+      const hud=this.game.touch?.premium?.p810?.editor?.layout||{};
+      const payload=JSON.stringify({version:1,camera:{...camera},hud});
+      const url=new URL('https://drakenhok-star.github.io/HIGHFLY-ORIGIN-DEMO/p186/');
+      url.searchParams.set('hf_p186_transfer',payload);
+      try{
+        await navigator.clipboard.writeText(url.toString());
+        this.announce('PERFIL COPIADO: pegá el enlace para entrar a DEMO P186 con TU cámara y HUD');
+      }catch(_){
+        this.announce('El navegador impidió copiar: seleccioná el enlace en el cuadro');
+        window.prompt?.('Copiá el enlace de transferencia a P186:',url.toString());
+      }
     });
     this.syncTrainingUI();
     this.focusBtn.addEventListener('pointerdown',e=>{
