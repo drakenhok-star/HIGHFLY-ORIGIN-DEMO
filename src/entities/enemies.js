@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { worldIsSafeP18 } from '../world/world-registry-p18.js';
 
 const WOLF_PACK_HOMES = [
   { x: 120, z: 160 },
@@ -6,6 +7,10 @@ const WOLF_PACK_HOMES = [
   { x: 80, z: -180 },
 ];
 const WOLF_OFFSETS = [[0, 0], [4.2, 2.6], [-3.6, 3.4]];
+// P18: two border patrols use the already-approved CC0 wolf model.
+// 4 extra rigs in total, away from the safe 78m town; no asset downloads.
+const P18_FRONTIER_PACKS = [{x:110,z:95,id:'wolf_edge_east_01'}, {x:-112,z:76,id:'wolf_edge_west_01'}];
+const P18_FRONTIER_OFFSETS = [[0,0],[4,3.4]];
 const COS35 = Math.cos((35 * Math.PI) / 180);
 
 // 雪原高台Lobo helado群（PLATEAU 380,-150，4 只一群，120s 重生）
@@ -115,6 +120,12 @@ export class Enemies {
   spawnAll() {
     this.packs = WOLF_PACK_HOMES.map((h) => ({ home: h, members: [], respawnT: -1, ice: false, respawnDelay: 90 }));
     this.packs.push({ home: ICE_PACK_HOME, members: [], respawnT: -1, ice: true, respawnDelay: 120 });
+    if (this.game.p18Enabled) {
+      for (const spec of P18_FRONTIER_PACKS) this.packs.push({
+        home:{x:spec.x,z:spec.z},regionId:spec.id,p18:true,
+        members:[],respawnT:-1,ice:false,respawnDelay:115
+      });
+    }
     for (let pi = 0; pi < this.packs.length; pi++) this._spawnPack(pi);
     const sc = this.game.structures.stonesCenter;
     for (let i = 0; i < 6; i++) {
@@ -147,8 +158,11 @@ export class Enemies {
 
   _spawnPack(pi) {
     const pack = this.packs[pi];
-    const offs = pack.ice ? ICE_WOLF_OFFSETS : WOLF_OFFSETS;
-    pack.members = offs.map((o) => this._spawnWolf(pack.home.x + o[0], pack.home.z + o[1], pi, pack.ice));
+    const offs = pack.p18 ? P18_FRONTIER_OFFSETS : pack.ice ? ICE_WOLF_OFFSETS : WOLF_OFFSETS;
+    pack.members = offs.map((o,j) => this._spawnWolf(
+      pack.home.x + o[0], pack.home.z + o[1], pi, pack.ice,
+      pack.p18 ? (j===0?'alpha':'scout') : null
+    ));
     pack.respawnT = -1;
   }
 
@@ -231,7 +245,7 @@ export class Enemies {
     }
   }
 
-  _spawnWolf(x, z, packIdx, ice = false) {
+  _spawnWolf(x, z, packIdx, ice = false, p18Role = null) {
     const hp = ice ? 45 : 30 + (this.game.stats.level - 1) * 5;
     const e = this._base('wolf', ice ? 'Lobo helado' : 'Lobo', hp, 1.0, x, z);
     e.dmg = ice ? 12 : 8;
@@ -239,8 +253,29 @@ export class Enemies {
     e.aggroR = 28; e.attackRange = 2.3; e.attackCd = 1.3;
     e.packIdx = packIdx;
     e.ice = ice;
+    if (this.game.p18Enabled && p18Role) {
+      e.p18Frontier = true;
+      e.p18Pack = true;
+      e.p18Role = p18Role;
+      e.name = p18Role==='alpha' ? 'Lobo centinela' : 'Lobo de frontera';
+      e.hp = e.maxHp = p18Role==='alpha' ? 64 : 37;
+      e.dmg = p18Role==='alpha' ? 12 : 9;
+      e.speed = p18Role==='alpha' ? 8.1 : 7.5;
+      e.aggroR = 26;
+    }
     this._attachRig(e, 'wolf');
     if (ice) this._tintIce(e);
+    if (e.p18Role === 'alpha') {
+      e.rig.root.scale.multiplyScalar(1.13);
+      // Quaternius CC0 wolf, visually distinguished only by a warm coat tint.
+      e.rig.root.traverse(o => {
+        if (!o.isMesh || !o.material) return;
+        const mats = Array.isArray(o.material) ? o.material : [o.material];
+        for (const m of mats) if (m.color) m.color.lerp(new THREE.Color(0xaa7254),.30);
+      });
+      // Restore hit-flash originals to the actual per-instance materials.
+      for (const m of e.mats) {m.e=m.m.emissive.getHex();m.i=m.m.emissiveIntensity;}
+    }
     e.rig.play('Idle');
     e.rig.update(0.3 + Math.random() * 1.5);
     return e;
@@ -344,6 +379,20 @@ export class Enemies {
       if (e.type === 'draugr' && !e.awakened) this._awaken(e);
       else if (e.state !== 'attack' && e.state !== 'awaken') e.state = 'chase';
       e.aggroT = 10;
+      // Adapted MIT-style dungeon pack assist: only living idle packmates
+      // sharing this pack, within 32m, and never pulling into the safe city.
+      if (this.game.p18Enabled && e.p18Pack &&
+          !worldIsSafeP18(this.game.player.pos.x,this.game.player.pos.z)) {
+        const pack=this.packs[e.packIdx];
+        let alerted=0;
+        for (const mate of pack?.members||[]) {
+          if(mate===e || !mate.alive || mate.state!=='idle' ||
+             mate.group.position.distanceToSquared(e.group.position)>32*32)continue;
+          mate.state='chase';
+          mate.aggroT=Math.max(mate.aggroT,6);
+          if(++alerted>=3)break;
+        }
+      }
     }
     if (e.hp <= 0) {
       e.hp = 0;
@@ -397,6 +446,7 @@ export class Enemies {
     g.stats.addXP(xp);
     // Lobo helado按独立类型上报：q1「狼患」只认Lobo
     g.quests.onEnemyKilled(e.ice ? 'ice_wolf' : e.type);
+    if(g.p18Enabled && e.p18Frontier)g.livingWorld?.onEnemyKilled(e);
     this._spawnDrop(e.group.position.x, e.group.position.z, items, gold);
 
     if (e.type === 'draugr' && !e.boss) {
@@ -492,6 +542,11 @@ export class Enemies {
     const dzHome = pos.z - e.home.z;
     const homeDist = Math.hypot(dxHome, dzHome);
     const leash = e.type === 'wolf' ? 50 : 38;
+    // The player may escape into town; frontier predators stop at the border.
+    if (g.p18Enabled && e.p18Frontier && worldIsSafeP18(p.x,p.z) && e.state !== 'return') {
+      e.state='return';e.aggroT=0;e.hitPending=-1;e.boltPending=-1;
+      e.kbVel.set(0,0,0);
+    }
     if (homeDist > leash && e.state !== 'return') {
       e.state = 'return';
       e.aggroT = 0;
