@@ -70,7 +70,29 @@ export class NPCs {
   startDialogue(npc) {
     if(this.game.p18Enabled)this.game.livingWorld?.onNpcTalk(npc.id);
     this.game.setState('dialogue');
-    this.game.menus.showDialogue(this.buildDialogue(npc));
+    const dialogue=this.buildDialogue(npc);
+    // P187 real teaching interaction on an EXISTING NPC, not a fake spawned master.
+    // Appends to the original quest/forge dialogue without altering its branches.
+    if(npc.id==='sigrid' && this.game.p187Professions &&
+       this.game.stats.level>=2 &&
+       (!this.game.p187Professions.isLearned('weaponcrafting') ||
+        !this.game.p187Professions.isLearned('armorcrafting'))){
+      const teacher={
+        label:'Aprender herrería básica (armas y armaduras)',
+        action:()=>{
+          const p=this.game.p187Professions;
+          const weapon=p.learnAtTrainer('weaponcrafting','sigrid');
+          const armor=p.learnAtTrainer('armorcrafting','sigrid');
+          if(weapon.ok||armor.ok){
+            this.game.saveSys.save({silent:true});
+            this.game.hud.notify('¡Herrería inicial aprendida! Consultá OFICIOS 1–20');
+          }
+          this.startDialogue(npc);
+        }
+      };
+      dialogue.options=Array.isArray(dialogue.options)?[teacher,...dialogue.options]:[teacher];
+    }
+    this.game.menus.showDialogue(dialogue);
   }
 
   _questProgress(id) {
