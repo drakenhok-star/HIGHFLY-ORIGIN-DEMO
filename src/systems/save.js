@@ -5,12 +5,13 @@ const KEY_P812 = 'highfly_p812_save';
 const KEY_P13 = 'highfly_p13_save';
 const KEY_P14 = 'highfly_p14_save';
 const KEY_P15 = 'highfly_p15_save';
+const KEY_P16 = 'highfly_p16_save';
 
 export class SaveSys {
   constructor(game) {
     this.game = game;
     this.autosaveTimer = 0;
-    this.key=game.p15Enabled?KEY_P15:game.p14Enabled?KEY_P14:game.p13Enabled?KEY_P13:game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
+    this.key=game.p16Enabled?KEY_P16:game.p15Enabled?KEY_P15:game.p14Enabled?KEY_P14:game.p13Enabled?KEY_P13:game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
   }
 
   save() {
@@ -39,6 +40,7 @@ export class SaveSys {
 
   hasSave() {
     return localStorage.getItem(this.key) !== null ||
+      (this.game.p16Enabled && localStorage.getItem(KEY_P15)!==null) ||
       (this.game.p15Enabled && localStorage.getItem(KEY_P14)!==null) ||
       (this.game.p14Enabled && localStorage.getItem(KEY_P13)!==null) ||
       (this.game.p13Enabled && localStorage.getItem(KEY_P812)!==null) ||
@@ -50,6 +52,7 @@ export class SaveSys {
   loadRaw() {
     // First P7 visit reads P6 progress, but writes ONLY P7: original never overwritten.
     const raw = localStorage.getItem(this.key) ||
+      (this.game.p16Enabled?localStorage.getItem(KEY_P15):null) ||
       (this.game.p15Enabled?localStorage.getItem(KEY_P14):null) ||
       (this.game.p14Enabled?localStorage.getItem(KEY_P13):null) ||
       (this.game.p13Enabled?localStorage.getItem(KEY_P812):null) ||
