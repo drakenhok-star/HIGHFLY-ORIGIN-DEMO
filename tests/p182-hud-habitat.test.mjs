@@ -73,6 +73,9 @@ assert.ok(enemy.includes('e._p182Step||(e._p182Step='),'reuse output object');
 assert.match(enemy,/if\(!dry\)return null/,'draugr never spawn under water');
 const map=await readFile(new URL('../src/ui/world-map-p34.js',import.meta.url),'utf8');
 assert.doesNotMatch(map,/hf-p181-radar-target/,'no redundant label under radar');
+assert.match(map,/const normals=packs\.filter/,'normal wolf POIs follow dry relocated pack homes');
+assert.match(map,/list\[POIS\.length\+i\]/,'frontier POIs follow their dry relocated pack homes');
+
 assert.ok(map.includes('this.hunterArrow(ctx,px,py,this.game.player.bodyYaw??'),
  'map arrow reflects torso heading, not camera');
 assert.ok(map.includes('this.hunterArrow(ctx,n/2,n/2,this.game.player.bodyYaw??'),
