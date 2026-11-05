@@ -18,7 +18,10 @@ export const LIVE_CREATURES_P18 = Object.freeze([
   current('ice_wolf','wolf','beast','pack_hunt',['frost_plateau_01'],4),
   current('draugr_warrior','skeleton_warrior','undead','melee_guard',['stones_01','barrow_01']),
   current('draugr_mage','skeleton_mage','undead','ranged_cast',['stones_01','barrow_01']),
-  current('ancient_dragon','dragon','dragon','boss_phase',['dragon_tower_01'],1)
+  current('ancient_dragon','dragon','dragon','boss_phase',['dragon_tower_01'],1),
+  Object.freeze({id:'wolf_sentinel',model:'wolf',family:'beast',behavior:'pack_alert',
+    zoneIds:Object.freeze(['wolf_edge_east_01','wolf_edge_west_01']),groupCap:2,
+    assetApproved:true,implementedInP16:false,implementedInP18:true})
 ]);
 export const PLANNED_CREATURES_P18 = Object.freeze([
   planned('wild_boar','beast','charge_flee',['wolf_north_01','clearing_01']),
@@ -33,7 +36,7 @@ export function creatureSpecP18(id){return MAP.get(id)||null;}
 export function creatureSpawnableP18(id,regionId){
   const c=creatureSpecP18(id);
   const region=WORLD_REGIONS_P18.find(z=>z.id===regionId);
-  if(!c||!c.assetApproved||!c.implementedInP16||!c.model||!region)return false;
+  if(!c||!c.assetApproved||!(c.implementedInP16||c.implementedInP18)||!c.model||!region)return false;
   if(region.kind==='safe_city'||!region.spawnsEnemies)return false;
   return c.zoneIds.includes(regionId);
 }
