@@ -158,6 +158,9 @@ class Game {
     if (this.p810Enabled && this.touch?.premium?.p810?.perf){
       this.touch.premium.p810.perf.style.visibility=s==='playing'?'visible':'hidden';
     }
+    // Enter the P186 preview with the recorded user's camera and real controls
+    // in the same gesture, rather than waiting for world/AI frames to advance.
+    if(s==='playing')this.p186Skills?.enterPlaying();
     if (s === 'playing') this.requestPointerLock();
     else this.releasePointerLock();
   }
