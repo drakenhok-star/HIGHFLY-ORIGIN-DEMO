@@ -21,6 +21,7 @@ export class Quests {
       q1: new THREE.Vector3(),
       q2: new THREE.Vector3(),
       q3: new THREE.Vector3(),
+      p18: new THREE.Vector3(),
     };
     this.reset();
   }
@@ -99,7 +100,7 @@ export class Quests {
   }
 
   list() {
-    return QUEST_IDS.map((id) => {
+    const quests=QUEST_IDS.map((id) => {
       const def = QUEST_DEFS[id];
       return {
         id,
@@ -110,6 +111,15 @@ export class Quests {
         need: def.need,
       };
     });
+    // The P18 quest is owned by LivingWorldP18; expose it to the EXISTING
+    // quest journal without altering P16 quest definitions or save schema.
+    const frontier=this.game.p18Enabled?this.game.livingWorld?.quest:null;
+    if(frontier)quests.push({
+      id:'p18_frontier',name:'Centinelas de la frontera',
+      desc:'Eliminá 3 lobos de la frontera este u oeste. Volvé con Bjorn.',
+      state:frontier.status,progress:frontier.progress,need:3
+    });
+    return quests;
   }
 
   markers() {
@@ -129,6 +139,26 @@ export class Quests {
       if (dragon && dragon.alive) {
         out.push({ pos: this._markerVecs.q3.copy(dragon.group.position), label: QUEST_DEFS.q3.name });
       }
+    }
+    const frontier=this.game.p18Enabled?this.game.livingWorld?.quest:null;
+    if(frontier?.status==='active'){
+      const p=this.game.player.pos;
+      let nearest=null,best=Infinity;
+      for(const wolf of this.game.enemies.list){
+        if(!wolf.p18Frontier||!wolf.alive)continue;
+        const d=wolf.group.position.distanceToSquared(p);
+        if(d<best){nearest=wolf;best=d;}
+      }
+      if(nearest)out.push({
+        pos:this._markerVecs.p18.copy(nearest.group.position),
+        label:'Centinelas de la frontera'
+      });
+    }else if(frontier?.status==='complete'){
+      const bjorn=this.game.npcs.list.find(n=>n.id==='bjorn');
+      if(bjorn)out.push({
+        pos:this._markerVecs.p18.copy(bjorn.pos),
+        label:'Regresá con Bjorn'
+      });
     }
     return out;
   }
