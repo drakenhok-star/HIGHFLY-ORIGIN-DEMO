@@ -13,12 +13,15 @@ terrain.getHeight=function(x,z){return ctx.height.call(this,x,z)};
 terrain.getSlope=function(x,z){return ctx.slope.call(this,x,z)};
 const allow=(x,z)=>!worldIsSafeP18(x,z)&&Math.abs(x)<1100&&Math.abs(z)<1100;
 const found=P183B_CAMPS.map(c=>({id:c.id,type:c.type,biome:c.biome,at:resolveBiomeCampP183b(terrain,c,allow)}));
-const coastal=resolveCoastSitesP183b(terrain,allow);
+const wolfHomes=[[110,95],[-112,76],[120,160],[-150,120],[80,-180]];
+const shoreAllow=(x,z)=>allow(x,z)&&wolfHomes.every(([wx,wz])=>(x-wx)**2+(z-wz)**2>=60*60)&&
+  found.filter(c=>c.at).every(c=>(x-c.at.x)**2+(z-c.at.z)**2>=60*60);
+const coastal=resolveCoastSitesP183b(terrain,shoreAllow);
 for(const c of found){
  if(c.at)assert.ok(biomeValidP183b(terrain,c.at.x,c.at.z,c.biome,allow));
  console.log('P183B TERRAIN '+c.id+' : '+(c.at?'X '+Math.round(c.at.x)+' Z '+Math.round(c.at.z)+' Y '+Math.round(c.at.y):'NO VALID CELL'));
 }
 console.log('P183B COAST: '+JSON.stringify(coastal.map(c=>({x:Math.round(c.x),z:Math.round(c.z)}))));
 assert.ok(found.filter(c=>c.at).length>=6,'at least six camps must have real, dry terrain');
-assert.ok(coastal.length>0,'coast must have at least one actual land/water transition');
+assert.ok(coastal.length>0,'coast must have at least one real beach separated from wolf camps');
 console.log('P183B REAL TERRAIN PASS: '+found.filter(c=>c.at).length+'/'+found.length+' camps, '+coastal.length+' crab beaches');
