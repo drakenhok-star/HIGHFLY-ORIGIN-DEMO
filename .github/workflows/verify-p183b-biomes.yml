@@ -1,0 +1,38 @@
+name: "HIGHFLY P18.3b · BIOME FAMILIES CI"
+on:
+  push:
+    branches: [p183b-biome-families-20261105]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Fetch and verify real CC0 Gobkit boar
+        shell: bash
+        run: bash scripts/fetch_gobkit_boar_p183b.sh
+      - name: Check source syntax
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -name '*.js' -print0 | while IFS= read -r -d '' f; do node --input-type=module --check < "$f"; done
+          node --input-type=module --check < lib/jsm/loaders/KTX2Loader.js
+          node --input-type=module --check < lib/jsm/libs/meshopt_decoder.module.js
+      - name: All gameplay regressions with boar verified
+        shell: bash
+        env:
+          HF_REQUIRE_BOAR: "1"
+        run: |
+          set -Eeuo pipefail
+          for t in tests/*.test.mjs; do node "$t"; done
+      - name: Guard nonredistributable media
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          ! find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' -o -iname '*Sketchfab*' \) | grep -q .
