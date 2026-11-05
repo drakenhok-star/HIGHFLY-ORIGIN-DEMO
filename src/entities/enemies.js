@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { worldIsSafeP18 } from '../world/world-registry-p18.js';
 import { dryPackCenterP182, groundedStepP182 } from '../world/terrestrial-habitat-p182.js';
+import { shallowStepP183, waterSpeedP183 } from '../world/shallow-water-p183.js';
+import { rollBonusLootP183 } from '../systems/loot-table-p183.js';
 
 const WOLF_PACK_HOMES = [
   { x: 120, z: 160 },
@@ -61,6 +63,15 @@ export class Enemies {
     this.pendingRespawns = [];
     this.geoCache = new Map();
     this.sackMat = new THREE.MeshStandardMaterial({ color: 0x7a5c34, roughness: 0.8, metalness: 0, emissive: 0xc9a86a, emissiveIntensity: 0.45 });
+    // Reuse existing loot sack geometry; only material changes with rarity.
+    // No additional meshes or draw calls per sack relative to P18.2.1.
+    this.p183SackMats = {
+      common:this.sackMat,
+      uncommon:new THREE.MeshStandardMaterial({color:0x37856c,roughness:.8,emissive:0x256b53,emissiveIntensity:.3}),
+      rare:new THREE.MeshStandardMaterial({color:0x366bac,roughness:.8,emissive:0x2459a1,emissiveIntensity:.4}),
+      epic:new THREE.MeshStandardMaterial({color:0x7741a6,roughness:.8,emissive:0x7737b4,emissiveIntensity:.5}),
+      legendary:new THREE.MeshStandardMaterial({color:0xb7892b,roughness:.8,emissive:0xc89c3a,emissiveIntensity:.6})
+    };
     this.knotMat = new THREE.MeshStandardMaterial({ color: 0x5a4426, roughness: 1, metalness: 0 });
     this.boltGeo = new THREE.SphereGeometry(0.16, 8, 6);
     this.boltMat = new THREE.MeshBasicMaterial({
@@ -354,12 +365,12 @@ export class Enemies {
     this.dragon = e;
   }
 
-  _spawnDrop(x, z, items, gold) {
+  _spawnDrop(x, z, items, gold, rarity='common') {
     const y = this._groundAt(x, z);
     const mesh = new THREE.Group();
     const sack = new THREE.Mesh(
       this._geo('sack', () => new THREE.SphereGeometry(0.3, 6, 5)),
-      this.sackMat
+      (this.game.p183Enabled && this.p183SackMats[rarity]) || this.sackMat
     );
     sack.scale.set(1, 1.15, 1);
     mesh.add(sack);
@@ -372,7 +383,7 @@ export class Enemies {
     const pos = new THREE.Vector3(x, y + 0.55, z);
     mesh.position.copy(pos);
     this.game.scene.add(mesh);
-    this.lootDrops.push({ mesh, pos, items, gold, t: Math.random() * 6 });
+    this.lootDrops.push({ mesh, pos, items, gold, rarity, t: Math.random() * 6 });
   }
 
   _awaken(e) {
@@ -467,12 +478,20 @@ export class Enemies {
       xp = 300; items = ['dragon_bone', 'dragon_scale'];
       gold = 300;
     }
+    // P18.3: keep every original guaranteed item, gold, XP and mission event.
+    // Bonus tables are independent from quests and require no new visual assets.
+    let rarity='common';
+    if(g.p183Enabled){
+      const extra=rollBonusLootP183(e);
+      items=items.concat(extra.items);
+      rarity=extra.rarity;
+    }
     g.stats.addXP(xp);
     // Lobo helado按独立类型上报：q1「狼患」只认Lobo
     // Separate species credit: centinelas are NOT standard q1 wolves.
     g.quests.onEnemyKilled(e.p18Frontier ? 'wolf_sentinel' : e.ice ? 'ice_wolf' : e.type);
     if(g.p18Enabled && e.p18Frontier)g.livingWorld?.onEnemyKilled(e);
-    this._spawnDrop(e.group.position.x, e.group.position.z, items, gold);
+    this._spawnDrop(e.group.position.x, e.group.position.z, items, gold, rarity);
 
     if (e.type === 'draugr' && !e.boss) {
       this.pendingRespawns.push({ kind: 'draugr', t: 120, x: e.home.x, z: e.home.z, variant: e.variant });
@@ -691,6 +710,7 @@ export class Enemies {
     }
 
     if (e.slowT > 0) sp *= e.slowFactor; // 凛冬之息减速（动画速率随 sp 同步变慢）
+    if(g.p183Enabled)sp*=waterSpeedP183(g.terrain,pos.x,pos.z);
 
     const stepX=(mx * sp + e.kbVel.x) * dt;
     const stepZ=(mz * sp + e.kbVel.z) * dt;
@@ -698,8 +718,11 @@ export class Enemies {
       // All ground mobs (wolf/draugr) stay on land even when aggro, wandering
       // or being knocked back. Slide along shore if only one axis is valid.
       const prevX=pos.x,prevZ=pos.z;
-      const next=groundedStepP182(g.terrain,prevX,prevZ,stepX,stepZ,
-        e._p182Step||(e._p182Step={x:prevX,z:prevZ,blocked:false}));
+      const next=g.p183Enabled
+        ? shallowStepP183(g.terrain,prevX,prevZ,stepX,stepZ,
+            e._p182Step||(e._p182Step={x:prevX,z:prevZ,blocked:false}))
+        : groundedStepP182(g.terrain,prevX,prevZ,stepX,stepZ,
+            e._p182Step||(e._p182Step={x:prevX,z:prevZ,blocked:false}));
       pos.x=next.x;pos.z=next.z;
       if(next.blocked){
         e.kbVel.x=0;e.kbVel.z=0;
