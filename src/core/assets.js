@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 
 const FILES = {
   player: './assets/models/player_barbarian.glb',
@@ -14,6 +15,13 @@ const FILES = {
   skeleton_blade: './assets/models/draugr_weapon_skeleton_blade.glb',
   wolf: './assets/models/wolf_quaternius.glb',
   spider: './assets/models/spider_quaternius_cc0.glb',
+  crab: './assets/models/crab_quaternius_cc0.glb',
+  goblin: './assets/models/goblin_quaternius_cc0.glb',
+  orc: './assets/models/orc_quaternius_cc0.glb',
+  stag: './assets/models/stag_quaternius_cc0.glb',
+  fox: './assets/models/fox_quaternius_cc0.glb',
+  yeti: './assets/models/yeti_quaternius_cc0.glb',
+  boar: './assets/models/boar_gobkit_cc0.glb',
   dragon: './assets/models/dragon_evolved_quaternius.glb',
   pine1: './assets/models/env_pine_01.glb',
   pine2: './assets/models/env_pine_02.glb',
@@ -43,6 +51,13 @@ const SCALE = {
   skeleton_mage: { targetHeight: 1.85 },
   wolf: { fixed: 0.28 },
   spider: { targetHeight: 0.85 },
+  crab: { targetHeight: 0.72 },
+  goblin: { targetHeight: 1.22 },
+  orc: { targetHeight: 2.08 },
+  stag: { targetHeight: 1.7 },
+  fox: { targetHeight: 0.75 },
+  yeti: { targetHeight: 2.15 },
+  boar: { targetHeight: 1.12 },
   dragon: { fixed: 3.9 }
 };
 
@@ -221,18 +236,31 @@ export class AssetLib {
   async loadAll(onProgress) {
     const loader = new GLTFLoader();
     loader.setMeshoptDecoder(MeshoptDecoder); // MIT, vendored locally for Quaternius rigs
+    // Before Game creates its WebGL context, choose the universally compatible
+    // RGBA32 Basis fallback (no compressed-format capabilities assumed).
+    // This preserves the original Quaternius goblin texture in WebGL1/2.
+    const ktx2=new KTX2Loader().setTranscoderPath('./basis/');
+    ktx2.detectSupport({extensions:{has:()=>false}});
+    loader.setKTX2Loader(ktx2);
     const entries = Object.entries(FILES);
     const total = entries.length;
     let done = 0;
+    const optional=new Set(['boar','crab','goblin','orc','stag','fox','yeti']);
     await Promise.all(entries.map(async ([key, url]) => {
-      const gltf = await loader.loadAsync(url);
-      // 在源场景上隐藏道具：克隆继承 visible，且 nativeHeight 不被道具撑高
-      applyHiddenProps(gltf.scene, key);
-      const nativeHeight = measureVisibleHeight(gltf.scene);
-      this._lib[key] = { gltf, nativeHeight };
-      done += 1;
-      if (onProgress) onProgress(done, total);
+      try {
+        const gltf = await loader.loadAsync(url);
+        applyHiddenProps(gltf.scene, key);
+        const nativeHeight = measureVisibleHeight(gltf.scene);
+        this._lib[key] = { gltf, nativeHeight };
+      } catch (error) {
+        if (!optional.has(key)) throw error;
+        console.warn('[HIGHFLY biome] Modelo opcional no disponible, no aparece:',key,error);
+      } finally {
+        done += 1;
+        if (onProgress) onProgress(done, total);
+      }
     }));
+    ktx2.dispose();
   }
 
   has(key) { return !!this._lib[key]; }
