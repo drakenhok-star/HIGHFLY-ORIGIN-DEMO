@@ -121,7 +121,8 @@ export class SaveSys {
     this.autosaveTimer += dt;
     if (this.autosaveTimer >= 60) {
       this.autosaveTimer = 0;
-      // A silent autosave prevents two stacked black toast panels every 60s.
+      // Autosave status remains observable without two stacked black toast panels.
+      this.lastAutosaveStatus='Guardado automático';
       this.save({silent:true});
     }
   }
