@@ -5,13 +5,13 @@ import {
  creatureSpecP18,creatureSpawnableP18,newSpeciesReadyP18,
  monsterSimulationTierP18,zoneSpawnProposalP18,P18_PROPOSED_MOBILE_LIMITS
 } from '../src/world/living-ecology-p18.js';
-assert.equal(LIVE_CREATURES_P18.length,5,'5 existing varieties: wolves, ice wolves, draugr warriors/mages, dragon');
+assert.equal(LIVE_CREATURES_P18.length,6,'5 original monster varieties plus P18 sentinel');
 assert.equal(PLANNED_CREATURES_P18.length,5,'new families only after assets licensed');
-assert.equal(new Set(CREATURES_P18.map(x=>x.id)).size,10);
+assert.equal(new Set(CREATURES_P18.map(x=>x.id)).size,11);
 const lib=await readFile(new URL('../src/core/assets.js',import.meta.url),'utf8');
 for(const x of LIVE_CREATURES_P18){
  assert.equal(x.assetApproved,true);
- assert.equal(x.implementedInP16,true);
+ assert.ok(x.implementedInP16||x.implementedInP18,'implemented in P16 or P18');
  assert.ok(lib.includes("  "+x.model+": './assets/models/"),'existing visual key must exist in P16.3 AssetLib: '+x.model);
  assert.ok(x.zoneIds.length>0);
 }
@@ -23,6 +23,7 @@ for(const x of PLANNED_CREATURES_P18){
  assert.equal(newSpeciesReadyP18(x,['wolf'],[x.id]),false);
 }
 assert.equal(creatureSpawnableP18('wolf','wolf_north_01'),true);
+assert.equal(creatureSpawnableP18('wolf_sentinel','wolf_edge_east_01'),true);
 assert.equal(creatureSpawnableP18('wolf','village_01'),false);
 assert.equal(creatureSpawnableP18('ancient_dragon','barrow_01'),false);
 assert.equal(creatureSpawnableP18('draugr_mage','stones_01'),true);
@@ -44,4 +45,4 @@ assert.equal(monsterSimulationTierP18({distanceSq:300*300,questRequired:true}),'
 assert.equal(monsterSimulationTierP18({distanceSq:300*300,boss:true}),'full');
 const file=await readFile(new URL('../src/world/living-ecology-p18.js',import.meta.url),'utf8');
 assert.doesNotMatch(file,/game\.enemies\.|new THREE|\.addXP|setInterval|localStorage/,'policy cannot mutate existing gameplay');
-console.log('HIGHFLY P18 W0.1 PASS: existing creature models, 5 gated new species, town safety, spawn caps, quest/boss AI and license barrier');
+console.log('HIGHFLY P18 W0.1 PASS: approved wolf sentinel variant plus 5 gated new species, town safety, spawn caps, quest/boss AI and license barrier');
