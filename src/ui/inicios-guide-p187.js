@@ -23,6 +23,7 @@ export class P187VillageGuide{
    if(!quick)return;
    this.button=make('button',quick,'🏘 PUEBLO · OFICIOS 1–20');
    this.button.type='button';
+   this.game.touch?.premium?.p810?.quickNav?.addAction(this.button,'oficios');
    this.button.addEventListener('click',()=>{
      this.game.touch.premium.p810.toggleQuickMenu(false);
      this.toggle();
