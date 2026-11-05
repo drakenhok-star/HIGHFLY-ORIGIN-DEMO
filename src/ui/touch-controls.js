@@ -3,6 +3,7 @@
  * MIT: code extension; upstream: https://github.com/zexadev/tianjie5
  */
 import { PremiumHudP5 } from './premium-hud-p5.js';
+import {responsiveJoystick,shouldClaimJoyContact} from '../combat/hit-confirm-p16.js';
 
 export class TouchControls {
   constructor(game) {
@@ -21,6 +22,7 @@ export class TouchControls {
     game.input.touchSprint = false;
     game.input.touchUseHold = false;
     this.joystickId = null;
+    this._joyRect=null;
     this.cameraId = null;
     this.runIds = new Set();
     this.runToggle = false;
@@ -72,31 +74,42 @@ export class TouchControls {
     joy.appendChild(knob);
     root.appendChild(joy);
     this.knob = knob;
-    const move = (e) => {
-      const rect = joy.getBoundingClientRect();
-      const radius = rect.width * .38;
-      let x = (e.clientX - rect.left - rect.width/2) / radius;
-      let y = (e.clientY - rect.top - rect.height/2) / radius;
-      const d = Math.max(1, Math.hypot(x, y));
-      x /= d; y /= d;
-      this.game.input.touchMove.x = x;
-      this.game.input.touchMove.y = y;
-      knob.style.transform = 'translate(calc(-50% + '+(x*radius)+'px),calc(-50% + '+(y*radius)+'px))';
+    const move=(e)=>{
+      const r=this._joyRect||joy.getBoundingClientRect();
+      const radius=r.width*.38;
+      const packets=this.game.p16Enabled?e.getCoalescedEvents?.():null;
+      const latest=packets?.length?packets[packets.length-1]:e;
+      let x=(latest.clientX-r.left-r.width/2)/radius;
+      let y=(latest.clientY-r.top-r.height/2)/radius;
+      const d=Math.max(1,Math.hypot(x,y));x/=d;y/=d;
+      const cmd=this.game.p16Enabled?responsiveJoystick(x,y):{x,y};
+      this.game.input.touchMove.x=cmd.x;this.game.input.touchMove.y=cmd.y;
+      knob.style.transform='translate(calc(-50% + '+(cmd.x*radius)+'px),calc(-50% + '+(cmd.y*radius)+'px))';
     };
-    joy.addEventListener('pointerdown', (e) => {
-      if (this.game.state !== 'playing' || this.joystickId !== null) return;
-      e.preventDefault(); e.stopPropagation();
-      this.joystickId = e.pointerId;
+    const beginJoy=e=>{
+      if(this.game.state!=='playing'||this.joystickId!==null||this.game.input.hudEditing)return;
+      e.preventDefault();e.stopPropagation();
+      this.joystickId=e.pointerId;
+      this._joyRect=joy.getBoundingClientRect();
       joy.setPointerCapture(e.pointerId);
       move(e);
+    };
+    joy.addEventListener('pointerdown',beginJoy);
+    joy.addEventListener('pointermove',e=>{
+      if(e.pointerId!==this.joystickId)return;
+      e.preventDefault();move(e);
     });
-    joy.addEventListener('pointermove', (e) => {
-      if (e.pointerId !== this.joystickId) return;
-      e.preventDefault(); move(e);
-    });
+    if(this.game.p16Enabled)document.addEventListener('pointerdown',e=>{
+      if(e.pointerType==='mouse'||this.game.state!=='playing'||this.joystickId!==null||
+         this.game.input.hudEditing||joy.contains(e.target)||
+         e.target?.closest?.('button,[role="button"],#hf-p5-overlay,#hf-p10-editor'))return;
+      const r=joy.getBoundingClientRect();
+      if(shouldClaimJoyContact(e.clientX,e.clientY,r,24))beginJoy(e);
+    },true);
     const endJoy = (e) => {
       if (e.pointerId !== this.joystickId) return;
       this.joystickId = null;
+      this._joyRect=null;
       this.game.input.touchMove.x = 0; this.game.input.touchMove.y = 0;
       knob.style.transform = 'translate(-50%,-50%)';
     };
@@ -202,7 +215,7 @@ export class TouchControls {
     if(this.game.p812Enabled)this.game.input.touchAttackHold=false;
     if(this.game.p14Enabled)this.game.input.touchUseHold=false;
     if(this.game.p812Enabled){this.runToggle=false;this.runButton?.classList.remove('hf-p812-running');}
-    this.joystickId=null;this.cameraId=null;
+    this.joystickId=null;this._joyRect=null;this.cameraId=null;
     if(this.knob)this.knob.style.transform='translate(-50%,-50%)';
   }
   setState(s) {
