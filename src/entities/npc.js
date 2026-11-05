@@ -224,7 +224,7 @@ export class NPCs {
       const frontier=game.livingWorld.quest;
       if(frontier.status==='available') return {
         name:npc.name,
-        text:'Los lobos centinela acechan los senderos del este y del oeste. Eliminá 3. Recompensa: 75 oro y 60 XP. ¿Nos ayudás?',
+        text:'Los Centinelas de la frontera son lobos que acechan los senderos del este y oeste. Eliminá 3. Recompensa: 75 oro y 60 XP. ¿Nos ayudás?',
         options:[
           {label:'Aceptar: Lobo centinela · 75 oro + 60 XP',action:()=>{game.livingWorld.acceptFrontier();close();}},
           bye
