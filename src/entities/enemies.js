@@ -124,6 +124,25 @@ export class Enemies {
     }
     this._spawnBarrowDraugr();
     this._spawnDragon();
+    if(this.game.p16Enabled && new URLSearchParams(location.search).has('hf_training'))
+      this._spawnTrainingDummy();
+  }
+
+  _spawnTrainingDummy(){
+    const p=this.game.player.group.position;
+    const e=this._base('training','ENTRENAMIENTO · 4 IMPACTOS',99999,.9,p.x+5,p.z-3);
+    this._attachRig(e,'skeleton_warrior');
+    e.training=true;e.aggroR=0;e.attackRange=0;e.speed=0;
+    e.rig.play('Idle');
+    // Noncombat QA target. No kill, XP, quest progress, drops or rewards.
+    e.takeDamage=amount=>{
+      const damage=Math.max(0,Math.min(200,Number(amount)||0));
+      if(!damage)return;
+      e.hp=Math.max(1,e.hp-damage);
+      e.flashT=.12;
+      for(const mat of e.mats){mat.m.emissive.setHex(0xff3030);mat.m.emissiveIntensity=.9;}
+    };
+    return e;
   }
 
   _spawnPack(pi) {
@@ -896,6 +915,12 @@ export class Enemies {
             e.mats[j].m.emissiveIntensity = k;
           }
         }
+      }
+      if(e.training){
+        e.hp=e.maxHp;
+        e.kbVel.set(0,0,0);e.hitstunT=0;
+        e.rig.play('Idle');e.rig.update(dt);
+        continue;
       }
       if (!e.alive) {
         if (!e.group.parent) {
