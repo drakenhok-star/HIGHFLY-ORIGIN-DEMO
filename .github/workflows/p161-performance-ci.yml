@@ -38,6 +38,8 @@ jobs:
           node tests/p16-hit-confirm.test.mjs
       - name: P16.1 opt-in profiler tests
         run: node tests/p161-performance.test.mjs
+      - name: P16.1 grass disk and atomic rebuild regressions
+        run: node tests/p161-grass-budget.test.mjs
       - name: Terrain and public asset checks
         shell: bash
         run: |
