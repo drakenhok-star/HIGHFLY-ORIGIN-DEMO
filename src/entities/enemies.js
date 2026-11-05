@@ -257,7 +257,8 @@ export class Enemies {
       e.p18Frontier = true;
       e.p18Pack = true;
       e.p18Role = p18Role;
-      e.name = p18Role==='alpha' ? 'Lobo centinela' : 'Lobo de frontera';
+      e.name = p18Role==='alpha' ? 'Lobo centinela alfa' : 'Lobo centinela explorador';
+      e.speciesId='wolf_sentinel'; // distinct objective identity, wolf rig/combat remains compatible
       e.hp = e.maxHp = p18Role==='alpha' ? 64 : 37;
       e.dmg = p18Role==='alpha' ? 12 : 9;
       e.speed = p18Role==='alpha' ? 8.1 : 7.5;
@@ -445,7 +446,8 @@ export class Enemies {
     }
     g.stats.addXP(xp);
     // Lobo helado按独立类型上报：q1「狼患」只认Lobo
-    g.quests.onEnemyKilled(e.ice ? 'ice_wolf' : e.type);
+    // Separate species credit: centinelas are NOT standard q1 wolves.
+    g.quests.onEnemyKilled(e.p18Frontier ? 'wolf_sentinel' : e.ice ? 'ice_wolf' : e.type);
     if(g.p18Enabled && e.p18Frontier)g.livingWorld?.onEnemyKilled(e);
     this._spawnDrop(e.group.position.x, e.group.position.z, items, gold);
 
