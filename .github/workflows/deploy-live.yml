@@ -591,6 +591,44 @@ jobs:
           echo "P18.3 pinned 78dda20e007a2f8ff09c2b43809e1a1c82b14ae3 at /p183/"
           echo "All previous Page builds and Skill Lab remain untouched"
 
+      - name: Publish P18.3b distinct biome families playable preview (P18.2.1 and all older preserved)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          # Exact SHA is CI-green and immutable. Never overwrite stable snapshots.
+          git fetch --no-tags --depth=1 origin refs/heads/p183b-biome-families-20261105
+          test "$(git rev-parse FETCH_HEAD)" = "2a7b9418219aa0f4b2172e5632fa9518dba2d425"
+          mkdir -p .p183b-validate .site/p183b
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets tests scripts docs basis | tar -x -C .p183b-validate
+          (
+            cd .p183b-validate
+            test -s src/world/biome-families-p183b.js
+            test -s src/ui/biome-tour-p183b.js
+            test -s lib/jsm/loaders/KTX2Loader.js
+            test -s lib/jsm/libs/meshopt_decoder.module.js
+            test -s basis/basis_transcoder.wasm
+            # Fetch the exact audited public CC0 boar. This one is not committed.
+            bash scripts/fetch_gobkit_boar_p183b.sh
+            export HF_REQUIRE_BOAR=1
+            for test in tests/*.test.mjs; do node "$test"; done
+            find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+              node --input-type=module --check < "$file"
+            done
+            if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' -o -iname '*Sketchfab*' \) | grep -q .; then
+              echo "P18.3b rejected: restricted asset"
+              exit 1
+            fi
+            cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets basis ../.site/p183b/
+          )
+          touch .site/p183b/.nojekyll
+          test -s .site/p183b/assets/models/boar_gobkit_cc0.glb
+          test -s .site/p183b/assets/models/crab_quaternius_cc0.glb
+          test -s .site/p183b/index.html
+          for previous in p16 p161 p163 p18 p181 p182 p1821 p183; do
+            test -s ".site/$previous/index.html"
+          done
+          echo "P18.3b CI-green families + QA biome tour at /p183b/; prior snapshots preserved"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
