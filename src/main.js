@@ -33,6 +33,8 @@ import { PerfProbeP6 } from './ui/perf-probe-p6.js';
 import { PerfFoundationP161 } from './ui/performance-p161.js';
 import { PerfGovernorP163 } from './ui/performance-p163.js';
 import { LivingWorldP18 } from './world/living-world-runtime-p18.js';
+import { installP186Combat } from './combat/skill-bridge-p186.js';
+import { consumeP186TransferFromUrl } from './ui/p186-profile.js';
 
 class Game {
   constructor(assets) {
@@ -48,6 +50,8 @@ class Game {
     this.p14Enabled=this.p13Enabled && !new URLSearchParams(location.search).has('hf_p14_off');
     this.p15Enabled=this.p14Enabled && !new URLSearchParams(location.search).has('hf_p15_off');
     this.p16Enabled=this.p15Enabled && !new URLSearchParams(location.search).has('hf_p16_off');
+    // Explicit L27 -> P186 transfer occurs before the asynchronous HUD editor loads.
+    this.p186Transfer=consumeP186TransferFromUrl();
     this.p18Build=true;
     this.p182Build=true; // P18.1 save remains read-only when testing a new P18.2 game
     this.p183Build=true; // new isolated save; prior P18.2 state read-only
@@ -134,6 +138,8 @@ class Game {
     }
 
     this.wireInput();
+    // Isolated P186 mechanics only: P185 world, AI, joystick and P16 combat remain owners.
+    this.p186Skills=new URLSearchParams(location.search).has('hf_p186_off')?null:installP186Combat(this);
     window.addEventListener('resize', () => this.onResize());
   }
 
@@ -152,6 +158,9 @@ class Game {
     if (this.p810Enabled && this.touch?.premium?.p810?.perf){
       this.touch.premium.p810.perf.style.visibility=s==='playing'?'visible':'hidden';
     }
+    // Enter the P186 preview with the recorded user's camera and real controls
+    // in the same gesture, rather than waiting for world/AI frames to advance.
+    if(s==='playing')this.p186Skills?.enterPlaying();
     if (s === 'playing') this.requestPointerLock();
     else this.releasePointerLock();
   }
@@ -400,6 +409,8 @@ function loop(time) {
     if (perf161) perf161.endSection('effects');
     if (perf161) perf161.startSection('enemies');
     game.enemies.update(dt);
+    // Run after native enemy AI: 4 confirmed aerial shots use its existing landing FSM.
+    game.p186Skills?.update(dt);
     if (perf161) perf161.endSection('enemies');
     if (perf161) perf161.startSection('npcs');
     game.npcs.update(dt);
