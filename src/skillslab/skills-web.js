@@ -559,19 +559,20 @@ export class TianjieMobaSkillsLab {
   spawnTraining(manual=true,count=this.trainingCount){
     const g=this.game;
     if(g.state!=='playing'||!g.enemies?.trainingLab)return false;
-    this.trainingCount=count===3?3:1;
-    g.enemies.configureTrainingTargets(this.trainingCount);
+    this.trainingCount=3;
+    g.enemies.configureTrainingTargets(3);
+    // A recreated target is a NEW entity: never keep a stale focus pointer.
+    this.focusTarget=null;this.focusPanelOpen=false;
+    this.renderMonsterSelector();
     this.training=g.enemies.list.filter(e=>e.training&&e.alive);
     this.enemiesList=g.enemies.list;
     this.lastSpawn=this.now();
     this.syncTrainingUI();
-    if(manual)this.announce(this.trainingCount===3
-      ?'3 objetivos quietos · Sin IA ni ataques · Reciben daño real'
-      :'1 objetivo quieto · Sin IA ni ataques · Recibe daño real');
+    if(manual)this.announce('UNA ISLA · 3 esqueletos delante · DRAGÓN volador detrás · Sin IA · Daño real');
     return true;
   }
   resetTraining(){
-    const done=this.spawnTraining(false,this.trainingCount);
+    const done=this.spawnTraining(false,3);
     if(!done)return;
     // A training reset is explicit; it must not change P16 damage/combo rules.
     this.game.stats.hp=this.game.stats.maxHp;
@@ -586,9 +587,9 @@ export class TianjieMobaSkillsLab {
   syncTrainingUI(){
     const button=this.root?.querySelector('#hf-lab-train');
     if(button){
-      button.textContent='OBJ: '+this.trainingCount+' / 3';
+      button.textContent='3 BLANCOS + 🐉';
       button.setAttribute('aria-label',
-        'Cambiar entre uno y tres objetivos estáticos');
+        'Una isla de entrenamiento con tres enemigos terrestres y un dragón volador');
     }
   }
 
@@ -597,7 +598,7 @@ export class TianjieMobaSkillsLab {
     root.id='hf-tianjie-skills-lab';
     root.setAttribute('translate','no');
     root.innerHTML=`<div class="hf-lab-top">
-      <strong class="hf-lab-title">HIGHFLY <span>FURY P16 + SKILL LAB L23 · AIM TERRESTRE + ENFOCAR</span></strong>
+      <strong class="hf-lab-title">HIGHFLY <span>FURY P16 · LAB L24 ÚNICO · AIM + ENFOCAR</span></strong>
       <div class="hf-lab-modes">
         <button type="button" data-style="0">✦ AÉREA</button>
         <button type="button" data-style="1">⚔ ABISAL</button>
@@ -607,7 +608,7 @@ export class TianjieMobaSkillsLab {
       </div>
       <div class="hf-lab-sub">
         <span id="hf-lab-readout">S1 · S2 · S3 NUEVAS | S4 WULD ORIGINAL</span>
-        <button type="button" id="hf-lab-train">OBJ: 1 / 3</button>
+        <button type="button" id="hf-lab-train">3 BLANCOS + 🐉</button>
         <button type="button" id="hf-lab-reset">REINICIAR</button>
         <button type="button" id="hf-l23-focus" aria-expanded="false">◎ ENFOCAR</button>
 
@@ -628,7 +629,7 @@ export class TianjieMobaSkillsLab {
       b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();this.setStyle(Number(b.dataset.style));});
     root.querySelector('#hf-lab-train').addEventListener('pointerdown',e=>{
       e.preventDefault();e.stopPropagation();
-      this.spawnTraining(true,this.trainingCount===1?3:1);
+      this.announce('ISLA ÚNICA: enfrente 3 monstruos quietos; detrás el dragón volador · ENFOCAR para seleccionarlo');
     });
     root.querySelector('#hf-lab-reset').addEventListener('pointerdown',e=>{
       e.preventDefault();e.stopPropagation();this.resetTraining();
