@@ -200,6 +200,29 @@ jobs:
           echo "P15 published from SHA 768dd202c95da57f9b6c02e06a5d8d0a251203d1, CI verified"
           echo "Previous /, /p6/, /p7/, /p810/, /p812/, /p13/, /p14/ untouched"
 
+      - name: Add CI-green P16 FURY Hit Confirm + Responsive Joystick (keep P15 and prior demos)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags --depth=1 origin refs/heads/p16-fury-hitconfirm-20261105
+          test "$(git rev-parse FETCH_HEAD)" = "a83e7993d84da33c8d0792277c08d69a56bd1906"
+          mkdir -p .site/p16
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets | tar -x -C .site/p16
+          test -s .site/p16/index.html
+          test -s .site/p16/src/combat/hit-confirm-p16.js
+          test -s .site/p16/src/combat/combat.js
+          test -s .site/p16/src/ui/touch-controls.js
+          test -s .site/p16/src/player/player.js
+          test -s .site/p16/assets/models/player_barbarian.glb
+          find .site/p16/src -type f -name '*.js' -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+          if find .site/p16 -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
+            echo "Restricted material found"; exit 1
+          fi
+          echo "P16 pinned to CI-green commit a83e7993d84da33c8d0792277c08d69a56bd1906"
+          echo "Preserved stable and /p6/ /p7/ /p810/ /p812/ /p13/ /p14/ /p15/"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
