@@ -214,6 +214,7 @@ export class TianjieMobaSkillsLab {
         const hits=this.hitCone(at,dir,3.8,80,70,{launch:true,stun:1.05,height:3.8});
         this.fx.slash(at,dir,2);
         this.fx.impact(at.clone().addScaledVector(dir,1.2),2,2.8);
+        this.fx.signature.upwardPillar(at.clone().addScaledVector(dir,1.8),'#f5d58c',4.6,.62);
         this.announce('¡GANCHO ASCENDENTE! '+hits+' enemigo(s) elevados');
         this.animatePlayer(2);
         return true;
@@ -261,11 +262,8 @@ export class TianjieMobaSkillsLab {
     const g=this.game,p=g.player,at=p.pos.clone();
     if(slot===1){
       this.fx.launch(at,dir,0);
-      const geo=new THREE.SphereGeometry(.27,10,8);
-      const mat=new THREE.MeshStandardMaterial({
-        color:0xa46aff,emissive:0xaa55ff,emissiveIntensity:2.3
-      });
-      const mesh=new THREE.Mesh(geo,mat);
+      // Violet cast now gets a proper multi-layer 3D projectile and instanced sparks.
+      const mesh=this.fx.energyBolt(0);
       mesh.position.copy(at).add(vec(0,1.2,0)).add(dir.clone().multiplyScalar(.7));
       g.scene.add(mesh);
       this.projectiles.push({mesh,dir:dir.clone(),speed:28,remaining:17,style:0});
@@ -288,12 +286,14 @@ export class TianjieMobaSkillsLab {
       this.activeLeap={started:this.now(),deadline:this.now()+1.6,
         intended:raw.clone(),initial:at.clone(),landed:false};
       this.fx.ascend(at,travelDir);
+      this.fx.signature.upwardPillar(at,'#b870ff',3.4,.58);
       this.fx.landingMarker(raw,2.45,1.17,0);
       this.announce('ASCENSO: ¡el daño y la elevación ocurren al aterrizar!');
     }
     if(slot===3){
       this.busyUntil=this.now()+.25;
       this.fx.tornado(g.player.pos.clone(),4,0,2.15);
+      this.fx.signature.gravityFunnel(g.player.pos.clone(),'#b879fa',3.5,4.6,1.8);
       for(let tick=0;tick<11;tick++){
         this.schedule(tick*(2/11),()=>{
           this.hitSphere(g.player.pos,4.0,tick===10?55:22,{launch:true,stun:.34,height:7.3});
@@ -309,19 +309,24 @@ export class TianjieMobaSkillsLab {
       for(let i=0;i<3;i++)this.schedule(.11*i,()=>{
         const now=p.pos.clone(),forward=dir.clone();
         this.hitCone(now,forward,4.7+i*.95,47,i===2?30:21,{height:2.7});
-        this.fx.slash(now.clone().addScaledVector(forward,i*.6),forward,1);
+        this.fx.signature.groundWave(now,forward,3.3+i*1.25,
+          i===2?'#ffb1a4':'#ee446f',.43,47,.40);
+        this.fx.sparks(now.clone().addScaledVector(forward,1.6+i*.7),
+          '#ff84a4',12,2.4,.30,.12);
       });
     }
     if(slot===2){
       p.startDash({direction:{x:dir.x,z:dir.z},speed:23,duration:.27,style:'dodge'});
       this.fx.launch(at,dir,1);
+      this.fx.signature.rushLines(at,dir,'#ec5c9a',.45);
       this.schedule(.28,()=>{
         this.hitCone(p.pos,dir,3.0,70,60,{expose:true});
         this.fx.impact(p.pos.clone(),1,3);
+        this.fx.signature.crescent(p.pos.clone(),dir,'#ff6f9f',.51,1.0);
       });
     }
     if(slot===3){
-      this.fx.slash(at.clone().add(dir.clone().multiplyScalar(3)),dir,1);
+      this.fx.signature.darkExecution(at,dir,.70);
       this.schedule(.29,()=>{
         for(const e of this.candidates(p.pos,10,dir,15)){
           const d=e.group.position.clone().sub(p.pos).setY(0);
@@ -330,7 +335,9 @@ export class TianjieMobaSkillsLab {
           const missing=1-e.hp/Math.max(1,e.maxHp);
           this.struck(e,105+85*clamp(missing,0,1),dir);
         }
-        this.fx.impact(p.pos.clone().add(dir.clone().multiplyScalar(5)),1,3.4);
+        const end=p.pos.clone().add(dir.clone().multiplyScalar(5));
+        this.fx.impact(end,1,3.4);
+        this.fx.signature.crescent(end,dir,'#ff728a',.54,1.65);
       });
     }
   }
@@ -343,14 +350,15 @@ export class TianjieMobaSkillsLab {
         for(const e of this.candidates(now,3.7+i*1.7,dir,57,2.6)){
           this.struck(e,22,dir);e.applySlow?.(.55,1.3);
         }
-        this.fx.slash(now.clone().addScaledVector(dir,i*.85),dir,2);
-        this.fx.ring(now,2.8+i*.7,PALETTE[2],.32);
+        this.fx.signature.groundWave(now,dir,3.0+i*1.7,
+          i===2?'#fff4c8':'#dfba6a',.47,57,.38);
       });
     }
     if(slot===2){
       p.startDash({direction:{x:dir.x,z:dir.z},speed:17,duration:.36,style:'dodge'});
       this.guardianDash={until:this.now()+.36,dir:dir.clone(),touched:new Set()};
       this.fx.launch(at,dir,2);
+      this.fx.signature.rushLines(at,dir,'#f2cc7e',.45);
       this.schedule(.37,()=>{
         this.guardianDash=null;
         this.hitSphere(p.pos,2.5,34,{push:1.8,height:2.8});
@@ -362,6 +370,7 @@ export class TianjieMobaSkillsLab {
       this.guardianPull={started:this.now(),expires:this.now()+1.75,lastTick:-1,
         targets:new Set()};
       this.fx.vortex(p.pos.clone(),4.8,2);
+      this.fx.signature.gravityFunnel(p.pos.clone(),'#dfb967',4.8,4.9,1.65);
       this.announce('COLAPSO: absorbiendo enemigos hasta impacto final');
     }
   }
@@ -408,6 +417,7 @@ export class TianjieMobaSkillsLab {
     const center=this.game.player.pos.clone();
     const hits=this.hitSphere(center,4.8,105,{launch:true,stun:1.25,height:5.5});
     this.fx.landing(center,2,4.8);
+    this.fx.signature.upwardPillar(center,'#fff0b8',4.8,.62);
     this.announce('¡IMPACTO DE GRAVEDAD! '+hits+' elevados · S3 completada');
     this.animatePlayer(3);
     return hits;
@@ -425,6 +435,7 @@ export class TianjieMobaSkillsLab {
         launch:true,stun:1.15
       });
       this.fx.landing(impactPoint,0,2.45);
+      this.fx.signature.upwardPillar(impactPoint,'#d5aaff',3.2,.59);
       this.recastStyle=0;
       this.recastUntil=t+3.5;
       this.announce(count?
