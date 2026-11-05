@@ -29,7 +29,8 @@ export class Terrain {
     this.waterY = -2;
     this.noise = makeNoise2D(1337);
     this.chunks = new Map();
-    this.p161TerrainEnabled = new URLSearchParams(location.search).get('hf_p161_terrain') === '1';
+    this.p161TerrainEnabled = new URLSearchParams(location.search).get('hf_p161_terrain') === '1' ||
+      (!!game.p163Enabled && new URLSearchParams(location.search).get('hf_p161_terrain') !== '0');
     this._p161ChunkJob = null;
     this.p161TerrainStats = this.p161TerrainEnabled ? {
       enabled:true,completed:0,cancelled:0,pending:false,lastVertices:0,lastChunkMs:0,lastStepMs:0
