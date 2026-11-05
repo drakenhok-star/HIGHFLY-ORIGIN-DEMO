@@ -7,6 +7,7 @@ import {targetWithinSkillVolume22,isCancelDrop22,sweptProjectileHit22,enemyChest
 import {availableMonsters23,focusedFlightShot23} from './monster-focus-l23.js';
 import {L25AerialRupture} from './aerial-rupture-l25.js';
 import {L25PremiumSkillVfx} from './premium-vfx-l25.js';
+import {ClaudeVfxL26} from './claudecraft-vfx-l26.js';
 
 // FURY P16 hit-confirm and ATK gesture are authoritative for movement and combat.
 // This skill lab never replaces g.combat.melee or g.player.update.
@@ -42,6 +43,7 @@ export class TianjieMobaSkillsLab {
     this.exposed=new WeakMap();
     this.fx=new TianjieSkillVfx(game);
     this.premiumFx=new L25PremiumSkillVfx(this.fx);
+    this.claudeFx=new ClaudeVfxL26(this.fx);
     this.airRupture=new L25AerialRupture(this);
     this.aimGuide=new TianjieAimGuide(game);
     this.activeLeap=null;
@@ -255,7 +257,7 @@ export class TianjieMobaSkillsLab {
     else if(this.style===2)this.guardian(slot,dir);
     else castClaudeSkill(this,slot,dir,groundTarget,{manualAim:aimMode==='manual'});
     // L25 accent pass: all 15 skills, separate from damage and cooldown rules.
-    this.premiumFx.onCast(this.style,slot,g.player.pos,dir,groundTarget);
+    if(this.style<3)this.premiumFx.onCast(this.style,slot,g.player.pos,dir,groundTarget);
     this.animatePlayer(slot);
     this.renderHud(true);
     return true;
@@ -548,6 +550,7 @@ export class TianjieMobaSkillsLab {
             const closest=old.clone().lerp(pr.mesh.position,contact.t);
             this.struck(e,pr.damage??65,pr.dir);
             if(pr.aerialBasic)this.airRupture.confirm(e,closest);
+            if(pr.style===3 && pr.burn)this.claudeFx.fireImpact(closest);
             if(pr.burn)this.applyBurn(e,pr.burn.ticks,pr.burn.perTick,pr.burn.interval);
             else e.applySlow?.(.72,1.3);
             this.fx.impact(closest,pr.style,1.5);
