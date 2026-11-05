@@ -1,0 +1,43 @@
+name: HIGHFLY L24 — One Island Dragon + 3 Ground Targets
+on:
+  push:
+    branches:
+      - l24-unified-island-dragon-and-bots-20261105
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  unified-island:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax-check game modules, dragon spawn and targeting
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -name '*.js' -type f -print0 | while IFS= read -r -d '' f; do
+            node --input-type=module --check < "$f"
+          done
+          node --check tests/l24-unified-island.test.mjs
+      - name: Verify original combat, explicit focus and one-scene four-target setup
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          node tests/p15-finisher.test.mjs
+          node tests/p15-interruption.test.mjs
+          node tests/p16-hit-confirm.test.mjs
+          node tests/p19-fury-skills.test.mjs
+          node tests/l23-monster-focus.test.mjs
+          node tests/l24-unified-island.test.mjs
+          node scripts/audit_animation_p6.mjs
+          test -s assets/models/dragon_evolved_quaternius.glb
+          test -s assets/models/draugr_skeleton_warrior.glb
+          test -s LICENSE
+          test -s PROVENANCE.md
+          ! find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .
+# Source structural QA does not claim S23 Ultra GPU verification.
+# Single Pages deployment is separately pinned to the approved commit.
