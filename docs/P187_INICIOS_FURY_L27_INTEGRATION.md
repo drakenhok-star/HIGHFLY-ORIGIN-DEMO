@@ -33,6 +33,29 @@
   de profesiones, evitando contaminación de partidas. El guardado original
   no se sobrescribe al probar P187.
 
+## Navegación HIGHFLY en Android
+El menú rápido original queda dividido en cuatro pestañas SIN cambiar bolsa,
+inventario, misiones ni HUD de pantalla:
+- **AVENTURA:** inventario, mochila, misiones, mapa y funciones de exploración.
+- **COMBATE:** menú de estilos, catálogo de quince tarjetas FURY y sus CDs.
+- **OFICIOS:** guía de 15 profesiones, ocho núcleos y progresión niveles 1–20.
+- **SISTEMA:** ajustes, editar HUD, guardar y pausar.
+Los botones originales se reubican conservando sus event listeners; los nuevos
+registran su propia sección. Archivo: `src/ui/quick-nav-p187.js`.
+La prueba de Chrome táctil horizontal verifica navegación, menús heredados y
+que el panel del Pueblo aparece en OFICIOS.
+
+## Límites reales al 2026-11-05
+- **NO** se añadieron todavía 13 maestros 3D ni cinco villas construidas.
+- **NO** se añadieron nuevas cadenas de quests ni los dos dungeons ampliados
+  jugables; se conservan las misiones originales y la lección real de Sigrid.
+- El preapuntado manual completo con líneas/conos/círculos y gesto CANCELAR
+  del Skill Lab exige transferencia y pruebas adicionales.
+- El despliegue aislado en Vercel no pudo crearse: el proveedor respondió
+  `402 api-deployments-free-per-day` (cuota gratuita agotada por 24 horas).
+  P187 sólo se prueba en CI/Chrome hasta que exista una URL autorizada;
+  NO tocar Pages principal ni atribuir una URL de juego inexistente.
+
 ## Controles / pruebas a realizar
 1. Entrar al juego. Validar puerto/ciudad, agua, NPC, mobs, loot, cripta,
    mapa, 360° joystick, cámara, S4, ATK nativo en carrera/aire.
