@@ -48,6 +48,7 @@ export class TianjieMobaSkillsLab {
     this.aimDragThreshold=4;
     this.enemiesList=null;
     this.training=[];
+    this.trainingCount=game.enemies?.trainingCount||1;
     this.lastHud=-1;
     this.lastSpawn=-1;
     this.lastPlay=false;
@@ -420,8 +421,11 @@ export class TianjieMobaSkillsLab {
       this.busyUntil=0;
     }
     if(this.lastSpawn<0){
-      this.lastSpawn=now; // one real CC0 training group per session reset
-      this.spawnTraining(false);
+      // EnemyManager owns the ONLY 1-3 skeleton targets: no extra spawns here.
+      this.lastSpawn=now;
+      this.training=g.enemies.list.filter(e=>e.training&&e.alive);
+      this.trainingCount=g.enemies.trainingCount||1;
+      this.syncTrainingUI();
     }
     this.updateLeap();
     this.updateGuardianPull();
@@ -473,32 +477,40 @@ export class TianjieMobaSkillsLab {
     if(now-this.lastHud>.11){this.lastHud=now;this.renderHud();}
   }
 
-  spawnTraining(manual=true){
-    const g=this.game,p=g.player;
-    if(g.state!=='playing')return;
-    this.training=this.training.filter(e=>e?.alive);
-    if(this.training.length>=5){
-      if(manual)this.announce('Ya hay enemigos de entrenamiento.');
-      return;
+  spawnTraining(manual=true,count=this.trainingCount){
+    const g=this.game;
+    if(g.state!=='playing'||!g.enemies?.trainingLab)return false;
+    this.trainingCount=count===3?3:1;
+    g.enemies.configureTrainingTargets(this.trainingCount);
+    this.training=g.enemies.list.filter(e=>e.training&&e.alive);
+    this.enemiesList=g.enemies.list;
+    this.lastSpawn=this.now();
+    this.syncTrainingUI();
+    if(manual)this.announce(this.trainingCount===3
+      ?'3 objetivos quietos · Sin IA ni ataques · Reciben daño real'
+      :'1 objetivo quieto · Sin IA ni ataques · Recibe daño real');
+    return true;
+  }
+  resetTraining(){
+    const done=this.spawnTraining(false,this.trainingCount);
+    if(!done)return;
+    // A training reset is explicit; it must not change P16 damage/combo rules.
+    this.game.stats.hp=this.game.stats.maxHp;
+    this.game.stats.mp=this.game.stats.maxMp;
+    this.game.stats.sp=this.game.stats.maxSp;
+    this.ready=LAB_STYLES.map(()=>[0,0,0]);
+    this.recastUntil=0;this.recastStyle=-1;
+    this.game.combat.breakCombo?.('training-reset');
+    this.announce('Prueba reiniciada · HP/MP/Energía recuperados');
+    this.renderHud(true);
+  }
+  syncTrainingUI(){
+    const button=this.root?.querySelector('#hf-lab-train');
+    if(button){
+      button.textContent='OBJ: '+this.trainingCount+' / 3';
+      button.setAttribute('aria-label',
+        'Cambiar entre uno y tres objetivos estáticos');
     }
-    const forward=p.getForward(),right=vec(-forward.z,0,forward.x);
-    let added=0;
-    for(const [dist,side] of [[7,-3],[9,0],[7,3]]){
-      if(this.training.length+added>=6)break;
-      const offset=forward.clone().multiplyScalar(dist).addScaledVector(right,side);
-      const x=p.pos.x+offset.x,z=p.pos.z+offset.z;
-      const y=g.terrain.getHeight(x,z);
-      if(insideBlockingObject(g,x,y+1,z,1.1))continue;
-      const e=g.enemies._spawnDraugr(x,z,added%2?'mage':'warrior');
-      if(!e)continue;
-      e.hp=e.maxHp=240;
-      e.dmg=2;e.speed=1.7;e.aggroR=15;
-      e.awakened=true;
-      e.name='Draugr de entrenamiento';
-      this.training.push(e);
-      added++;
-    }
-    if(manual)this.announce(added?'Draugr CC0 preparados para practicar.':'Buscá terreno abierto y reintentá ENTRENAR.');
   }
 
   installHud(){
@@ -516,11 +528,12 @@ export class TianjieMobaSkillsLab {
       </div>
       <div class="hf-lab-sub">
         <span id="hf-lab-readout">S1 · S2 · S3 NUEVAS | S4 WULD ORIGINAL</span>
-        <button type="button" id="hf-lab-train">+ ENTRENAR</button>
+        <button type="button" id="hf-lab-train">OBJ: 1 / 3</button>
+        <button type="button" id="hf-lab-reset">REINICIAR</button>
         <button type="button" id="hf-lab-quality">FX: MEDIO</button>
         <button type="button" id="hf-lab-cancel" hidden>CANCELAR</button>
       </div>
-      <div id="hf-lab-message" role="status">Mismo personaje KayKit · FURY P14 intacto · ATK y SALTO originales</div>
+      <div id="hf-lab-message" role="status">FURY P16 intacto · Objetivos inmóviles · Daño real · Sin agresión</div>
     </div>`;
     document.body.appendChild(root);
     this.root=root;
@@ -530,8 +543,13 @@ export class TianjieMobaSkillsLab {
     for(const b of root.querySelectorAll('[data-style]'))
       b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();this.setStyle(Number(b.dataset.style));});
     root.querySelector('#hf-lab-train').addEventListener('pointerdown',e=>{
-      e.preventDefault();e.stopPropagation();this.spawnTraining(true);
+      e.preventDefault();e.stopPropagation();
+      this.spawnTraining(true,this.trainingCount===1?3:1);
     });
+    root.querySelector('#hf-lab-reset').addEventListener('pointerdown',e=>{
+      e.preventDefault();e.stopPropagation();this.resetTraining();
+    });
+    this.syncTrainingUI();
     root.querySelector('#hf-lab-quality').addEventListener('pointerdown',e=>{
       e.preventDefault();e.stopPropagation();
       this.quality=(this.quality+1)%3;
