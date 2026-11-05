@@ -21,6 +21,12 @@ export class PerformanceP2 {
     this.defaultDpr = Math.min(window.devicePixelRatio || 1, 2);
     this.originalWaterUpdate = game.water.update.bind(game.water);
     this.originalWaterMaterial = game.water.mesh.material;
+    // P16.3: FLUID/BALANCED/WATER use flat water. The 224x224 wave mesh
+    // carries ~100k triangles even when no shader displacement is active.
+    // Keep the exact original geometry for HIGH and use 24x24 for lite.
+    this.originalWaterGeometry = game.water.mesh.geometry;
+    this.flatWaterGeometry = game.p163Enabled ?
+      new THREE.PlaneGeometry(1400, 1400, 24, 24) : null;
     this.waterLite = new THREE.MeshPhongMaterial({
       color: 0x2f798c,
       emissive: 0x0b2936,
@@ -112,6 +118,7 @@ export class PerformanceP2 {
     const game = this.game;
     const isHigh = id==='HIGH';
     game.water.mesh.material = isHigh ? this.originalWaterMaterial : this.waterLite;
+    if (this.flatWaterGeometry) game.water.mesh.geometry = isHigh ? this.originalWaterGeometry : this.flatWaterGeometry;
     const isFluid = id==='FLUID';
     const isBalanced = id==='BALANCED';
     const isLight = isFluid || isBalanced;
@@ -138,6 +145,7 @@ export class PerformanceP2 {
     }
     this.btn.textContent = 'GPU: ' + selected.label;
     this.note.textContent = selected.desc + ' · Tocá para comparar';
+    game.perf163?.onPresetChange?.();
   }
 
   setState(state) {
