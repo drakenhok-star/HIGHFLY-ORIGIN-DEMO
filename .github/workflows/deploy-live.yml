@@ -223,23 +223,24 @@ jobs:
           echo "P16 pinned to CI-green commit a83e7993d84da33c8d0792277c08d69a56bd1906"
           echo "Preserved stable and /p6/ /p7/ /p810/ /p812/ /p13/ /p14/ /p15/"
 
-      - name: Add isolated P16.1 Performance preview (P16 remains frozen and playable)
+      - name: Add P16.1 Performance + Training (P16 frozen, Skill Lab separate)
         shell: bash
         run: |
           set -Eeuo pipefail
-          # Publish one pinned, reviewed experimental snapshot. Never publish
-          # mutable HEAD implicitly; bump this SHA for the next approved build.
+          # Pin immutable approved source, never publish moving branch head.
           git fetch --no-tags --depth=1 origin refs/heads/p16-1-performance-foundation-20261105
-          test "$(git rev-parse FETCH_HEAD)" = "2c76436c81c67791f355bfe5087c325592989816"
+          test "$(git rev-parse FETCH_HEAD)" = "de853a300416d4ac72a5e4d8279af410be3288ef"
           mkdir -p .p161-validate .site/p161
           git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets tests scripts | tar -x -C .p161-validate
           cd .p161-validate
           test -s index.html
+          test -s src/combat/hit-confirm-p16.js
           test -s src/ui/performance-p161.js
           test -s src/world/grass-cursor-p161.js
-          test -s src/world/scatter.js
           test -s src/world/terrain.js
-          test -s src/combat/hit-confirm-p16.js
+          test -s src/ui/training-p161.js
+          test -s src/ui/training-p161.css
+          test -s src/ui/training-schedule-p161.js
           test -s assets/models/player_barbarian.glb
           find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
             node --input-type=module --check < "$file"
@@ -258,52 +259,20 @@ jobs:
           node tests/p161-performance.test.mjs
           node tests/p161-grass-budget.test.mjs
           node tests/p161-terrain-budget.test.mjs
+          node tests/p161-training-ui.test.mjs
           node scripts/p14-mountain-scan.mjs
           node scripts/audit_animation_p6.mjs
           if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
-            echo "Restricted assets detected"; exit 1
+            echo "P16.1 contains restricted assets"; exit 1
           fi
           cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets ../.site/p161/
-          touch ../.site/p161/.nojekyll
-          test -s ../.site/p161/index.html
           cd ..
-          echo "P16 stable: /p16/ -> a83e7993d84da33c8d0792277c08d69a56bd1906"
-          echo "P16.1 Performance experimental: /p161/ -> 2c76436c81c67791f355bfe5087c325592989816"
-          echo "Skill Lab deploy is entirely separate (no changes to the Skill Lab repository)."
-
-      - name: Add P16.1 PERFORMANCE + TRAINING preview (preserve P16 and Skill Lab)
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          git fetch --no-tags --depth=1 origin refs/heads/p16-1-performance-foundation-20261105
-          test "$(git rev-parse FETCH_HEAD)" = "de853a300416d4ac72a5e4d8279af410be3288ef"
-          mkdir -p .site/p161
-          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets tests scripts | tar -x -C .site/p161
+          touch .site/p161/.nojekyll
           test -s .site/p161/index.html
-          test -s .site/p161/src/ui/performance-p161.js
-          test -s .site/p161/src/world/grass-cursor-p161.js
-          test -s .site/p161/src/ui/training-p161.js
-          test -s .site/p161/src/ui/training-p161.css
-          test -s .site/p161/src/ui/training-schedule-p161.js
-          test -s .site/p161/assets/models/player_barbarian.glb
-          (
-            cd .site/p161
-            find src -type f -name '*.js' -print0 | while IFS= read -r -d '' file; do
-              node --input-type=module --check < "$file"
-            done
-            node tests/p16-hit-confirm.test.mjs
-            node tests/p161-performance.test.mjs
-            node tests/p161-grass-budget.test.mjs
-            node tests/p161-terrain-budget.test.mjs
-            node tests/p161-training-ui.test.mjs
-          )
-          if find .site/p161 -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
-            echo "Restricted assets detected in P16.1"; exit 1
-          fi
-          rm -rf .site/p161/tests .site/p161/scripts
-          echo "P16.1 validated and pinned to de853a300416d4ac72a5e4d8279af410be3288ef"
-          echo "Demo Pages: / (original), /p16/ backup, /p161/ performance + Training"
-          echo "FURY-SKILL-LAB repo and separate Pages remain unchanged"
+          test -s .site/p16/index.html
+          echo "P16 backup remains pinned to a83e7993d84da33c8d0792277c08d69a56bd1906"
+          echo "P16.1 Performance + Training: /p161/ pinned de853a300416d4ac72a5e4d8279af410be3288ef"
+          echo "Skill Lab and other repositories untouched."
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
