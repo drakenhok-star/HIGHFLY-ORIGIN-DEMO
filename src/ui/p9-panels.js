@@ -12,6 +12,14 @@ const REWARDS={
  q2:{gold:150,xp:100,giver:'Sigrid · herrería',kind:'secundaria'},
  q3:{gold:500,xp:400,giver:'Olaf · aldea',kind:'principal'}
 };
+// P18+ quests carry their own authoritative rewards; unknown rewards are
+// never treated as "secret" unless the quest explicitly opts in.
+function questRewards(q){
+  if(REWARDS[q.id])return REWARDS[q.id];
+  return {gold:q.rewardGold??null,xp:q.rewardXp??null,
+    giver:q.giver||'NPC por descubrir',kind:q.kind||'secundaria',
+    secret:q.secret===true};
+}
 const COLORS={weapon:'#ffcc6f',armor:'#a8adff',potion:'#ec72a8',misc:'#b77afb'};
 const ICONS={
  weapon:'<path d="M29 4l7 7-17 18-4-4L29 4z" fill="#b9dffc" stroke="#fff5cc" stroke-width="1.5"/><path d="M12 24l12 12M9 27l6-6" stroke="#fbd67e" stroke-width="4" stroke-linecap="round"/><path d="M14 32l-6 7" stroke="#ba83e8" stroke-width="4" stroke-linecap="round"/>',
@@ -147,13 +155,13 @@ export class HighflyPanelsP9 {
   const categories=[['all','Todas'],['principal','Principales'],['secundaria','Secundarias'],
     ['active','En curso'],['complete','Para entregar'],['done','Completadas']];
   for(const [key,name] of categories){
-   const qlist=quests.filter(q=>key==='all'||(key==='principal'||key==='secundaria'?REWARDS[q.id]?.kind===key:q.state===key));
+   const qlist=quests.filter(q=>key==='all'||(key==='principal'||key==='secundaria'?questRewards(q).kind===key:q.state===key));
    const b=el('button',this.questGroup===key?'active':'',name+' ('+qlist.length+')',nav);b.type='button';
    b.addEventListener('click',()=>{this.questGroup=key;this.renderQuests();});
   }
   const visible=quests.filter(q=>
    (this.questGroup==='all'||(this.questGroup==='principal'||this.questGroup==='secundaria'?
-     REWARDS[q.id]?.kind===this.questGroup:q.state===this.questGroup))&&
+     questRewards(q).kind===this.questGroup:q.state===this.questGroup))&&
    q.name.toLowerCase().includes(this.questSearch.toLowerCase()));
   if(!visible.some(q=>q.id===this.selectedQuest)&&visible.length)this.selectedQuest=visible[0].id;
   for(const q of visible){
@@ -173,7 +181,7 @@ export class HighflyPanelsP9 {
   if(!visible.length)el('p','hf-p9-muted','No hay misiones en este filtro.',center);
   const q=quests.find(x=>x.id===this.selectedQuest) || visible[0];
   if(!q){el('p',null,'Seleccioná una misión.',detail);return;}
-  const info=REWARDS[q.id];
+  const info=questRewards(q);
   el('h3',null,'✦ '+q.name,detail);
   el('p',null,q.desc,detail);
   el('strong',null,'Objetivo',detail);
@@ -182,7 +190,13 @@ export class HighflyPanelsP9 {
   el('span',null,undefined,meter).style.width=(Math.min(1,q.progress/Math.max(1,q.need))*100)+'%';
   el('h3',null,'RECOMPENSAS',detail);
   const reward=el('div','hf-p9-reward',undefined,detail);
-  el('span',null,'◈ '+info.gold+' oro',reward);el('span',null,'✦ '+info.xp+' XP',reward);
+  if(info.secret){
+    el('span',null,'◈ ? oro',reward);el('span',null,'✦ ? XP',reward);
+    el('p','hf-p9-muted','Recompensa secreta · se revela al completar la misión.',detail);
+  }else{
+    el('span',null,Number.isFinite(info.gold)?'◈ '+info.gold+' oro':'◈ Recompensa por definir',reward);
+    el('span',null,Number.isFinite(info.xp)?'✦ '+info.xp+' XP':'✦ XP por definir',reward);
+  }
   el('p',null,'NPC: '+info.giver,detail);
   if(q.state==='complete'){
    el('p','hf-p9-muted','Objetivo completado. Entregá hablando con el NPC correspondiente.',detail);
