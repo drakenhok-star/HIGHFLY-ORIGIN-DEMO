@@ -59,6 +59,34 @@ try {
   'all 15 skill handlers must cast without JS exceptions');
  assert.ok(casts.nativeStill,'native P16 melee implementation unchanged');
  assert.ok(casts.active<=casts.cap,'mobile FX pool bounded');
+ // P187 real browser: display all 15 skill cards and all registered professions.
+ await page.evaluate(()=>window.game.p186Skills.openStyleMenu());
+ assert.equal(await page.locator('#hf-p186-styles .hf-p187-skill-cards article').count(),15,
+  'all fifteen cards show in a compact scrollable mobile panel');
+ await page.evaluate(()=>window.game.p186Skills.openStyleMenu());
+ await page.waitForFunction(()=>!!window.game?.p187VillageGuide?.button,undefined,{timeout:15000});
+ await page.evaluate(()=>window.game.p187VillageGuide.open());
+ const villageCopy=await page.locator('#hf-p187-inicios-guide').innerText();
+ assert.ok(villageCopy.includes('Minería')&&villageCopy.includes('Encantamiento')&&
+  villageCopy.includes('Fabricación de armaduras'),
+  'the initial town registers all trade families in the existing HUD');
+ await page.evaluate(()=>window.game.p187VillageGuide.close());
+ const teaching=await page.evaluate(()=>{
+  const g=window.game,prof=g.p187Professions;
+  g.stats.level=2;
+  const first=prof.learnAtTrainer('weaponcrafting','sigrid');
+  const second=prof.learnAtTrainer('armorcrafting','sigrid');
+  const previous=localStorage.getItem('highfly_p183_save');
+  g.saveSys.save({silent:true});
+  return {first:first.ok,second:second.ok,key:g.saveSys.key,
+    saved:JSON.parse(localStorage.getItem('highfly_p187_save')).professionsP187,
+    oldUnchanged:localStorage.getItem('highfly_p183_save')===previous};
+ });
+ assert.ok(teaching.first&&teaching.second,'real Sigrid trainer teaches weapon+armor');
+ assert.equal(teaching.key,'highfly_p187_save','prior P185 save kept read-only');
+ assert.equal(teaching.saved.learned.weaponcrafting,true);
+ assert.equal(teaching.saved.learned.armorcrafting,true);
+ assert.equal(teaching.oldUnchanged,true,'older P185 save never overwritten');
  await mkdir('audit-output',{recursive:true});
  try{await page.screenshot({path:'audit-output/p186-landscape.png',timeout:15000,animations:'disabled'});}
  catch(e){console.log('Noncritical screenshot:',e.message);}
