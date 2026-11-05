@@ -77,7 +77,7 @@ Cada experimento: **baseline -> una variable controlada -> 3 corridas -> delta P
 
 ## 6. Primera implementación experimental P16.1 — progresiva, aislada y reversible
 
-**Implementada en la rama experimental, no desplegada en ninguna Pages.** Cada mejora se activa mediante URL del futuro **Pages de laboratorio** y no cambia el juego al abrir la página sin banderas:
+**Implementada en la rama experimental, destinada a publicarse en la MISMA GitHub Pages de HIGHFLY-ORIGIN-DEMO bajo /p161/ tras pasar CI.** Cada mejora se activa mediante URL del futuro **Pages de laboratorio** y no cambia el juego al abrir la página sin banderas:
 
 | Parámetro de la URL | Prueba | Qué cambia |
 |---|---|---|
@@ -85,7 +85,7 @@ Cada experimento: **baseline -> una variable controlada -> 3 corridas -> delta P
 | `hf_p161_grass=1` | Césped por frames | Sustituye reconstrucción bloqueante por barrido de celdas temporizado con doble `InstancedMesh`, conservando césped anterior hasta intercambio completo. |
 | `hf_p161_terrain=1` | Chunks por frames | Calcula exactamente los mismos vértices/colores en lotes limitados; conserva chunk central inmediato y preprocesa vecinos en el menú. |
 
-Ejemplos de configuraciones **en la URL del futuro sitio experimental**, nunca en la P16 publicada:
+Ejemplos de configuraciones **en la ruta /p161/ del sitio HIGHFLY-ORIGIN-DEMO**, nunca en la P16 publicada:
 - BASE: `?hf_p161_profile=1`
 - CÉSPED: `?hf_p161_profile=1&hf_p161_grass=1`
 - TERRENO: `?hf_p161_profile=1&hf_p161_terrain=1`
@@ -100,4 +100,6 @@ Observaciones de ingeniería:
 - Testeado mediante ejecución aislada de los algoritmos sin GPU: correspondencia del barrido de celdas, intercambio doble-buffer y coincidencia exacta de los 9409 vértices y colores por chunk. CI GitHub y S23 siguen pendientes de confirmación, no se afirma aprobación.
 - P16 `_rebuildGrass`, P16 `_buildChunk` y el límite de 3 chunks por frame permanecen en la ruta normal de ejecución.
 
-**Protección entre Pages:** el único deploy ya existente de la demo está asociado a `main`. P16.1 únicamente contiene código y CI. No crear un segundo deploy en el mismo repositorio ni publicar estos experimentos sobre P16; el sitio de laboratorio distinto debe tener su propio repositorio Pages.
+**Protección entre proyectos:** la demo sirve /p16/ (backup) y /p161/ (nueva experimental) EN SU MISMA GITHUB PAGES mediante main. El Skill Lab mantiene otro repositorio y otra Pages. No modificar /p16/ ni desplegar P16.1 en el Skill Lab.
+
+**Ruta de publicación correcta:** https://drakenhok-star.github.io/HIGHFLY-ORIGIN-DEMO/p161/ (requiere verificar primero que GitHub Actions haya desplegado). Backup https://drakenhok-star.github.io/HIGHFLY-ORIGIN-DEMO/p16/. No utilizar Codespaces ni un nuevo Pages para este experimento.
