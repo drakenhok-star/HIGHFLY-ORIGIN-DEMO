@@ -25,21 +25,19 @@ export class LivingWorldP18 {
     this.reset();
     this.node=document.createElement('div');
     this.node.id='hf-p18-zone';
-    this.node.setAttribute('aria-label','HIGHFLY · zona del mundo');
+    this.node.setAttribute('aria-label','Misión activa');
     this.node.style.display='none';
     document.body.appendChild(this.node);
     const css=document.createElement('style');
     css.id='hf-p18-zone-style';
     css.textContent=[
-      '#hf-p18-zone{position:fixed;left:50%;transform:translateX(-50%);top:max(57px,calc(env(safe-area-inset-top) + 49px));',
-      'max-width:min(45vw,350px);padding:5px 10px;z-index:38;pointer-events:none;text-align:center;',
-      'color:#e2efff;border-radius:9px;border:1px solid #709acb90;background:#07162ce6;',
-      'font:700 11px/1.25 system-ui,sans-serif;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;',
-      'box-shadow:0 3px 12px #0006}',
-      '#hf-p18-zone strong{color:#8adeff}',
-      '#hf-p18-zone[data-safe="yes"] strong{color:#9ff8c8}',
-      '#hf-p18-zone[data-safe="no"] strong{color:#ffd198}',
-      '@media(max-height:460px){#hf-p18-zone{top:46px;font-size:9px;padding:3px 8px;max-width:40vw}}'
+      '#hf-p18-zone{position:fixed;left:50%;transform:translateX(-50%);',
+      'top:max(9px,calc(env(safe-area-inset-top) + 8px));',
+      'max-width:min(50vw,360px);padding:6px 12px;z-index:48;pointer-events:none;text-align:center;',
+      'color:#ffdfaa;border-radius:9px;border:1px solid #c18ae0a0;background:#1a1035da;',
+      'font:750 11px/1.25 system-ui,sans-serif;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;',
+      'box-shadow:0 2px 8px #0005}',
+      '@media(max-height:460px){#hf-p18-zone{top:5px;font-size:10px;padding:4px 9px;max-width:46vw}}'
     ].join('');
     document.head.appendChild(css);
     if(typeof window!=='undefined')window.highflyP18Report=()=>this.report();
@@ -69,17 +67,18 @@ export class LivingWorldP18 {
     }
   }
   setVisible(yes){
-    this.node.style.display=yes&&this.enabled?'block':'none';
+    const active=this.quest.status==='active'||this.quest.status==='complete';
+    this.node.style.display=yes&&this.enabled&&active?'block':'none';
   }
   refreshLabel(){
-    const z=this.zone;
-    if(!z)return;
-    const quest=this.quest.status==='active'
-      ?' · Centinelas '+this.quest.progress+'/'+FRONTIER.need
-      :this.quest.status==='complete'?' · Volvé con Bjorn':'';
-    this.node.dataset.safe=z.kind==='safe_city'?'yes':'no';
-    this.node.textContent='P18 · '+z.name+
-      (z.kind==='safe_city'?' · SEGURA':' · EXPLORACIÓN')+quest;
+    // The zone is internal quest/visit state, not a permanent HUD banner.
+    // This top-center strip displays ONLY an actual active mission.
+    const active=this.quest.status==='active';
+    const complete=this.quest.status==='complete';
+    this.node.textContent=active
+      ?'✦ MISIÓN ACTIVA · CENTINELAS '+this.quest.progress+'/'+FRONTIER.need
+      :complete?'✦ MISIÓN LISTA · VOLVÉ CON BJORN':'';
+    this.setVisible(this.game.state==='playing');
   }
   onNpcTalk(id){
     if(!this.enabled)return;
