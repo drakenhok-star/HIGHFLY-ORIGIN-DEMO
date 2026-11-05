@@ -116,12 +116,16 @@ export class WorldMapP34 {
     window.setTimeout(step,40);
   }
   pointsOfInterest(){
-    const base=this.game.p18Enabled?P181_ALL_POIS:POIS;
+    // Patrols are creatures, NOT permanent POIs. Gold quest dots appear only
+    // during the hunt, while Bjorn is the turn-in target, and NEVER after claim.
+    const frontierActive=this.game.p18Enabled &&
+      this.game.livingWorld?.quest?.status==='active';
+    const base=frontierActive?P181_ALL_POIS:POIS;
     if(!this.game.p18Enabled||!this.game.enemies?.packs)return base;
-    // Regenerate positions from actual dry habitats. Old static markers could
-    // still point into the ocean after the pack is moved to a safe shoreline.
-    // Cache the rows: no array allocations on every 280ms radar redraw.
-    if(!this._p182POIs)this._p182POIs=base.map(row=>row.slice());
+    // Cache correctly by list length: a quest change must REMOVE prior gold
+    // dots even if this method has already created the 2 extra marker rows.
+    if(!this._p182POIs||this._p182POIs.length!==base.length)
+      this._p182POIs=base.map(row=>row.slice());
     const list=this._p182POIs,packs=this.game.enemies.packs;
     const normals=packs.filter(p=>!p.p18&&!p.ice);
     for(let i=0;i<3;i++){
@@ -129,9 +133,11 @@ export class WorldMapP34 {
     }
     const ice=packs.find(p=>p.ice);
     if(ice?.home){list[7][1]=ice.home.x;list[7][2]=ice.home.z;}
-    for(let i=0;i<FRONTIER_ZONES_P181.length;i++){
-      const pack=packs.find(p=>p.p18&&p.regionId===FRONTIER_ZONES_P181[i].id);
-      if(pack?.home){list[POIS.length+i][1]=pack.home.x;list[POIS.length+i][2]=pack.home.z;}
+    if(frontierActive){
+      for(let i=0;i<FRONTIER_ZONES_P181.length;i++){
+        const pack=packs.find(p=>p.p18&&p.regionId===FRONTIER_ZONES_P181[i].id);
+        if(pack?.home){list[POIS.length+i][1]=pack.home.x;list[POIS.length+i][2]=pack.home.z;}
+      }
     }
     return list;
   }
@@ -214,6 +220,12 @@ export class WorldMapP34 {
     this.pinnedLabel=({q1:'Lobos',q2:'Espada ancestral',q3:'Dragón',
       p18_frontier:'Lobo centinela · Frontera'})[id];
     this.drawMini();return true;
+  }
+  clearTrackedQuest(id){
+    if(this.pinnedQuestId!==id)return false;
+    this.pinnedQuestId=null;this.pinnedLabel='';
+    if(this.game.state==='playing')this.drawMini();
+    return true;
   }
   missionPosition(){
     const id=this.pinnedQuestId,g=this.game;
