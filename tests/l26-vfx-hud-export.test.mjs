@@ -70,4 +70,16 @@ assert.ok(existsSync('src/skillslab/rupture-state-l25.js') &&
 assert.ok(!read('src/combat/combat.js').includes('L26')&&
  !read('src/player/player.js').includes('L26'),
  'original P16 combat and movement are untouched');
+const exportCatalog=await pure('src/skillslab/skill-catalog-export-l26.js');
+const rows=exportCatalog.HIGHFLY_SKILL_EXPORT_L26;
+assert.equal(rows.length,15,'portable catalog contains exactly 15 distinct skills');
+assert.equal(new Set(rows.map(x=>x.id)).size,15,'portable skill IDs unique');
+assert.equal(exportCatalog.l26SkillFamilies().length,5,'five kit families export');
+for(const s of rows){
+  assert.ok(s.cost>0&&s.cd>0&&s.slot>=1&&s.slot<=3,'valid cost/cooldown/slot '+s.id);
+  assert.ok(s.resource==='MP'||s.resource==='ENERGY','explicit resource type '+s.id);
+  assert.ok(s.source==='WOCC_MIT_RECONSTRUCTION'||s.source==='HIGHFLY_ORIGINAL');
+  assert.equal(exportCatalog.findL26Skill(s.id),s,'portable lookup resolves '+s.id);
+}
+assert.equal(exportCatalog.findL26Skill('unknown'),null,'invalid skill is not silently substituted');
 console.log('PASS L26: draggable ENFOCAR; original 6 MIT-grammar VFX on real hit; 15 profiles; no P16/game core modifications.');
