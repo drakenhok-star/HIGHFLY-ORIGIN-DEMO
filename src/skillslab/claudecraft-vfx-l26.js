@@ -59,6 +59,7 @@ export class ClaudeVfxL26{
  /** One instanced draw, height-rising ice shards anchored to ground profile. */
  icePillars(origin,radius=5,life=1.45){
   const count=this.fx.quality===0?7:12;
+  const baseY=ground(this.game,origin.x,origin.z);
   const mesh=new THREE.InstancedMesh(
     new THREE.ConeGeometry(.34,1.35,5),mat('#b9f3ff',.83),count);
   const dummy=new THREE.Object3D();
@@ -67,13 +68,14 @@ export class ClaudeVfxL26{
     const r=radius*(.70+(i%4)*.065);
     const x=origin.x+Math.sin(a)*r,z=origin.z+Math.cos(a)*r;
     const h=1.35+(i%4)*.34;
-    dummy.position.set(x,ground(this.game,x,z)+.18+h*.5);
+    dummy.position.set(x,ground(this.game,x,z)-baseY+.18+h*.5);
     dummy.rotation.set(Math.sin(a)*.18,a,Math.cos(a)*.16);
     dummy.scale.set(.84,h,.82);dummy.updateMatrix();
     mesh.setMatrixAt(i,dummy.matrix);
   }
   mesh.instanceMatrix.needsUpdate=true;
   mesh.frustumCulled=false;
+  mesh.position.y=baseY;
   mesh.scale.y=.06;
   return this.fx.add(mesh,life,'l26-ice-rise');
  }
