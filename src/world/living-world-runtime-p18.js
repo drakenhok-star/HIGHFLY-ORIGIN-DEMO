@@ -69,6 +69,16 @@ export class LivingWorldP18 {
   setVisible(yes){
     this.node.style.display=yes&&this.enabled?'block':'none';
   }
+  refreshLabel(){
+    const z=this.zone;
+    if(!z)return;
+    const quest=this.quest.status==='active'
+      ?' · Centinelas '+this.quest.progress+'/'+FRONTIER.need
+      :this.quest.status==='complete'?' · Volvé con Bjorn':'';
+    this.node.dataset.safe=z.kind==='safe_city'?'yes':'no';
+    this.node.textContent='P18 · '+z.name+
+      (z.kind==='safe_city'?' · SEGURA':' · EXPLORACIÓN')+quest;
+  }
   onNpcTalk(id){
     if(!this.enabled)return;
     this.world=applyWorldEventP18(this.world,{type:'npcTalked',id});
@@ -77,6 +87,7 @@ export class LivingWorldP18 {
     if(this.quest.status!=='available')return false;
     this.quest.status='active';
     this.quest.progress=0;
+    this.refreshLabel();
     this.game.hud.questBanner('Nueva misión: '+FRONTIER.name);
     this.game.hud.notify('Eliminá '+FRONTIER.need+' lobos de frontera y volvé con Bjorn');
     this.game.saveSys.save();
@@ -85,9 +96,11 @@ export class LivingWorldP18 {
   onEnemyKilled(enemy){
     if(!this.enabled||!enemy?.p18Frontier||this.quest.status!=='active')return false;
     this.quest.progress=Math.min(FRONTIER.need,this.quest.progress+1);
+    this.refreshLabel();
     this.game.hud.notify(FRONTIER.name+': '+this.quest.progress+'/'+FRONTIER.need);
     if(this.quest.progress===FRONTIER.need){
       this.quest.status='complete';
+      this.refreshLabel();
       this.game.hud.questBanner('Patrulla completa · Volvé con Bjorn');
     }
     this.game.saveSys.save();
@@ -96,6 +109,7 @@ export class LivingWorldP18 {
   turnInFrontier(){
     if(this.quest.status!=='complete')return false;
     this.quest.status='done';
+    this.refreshLabel();
     this.game.inventory.gold+=FRONTIER.rewardGold;
     this.game.stats.addXP(FRONTIER.rewardXp);
     this.world=applyWorldEventP18(this.world,{type:'questCompleted',id:FRONTIER.id});
@@ -117,8 +131,7 @@ export class LivingWorldP18 {
     const isNew=!this.world.visited[z.id];
     this.world=applyWorldEventP18(this.world,{type:'areaVisited',id:z.id});
     this.lastRegion=z.id;
-    this.node.dataset.safe=z.kind==='safe_city'?'yes':'no';
-    this.node.textContent='P18 · '+z.name+(z.kind==='safe_city'?' · ZONA SEGURA':' · EXPLORACIÓN');
+    this.refreshLabel();
     if(isNew && clock()-this.lastNotified>5000){
       this.lastNotified=clock();
       g.hud.notify('Exploraste: '+z.name);
