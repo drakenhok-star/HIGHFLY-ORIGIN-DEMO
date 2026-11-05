@@ -390,7 +390,7 @@ export class TianjieMobaSkillsLab {
     if(state.lastTick>=0&&t-state.lastTick<.085)return;
     state.lastTick=t;
     const center=this.game.player.pos.clone();
-    for(const enemy of this.candidates(center,4.8)){
+    for(const enemy of this.candidates(center,4.8,null,180,5.5)){
       if(enemy.boss||enemy.type==='dragon')continue;
       const pull=center.clone().sub(enemy.group.position).setY(0);
       if(pull.lengthSq()<.3)continue;
@@ -406,7 +406,7 @@ export class TianjieMobaSkillsLab {
     if(!this.guardianPull)return 0;
     this.guardianPull=null;
     const center=this.game.player.pos.clone();
-    const hits=this.hitSphere(center,4.8,105,{launch:true,stun:1.25});
+    const hits=this.hitSphere(center,4.8,105,{launch:true,stun:1.25,height:5.5});
     this.fx.landing(center,2,4.8);
     this.announce('¡IMPACTO DE GRAVEDAD! '+hits+' elevados · S3 completada');
     this.animatePlayer(3);
