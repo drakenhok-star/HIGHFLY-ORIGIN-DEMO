@@ -1,0 +1,46 @@
+name: HIGHFLY L25 — Legal VFX + Air Rupture QA
+on:
+  push:
+    branches:
+      - l25-vfx-ruptura-aerea-20261105
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression-and-air:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check full JS and test syntax
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -name '*.js' -type f -print0 | while IFS= read -r -d '' f; do
+            node --input-type=module --check < "$f"
+          done
+          for f in tests/p15-finisher.test.mjs tests/p15-interruption.test.mjs tests/p16-hit-confirm.test.mjs tests/p19-fury-skills.test.mjs tests/l23-monster-focus.test.mjs tests/l24-unified-island.test.mjs tests/l25-vfx-air-rupture.test.mjs; do
+            node --check "$f"
+          done
+      - name: FURY P16 preserved + 15 VFX + one island + hit-confirmed aerial rupture
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          node tests/p15-finisher.test.mjs
+          node tests/p15-interruption.test.mjs
+          node tests/p16-hit-confirm.test.mjs
+          node tests/p19-fury-skills.test.mjs
+          node tests/l23-monster-focus.test.mjs
+          node tests/l24-unified-island.test.mjs
+          node tests/l25-vfx-air-rupture.test.mjs
+          node scripts/audit_animation_p6.mjs
+          test -s assets/models/dragon_evolved_quaternius.glb
+          test -s assets/models/draugr_skeleton_warrior.glb
+          test -s docs/L25_VFX_DEPENDENCY_AUDIT_AND_AERIAL_RUPTURE.md
+          test -s LICENSE
+          test -s PROVENANCE.md
+          ! find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .
+# GPU/Android visual QA is a separate manual acceptance gate; CI is not proof of device FPS.
