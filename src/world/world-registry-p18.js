@@ -14,7 +14,7 @@ const region = spec => Object.freeze(spec);
 export const WORLD_REGIONS_P18 = Object.freeze([
   region({id:'village_01',name:'Aldea inicial',layer:'overworld',kind:'safe_city',x:0,z:40,radius:78,priority:100,spawnsEnemies:false}),
   region({id:'stones_01',name:'Ruinas antiguas',layer:'overworld',kind:'ruins',x:-220,z:-180,radius:52,priority:80,spawnsEnemies:true}),
-  region({id:'clearing_01',name:'Claro del bosque',layer:'overworld',kind:'field',x:150,z:150,radius:26,priority:75,spawnsEnemies:false}),
+  region({id:'clearing_01',name:'Claro del bosque',layer:'overworld',kind:'field',x:150,z:150,radius:26,priority:75,spawnsEnemies:true}),
   region({id:'wolf_north_01',name:'Bosque de lobos norte',layer:'overworld',kind:'field',x:120,z:160,radius:55,priority:60,spawnsEnemies:true}),
   region({id:'wolf_west_01',name:'Bosque de lobos oeste',layer:'overworld',kind:'field',x:-150,z:120,radius:55,priority:60,spawnsEnemies:true}),
   region({id:'wolf_south_01',name:'Bosque de lobos sur',layer:'overworld',kind:'field',x:80,z:-180,radius:55,priority:60,spawnsEnemies:true}),
@@ -92,7 +92,7 @@ export function npcSimulationTierP18(distanceSquared){
 }
 
 const ID=/^[a-z0-9_-]{2,64}$/;
-function validId(id){return typeof id==='string'&&ID.test(id);}
+function validId(id){return typeof id==='string'&&ID.test(id)&&!['__proto__','prototype','constructor'].includes(id);}
 export function createWorldStateP18(data=null){
   const seed=data&&typeof data==='object'&&!Array.isArray(data)&&data.schemaVersion===WORLD_P18_SCHEMA?data:null;
   const copySafeMap=val=>{
