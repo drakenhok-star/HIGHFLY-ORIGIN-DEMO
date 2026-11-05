@@ -34,6 +34,8 @@ import { PerfFoundationP161 } from './ui/performance-p161.js';
 import { PerfGovernorP163 } from './ui/performance-p163.js';
 import { LivingWorldP18 } from './world/living-world-runtime-p18.js';
 import { installP186Combat } from './combat/skill-bridge-p186.js';
+import { P187ProfessionRuntime } from './world/professions-runtime-p187.js';
+import { P187VillageGuide } from './ui/inicios-guide-p187.js';
 import { consumeP186TransferFromUrl } from './ui/p186-profile.js';
 
 class Game {
@@ -55,6 +57,7 @@ class Game {
     this.p18Build=true;
     this.p182Build=true; // P18.1 save remains read-only when testing a new P18.2 game
     this.p183Build=true; // new isolated save; prior P18.2 state read-only
+    this.p187Build=true; // P187 writes a NEW key and imports P183/P185 saves read-only
     this.p183Enabled=!new URLSearchParams(location.search).has('hf_p183_off');
     this.p183bEnabled=this.p183Enabled&&!new URLSearchParams(location.search).has('hf_p183b_off');
     this.p183cEnabled=this.p183bEnabled&&!new URLSearchParams(location.search).has('hf_p183c_off');
@@ -114,6 +117,7 @@ class Game {
     this.enemies = new Enemies(this);
     this.targeting=this.p6Enabled?new TargetingP6(this):null;
     this.npcs = new NPCs(this);
+    this.p187Professions = new P187ProfessionRuntime(this);
     this.audio = new AudioSys(this);
     this.saveSys = new SaveSys(this);
     this.hud = new HUD(this);
@@ -140,6 +144,7 @@ class Game {
     this.wireInput();
     // Isolated P186 mechanics only: P185 world, AI, joystick and P16 combat remain owners.
     this.p186Skills=new URLSearchParams(location.search).has('hf_p186_off')?null:installP186Combat(this);
+    this.p187VillageGuide=new P187VillageGuide(this);
     window.addEventListener('resize', () => this.onResize());
   }
 
@@ -224,6 +229,8 @@ class Game {
     this.livingWorld?.reset();
     this.player.reset();
     this.combat.reset();
+    this.p186Skills?.reset(); // no projectiles, queued damage or cooldowns leak across save/new game
+    this.p187Professions?.reset(); // load restores from the versioned P187 save when continuing
     if(this.targeting)this.targeting.cancel();
     // 室内重开新游戏/读档：立即恢复户外状态，不等 interiors.update 的远距自愈
     this.interiors.forceOutside();
@@ -411,6 +418,7 @@ function loop(time) {
     game.enemies.update(dt);
     // Run after native enemy AI: 4 confirmed aerial shots use its existing landing FSM.
     game.p186Skills?.update(dt);
+    game.p187VillageGuide?.update(dt);
     if (perf161) perf161.endSection('enemies');
     if (perf161) perf161.startSection('npcs');
     game.npcs.update(dt);
