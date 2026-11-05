@@ -1,0 +1,63 @@
+name: HIGHFLY L26 — Editable ENFOCAR and VFX Restoration QA
+on:
+  push:
+    branches: [l26-hud-editor-vfx-recovery-20261105]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  l26-static-and-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: All module syntax and regression checks (FURY P16 stays untouched)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -name '*.js' -type f -print0 | while IFS= read -r -d '' f; do
+            node --input-type=module --check < "$f"
+          done
+          node --check scripts/l26-browser-smoke.mjs
+          for f in tests/p15-finisher.test.mjs tests/p15-interruption.test.mjs tests/p16-hit-confirm.test.mjs tests/p19-fury-skills.test.mjs tests/l23-monster-focus.test.mjs tests/l24-unified-island.test.mjs tests/l25-vfx-air-rupture.test.mjs tests/l26-vfx-hud-export.test.mjs; do
+            node "$f"
+          done
+          node scripts/audit_animation_p6.mjs
+          test -s assets/models/dragon_evolved_quaternius.glb
+          test -s src/skillslab/claudecraft-vfx-l26.js
+          test -s PROVENANCE.md
+          ! find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .
+      - name: Setup Chrome headless
+        id: chrome
+        uses: browser-actions/setup-chrome@v2
+        with:
+          chrome-version: stable
+      - name: Install browser test driver (CI only, not shipped to players)
+        shell: bash
+        run: |
+          npm install --no-save --no-audit --no-fund playwright-core@1.51.1
+      - name: WebGL smoke at Samsung S23 Ultra landscape viewport
+        shell: bash
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+        run: |
+          set -Eeuo pipefail
+          node server.mjs > /tmp/highfly-l26-server.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:5520/lab.html >/dev/null; then break; fi
+            sleep .5
+          done
+          node scripts/l26-browser-smoke.mjs
+      - name: Store browser smoke screenshot for visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: l26-s23-landscape-ci-screenshot
+          path: audit-output/l26-landscape.png
+          if-no-files-found: ignore
+# Desktop simulated Chrome is not a measurement of actual mobile GPU FPS.
