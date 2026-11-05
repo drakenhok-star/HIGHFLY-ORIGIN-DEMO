@@ -5,6 +5,8 @@ const CHUNK = 200;
 const RES = 96;
 const VIEW_RADIUS = 2;
 const BUILD_PER_FRAME = 3;
+const P161_CHUNK_STEP_MS = 2.0;
+const P161_CHUNK_MAX_VERTICES = 1024;
 
 const FLATTEN_SPOTS = [
   { x: 0, z: 40, r: 75, y: 4.5 },
@@ -27,6 +29,11 @@ export class Terrain {
     this.waterY = -2;
     this.noise = makeNoise2D(1337);
     this.chunks = new Map();
+    this.p161TerrainEnabled = new URLSearchParams(location.search).get('hf_p161_terrain') === '1';
+    this._p161ChunkJob = null;
+    this.p161TerrainStats = this.p161TerrainEnabled ? {
+      enabled:true,completed:0,cancelled:0,pending:false,lastVertices:0,lastChunkMs:0,lastStepMs:0
+    } : null;
 
     this.material = new THREE.MeshStandardMaterial({
       vertexColors: true,
@@ -45,6 +52,12 @@ export class Terrain {
     this._tmpColor = new THREE.Color();
     this._tmpSnow = new THREE.Color();
 
+    if (this.p161TerrainEnabled) {
+      // Guarantee a walkable/visible central tile immediately; build surrounding
+      // terrain over subsequent menu frames instead of blocking a gameplay frame.
+      const start = game.camera.position;
+      this._buildChunk(Math.floor(start.x / CHUNK), Math.floor(start.z / CHUNK));
+    }
     this.update(0);
   }
 
@@ -150,10 +163,109 @@ export class Terrain {
     this.chunks.set(cx + ',' + cz, mesh);
   }
 
+
+  // P16.1 EXPERIMENTAL: incremental construction of the exact P16 heightfield.
+  // The original synchronous _buildChunk remains the instant rollback path.
+  _beginChunkJob(cx, cz) {
+    const geo = new THREE.PlaneGeometry(CHUNK, CHUNK, RES, RES);
+    geo.rotateX(-Math.PI / 2);
+    this._p161ChunkJob = {
+      cx, cz, geo, pos:geo.attributes.position,
+      colors:new Float32Array(geo.attributes.position.count * 3),
+      index:0, startedAt:performance.now()
+    };
+    this.p161TerrainStats.pending = true;
+  }
+
+  _stepChunkJob() {
+    const job = this._p161ChunkJob;
+    if (!job) return;
+    const start = performance.now();
+    const ox = (job.cx + 0.5) * CHUNK;
+    const oz = (job.cz + 0.5) * CHUNK;
+    let vertices = 0;
+    while (job.index < job.pos.count) {
+      const i = job.index++;
+      const wx = ox + job.pos.getX(i);
+      const wz = oz + job.pos.getZ(i);
+      const y = this.getHeight(wx, wz);
+      job.pos.setY(i, y);
+      const slope = this.getSlope(wx, wz);
+      const c = this._vertexColor(wx, wz, y, slope);
+      job.colors[i * 3] = c.r;
+      job.colors[i * 3 + 1] = c.g;
+      job.colors[i * 3 + 2] = c.b;
+      vertices++;
+      if (vertices >= P161_CHUNK_MAX_VERTICES ||
+          ((vertices & 31) === 0 && performance.now() - start >= P161_CHUNK_STEP_MS)) {
+        break;
+      }
+    }
+    this.p161TerrainStats.lastStepMs = performance.now() - start;
+    if (job.index < job.pos.count) return;
+    // Normals and mesh creation only once, after all positions/colors are ready.
+    job.geo.setAttribute('color', new THREE.BufferAttribute(job.colors, 3));
+    job.geo.computeVertexNormals();
+    const mesh = new THREE.Mesh(job.geo, this.material);
+    mesh.position.set(ox, 0, oz);
+    mesh.receiveShadow = true;
+    mesh.userData.cx = job.cx;
+    mesh.userData.cz = job.cz;
+    this.game.scene.add(mesh);
+    this.chunks.set(job.cx + ',' + job.cz, mesh);
+    this._p161ChunkJob = null;
+    this.p161TerrainStats.pending = false;
+    this.p161TerrainStats.completed++;
+    this.p161TerrainStats.lastVertices = job.pos.count;
+    this.p161TerrainStats.lastChunkMs = performance.now() - job.startedAt;
+  }
+
+  _updateBudgetedTerrain(ccx, ccz) {
+    let job = this._p161ChunkJob;
+    if (job && Math.max(Math.abs(job.cx - ccx), Math.abs(job.cz - ccz)) > VIEW_RADIUS + 1) {
+      // Teleports cancel unfinished geometry so stale work never leaks resources.
+      job.geo.dispose();
+      this._p161ChunkJob = null;
+      this.p161TerrainStats.cancelled++;
+      this.p161TerrainStats.pending = false;
+      job = null;
+    }
+    if (!job) {
+      for (let ring = 0; ring <= VIEW_RADIUS && !job; ring++) {
+        for (let cx = ccx - ring; cx <= ccx + ring && !job; cx++) {
+          for (let cz = ccz - ring; cz <= ccz + ring; cz++) {
+            if (Math.max(Math.abs(cx - ccx), Math.abs(cz - ccz)) !== ring) continue;
+            if (this.chunks.has(cx + ',' + cz)) continue;
+            this._beginChunkJob(cx, cz);
+            job = this._p161ChunkJob;
+            break;
+          }
+        }
+      }
+    }
+    if (job) this._stepChunkJob();
+
+    // Preserve the P16 cleanup and draw radius exactly.
+    for (const [key, mesh] of this.chunks) {
+      const dx = Math.abs(mesh.userData.cx - ccx);
+      const dz = Math.abs(mesh.userData.cz - ccz);
+      if (Math.max(dx, dz) > VIEW_RADIUS + 1) {
+        this.game.scene.remove(mesh);
+        mesh.geometry.dispose();
+        this.chunks.delete(key);
+      }
+    }
+  }
+
   update(dt) {
     const p = this.game.player ? this.game.player.pos : this.game.camera.position;
     const ccx = Math.floor(p.x / CHUNK);
     const ccz = Math.floor(p.z / CHUNK);
+
+    if (this.p161TerrainEnabled) {
+      this._updateBudgetedTerrain(ccx, ccz);
+      return;
+    }
 
     let built = 0;
     for (let ring = 0; ring <= VIEW_RADIUS && built < BUILD_PER_FRAME; ring++) {
