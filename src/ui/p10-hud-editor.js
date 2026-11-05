@@ -27,6 +27,7 @@ export class HudEditorP10{
   if(!HUD_IDS.includes(id)||!el)return;
   el.dataset.hfHudId=id;
   this.elements.set(id,el);
+  if(id==='focus'&&this.focusOption){this.focusOption.hidden=false;this.focusOption.disabled=false;}
   this.applyOne(id);
  }
  applyOne(id){
@@ -74,6 +75,7 @@ export class HudEditorP10{
    bag:'MOCHILA',menu:'MENÚ',focus:'ENFOCAR VOLADOR',combo:'COMBO',header:'HP / MP'};
   for(const id of HUD_IDS){
    const opt=node('option',null,NAMES[id]||id,this.select);opt.value=id;
+   if(id==='focus'){this.focusOption=opt;opt.hidden=true;opt.disabled=true;}
   }
   this.select.addEventListener('change',()=>this.choose(this.select.value));
   const makeSlider=(text,min,max,step,onInput)=>{
