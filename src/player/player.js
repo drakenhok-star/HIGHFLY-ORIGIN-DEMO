@@ -4,6 +4,7 @@ import { resolveDashDirection,relativeDodgeClip,worldMove,angleTo,wrapAngle } fr
 import { FuryTraversalP13 } from './fury-traversal-p13.js';
 import { landingRock } from './fury-surfaces-p13.js';
 import { canCancelAction } from '../combat/fury-combat-p15.js';
+import { attackIntentYaw, P162_ATTACK_TURN_RATE } from '../combat/turn-attack-p162.js';
 import { P16_RESPONSE } from '../combat/hit-confirm-p16.js';
 
 const _tmpV1 = new THREE.Vector3();
@@ -621,7 +622,12 @@ export class Player {
       if(this.dashT>=0){targetYaw=this.bodyYaw;}
       else if(this.attackT>=0 || this.castT>=0){
         const target=this.attackT>=0?g.combat?._attackTarget:(g.combat?._castTarget||g.targeting?.locked);
-        if(target?.alive){
+        if(g.p162Enabled && this.attackT>=0){
+          // Mobile ATK must track CURRENT joystick direction, not the direction
+          // on the first swing. Explicit lock-on is the one exception.
+          const locked=g.targeting?.valid(g.targeting.locked,4.7,true)?g.targeting.locked:null;
+          targetYaw=attackIntentYaw(this._moveDir,this.pos,this.bodyYaw,target,locked);
+        }else if(target?.alive){
           targetYaw=angleTo(target.group.position.x-this.pos.x,target.group.position.z-this.pos.z);
         }else targetYaw=this.bodyYaw;
       }else if(horizSpeed>0.5)targetYaw=angleTo(this.vel.x,this.vel.z);
@@ -637,7 +643,7 @@ export class Player {
     let dy = targetYaw - this.bodyYaw;
     while (dy > Math.PI) dy -= Math.PI * 2;
     while (dy < -Math.PI) dy += Math.PI * 2;
-    this.bodyYaw += (g.p7Enabled?wrapAngle(targetYaw-this.bodyYaw):dy) * (1 - Math.exp(-(g.p7Enabled && this.attackT>=0?32:12) * dt));
+    this.bodyYaw += (g.p7Enabled?wrapAngle(targetYaw-this.bodyYaw):dy) * (1 - Math.exp(-(g.p162Enabled && this.attackT>=0 ? P162_ATTACK_TURN_RATE : g.p7Enabled && this.attackT>=0 ? 32 : 12) * dt));
     this.rig.root.rotation.y = this.bodyYaw + MODEL_YAW_OFFSET;
 
     this.animate(dt, horizSpeed);
