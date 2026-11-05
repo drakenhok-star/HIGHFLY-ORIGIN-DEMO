@@ -665,6 +665,43 @@ jobs:
           test -s .site/p183c/index.html
           echo "P18.3c REAL HABITATS at /p183c/; all previous builds preserved"
 
+      - name: Publish P18.3d CC0 CLAUDECRAFT prairie monsters, visual scaling and WOC-style AI
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          # CI-green commit only; preserve old demos and no private SOURCE assets.
+          git fetch --no-tags --depth=1 origin refs/heads/p183d-prairie-reuse-first-20261105
+          test "$(git rev-parse FETCH_HEAD)" = "b521c0b8af261a34be0574547d1cc42eaa3c1ea1"
+          mkdir -p .p183d-validate .site/p183d
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets tests scripts docs basis | tar -x -C .p183d-validate
+          (
+            cd .p183d-validate
+            test -s assets/models/wolf_claudecraft_quaternius_cc0.glb
+            test -s src/world/biome-families-p183b.js
+            test -s src/core/assets.js
+            test -s tests/p183d-real-terrains.test.mjs
+            bash scripts/fetch_gobkit_boar_p183b.sh
+            export HF_REQUIRE_BOAR=1
+            find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+              node --input-type=module --check < "$file"
+            done
+            for test in tests/*.test.mjs; do node "$test"; done
+            if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' -o -iname '*Sketchfab*' -o -iname '*Meshy*' \) | grep -q .; then
+              echo "P18.3d blocked: restricted assets" >&2
+              exit 1
+            fi
+            cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets basis ../.site/p183d/
+          )
+          touch .site/p183d/.nojekyll
+          for previous in p16 p161 p163 p18 p181 p182 p1821 p183 p183b p183c; do
+            test -s ".site/$previous/index.html"
+          done
+          test -s .site/p183d/assets/models/boar_gobkit_cc0.glb
+          test -s .site/p183d/assets/models/wolf_claudecraft_quaternius_cc0.glb
+          test -s .site/p183d/assets/models/spider_quaternius_cc0.glb
+          test -s .site/p183d/index.html
+          echo "P18.3d REUSE FIRST prairie at /p183d/; all prior snapshots preserved"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
