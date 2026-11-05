@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {unifiedIslandLayout24} from '../skillslab/training-layout-l24.js';
 
 const WOLF_PACK_HOMES = [
   { x: 120, z: 160 },
@@ -157,22 +158,19 @@ export class Enemies {
     this.pendingRespawns.length = 0;
     this.bolts.length = 0;
     this.packs.length = 0;
-    const p = this.game.player;
-    const forward = p.getForward();
-    const right = new THREE.Vector3(-forward.z, 0, forward.x);
-    // Three separated dummies on the FRONT side of the SAME flat island.
-    const offsets=[[8.3,-3.8],[8.9,0],[8.3,3.8]];
-    offsets.forEach(([distance,side],i) => {
-      const spot=p.pos.clone().addScaledVector(forward,distance)
-        .addScaledVector(right,side);
-      this._spawnTrainingDummy(spot.x,spot.z,i);
-    });
-    // Opposite side, still on the same island. 15m lateral separation from
-    // spawn keeps short 3D projectiles in range, while the two areas do not
-    // overlap. Spawn relative to original player for reproducible resets.
-    const dragonSpot=p.pos.clone().addScaledVector(forward,-14.3)
-      .addScaledVector(right,1.3);
-    this._spawnTrainingDragon(dragonSpot.x,dragonSpot.z,p.pos);
+    // Capture the player's INITIAL island spawn exactly once.
+    // Resets never teleport combat areas to wherever the player is standing.
+    if(!this.trainingAnchor)this.trainingAnchor={
+      origin:this.game.player.pos.clone(),
+      forward:this.game.player.getForward().clone()
+    };
+    const layout=unifiedIslandLayout24(
+      this.trainingAnchor.origin,this.trainingAnchor.forward);
+    layout.skeletons.forEach((spot,i)=>
+      this._spawnTrainingDummy(spot.x,spot.z,i));
+    this._spawnTrainingDragon(
+      layout.dragon.x,layout.dragon.z,this.trainingAnchor.origin,
+      layout.hoverHeight);
     return true;
   }
 
@@ -206,7 +204,7 @@ export class Enemies {
     return e;
   }
 
-  _spawnTrainingDragon(x,z,face){
+  _spawnTrainingDragon(x,z,face,hoverHeight=7.0){
     // Real pre-existing Quaternius Dragon Evolved GLB + Flying_Idle clip.
     // Stays in the lab, is damageable, never chases, attacks, dies, drops loot
     // or awards XP. NO placeholder geometry, no duplicate separate spawner.
@@ -214,7 +212,7 @@ export class Enemies {
       8000,2.8,x,z);
     this._attachRig(e,'dragon');
     e.training=true;e.trainingDragon=true;e.trainingFlight=true;
-    e.flightOffset=7.0;
+    e.flightOffset=hoverHeight;
     e.group.position.y=this._groundAt(x,z)+e.flightOffset;
     e.home.copy(e.group.position);
     e.yaw=Math.atan2(face.x-x,face.z-z);
