@@ -3,7 +3,7 @@ import { hasLineOfSight, insideBlockingObject } from '../combat/targeting-p6.js'
 import { TianjieSkillVfx } from './lab-vfx.js';
 import { TianjieAimGuide, AIM_PROFILES } from './aim-guide-p16.js';
 import { castClaudeSkill } from './claudecraft-kit-p16.js';
-import {aerialDirection22,enemyChest22,directionToTarget22,targetWithinSkillVolume22,isCancelDrop22,sweptProjectileHit22} from './aerial-aim-l22.js';
+import {aerialDirection22,enemyChest22,directionToTarget22,targetWithinSkillVolume22,isCancelDrop22,sweptProjectileHit22,lockedLaunchDirection22} from './aerial-aim-l22.js';
 
 // FURY P16 hit-confirm and ATK gesture are authoritative for movement and combat.
 // This skill lab never replaces g.combat.melee or g.player.update.
@@ -114,6 +114,13 @@ export class TianjieMobaSkillsLab {
     const g=this.game,p=g.player;
     const target=g.targeting?.get(maxRange);
     if(target?.alive){
+      if((this.style===0||this.style===3) &&
+         AIM_PROFILES[this.style][slot-1].kind==='line'){
+        const chest=enemyChest22(target);
+        const muzzle={x:p.pos.x,y:p.pos.y+1.25,z:p.pos.z};
+        const flight=directionToTarget22(muzzle,chest);
+        if(flight)return vec(flight.x,flight.y,flight.z);
+      }
       const d=target.group.position.clone().sub(p.pos).setY(0);
       if(d.lengthSq()>0.01)return d.normalize();
     }
@@ -238,7 +245,7 @@ export class TianjieMobaSkillsLab {
       this.recastUntil=t+3.5;
     }
     // AERIAL recast starts only after actual ground impact, not takeoff.
-    if(this.style===0)this.aerial(slot,dir,groundTarget);
+    if(this.style===0)this.aerial(slot,dir,groundTarget,{manualAim:aimMode==='manual'});
     else if(this.style===1)this.rift(slot,dir);
     else if(this.style===2)this.guardian(slot,dir);
     else castClaudeSkill(this,slot,dir,groundTarget,{manualAim:aimMode==='manual'});
@@ -259,15 +266,24 @@ export class TianjieMobaSkillsLab {
     }
     p.actionDuration=slot===3?.42:.32;
   }
-  aerial(slot,dir,landingTarget=null){
+  aerial(slot,dir,landingTarget=null,options={}){
     const g=this.game,p=g.player,at=p.pos.clone();
     if(slot===1){
-      this.fx.launch(at,dir,0);
+      let shotDir=dir.clone();
+      // Explicit aerial lock overrides soft aim, but NEVER overrides a manual gesture.
+      if(!options.manualAim&&g.targeting?.locked&&g.targeting.valid(g.targeting.locked,17,true)){
+        const from={x:at.x,y:at.y+1.2,z:at.z};
+        const selected=lockedLaunchDirection22(from,g.targeting.locked,{
+          range:17,visible:(_e,q)=>hasLineOfSight(g,from,q)});
+        if(selected)shotDir=vec(selected.direction.x,selected.direction.y,selected.direction.z);
+      }
+      this.fx.launch(at,shotDir,0);
       // Violet cast now gets a proper multi-layer 3D projectile and instanced sparks.
       const mesh=this.fx.energyBolt(0);
-      mesh.position.copy(at).add(vec(0,1.2,0)).add(dir.clone().multiplyScalar(.7));
+      mesh.position.copy(at).add(vec(0,1.2,0)).add(shotDir.clone().multiplyScalar(.7));
+      mesh.quaternion.setFromUnitVectors(vec(0,0,1),shotDir);
       g.scene.add(mesh);
-      this.projectiles.push({mesh,dir:dir.clone(),speed:28,remaining:17,style:0});
+      this.projectiles.push({mesh,dir:shotDir.clone(),speed:28,remaining:17,style:0});
     }
     if(slot===2){
       // Authentic skill ordering: AIM GROUND -> TAKE OFF -> TRAVEL -> LAND
