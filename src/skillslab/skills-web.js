@@ -827,7 +827,9 @@ export class TianjieMobaSkillsLab {
     if(!this.aim)return;
     const a=this.aim,p=this.game.player;
     const prof=this.aimGuide.profile||AIM_PROFILES[this.style][a.slot-1];
-    const dir=a.dir||this.aimDirection(null,prof.range||17);
+    // While preparing a focused shot the beam follows a moving flyer.
+    if(!a.dragged)a.dir=this.aimDirection(null,prof.range||17,a.slot);
+    const dir=a.dir||this.aimDirection(null,prof.range||17,a.slot);
     let target=a.target;
     if(prof.kind==='zone'&&!target){
       // Terrain telegraphs always start from the player's own direction.
