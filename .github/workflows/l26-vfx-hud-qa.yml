@@ -58,6 +58,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: l26-s23-landscape-ci-screenshot
-          path: audit-output/l26-landscape.png
+          path: |
+            audit-output/l26-landscape.png
+            audit-output/l26-failure.png
           if-no-files-found: ignore
 # Desktop simulated Chrome is not a measurement of actual mobile GPU FPS.
