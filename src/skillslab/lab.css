@@ -246,3 +246,7 @@ body.hf-skills-lab #hf-touch #hf-l23-focus.active{
   color:#fff4cb;border-color:#ffd795;
   box-shadow:0 0 14px #ffc77eaa;
 }
+
+/* L27: central HUD crosshair falls exactly over the player head with the
+ * saved elevated camera. Pure presentation; manual aim/telegraphs remain. */
+body.hf-skills-lab .hud-crosshair {display:none!important;}
