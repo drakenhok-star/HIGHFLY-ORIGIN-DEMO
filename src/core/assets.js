@@ -14,6 +14,7 @@ const FILES = {
   skeleton_mage: './assets/models/draugr_skeleton_mage.glb',
   skeleton_blade: './assets/models/draugr_weapon_skeleton_blade.glb',
   wolf: './assets/models/wolf_quaternius.glb',
+  wolf_claude: './assets/models/wolf_claudecraft_quaternius_cc0.glb',
   spider: './assets/models/spider_quaternius_cc0.glb',
   crab: './assets/models/crab_quaternius_cc0.glb',
   goblin: './assets/models/goblin_quaternius_cc0.glb',
@@ -50,13 +51,15 @@ const SCALE = {
   skeleton_warrior: { targetHeight: 1.85 },
   skeleton_mage: { targetHeight: 1.85 },
   wolf: { fixed: 0.28 },
-  spider: { targetHeight: 0.85 },
-  crab: { targetHeight: 0.72 },
-  goblin: { targetHeight: 1.22 },
-  orc: { targetHeight: 2.08 },
-  stag: { targetHeight: 1.7 },
-  fox: { targetHeight: 0.75 },
-  yeti: { targetHeight: 2.15 },
+  // World of ClaudeCraft's verified Quaternius wolf, distinct from our existing wolf.
+  wolf_claude: { targetHeight: 1.6, animatedBounds: true },
+  spider: { targetHeight: 1.4, animatedBounds: true },
+  crab: { targetHeight: 1.7, animatedBounds: true },
+  goblin: { targetHeight: 2.1, animatedBounds: true },
+  orc: { targetHeight: 2.6, animatedBounds: true },
+  stag: { targetHeight: 1.9, animatedBounds: true },
+  fox: { targetHeight: 1.0, animatedBounds: true },
+  yeti: { targetHeight: 2.6, animatedBounds: true },
   boar: { targetHeight: 1.12 },
   dragon: { fixed: 3.9 }
 };
@@ -99,6 +102,57 @@ function measureVisibleHeight(root) {
   walk(root);
   if (box.isEmpty()) return 1;
   return Math.max(box.max.y - box.min.y, 0.001);
+}
+
+// REUSE FIRST P18.3d: use the animated skin bounds, like World of ClaudeCraft
+// (MIT src/render/characters/assets.ts). Static geometry boxes do not describe
+// Quaternius meshes with a 100x internal armature scale, causing tiny/offset mobs.
+function animatedSkinBoundsP183d(gltf) {
+  const model=skeletonClone(gltf.scene);
+  model.updateMatrixWorld(true);
+  const idle=gltf.animations.find(a=>/^(?:Idle|Spider_Idle)$/.test(a.name));
+  if(idle){
+    const mixer=new THREE.AnimationMixer(model);
+    mixer.clipAction(idle).play();
+    mixer.update(Math.min(0.45,Math.max(0.02,idle.duration*.45)));
+    model.updateMatrixWorld(true);
+    model.traverse(o=>{if(o.isSkinnedMesh)o.skeleton?.update();});
+    mixer.stopAllAction();
+    mixer.uncacheRoot(model);
+  }
+  const box=new THREE.Box3();
+  const point=new THREE.Vector3();
+  let vertices=0,skinned=0;
+  model.traverse(o=>{
+    if(!o.visible||!o.isSkinnedMesh)return;
+    skinned++;
+    const pos=o.geometry?.getAttribute('position');
+    if(!pos)return;
+    for(let i=0;i<pos.count;i++){
+      point.fromBufferAttribute(pos,i);
+      o.applyBoneTransform(i,point);
+      point.applyMatrix4(o.matrixWorld);
+      box.expandByPoint(point);
+      vertices++;
+    }
+  });
+  if(box.isEmpty()){
+    // Non-skinned fallback: still measure posed geometry, including node scale.
+    model.traverse(o=>{
+      if(!o.visible||!o.isMesh||o.isSkinnedMesh)return;
+      const pos=o.geometry?.getAttribute('position');
+      if(!pos)return;
+      for(let i=0;i<pos.count;i++){
+        point.fromBufferAttribute(pos,i);
+        point.applyMatrix4(o.matrixWorld);
+        box.expandByPoint(point);
+        vertices++;
+      }
+    });
+  }
+  if(box.isEmpty()||!Number.isFinite(box.min.y)||!Number.isFinite(box.max.y)
+    ||box.max.y-box.min.y<.001)throw new Error('animated skin bounding box is invalid');
+  return {height:box.max.y-box.min.y,minY:box.min.y,vertices,skinned};
 }
 
 function cloneMaterials(mesh) {
@@ -231,6 +285,8 @@ export class AssetLib {
   constructor() {
     this._lib = {};
     this._partsCache = new Map();
+    this.p183dAssets={};
+    this.loadErrors={};
   }
 
   async loadAll(onProgress) {
@@ -250,10 +306,20 @@ export class AssetLib {
       try {
         const gltf = await loader.loadAsync(url);
         applyHiddenProps(gltf.scene, key);
-        const nativeHeight = measureVisibleHeight(gltf.scene);
-        this._lib[key] = { gltf, nativeHeight };
+        const cfg=SCALE[key];
+        const measured=cfg?.animatedBounds?animatedSkinBoundsP183d(gltf):null;
+        const nativeHeight=measured?.height??measureVisibleHeight(gltf.scene);
+        this._lib[key] = { gltf, nativeHeight,footMinY:measured?.minY??0 };
+        if(measured){
+          this.p183dAssets[key]={rawHeight:+measured.height.toFixed(4),
+            scale:+(cfg.targetHeight/nativeHeight).toFixed(5),
+            groundOffset:+(-measured.minY*cfg.targetHeight/nativeHeight).toFixed(4),
+            vertices:measured.vertices,skins:measured.skinned,
+            clips:gltf.animations.map(a=>a.name)};
+        }
       } catch (error) {
         if (!optional.has(key)) throw error;
+        this.loadErrors[key]=String(error?.message||error);
         console.warn('[HIGHFLY biome] Modelo opcional no disponible, no aparece:',key,error);
       } finally {
         done += 1;
@@ -261,6 +327,9 @@ export class AssetLib {
       }
     }));
     ktx2.dispose();
+    if(typeof window!=='undefined')window.highflyP183dAssets=()=>({
+      resident:this.p183dAssets,loadErrors:this.loadErrors
+    });
   }
 
   has(key) { return !!this._lib[key]; }
@@ -276,6 +345,10 @@ export class AssetLib {
     let s = 1;
     if (cfg) s = cfg.fixed !== undefined ? cfg.fixed : cfg.targetHeight / entry.nativeHeight;
     model.scale.setScalar(s);
+    if(cfg?.animatedBounds){
+      // Feet must meet the REAL terrain, not the glTF pivot or raw armature centre.
+      model.position.y=-entry.footMinY*s;
+    }
 
     model.traverse((o) => {
       if (!o.isMesh) return;
