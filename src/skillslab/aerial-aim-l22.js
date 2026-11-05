@@ -61,3 +61,17 @@ export function sweptProjectileHit22(from,to,center,radius){
  const distanceSq=dx*dx+dy*dy+dz*dz;
  return distanceSq<=radius*radius?{t,distanceSq}:null;
 }
+
+/** Explicit lock-on is the player's priority for an un-dragged 3D projectile.
+ * The direction is captured ONCE at release. The missile does not home.
+ * A target out of 3D range or behind an obstacle cannot acquire the shot.
+ */
+export function lockedLaunchDirection22(origin,enemy,{range=22,visible=()=>true}={}){
+ if(!enemy||enemy.alive===false)return null;
+ const target=enemyChest22(enemy);
+ const dir=directionToTarget22(origin,target);
+ if(!dir)return null;
+ const dist=Math.hypot(target.x-origin.x,target.y-origin.y,target.z-origin.z);
+ if(dist>range||!visible(enemy,target))return null;
+ return {direction:dir,target:enemy,distance:dist};
+}
