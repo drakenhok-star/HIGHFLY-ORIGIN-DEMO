@@ -13,8 +13,11 @@ export const HABITAT_P182_RADII=Object.freeze([0,8,16,26,38,54,72,92]);
 export function landCellP182(terrain,x,z,edge=HABITAT_P182_EDGE){
   if(!terrain||!Number.isFinite(x)||!Number.isFinite(z))return false;
   const minY=terrain.waterY+HABITAT_P182_CLEARANCE;
-  if(terrain.getHeight(x,z)<=minY)return false;
-  if(edge<=0)return true;
+  const h=terrain.getHeight(x,z);
+  if(h<=minY)return false;
+  // 1 procedural height query per frame on high ground. Only shore proximity
+  // needs 4 additional probes. Preserve the P16.3 FPS work.
+  if(edge<=0 || h>minY+5)return true;
   // Shoreline margin prevents a creature's legs/rig intersecting the water.
   return terrain.getHeight(x+edge,z)>minY &&
     terrain.getHeight(x-edge,z)>minY &&
@@ -48,17 +51,21 @@ export function dryPackCenterP182(terrain,desired,offsets,allow=(x,z)=>true){
  * try sliding along the shore before freezing horizontal motion.
  * The original player movement is never touched.
  */
-export function groundedStepP182(terrain,x,z,stepX,stepZ){
-  if(!Number.isFinite(stepX)||!Number.isFinite(stepZ))return {x,z,blocked:true};
+export function groundedStepP182(terrain,x,z,stepX,stepZ,out={x,z,blocked:false}){
+  if(!Number.isFinite(stepX)||!Number.isFinite(stepZ)){
+    out.x=x;out.z=z;out.blocked=true;return out;
+  }
   const nx=x+stepX,nz=z+stepZ;
-  if(landCellP182(terrain,nx,nz,1.1))return {x:nx,z:nz,blocked:false};
+  if(landCellP182(terrain,nx,nz,1.1)){
+    out.x=nx;out.z=nz;out.blocked=false;return out;
+  }
   const alongX=landCellP182(terrain,nx,z,1.1);
   const alongZ=landCellP182(terrain,x,nz,1.1);
   if(alongX&&alongZ){
-    if(Math.abs(stepX)>=Math.abs(stepZ))return {x:nx,z,blocked:true};
-    return {x,z:nz,blocked:true};
-  }
-  if(alongX)return {x:nx,z,blocked:true};
-  if(alongZ)return {x,z:nz,blocked:true};
-  return {x,z,blocked:true};
+    if(Math.abs(stepX)>=Math.abs(stepZ)){out.x=nx;out.z=z;}
+    else{out.x=x;out.z=nz;}
+  }else if(alongX){out.x=nx;out.z=z;}
+  else if(alongZ){out.x=x;out.z=nz;}
+  else{out.x=x;out.z=z;}
+  out.blocked=true;return out;
 }
