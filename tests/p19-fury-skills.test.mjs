@@ -94,8 +94,9 @@ assert.ok(lab.includes('this.original={cast:originalCast,shout:originalShout,upd
  'original P16 movement/skill actions retain escape hatch');
 assert.ok(lab.includes('this.aimSensitivity??.145'));
 assert.ok(lab.includes('Segundo golpe EN EL LUGAR')&&lab.includes('finishGuardianPull(){'));
-assert.ok(cl.includes('chooseLaunchVector')&&cl.includes('fx.energyBolt(3)'),
- 'one-shot ballistic aim and original plasma FX integrated');
+assert.ok(cl.includes('focusedFlightShot23(muzzle,lab.focusTarget')&&
+ cl.includes('fx.energyBolt(3)')&&!cl.includes('chooseLaunchVector('),
+ 'one-shot original Fireball FX retained with L23 explicit flying-monster focus, no hidden auto-target');
 assert.ok(fx.includes('new THREE.ShaderMaterial')&&fx.includes("this.add(obj,.28,'crown')"),
  'genuine animated original shader + volumetric impact');
 assert.ok(aim.includes('this.conform(center,turn)')&&
