@@ -72,6 +72,33 @@ try {
    buttonReady:!!g.p187VillageGuide?.button};
  });
  assert.ok(villageStatus.buttonReady,'Village guide must mount in the existing HUD: '+JSON.stringify(villageStatus));
+ // Existing quick menu now has 4 accessible tabs rather than >10 stacked actions.
+ const quickSections=await page.evaluate(()=>{
+  const ui=window.game.touch.premium.p810,nav=ui.quickNav;
+  if(!nav)return null;
+  return {sections:[...nav.sections.keys()],
+   actions:Object.fromEntries([...nav.sections].map(([id,part])=>
+     [id,[...part.panel.querySelectorAll('button')].map(b=>b.textContent)]))};
+ });
+ assert.ok(quickSections,'P187 grouped quick menu installed');
+ assert.deepEqual(quickSections.sections,['aventura','combate','oficios','sistema']);
+ assert.ok(quickSections.actions.aventura.some(x=>x.includes('INVENTARIO')));
+ assert.ok(quickSections.actions.aventura.some(x=>x.includes('MISIONES')));
+ assert.ok(quickSections.actions.combate.some(x=>x.includes('15 SKILLS')));
+ assert.ok(quickSections.actions.oficios.some(x=>x.includes('OFICIOS 1–20')));
+ assert.ok(quickSections.actions.sistema.some(x=>x.includes('EDITAR HUD')));
+ assert.ok(quickSections.actions.sistema.some(x=>x.includes('GUARDAR')));
+ const switchWorks=await page.evaluate(()=>{
+  const ui=window.game.touch.premium.p810;
+  ui.toggleQuickMenu(true);
+  ui.quickNav.sections.get('oficios').tab.click();
+  const correct=ui.quickNav.selected==='oficios' &&
+   !ui.quickNav.sections.get('oficios').panel.hidden &&
+   ui.quickNav.sections.get('aventura').panel.hidden;
+  ui.toggleQuickMenu(false);
+  return correct;
+ });
+ assert.ok(switchWorks,'mobile tab switching works without losing original actions');
  await page.evaluate(()=>window.game.p187VillageGuide.open());
  const villageCopy=await page.locator('#hf-p187-inicios-guide').innerText();
  assert.ok(villageCopy.includes('Minería')&&villageCopy.includes('Encantamiento')&&
