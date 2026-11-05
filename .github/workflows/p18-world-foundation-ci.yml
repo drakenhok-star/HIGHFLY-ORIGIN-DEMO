@@ -52,6 +52,8 @@ jobs:
         run: node tests/p18-world-registry.test.mjs
       - name: P18 ecosystem mob/loot license gates and mobile budgets
         run: node tests/p18-living-ecology.test.mjs
+      - name: P18 playable bounty E2E, save isolation, two frontier packs and NPC bridge
+        run: node tests/p18-playable-integration.test.mjs
       - name: Terrain and public asset checks
         shell: bash
         run: |
