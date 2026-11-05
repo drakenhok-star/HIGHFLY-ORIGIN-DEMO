@@ -6,6 +6,9 @@ function attach(){
  if(!g||!g.player||!g.combat||!g.enemies||!g.touch){
   requestAnimationFrame(attach);return;
  }
+ // P16 Game.newGame()/continueGame() calls player.reset() before playing.
+ // Attach only AFTER native P16 resets the camera, not during menu splash.
+ if(g.state!=='playing'){requestAnimationFrame(attach);return;}
  if(window.highflySkillsLab)return;
  if(!g.p16Enabled){
   console.error('[HIGHFLY P19] FURY P16 is required; refusing downgraded boot.');
