@@ -20,7 +20,7 @@ try{
  const page=await context.newPage();
  page.on('pageerror',e=>errors.push('pageerror: '+e.message));
  page.on('console',m=>{if(m.type()==='error')errors.push('console: '+m.text().slice(0,300));});
- await page.goto('http://127.0.0.1:8957/',{waitUntil:'domcontentloaded',timeout:30000});
+ await page.goto('http://127.0.0.1:8957/?hf_training=1',{waitUntil:'domcontentloaded',timeout:30000});
  await page.waitForFunction(()=>!!window.game?.touch?.premium?.p810,null,{timeout:90000});
  await page.waitForFunction(()=>document.getElementById('asset-splash')===null,null,{timeout:60000}).catch(async err=>{
    const info=await page.evaluate(()=>{
@@ -47,7 +47,7 @@ try{
    menuText:document.getElementById('hf-p810-quick')?.textContent||'',
    initialized:window.game.combat?._meleeContext==='ground'}));
   assert.ok(p15.active&&p15.initialized,'P15 combat registered in the live 3D game');
-  assert.equal(p15.saveKey,'highfly_p15_save','save is separate from P14');
+  assert.equal(p15.saveKey,await page.evaluate(()=>window.game.p16Enabled?'highfly_p16_save':'highfly_p15_save'),'latest version saves independently');
   assert.ok(!p15.menuText.includes('PROBAR PARKOUR')&&!p15.menuText.includes('MESETA MONTAÑOSA'),
    'temporary P14 teleport tools removed from player menu');
   const finisher=await page.evaluate(()=>{
@@ -64,9 +64,50 @@ try{
    g.player.attackT=-1;
    return sample;
   });
-  assert.equal(finisher.step,4,'fourth hit triggers from an existing chain');
+  assert.equal(finisher.step,await page.evaluate(()=>window.game.p16Enabled?3:4),'P16 attempts cannot advance before impact');
   assert.equal(finisher.mode,'launch','UP joystick is captured as fourth-hit launch');
   assert.ok(finisher.vy>8.5 && finisher.energySpent,'launcher has real vertical physics and usual attack cost');
+  if(await page.evaluate(()=>window.game.p16Enabled)){
+    const result=await page.evaluate(()=>{
+      const g=window.game,c=g.combat,trainer=g.enemies.list.find(e=>e.training);
+      if(!trainer)return {reason:'trainer absent'};
+      const p=g.player.pos,dir=g.player.getCombatForward();
+      const old={x:trainer.group.position.x,y:trainer.group.position.y,z:trainer.group.position.z};
+      // Validated miss: trainer far away, lock removed and all other targets
+      // near the town excluded with a perpendicular forward direction.
+      const missed=c.comboStep===0;
+      const farHP=trainer.hp;
+      c.meleeCd=0;c.meleeHitT=-1;c.comboTimer=0;
+      trainer.group.position.set(p.x+75,p.y,p.z+75);
+      g.targeting.locked=null;
+      c.melee();c.meleeHitT=-1;c.resolveMelee();
+      const afterMiss=c.comboStep===0 && !c.lastConfirmedHit && trainer.hp===farHP;
+      // Bring real training enemy in the natural strike arc. No fake damage.
+      trainer.group.position.set(p.x+dir.x*1.9,p.y,p.z+dir.z*1.9);
+      g.targeting.locked=trainer;
+      const hits=[];
+      for(let i=1;i<=4;i++){
+        c.meleeCd=0;c.attackBuffer=0;c.meleeHitT=-1;
+        g.stats.sp=Math.max(30,g.stats.sp);
+        g.input.touchMove.x=0;g.input.touchMove.y=i===4?-1:0;
+        c.melee();
+        const before=c.comboStep;
+        c.meleeHitT=-1;c.resolveMelee();
+        hits.push({before,after:c.comboStep,confirmed:c.lastConfirmedHit});
+      }
+      g.input.touchMove.y=0;g.targeting.locked=null;
+      trainer.group.position.set(old.x,old.y,old.z);
+      c.comboStep=0;c.comboTimer=0;c.meleeCd=0;c.meleeHitT=-1;c._finisher=null;
+      g.player.attackT=-1;
+      return {missed,afterMiss,hits,trainerAlive:trainer.alive&&trainer.hp>0,
+        upperBodyAvailable:g.player.rig.supportsUpperBody('1H_Melee_Attack_Slice_Diagonal')};
+    });
+    assert.equal(result.afterMiss,true,'swinging in the air cannot advance combo');
+    assert.deepEqual(result.hits.map(h=>h.after),[1,2,3,4],
+      'four confirmed enemy HP losses, not four ATK button presses');
+    assert.ok(result.hits.every(h=>h.confirmed),'each strike must land');
+    assert.equal(result.trainerAlive,true,'trainer provides no kill or loot');
+  }
   const interruption=await page.evaluate(()=>{
     const g=window.game,c=g.combat,s=g.stats,p=g.player;
     c.comboStep=3;c.comboTimer=.8;c.meleeHitT=.1;c._finisher={mode:'launch'};
@@ -160,7 +201,7 @@ try{
  // No GPU/compositor stability dependency in software WebGL runner.
  // Pointer behavior is covered independently in the touch smoke checks.
  await saveButton.dispatchEvent('click',{bubbles:true,cancelable:true});
- assert.ok(await page.evaluate(()=>localStorage.getItem(window.game.p15Enabled?'highfly_p15_save':window.game.p14Enabled?'highfly_p14_save':window.game.p13Enabled?'highfly_p13_save':window.game.p812Enabled?'highfly_p812_save':'highfly_p810_save')!==null),'P812 and P810 save separately from P7');
+ assert.ok(await page.evaluate(()=>localStorage.getItem(window.game.p16Enabled?'highfly_p16_save':window.game.p15Enabled?'highfly_p15_save':window.game.p14Enabled?'highfly_p14_save':window.game.p13Enabled?'highfly_p13_save':window.game.p812Enabled?'highfly_p812_save':'highfly_p810_save')!==null),'P812 and P810 save separately from P7');
  await mkdir('audit-output',{recursive:true});
  if(process.env.HF_CAPTURE==='1'){
   try{await page.screenshot({path:'audit-output/p810-mobile-landscape.png',animations:'disabled',fullPage:false,timeout:15000});}
