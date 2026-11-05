@@ -38,7 +38,8 @@ function cellHash(ix, iz, salt) {
 export class Scatter {
   constructor(game) {
     this.game = game;
-    this.p161GrassEnabled = new URLSearchParams(location.search).get('hf_p161_grass') === '1';
+    this.p161GrassEnabled = new URLSearchParams(location.search).get('hf_p161_grass') === '1' ||
+      (!!game.p163Enabled && new URLSearchParams(location.search).get('hf_p161_grass') !== '0');
     this.meshes = [];
     this.obstacles = game.p7Enabled ? new NatureObstaclesP7(12) : null;
     this.forestNoise = makeNoise2D(1338);
