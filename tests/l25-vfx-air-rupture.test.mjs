@@ -39,7 +39,7 @@ assert.ok(!combat.includes('L25_AIR')&&!enemies.includes('L25_AIR')&&
 assert.ok(lab.includes('}).filter(item=>item.air);')&&
  lab.includes('this.focusTarget=this.focusTarget===selected?null:selected'),
  'only flyers eligible, with explicit one-tap toggle');
-assert.ok(lab.includes('root.appendChild(this.focusBtn)')&&
+assert.ok(lab.includes('this.game.touch.root.appendChild(this.focusBtn)')&&
  lab.includes("editor.register('focus',this.focusBtn)")&&
  lab.includes("document.querySelector('#hf-p810-bag')"),
  'L26 focus is editable by HUD and cancel follows original MOCHILA');
