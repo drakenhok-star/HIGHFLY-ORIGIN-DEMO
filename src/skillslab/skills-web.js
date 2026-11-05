@@ -70,7 +70,10 @@ export class TianjieMobaSkillsLab {
     this.installHud();
     this.bindKeyboard();
     this.attachTouchButtons();
-    this.bindingCheck=setInterval(()=>this.attachTouchButtons(),700);
+    this.bindingCheck=setInterval(()=>{
+      this.attachTouchButtons();
+      this.ensureFocusEditor(); // HUD P10 initializes asynchronously.
+    },700);
   }
   now(){return this.game.time.elapsed;}
   styleDef(){return LAB_STYLES[this.style];}
