@@ -174,6 +174,7 @@ export class PerfFoundationP161 {
       peakRenderStats: { ...this._peaks },
       resourceCounts: this._resources,
       experimentalGrass: this.game.scatter?.p161GrassStats ? { ...this.game.scatter.p161GrassStats } : null,
+      experimentalTerrain: this.game.terrain?.p161TerrainStats ? { ...this.game.terrain.p161TerrainStats } : null,
       timingsMs: timings
     };
   }
