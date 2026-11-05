@@ -339,7 +339,12 @@ export class Enemies {
       if(count)this.p183bSites.push({spec,site});
     }
     if(this.game.assets.has('crab')){
-      for(const [i,site] of resolveCoastSitesP183b(t,allow).entries()){
+      // Shore crabs must not overlap existing wolf frontier camps or new dens.
+      const wolfHomes=[[110,95],[-112,76],[120,160],[-150,120],[80,-180]];
+      const shoreAllow=(x,z)=>allow(x,z)&&
+        wolfHomes.every(([wx,wz])=>(x-wx)**2+(z-wz)**2>=60*60)&&
+        this.p183bSites.every(({site})=>(x-site.x)**2+(z-site.z)**2>=60*60);
+      for(const [i,site] of resolveCoastSitesP183b(t,shoreAllow).entries()){
         const spec={...P183B_COAST_TEMPLATE,id:'shore_crab_'+(i+1)};
         if(this._spawnBiomeMobP183b(spec,site.x,site.z))this.p183bSites.push({spec,site});
       }
