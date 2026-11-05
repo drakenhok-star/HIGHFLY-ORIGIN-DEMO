@@ -30,6 +30,7 @@ import { TouchControls } from './ui/touch-controls.js'; // HIGHFLY_TOUCH_PATCH_V
 import { TargetingP6 } from './combat/targeting-p6.js';
 import { PerfProbeP6 } from './ui/perf-probe-p6.js';
 import { PerfFoundationP161 } from './ui/performance-p161.js';
+import { PerfGovernorP163 } from './ui/performance-p163.js';
 
 class Game {
   constructor(assets) {
@@ -45,6 +46,7 @@ class Game {
     this.p14Enabled=this.p13Enabled && !new URLSearchParams(location.search).has('hf_p14_off');
     this.p15Enabled=this.p14Enabled && !new URLSearchParams(location.search).has('hf_p15_off');
     this.p16Enabled=this.p15Enabled && !new URLSearchParams(location.search).has('hf_p16_off');
+    this.p163Enabled=!new URLSearchParams(location.search).has('hf_p163_off');
     this.p812Eco=false;
     if(this.p812Enabled){
       try{this.p812Eco=localStorage.getItem('hf_p812_eco')==='1';}catch(err){}
@@ -106,6 +108,7 @@ class Game {
     this.p6Perf = new PerfProbeP6(this);
     this.performanceP2 = new PerformanceP2(this);
     this.perf161 = new PerfFoundationP161(this);
+    this.perf163 = this.p163Enabled ? new PerfGovernorP163(this) : null;
     this.worldMapP34 = null;
     if (!new URLSearchParams(location.search).has('hf_no_map')) {
       try { this.worldMapP34 = new WorldMapP34(this); }
@@ -402,7 +405,8 @@ function loop(time) {
   if(game.p812Enabled && (game.state==='inventory'||game.state==='quests')){
     // Keep the scene frozen while inventory/quest overlays cover it; preview 3D
     // renders separately and can update at a low frame rate.
-  }else if(game.p812Enabled && game.performanceP2?.preset==='FLUID'){
+  }else if(game.p812Enabled && (game.performanceP2?.preset==='FLUID' ||
+           (game.p163Enabled && game.performanceP2?.preset==='BALANCED'))){
     // FLUID mode does not require a full-screen postprocessing composer pass.
     // Renderer already owns SRGB output and ACES tone mapping.
     game.renderer.render(game.scene,game.camera);
@@ -413,6 +417,7 @@ function loop(time) {
   game.p6Perf.mark('render');
   game.p6Perf.end();
   if (perf161) perf161.endFrame();
+  if(game.perf163)game.perf163.update(time);
   game.mobileAudit.end();
 
   if (!splashHidden) {
