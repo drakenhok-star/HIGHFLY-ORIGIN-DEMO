@@ -115,7 +115,26 @@ export class WorldMapP34 {
     };
     window.setTimeout(step,40);
   }
-  pointsOfInterest(){return this.game.p18Enabled?P181_ALL_POIS:POIS;}
+  pointsOfInterest(){
+    const base=this.game.p18Enabled?P181_ALL_POIS:POIS;
+    if(!this.game.p18Enabled||!this.game.enemies?.packs)return base;
+    // Regenerate positions from actual dry habitats. Old static markers could
+    // still point into the ocean after the pack is moved to a safe shoreline.
+    // Cache the rows: no array allocations on every 280ms radar redraw.
+    if(!this._p182POIs)this._p182POIs=base.map(row=>row.slice());
+    const list=this._p182POIs,packs=this.game.enemies.packs;
+    const normals=packs.filter(p=>!p.p18&&!p.ice);
+    for(let i=0;i<3;i++){
+      if(normals[i]?.home){list[4+i][1]=normals[i].home.x;list[4+i][2]=normals[i].home.z;}
+    }
+    const ice=packs.find(p=>p.ice);
+    if(ice?.home){list[7][1]=ice.home.x;list[7][2]=ice.home.z;}
+    for(let i=0;i<FRONTIER_ZONES_P181.length;i++){
+      const pack=packs.find(p=>p.p18&&p.regionId===FRONTIER_ZONES_P181[i].id);
+      if(pack?.home){list[POIS.length+i][1]=pack.home.x;list[POIS.length+i][2]=pack.home.z;}
+    }
+    return list;
+  }
   // More visible than a normal wolf POI: gold diamond with C for Centinela.
   frontierDiamond(ctx,px,py,label,offscreen=false){
     ctx.save();
