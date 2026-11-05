@@ -32,6 +32,18 @@ assert.equal(a.lockedLaunchDirection22(muzzle,selected,{range:5}),null,
 assert.ok(a.lockedLaunchDirection22(muzzle,{
   ...selected,alive:false},{range:22})===null,
   'dead flying enemy cannot attract a locked projectile');
+const ground=()=>2;
+const groundEnemy={alive:true,group:{position:{x:0,y:2,z:-8}},hitRadius:.9};
+assert.equal(a.isFlying22(groundEnemy,ground),false,'ground enemy is not flying');
+assert.equal(a.flyingAutoTarget22(muzzle,f,[groundEnemy],ground,{range:22}),null,
+ 'ground enemy must NEVER steal manual Fireball aim');
+const onlyFlyer=a.flyingAutoTarget22(muzzle,f,[groundEnemy,selected],ground,
+ {range:22,halfAngle:18});
+assert.ok(onlyFlyer?.target===selected&&onlyFlyer.direction.y>.4,
+ 'soft lock may help a genuine elevated enemy');
+assert.equal(a.flyingAutoTarget22(muzzle,f,[selected],ground,{
+ range:22,visible:()=>false}),null,
+ 'automatic flight targeting must obey obstacles');
 const terrain=()=>2;
 const enemy={group:{position:{x:0,y:8,z:-8}},hitRadius:.9};
 const aim=a.enemyChest22(enemy);
@@ -60,9 +72,17 @@ assert.ok(skills.includes('root.appendChild(this.cancelBtn)'),'fixed X anchored 
 assert.ok(skills.includes('if(shouldCancel)return'),'X cancel never triggers cast');
 assert.ok(skills.includes("aerial(slot,dir,groundTarget,{manualAim:aimMode==='manual'})"),
   'explicit swipe mode passes through to aerial Guinevere');
-assert.ok(skills.includes('lockedLaunchDirection22(from,g.targeting.locked'),
-  'Guinevere honors explicit 3D lock over soft target');
-assert.ok(claude.includes('explicit||chooseLaunchVector'),
+assert.ok(skills.includes('lockedLaunchDirection22(from,locked'),
+  'Guinevere honors explicitly locked FLYER over soft target');
+assert.ok(skills.includes('flyingAutoTarget22(from,shotDir'),
+  'Guinevere can soft-correct flight only');
+assert.ok(skills.includes("if((this.style===0||this.style===3)") &&
+  skills.includes("const projectile=(this.style===0||this.style===3)") &&
+  skills.includes("isFlying22(locked,terrain)"),
+  'no auto target for ground skills, cones or melee');
+assert.ok(claude.includes('explicit||chooseLaunchVector') &&
+  claude.includes('isFlying22(e,terrain)') &&
+  claude.includes('locked&&isFlying22(locked,terrain)'),
   'Fireball locks first and falls back to soft aim only if no explicit lock');
 assert.ok(claude.includes('options.manualAim?'),
   'a manual skyward gesture cannot be redirected to a nearby ground target');
