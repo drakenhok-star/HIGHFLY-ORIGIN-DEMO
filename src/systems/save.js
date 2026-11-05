@@ -6,7 +6,7 @@ const KEY_P13 = 'highfly_p13_save';
 const KEY_P14 = 'highfly_p14_save';
 const KEY_P15 = 'highfly_p15_save';
 const KEY_P16 = 'highfly_p16_save';
-const KEY_FURY_SKILL_LAB = 'highfly_fury_skill_lab_p21_save';
+const KEY_FURY_SKILL_LAB = 'highfly_fury_skill_lab_l22_save';
 
 export class SaveSys {
   constructor(game) {
