@@ -3,7 +3,9 @@ import { worldIsSafeP18 } from '../world/world-registry-p18.js';
 import { dryPackCenterP182, groundedStepP182 } from '../world/terrestrial-habitat-p182.js';
 import { shallowStepP183, waterSpeedP183 } from '../world/shallow-water-p183.js';
 import { rollBonusLootP183 } from '../systems/loot-table-p183.js';
+import { P183_PENDING_SPECIES, speciesReadyP183 } from '../world/species-gate-p183.js';
 
+const P183_SPIDER_DENS = [{x:-228,z:183},{x:-245,z:192}]; // independent spawn / no quest ownership
 const WOLF_PACK_HOMES = [
   { x: 120, z: 160 },
   { x: -150, z: 120 },
@@ -61,6 +63,7 @@ export class Enemies {
     this.dragon = null;
     this.packs = [];
     this.pendingRespawns = [];
+    this.p183VenomTicks=0;this.p183VenomTime=0;
     this.geoCache = new Map();
     this.sackMat = new THREE.MeshStandardMaterial({ color: 0x7a5c34, roughness: 0.8, metalness: 0, emissive: 0xc9a86a, emissiveIntensity: 0.45 });
     // Reuse existing loot sack geometry; only material changes with rarity.
@@ -147,6 +150,12 @@ export class Enemies {
     }
     this._spawnBarrowDraugr();
     this._spawnDragon();
+    if(this.game.p183Enabled){
+      const spec=P183_PENDING_SPECIES.find(s=>s.id==='forest_spider');
+      if(speciesReadyP183(spec,['spider'].filter(k=>this.game.assets.has(k)))){
+        for(const den of P183_SPIDER_DENS)this._spawnSpider(den.x,den.z);
+      }
+    }
     if(this.game.p16Enabled && new URLSearchParams(location.search).has('hf_training'))
       this._spawnTrainingDummy();
   }
@@ -310,6 +319,16 @@ export class Enemies {
     return e;
   }
 
+  _spawnSpider(x,z){
+    if(!this.game.p183Enabled||!this.game.assets.has('spider'))return null;
+    const dry=dryPackCenterP182(this.game.terrain,{x,z},[[0,0]],(nx,nz)=>!worldIsSafeP18(nx,nz));
+    if(!dry)return null;
+    const e=this._base('spider','Araña del bosque',44,.85,dry.x,dry.z);
+    e.speciesId='forest_spider';e.dmg=8;e.speed=3.9;e.aggroR=14;e.attackRange=1.65;e.attackCd=1.7;
+    this._attachRig(e,'spider');e.rig.play('Spider_Idle');e.rig.update(Math.random());
+    return e;
+  }
+
   _spawnDraugr(x, z, variant = 'warrior') {
     if(this.game.p18Enabled){
       const dry=dryPackCenterP182(this.game.terrain,{x,z},[[0,0]],
@@ -451,7 +470,7 @@ export class Enemies {
     e.kbVel.set(0, 0, 0);
     e.boltPending = -1;
     e.hitPending = -1;
-    this._once(e, e.type === 'draugr' ? 'Death_A' : 'Death');
+    this._once(e,e.type==='draugr'?'Death_A':e.type==='spider'?'Spider_Death':'Death');
     e.animLock = 1e9;
     e.slowT = 0;
     e.slowDur = 0;
@@ -474,6 +493,8 @@ export class Enemies {
         xp = 35; items = ['draugr_bone'];
         gold = 10 + Math.floor(Math.random() * 16);
       }
+    } else if(e.type==='spider'){
+      xp=28;items=['spider_silk'];gold=6+Math.floor(Math.random()*10);
     } else {
       xp = 300; items = ['dragon_bone', 'dragon_scale'];
       gold = 300;
@@ -489,10 +510,11 @@ export class Enemies {
     g.stats.addXP(xp);
     // Lobo helado按独立类型上报：q1「狼患」只认Lobo
     // Separate species credit: centinelas are NOT standard q1 wolves.
-    g.quests.onEnemyKilled(e.p18Frontier ? 'wolf_sentinel' : e.ice ? 'ice_wolf' : e.type);
+    g.quests.onEnemyKilled(e.p18Frontier ? 'wolf_sentinel' : e.ice ? 'ice_wolf' : (e.speciesId||e.type));
     if(g.p18Enabled && e.p18Frontier)g.livingWorld?.onEnemyKilled(e);
     this._spawnDrop(e.group.position.x, e.group.position.z, items, gold, rarity);
 
+    if(e.type==='spider')this.pendingRespawns.push({kind:'spider',t:105,x:e.home.x,z:e.home.z});
     if (e.type === 'draugr' && !e.boss) {
       this.pendingRespawns.push({ kind: 'draugr', t: 120, x: e.home.x, z: e.home.z, variant: e.variant });
     }
@@ -605,7 +627,14 @@ export class Enemies {
       e.hitPending -= dt;
       if (e.hitPending < 0) {
         e.hitPending = -1;
-        if (dist < e.attackRange + 0.9) g.stats.damage(e.dmg);
+        if(dist<e.attackRange+0.9){
+          g.stats.damage(e.dmg);
+          if(g.p183Enabled&&e.type==='spider'&&Math.random()<.3){
+            this.p183VenomTicks=Math.max(this.p183VenomTicks,3);
+            this.p183VenomTime=1;
+            g.hud.notify('Envenenado: 3 pulsos');
+          }
+        }
       }
     }
     if (e.boltPending >= 0) {
@@ -704,8 +733,9 @@ export class Enemies {
       } else if (e.cdT <= 0) {
         e.cdT = e.attackCd;
         e.hitPending = 0.2;
-        if (e.type === 'wolf') this._once(e, 'Attack', 0.8);
-        else this._once(e, '1H_Melee_Attack_Slice_Diagonal');
+        if(e.type==='wolf')this._once(e,'Attack',.8);
+        else if(e.type==='spider')this._once(e,'Spider_Attack',.8);
+        else this._once(e,'1H_Melee_Attack_Slice_Diagonal');
       }
     }
 
@@ -761,13 +791,15 @@ export class Enemies {
         if (e.type === 'wolf') {
           if (e.state === 'chase') this._loco(e, 'Gallop', sp / 7);
           else this._loco(e, 'Walk');
+        } else if(e.type==='spider'){
+          this._loco(e,'Spider_Walk',Math.max(.65,sp/3.9));
         } else if (e.variant === 'mage') {
           this._loco(e, 'Walking_A', Math.max(0.8, sp / 4.2));
         } else {
           this._loco(e, 'Walking_D_Skeletons');
         }
       } else {
-        this._loco(e, 'Idle');
+        this._loco(e,e.type==='spider'?'Spider_Idle':'Idle');
       }
     }
     e.rig.update(dt);
@@ -994,7 +1026,11 @@ export class Enemies {
       d.mesh.rotation.y += dt * 1.6;
     }
 
-    this._updateBolts(dt, p);
+    this._updateBolts(dt,p);
+    if(g.p183Enabled&&this.p183VenomTicks>0){
+      this.p183VenomTime-=dt;
+      if(this.p183VenomTime<=0){g.stats.damage(2);this.p183VenomTicks--;this.p183VenomTime+=1;}
+    }
 
     for (let i = this.pendingRespawns.length - 1; i >= 0; i--) {
       const r = this.pendingRespawns[i];
@@ -1002,6 +1038,7 @@ export class Enemies {
       if (r.t <= 0) {
         this.pendingRespawns.splice(i, 1);
         if (r.kind === 'draugr') this._spawnDraugr(r.x, r.z, r.variant);
+        if (r.kind === 'spider' && g.p183Enabled) this._spawnSpider(r.x,r.z);
       }
     }
 
@@ -1085,6 +1122,7 @@ export class Enemies {
     }
     this.bolts = [];
     this.pendingRespawns = [];
+    this.p183VenomTicks=0;this.p183VenomTime=0;
     this.packs = [];
     this.dragon = null;
     this.spawnAll();

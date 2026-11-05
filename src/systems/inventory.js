@@ -9,6 +9,7 @@ export const ITEM_DB = {
   health_potion: { name: 'Poción de salud', type: 'potion', heal: 40, value: 30, desc: 'Restaura 40 HP.' },
   mana_potion: { name: 'Poción de maná', type: 'potion', mana: 40, value: 30, desc: 'Restaura 40 MP.' },
   wolf_pelt: { name: 'Piel de lobo', type: 'misc', value: 12, desc: 'Pelaje de lobo de las tierras frías.' },
+  spider_silk: { name: 'Seda de araña', type: 'misc', value: 16, desc: 'Material del bosque.' },
   draugr_bone: { name: 'Restos de draugr', type: 'misc', value: 18, desc: 'Restos impregnados de frío.' },
   dragon_bone: { name: 'Hueso de dragón', type: 'misc', value: 500, desc: 'Huesos de un dragón antiguo.' },
   dragon_scale: { name: 'Escama de dragón', type: 'misc', value: 350, desc: 'Escamas extraordinariamente resistentes.' },

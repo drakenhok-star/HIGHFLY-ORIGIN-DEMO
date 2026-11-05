@@ -4,7 +4,7 @@
  */
 export const P183_PENDING_SPECIES=Object.freeze([
   Object.freeze({id:'wild_boar',label:'Jabalí salvaje',behavior:'charge_flee',modelKey:null,licenseVerified:false,rigValidated:false}),
-  Object.freeze({id:'forest_spider',label:'Araña del bosque',behavior:'ambush_web',modelKey:null,licenseVerified:false,rigValidated:false}),
+  Object.freeze({id:'forest_spider',label:'Araña del bosque',behavior:'venom_bite',modelKey:'spider',licenseVerified:true,rigValidated:true}),
   Object.freeze({id:'bandit_rogue',label:'Bandido',behavior:'retreat_alert',modelKey:null,licenseVerified:false,rigValidated:false})
 ]);
 export function speciesReadyP183(spec,loadedAssets){

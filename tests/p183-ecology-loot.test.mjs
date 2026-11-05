@@ -63,10 +63,15 @@ assert.equal(rollBonusLootP183({type:'training'},()=>0).items.length,0,
 
 assert.equal(P183_PENDING_SPECIES.length,3);
 for(const spec of P183_PENDING_SPECIES){
- assert.equal(spec.modelKey,null,'no stand-in model for '+spec.id);
- assert.equal(spec.licenseVerified,false);
- assert.equal(spec.rigValidated,false);
- assert.equal(speciesReadyP183(spec,['wolf']),false);
+ if(spec.id==='forest_spider'){
+  assert.equal(spec.modelKey,'spider');assert.equal(spec.licenseVerified,true);
+  assert.equal(spec.rigValidated,true);assert.equal(speciesReadyP183(spec,['spider']),true);
+  assert.equal(speciesReadyP183(spec,['wolf']),false);
+ }else{
+  assert.equal(spec.modelKey,null,'no stand-in model for '+spec.id);
+  assert.equal(spec.licenseVerified,false);assert.equal(spec.rigValidated,false);
+  assert.equal(speciesReadyP183(spec,['wolf']),false);
+ }
 }
 assert.equal(speciesReadyP183({
  modelKey:'boar_verified',licenseVerified:true,rigValidated:true

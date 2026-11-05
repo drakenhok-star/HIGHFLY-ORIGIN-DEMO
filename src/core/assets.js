@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
 const FILES = {
   player: './assets/models/player_barbarian.glb',
@@ -12,6 +13,7 @@ const FILES = {
   skeleton_mage: './assets/models/draugr_skeleton_mage.glb',
   skeleton_blade: './assets/models/draugr_weapon_skeleton_blade.glb',
   wolf: './assets/models/wolf_quaternius.glb',
+  spider: './assets/models/spider_quaternius_cc0.glb',
   dragon: './assets/models/dragon_evolved_quaternius.glb',
   pine1: './assets/models/env_pine_01.glb',
   pine2: './assets/models/env_pine_02.glb',
@@ -40,6 +42,7 @@ const SCALE = {
   skeleton_warrior: { targetHeight: 1.85 },
   skeleton_mage: { targetHeight: 1.85 },
   wolf: { fixed: 0.28 },
+  spider: { targetHeight: 0.85 },
   dragon: { fixed: 3.9 }
 };
 
@@ -217,6 +220,7 @@ export class AssetLib {
 
   async loadAll(onProgress) {
     const loader = new GLTFLoader();
+    loader.setMeshoptDecoder(MeshoptDecoder); // MIT, vendored locally for Quaternius rigs
     const entries = Object.entries(FILES);
     const total = entries.length;
     let done = 0;
@@ -230,6 +234,8 @@ export class AssetLib {
       if (onProgress) onProgress(done, total);
     }));
   }
+
+  has(key) { return !!this._lib[key]; }
 
   spawn(key) {
     const entry = this._lib[key];

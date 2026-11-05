@@ -14,17 +14,18 @@ export const P183_BONUS_TABLES=Object.freeze({
   ice_wolf:Object.freeze([entry('mana_potion',.09,'uncommon'),entry('hide_armor',.025,'rare')]),
   draugr:Object.freeze([entry('mana_potion',.10,'uncommon'),entry('steel_sword',.025,'rare')]),
   draugr_boss:Object.freeze([entry('steel_sword',.15,'rare'),entry('ancient_sword',.025,'epic')]),
-  dragon:Object.freeze([entry('dragonbone_sword',.08,'epic'),entry('dragonscale_armor',.09,'epic')])
+  dragon:Object.freeze([entry('dragonbone_sword',.08,'epic'),entry('dragonscale_armor',.09,'epic')]),
+  spider:Object.freeze([entry('health_potion',.08,'uncommon'),entry('hide_armor',.008,'rare')])
 });
 export const P183_BASE_RARITY=Object.freeze({
   wolf:'common',wolf_sentinel:'common',ice_wolf:'uncommon',
-  draugr:'common',draugr_boss:'rare',dragon:'rare'
+  draugr:'common',draugr_boss:'rare',dragon:'rare',spider:'common'
 });
 export function lootSpeciesP183(enemy){
   if(!enemy)return null;
   if(enemy.type==='wolf')return enemy.p18Frontier?'wolf_sentinel':enemy.ice?'ice_wolf':'wolf';
   if(enemy.type==='draugr')return enemy.boss?'draugr_boss':'draugr';
-  return enemy.type==='dragon'?'dragon':null;
+  return enemy.type==='dragon'?'dragon':enemy.type==='spider'?'spider':null;
 }
 /** Returns only bonus items: legacy guaranteed drops are always kept. */
 export function rollBonusLootP183(enemy,rng=Math.random){

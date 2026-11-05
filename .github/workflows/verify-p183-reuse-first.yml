@@ -1,0 +1,25 @@
+name: "HIGHFLY P18.3 · REUSE FIRST Spider CI"
+on:
+  push:
+    branches: [p183-reuse-first-spider-20261105]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Syntax check
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -name '*.js' -print0 | while IFS= read -r -d '' file; do node --input-type=module --check < "$file"; done
+      - name: All regressions
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          for t in tests/*.test.mjs; do node "$t"; done
