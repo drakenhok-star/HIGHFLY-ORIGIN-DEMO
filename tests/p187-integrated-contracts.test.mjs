@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {INICIOS_PROFESSIONS_P186} from '../src/world/inicios-v2-p186.js';
+import {HIGHFLY_SKILL_EXPORT_L26} from '../src/skillslab/skill-catalog-export-l26.js';
+import {P187ProfessionRuntime} from '../src/world/professions-runtime-p187.js';
+assert.equal(INICIOS_PROFESSIONS_P186.length,15);
+assert.equal(HIGHFLY_SKILL_EXPORT_L26.length,15);
+const game={stats:{level:2}},p=new P187ProfessionRuntime(game);
+assert.equal(p.learnAtTrainer('weaponcrafting','sigrid').ok,true);
+assert.equal(p.learnAtTrainer('armorcrafting','sigrid').ok,true);
+assert.equal(p.learnAtTrainer('weaponcrafting','sigrid').ok,false);
+const restored=new P187ProfessionRuntime(game);restored.applyData(p.serialize());
+assert.equal(restored.isLearned('armorcrafting'),true);
+console.log('P187 PASS: 15 skills, 15 professions, safe teaching.');
