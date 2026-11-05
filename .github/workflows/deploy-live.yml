@@ -230,7 +230,7 @@ jobs:
           # Publish one pinned, reviewed experimental snapshot. Never publish
           # mutable HEAD implicitly; bump this SHA for the next approved build.
           git fetch --no-tags --depth=1 origin refs/heads/p16-1-performance-foundation-20261105
-          test "$(git rev-parse FETCH_HEAD)" = "d75e5e90ca58c5406226a665acab52be45fff25b"
+          test "$(git rev-parse FETCH_HEAD)" = "2c76436c81c67791f355bfe5087c325592989816"
           mkdir -p .p161-validate .site/p161
           git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets tests scripts | tar -x -C .p161-validate
           cd .p161-validate
@@ -268,7 +268,7 @@ jobs:
           test -s ../.site/p161/index.html
           cd ..
           echo "P16 stable: /p16/ -> a83e7993d84da33c8d0792277c08d69a56bd1906"
-          echo "P16.1 Performance experimental: /p161/ -> d75e5e90ca58c5406226a665acab52be45fff25b"
+          echo "P16.1 Performance experimental: /p161/ -> 2c76436c81c67791f355bfe5087c325592989816"
           echo "Skill Lab deploy is entirely separate (no changes to the Skill Lab repository)."
 
       - name: Configure Pages
