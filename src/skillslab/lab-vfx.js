@@ -308,6 +308,8 @@ export class TianjieSkillVfx {
         a.mesh.scale.setScalar(scale);
         a.mesh.rotation.z+=dt*.32;
       }
+      if(a.kind==='l26-ice-rise')a.mesh.scale.y=.06+.94*Math.min(1,t/.34);
+      if(a.kind==='l26-skyshaft')a.mesh.scale.y=.08+.92*Math.min(1,t/.70);
       if(a.kind==='tornado'){a.mesh.rotation.y+=dt*3.6;}
       if(a.kind==='meteor'){
         a.mesh.position.y=a.landingY+a.fallHeight*Math.pow(1-t,1.35);
