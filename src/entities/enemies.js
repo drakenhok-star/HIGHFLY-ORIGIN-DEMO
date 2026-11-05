@@ -63,6 +63,9 @@ export class Enemies {
     // Optional QA query ?hf_targets=1 starts with a single bot.
     this.trainingCount = this.trainingLab &&
       new URLSearchParams(location.search).get('hf_targets') !== '1' ? 3 : 1;
+    // Optional L22 aerial collision target: one real rig floats 4.5u above ground.
+    // It is a TRAINING SIMULATOR, not an animal or a world-spawning flying mob.
+    this.trainingFlight=this.trainingLab && new URLSearchParams(location.search).has('hf_fly');
     this.geoCache = new Map();
     this.sackMat = new THREE.MeshStandardMaterial({ color: 0x7a5c34, roughness: 0.8, metalness: 0, emissive: 0xc9a86a, emissiveIntensity: 0.45 });
     this.knotMat = new THREE.MeshStandardMaterial({ color: 0x5a4426, roughness: 1, metalness: 0 });
@@ -174,6 +177,11 @@ export class Enemies {
     const e=this._base('training','OBJETIVO '+(index+1)+' · COMBATE',2400,.9,px,pz);
     this._attachRig(e,'skeleton_warrior');
     e.training=true;e.aggroR=0;e.attackRange=0;e.speed=0;e.dmg=0;
+    e.trainingFlight=!!this.trainingFlight && index===2;
+    if(e.trainingFlight){
+      e.name='OBJETIVO AÉREO · PRUEBA 3D';
+      e.group.position.y+=4.5;e.home.y+=4.5;
+    }
     e.hitPending=-1;e.boltPending=-1;e.attackCd=99;
     e.trainingLastHit=-1e6;e.hitstunT=0;
     e.rig.play('Idle');
@@ -971,7 +979,7 @@ export class Enemies {
         e.hitPending=-1;e.boltPending=-1;
         const pos=e.group.position;
         pos.x+=e.kbVel.x*dt;pos.z+=e.kbVel.z*dt;
-        const ground=this._groundAt(pos.x,pos.z);
+        const ground=this._groundAt(pos.x,pos.z)+(e.trainingFlight?4.5:0);
         if(e.kbVel.y>0||pos.y>ground+.015){
           pos.y+=e.kbVel.y*dt;e.kbVel.y-=26*dt;
           if(pos.y<=ground){pos.y=ground;e.kbVel.y=0;}
