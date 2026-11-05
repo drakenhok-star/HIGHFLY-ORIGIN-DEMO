@@ -88,9 +88,10 @@ const cl=read('src/skillslab/claudecraft-kit-p16.js');
 const aim=read('src/skillslab/aim-guide-p16.js');
 const fx=read('src/skillslab/lab-vfx.js');
 const boot=read('src/skillslab/boot.js'),page=read('lab.html');
-assert.ok(!lab.includes('g.combat.melee=')&&!lab.includes('g.player.update='),
- 'skills cannot replace P16 basic attack or player locomotion');
-assert.ok(lab.includes('this.original={cast:originalCast,shout:originalShout,update:originalUpdate}'),
+assert.ok(lab.includes('g.combat.melee=(...args)=>this.airRupture.tryFire()?undefined:originalMelee(...args)') &&
+ !lab.includes('g.player.update='),
+ 'L25 intercepts ONLY focused aerial ATK and always falls through to original P16 melee');
+assert.ok(lab.includes('this.original={melee:originalMelee,cast:originalCast,shout:originalShout,update:originalUpdate}'),
  'original P16 movement/skill actions retain escape hatch');
 assert.ok(lab.includes('this.aimSensitivity??.145'));
 assert.ok(lab.includes('Segundo golpe EN EL LUGAR')&&lab.includes('finishGuardianPull(){'));
