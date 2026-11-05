@@ -19,6 +19,7 @@ export function castClaudeSkill(lab,slot,direction,target=null,options={}){
   if(lab.style===3){
     if(slot===1){
       fx.launch(pos,direction,3);
+      lab.claudeFx.fireCharge(pos,direction);
       const muzzle=pos.clone().add(vec(0,1.25,0))
         .addScaledVector(direction,.65);
       // L23: ONLY user-selected flying monsters receive an elevated shot.
@@ -49,12 +50,13 @@ export function castClaudeSkill(lab,slot,direction,target=null,options={}){
       center.y=g.terrain.getHeight(center.x,center.z);
       fx.meteorWarning(center,4.15);
       fx.fallingMeteor(center,.75);
+      lab.claudeFx.meteorSkybeam(center,.75);
       // Visible wind-up + falling meteor; resolves once, at destination,
       // not instantly on button release.
       lab.schedule(.75,()=>{
         const hit=lab.hitSphere(center,4.15,138,{height:2.15});
         fx.meteorImpact(center,4.15);
-        fx.signature.meteorScars(center,4.15,'#fe5f31',1.65);
+        lab.claudeFx.meteorDetonate(center);
         for(const enemy of lab.candidates(center,4.15,null,180,2.15)){
           enemy.applySlow?.(.57,1.2);
           lab.applyBurn(enemy,3,6,.45);
@@ -72,9 +74,8 @@ export function castClaudeSkill(lab,slot,direction,target=null,options={}){
         }
       }
       fx.frostNova(pos,5);
-      fx.signature.iceShards(pos,5,'#92e4ff',1.2,14);
-      for(const enemy of lab.candidates(pos,5,null,180,2.8))
-        fx.signature.iceShards(enemy.group.position.clone(),.78,'#d4f9ff',1.15,5);
+      const frozen=lab.candidates(pos,5,null,180,2.8);
+      lab.claudeFx.frostNova(pos,frozen);
       if(hit)lab.announce('¡CONGELACIÓN! '+hit+' objetivo(s)');
       return;
     }
@@ -89,8 +90,7 @@ export function castClaudeSkill(lab,slot,direction,target=null,options={}){
         const behind=facing.dot(targetToPlayer)<-.43;
         critical ||= behind;
         lab.struck(enemy,behind?130:72,direction);
-        fx.signature.shadowStrike(enemy.group.position.clone(),direction,
-          behind?'#db92ff':'#79cfff',.53);
+        lab.claudeFx.backstabContact(enemy,direction,behind);
       }
       fx.backstab(pos,direction);
       if(critical)lab.announce('¡ATAQUE POR LA ESPALDA! Daño crítico');
@@ -100,7 +100,7 @@ export function castClaudeSkill(lab,slot,direction,target=null,options={}){
       const foes=lab.candidates(pos,3.25,direction,40);
       for(const enemy of foes){
         lab.struck(enemy,65,direction);
-        fx.signature.chains(enemy.group.position.clone(),'#d94e80',2.1,.9);
+        lab.claudeFx.kidneyContact(enemy,direction);
         enemy.applySlow?.(.04,1.1);
         if(!enemy.boss&&enemy.type!=='dragon'){
           enemy.cdT=Math.max(enemy.cdT||0,1.1);
@@ -115,13 +115,13 @@ export function castClaudeSkill(lab,slot,direction,target=null,options={}){
       p.startDash({direction:{x:direction.x,z:direction.z},
         speed:22,duration:.36,style:'dodge'});
       fx.launch(pos,direction,4);
-      fx.signature.rushLines(pos,direction,'#69ebfa',.48);
+      lab.claudeFx.chargeWindup(pos,direction);
       lab.schedule(.37,()=>{
         const hits=lab.hitCone(p.pos,direction,3.3,65,82,{
           launch:true,stun:.65
         });
         fx.landing(p.pos.clone(),4,3.1);
-        fx.signature.crescent(p.pos.clone(),direction,'#bbf5ff',.65,1.2);
+        lab.claudeFx.chargeCrash(p.pos.clone(),direction,hits);
         if(hits)lab.announce('¡EMBESTIDA! '+hits+' objetivo(s)');
       });
     }
