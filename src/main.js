@@ -31,6 +31,7 @@ import { TargetingP6 } from './combat/targeting-p6.js';
 import { PerfProbeP6 } from './ui/perf-probe-p6.js';
 import { PerfFoundationP161 } from './ui/performance-p161.js';
 import { PerfGovernorP163 } from './ui/performance-p163.js';
+import { LivingWorldP18 } from './world/living-world-runtime-p18.js';
 
 class Game {
   constructor(assets) {
@@ -46,6 +47,7 @@ class Game {
     this.p14Enabled=this.p13Enabled && !new URLSearchParams(location.search).has('hf_p14_off');
     this.p15Enabled=this.p14Enabled && !new URLSearchParams(location.search).has('hf_p15_off');
     this.p16Enabled=this.p15Enabled && !new URLSearchParams(location.search).has('hf_p16_off');
+    this.p18Enabled=!new URLSearchParams(location.search).has('hf_p18_off');
     this.p163Enabled=!new URLSearchParams(location.search).has('hf_p163_off');
     this.p812Eco=false;
     if(this.p812Enabled){
@@ -103,6 +105,7 @@ class Game {
     this.saveSys = new SaveSys(this);
     this.hud = new HUD(this);
     this.menus = new Menus(this);
+    this.livingWorld = this.p18Enabled ? new LivingWorldP18(this) : null;
     this.touch = new TouchControls(this);
     this.mobileAudit = new MobileAudit(this);
     this.p6Perf = new PerfProbeP6(this);
@@ -127,6 +130,7 @@ class Game {
     if (this.mobileAudit) this.mobileAudit.setState(s);
     if (this.performanceP2) this.performanceP2.setState(s);
     if (this.worldMapP34) this.worldMapP34.setState(s);
+    this.livingWorld?.setVisible(s === 'playing');
     if (this.p810Enabled && this.worldMapP34?.mini){
       this.worldMapP34.mini.style.visibility=s==='playing'?'visible':'hidden';
     }
@@ -191,6 +195,7 @@ class Game {
     this.quests.reset();
     this.structures.reset();
     this.enemies.reset();
+    this.livingWorld?.reset();
     this.player.reset();
     this.combat.reset();
     if(this.targeting)this.targeting.cancel();
@@ -380,6 +385,7 @@ function loop(time) {
     if (perf161) perf161.endSection('enemies');
     if (perf161) perf161.startSection('npcs');
     game.npcs.update(dt);
+    game.livingWorld?.update(dt);
     if (perf161) perf161.endSection('npcs');
     game.stats.update(dt);
     if (perf161) perf161.startSection('scatter');
