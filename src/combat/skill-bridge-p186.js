@@ -425,7 +425,7 @@ export class P186CombatBridge{
  openStyleMenu(){
   if(this.stylePanel){this.stylePanel.remove();this.stylePanel=null;return;}
   const panel=document.createElement('div');panel.id='hf-p186-styles';
-  panel.style.cssText='position:fixed;z-index:250;right:5%;top:19%;width:270px;max-width:86vw;background:#140d36f5;border:2px solid #a978ff;border-radius:16px;color:white;padding:12px;font:700 13px system-ui;display:flex;flex-direction:column;gap:7px';
+  panel.style.cssText='position:fixed;z-index:250;right:5%;top:7%;width:330px;max-width:88vw;max-height:82vh;overflow-y:auto;touch-action:pan-y;background:#140d36f5;border:2px solid #a978ff;border-radius:16px;color:white;padding:12px;font:700 13px system-ui;display:flex;flex-direction:column;gap:7px';
   const heading=document.createElement('strong');
   heading.textContent='HIGHFLY · 15 HABILIDADES';panel.appendChild(heading);
   for(let i=0;i<5;i++){
@@ -438,6 +438,19 @@ export class P186CombatBridge{
     this.message('Estilo equipado: '+LABELS[i]);panel.remove();this.stylePanel=null;
    });
    panel.appendChild(row);
+   // All 15 skill cards remain browseable without leaving the game or spending resources.
+   const cards=document.createElement('div');cards.className='hf-p187-skill-cards';
+   cards.style.cssText='display:grid;gap:4px;margin:0 0 6px';
+   for(const sk of HIGHFLY_SKILL_EXPORT_L26.filter(s=>s.kit===KITS[i])){
+    const card=document.createElement('article');
+    card.style.cssText='background:#27204a;border:1px solid #5f4b8f;border-radius:9px;padding:7px 9px;display:grid;gap:3px';
+    const name=document.createElement('strong');name.textContent='S'+sk.slot+' · '+sk.name;
+    const info=document.createElement('small');
+    info.textContent=sk.cost+' '+(sk.resource==='MP'?'MANÁ':'ENERGÍA')+
+      ' · CD '+sk.cd+' s · VFX '+sk.vfx.replaceAll('-',' ');
+    info.style.color='#e2d8fa';card.append(name,info);cards.appendChild(card);
+   }
+   panel.appendChild(cards);
   }
   const close=document.createElement('button');close.textContent='CERRAR';
   close.addEventListener('click',()=>{panel.remove();this.stylePanel=null;});
