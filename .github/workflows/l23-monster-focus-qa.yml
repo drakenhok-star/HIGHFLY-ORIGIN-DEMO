@@ -1,0 +1,39 @@
+name: HIGHFLY L23 — Monster Focus and Manual Aim QA
+on:
+  push:
+    branches:
+      - l23-manual-aim-monster-focus-20261105
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-l23:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax-check all game and test modules
+        run: |
+          set -Eeuo pipefail
+          find src -type f -name '*.js' -print0 | while IFS= read -r -d '' f; do
+            node --input-type=module --check < "$f"
+          done
+          node --check tests/l23-monster-focus.test.mjs
+      - name: Pure monster selection and FURY P16 contracts
+        run: |
+          set -Eeuo pipefail
+          node tests/p15-finisher.test.mjs
+          node tests/p16-hit-confirm.test.mjs
+          node tests/p19-fury-skills.test.mjs
+          node tests/p20-static-lab.test.mjs
+          node tests/l23-monster-focus.test.mjs
+          node scripts/audit_animation_p6.mjs
+          test -s LICENSE
+          test -s PROVENANCE.md
+          test -s src/skillslab/monster-focus-l23.js
+          ! find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .
+# L23 intentionally tests structural contracts fast. It is a preview, not a
+# certified Galaxy S23 Ultra in-device WebGL performance pass.
