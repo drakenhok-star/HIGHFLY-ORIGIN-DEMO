@@ -43,10 +43,12 @@ const save=src('src/systems/save.js');
 const camera=src('src/skillslab/camera-lab-p18.js');
 assert.ok(skills.includes('id="hf-l23-focus"')&&
  skills.includes('id="hf-l23-target-panel"'),'one focus button and one monster chooser');
-assert.ok(skills.includes("item.air?'🪽 AÉREO · ':'⚔ TIERRA · '"),
- 'selector explains aerial/ground combat behavior');
-assert.ok(skills.includes('this.focusTarget=item.enemy'),
- 'only user tapping an explicit monster can set focus');
+assert.ok(skills.includes('}).filter(item=>item.air);') &&
+ skills.includes('const candidates=this.aerialFocusCandidates();'),
+ 'L25 focus chooser is flight-only; terrestrial AIM remains manual');
+assert.ok(skills.includes('this.focusTarget=item.enemy') &&
+ skills.includes('this.focusTarget=this.focusTarget===selected?null:selected'),
+ 'focus requires explicit player tap, including direct one-flyer toggle');
 assert.ok(skills.includes('focusedFlightShot23(origin,this.focusTarget'),
  'projectile preview follows explicitly selected flyer');
 assert.ok(skills.includes('focusedFlightShot23(from,this.focusTarget'),
