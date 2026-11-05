@@ -5,6 +5,8 @@ import { TianjieAimGuide, AIM_PROFILES } from './aim-guide-p16.js';
 import { castClaudeSkill } from './claudecraft-kit-p16.js';
 import {targetWithinSkillVolume22,isCancelDrop22,sweptProjectileHit22,enemyChest22} from './aerial-aim-l22.js';
 import {availableMonsters23,focusedFlightShot23} from './monster-focus-l23.js';
+import {L25AerialRupture} from './aerial-rupture-l25.js';
+import {L25PremiumSkillVfx} from './premium-vfx-l25.js';
 
 // FURY P16 hit-confirm and ATK gesture are authoritative for movement and combat.
 // This skill lab never replaces g.combat.melee or g.player.update.
@@ -39,6 +41,8 @@ export class TianjieMobaSkillsLab {
     this.projectiles=[];
     this.exposed=new WeakMap();
     this.fx=new TianjieSkillVfx(game);
+    this.premiumFx=new L25PremiumSkillVfx(this.fx);
+    this.airRupture=new L25AerialRupture(this);
     this.aimGuide=new TianjieAimGuide(game);
     this.activeLeap=null;
     this.guardianPull=null;
@@ -86,9 +90,13 @@ export class TianjieMobaSkillsLab {
 
   installCombatBridge(){
     const g=this.game;
+    const originalMelee=g.combat.melee.bind(g.combat);
     const originalCast=g.combat.cast.bind(g.combat);
     const originalShout=g.combat.shout.bind(g.combat);
     const originalUpdate=g.combat.update.bind(g.combat);
+    // Aerial ATK replaces melee ONLY while an explicitly focused flyer is airborne.
+    // On the ground FURY P16 1-2-3-4 stays the only attack implementation.
+    g.combat.melee=(...args)=>this.airRupture.tryFire()?undefined:originalMelee(...args);
     // The lab HTML is the sole entrypoint installing these wrappers.
     // Keep original melee(), movement, WULD/dash, quests and HUD intact.
     g.combat.cast=(...args)=>this.cast(1,null,'keyboard')||undefined;
@@ -103,7 +111,7 @@ export class TianjieMobaSkillsLab {
       if(g.state==='playing')this.update(dt);
       else this.cancelAim();
     };
-    this.original={cast:originalCast,shout:originalShout,update:originalUpdate};
+    this.original={melee:originalMelee,cast:originalCast,shout:originalShout,update:originalUpdate};
   }
 
   aimDirection(request,maxRange=17,slot=1){
@@ -245,6 +253,8 @@ export class TianjieMobaSkillsLab {
     else if(this.style===1)this.rift(slot,dir);
     else if(this.style===2)this.guardian(slot,dir);
     else castClaudeSkill(this,slot,dir,groundTarget,{manualAim:aimMode==='manual'});
+    // L25 accent pass: all 15 skills, separate from damage and cooldown rules.
+    this.premiumFx.onCast(this.style,slot,g.player.pos,dir,groundTarget);
     this.animatePlayer(slot);
     this.renderHud(true);
     return true;
@@ -504,6 +514,7 @@ export class TianjieMobaSkillsLab {
     this.updateLeap();
     this.updateGuardianDash();
     this.updateGuardianPull();
+    this.airRupture.update(dt);
     for(let i=this.events.length-1;i>=0;i--){
       const ev=this.events[i];
       if(ev.at>now)continue;
@@ -529,11 +540,13 @@ export class TianjieMobaSkillsLab {
         const possible=g.combat.collectTargets();
         for(const e of possible){
           if(!e?.alive||!e.group)continue;
+          if(pr.aerialBasic&&e!==pr.target)continue; // focused shot has one real target
           const contact=sweptProjectileHit22(old,pr.mesh.position,
             enemyChest22(e),Math.max(.4,e.hitRadius||.9)+.39);
           if(contact){
             const closest=old.clone().lerp(pr.mesh.position,contact.t);
             this.struck(e,pr.damage??65,pr.dir);
+            if(pr.aerialBasic)this.airRupture.confirm(e,closest);
             if(pr.burn)this.applyBurn(e,pr.burn.ticks,pr.burn.perTick,pr.burn.interval);
             else e.applySlow?.(.72,1.3);
             this.fx.impact(closest,pr.style,1.5);
@@ -580,6 +593,7 @@ export class TianjieMobaSkillsLab {
     this.game.stats.sp=this.game.stats.maxSp;
     this.ready=LAB_STYLES.map(()=>[0,0,0]);
     this.recastUntil=0;this.recastStyle=-1;
+    this.airRupture.reset();
     this.game.combat.breakCombo?.('training-reset');
     this.announce('Prueba reiniciada · HP/MP/Energía recuperados');
     this.renderHud(true);
@@ -598,7 +612,7 @@ export class TianjieMobaSkillsLab {
     root.id='hf-tianjie-skills-lab';
     root.setAttribute('translate','no');
     root.innerHTML=`<div class="hf-lab-top">
-      <strong class="hf-lab-title">HIGHFLY <span>FURY P16 · LAB L24 ÚNICO · AIM + ENFOCAR</span></strong>
+      <strong class="hf-lab-title">HIGHFLY <span>FURY P16 · LAB L25 ÚNICO · 15 VFX · RUPTURA AÉREA</span></strong>
       <div class="hf-lab-modes">
         <button type="button" data-style="0">✦ AÉREA</button>
         <button type="button" data-style="1">⚔ ABISAL</button>
@@ -610,7 +624,7 @@ export class TianjieMobaSkillsLab {
         <span id="hf-lab-readout">S1 · S2 · S3 NUEVAS | S4 WULD ORIGINAL</span>
         <button type="button" id="hf-lab-train">3 BLANCOS + 🐉</button>
         <button type="button" id="hf-lab-reset">REINICIAR</button>
-        <button type="button" id="hf-l23-focus" aria-expanded="false">◎ ENFOCAR</button>
+        <button type="button" id="hf-l23-focus" aria-expanded="false" aria-label="Enfocar monstruo volador">◎ AÉREO</button>
 
         <button type="button" id="hf-lab-cancel" hidden>CANCELAR</button>
       </div>
@@ -625,6 +639,7 @@ export class TianjieMobaSkillsLab {
     this.focusPanel=root.querySelector('#hf-l23-target-panel');
     // Move X outside the transformed top dock: CSS fixed must anchor to screen.
     root.appendChild(this.cancelBtn);
+    root.appendChild(this.focusBtn);
     for(const b of root.querySelectorAll('[data-style]'))
       b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();this.setStyle(Number(b.dataset.style));});
     root.querySelector('#hf-lab-train').addEventListener('pointerdown',e=>{
@@ -637,8 +652,18 @@ export class TianjieMobaSkillsLab {
     this.syncTrainingUI();
     this.focusBtn.addEventListener('pointerdown',e=>{
       e.preventDefault();e.stopPropagation();
-      this.focusPanelOpen=!this.focusPanelOpen;
-      this.renderMonsterSelector();
+      const flyers=this.aerialFocusCandidates();
+      if(flyers.length===1){
+        const selected=flyers[0].enemy;
+        this.focusTarget=this.focusTarget===selected?null:selected;
+        this.focusPanelOpen=false;
+        this.renderMonsterSelector();
+        if(this.focusTarget)this.game.hud?.showEnemyHP?.(selected);
+        this.announce(this.focusTarget?'Dragón enfocado · ATK = energía aérea':'Enfoque liberado · AIM manual');
+      }else{
+        this.focusPanelOpen=!this.focusPanelOpen;
+        this.renderMonsterSelector();
+      }
     });
     this.renderFocusLabel();
 
@@ -654,6 +679,7 @@ export class TianjieMobaSkillsLab {
     const def=this.styleDef();
     for(const b of this.root.querySelectorAll('[data-style]'))
       b.classList.toggle('active',Number(b.dataset.style)===this.style);
+    this.syncControlAnchors();
     this.readout.textContent=def.name+' · '+((this.style===0||this.style===3)?'MANÁ':'ENERGÍA')+
       (this.style===2&&this.guardianPull?' · S3 SEGUNDA FASE DISPONIBLE':'')+
       ' · S1 '+def.names[0]+' | S2 '+(this.canRecast()?'¡RECAST DISPONIBLE!':def.names[1])+
@@ -677,9 +703,33 @@ export class TianjieMobaSkillsLab {
     const e=this.focusTarget;
     if(e&&(!e.alive||!e.group||e.removed))this.focusTarget=null;
     const f=this.focusTarget;
-    this.focusBtn.textContent=f?'◎ '+(f.name||'OBJETIVO').slice(0,22):'◎ ENFOCAR';
+    const flying=f&&this.airRupture.isFlyer(f);
+    this.focusBtn.textContent=f?(flying?'◎ AÉREO':'◎ EN TIERRA'):'◎ AÉREO';
+    this.focusBtn.title=f?(flying?'ATK dispara al volador enfocado':'Dragón derribado: ATK terrestre FURY'):'Enfocar monstruo volador';
     this.focusBtn.classList.toggle('active',!!f);
     this.focusBtn.setAttribute('aria-expanded',String(!!this.focusPanelOpen));
+  }
+  aerialFocusCandidates(){
+    const g=this.game,p=g.player.pos,from={x:p.x,y:p.y+1.25,z:p.z};
+    return availableMonsters23(g.combat.collectTargets(),from,
+      (x,z)=>g.terrain.getHeight(x,z),{
+        range:38,visible:(_enemy,q)=>hasLineOfSight(g,from,q)
+      }).filter(item=>item.air);
+  }
+  syncControlAnchors(){
+    // Native HUD is editable; use current button bounds, never guessed pixels.
+    const position=(button,anchor,size)=>{
+      if(!button||!anchor)return;
+      const r=anchor.getBoundingClientRect();
+      if(r.width<10||r.height<10)return;
+      let x=r.right+7;
+      if(x+size>innerWidth-7)x=r.left-size-7;
+      const y=Math.max(5,Math.min(innerHeight-size-5,r.top+(r.height-size)/2));
+      button.style.left=Math.max(5,x)+'px';
+      button.style.top=y+'px';
+    };
+    position(this.focusBtn,document.querySelector('#hf-touch .hf-p5-atk'),43);
+    position(this.cancelBtn,document.querySelector('#hf-p810-bag'),46);
   }
   renderMonsterSelector(){
     const panel=this.focusPanel;if(!panel)return;
@@ -689,7 +739,7 @@ export class TianjieMobaSkillsLab {
     panel.replaceChildren();
     const heading=document.createElement('div');
     heading.className='hf-l23-panel-title';
-    heading.textContent='ENFOCAR MONSTRUO · ELEGÍ TU OBJETIVO';
+    heading.textContent='ENFOCAR · SOLO MONSTRUOS VOLADORES';
     panel.appendChild(heading);
     const clear=document.createElement('button');
     clear.type='button';clear.textContent='✕ LIBERAR ENFOQUE';
@@ -699,29 +749,24 @@ export class TianjieMobaSkillsLab {
       this.renderMonsterSelector();this.announce('Enfoque liberado · AIM manual');
     });
     panel.appendChild(clear);
-    const g=this.game,p=g.player.pos,from={x:p.x,y:p.y+1.25,z:p.z};
-    const candidates=availableMonsters23(g.combat.collectTargets(),
-      from,(x,z)=>g.terrain.getHeight(x,z),{
-        range:38,visible:(_enemy,q)=>hasLineOfSight(g,from,q)
-      });
+    const g=this.game;
+    const candidates=this.aerialFocusCandidates();
     if(!candidates.length){
       const note=document.createElement('p');
-      note.textContent='No hay monstruos visibles dentro del alcance.';
+      note.textContent='No hay voladores visibles dentro del alcance.';
       panel.appendChild(note);return;
     }
     for(const item of candidates.slice(0,14)){
       const b=document.createElement('button');b.type='button';
       b.className='hf-l23-target-row';
       const selected=this.focusTarget===item.enemy;
-      b.textContent=(selected?'✓ ':'○ ')+(item.air?'🪽 AÉREO · ':'⚔ TIERRA · ')+item.name+
-        (item.air?' · S1 enfocada':' · AIM manual');
+      b.textContent=(selected?'✓ ':'○ ')+'🪽 AÉREO · '+item.name+' · ATK de energía';
       b.addEventListener('pointerdown',ev=>{
         ev.preventDefault();ev.stopPropagation();
         this.focusTarget=item.enemy;
         this.focusPanelOpen=false;this.renderMonsterSelector();
         g.hud?.showEnemyHP?.(item.enemy);
-        this.announce('Enfocado: '+item.name+
-          (item.air?' · proyectiles S1 elevados':' · skills con AIM manual'));
+        this.announce('Enfocado: '+item.name+' · ATK energía / Ruptura Aérea');
       });
       panel.appendChild(b);
     }
