@@ -29,6 +29,7 @@ for(const asset of [...(json.buffers||[]),...(json.images||[])])
  assert.ok(!asset.uri||asset.uri.startsWith('data:'),'no foreign asset URLs');
 console.log('Gobkit Boar CC0: '+buf.length+' bytes, skins='+json.skins.length+', clips='+json.animations.map(c=>c.name).join(','));
 JS
+echo "e6ce64f0e4ac3646359c66d6d383604cb9299b11f867e1b62ea161c50d1e572c  $tmp" | sha256sum --check --status || { echo "CC0 boar integrity mismatch" >&2; exit 1; }
 mv "$tmp" "$file"
 trap - EXIT
 sha256sum "$file"

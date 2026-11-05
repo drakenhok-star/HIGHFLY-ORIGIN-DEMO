@@ -25,7 +25,8 @@ export const P183_BONUS_TABLES=Object.freeze({
 });
 export const P183_BASE_RARITY=Object.freeze({
   wolf:'common',wolf_sentinel:'common',ice_wolf:'uncommon',
-  draugr:'common',draugr_boss:'rare',dragon:'rare',spider:'common'
+  draugr:'common',draugr_boss:'rare',dragon:'rare',spider:'common',
+  boar:'common',goblin:'common',bandit:'common',orc:'uncommon',yeti:'rare',crab:'common'
 });
 export function lootSpeciesP183(enemy){
   if(!enemy)return null;
