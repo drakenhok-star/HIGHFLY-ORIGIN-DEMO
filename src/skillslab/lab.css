@@ -1,3 +1,38 @@
+/* L23 explicit monster-focus selector; never changes ground AIM. */
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-l23-focus{
+  min-width:91px;max-width:158px;min-height:26px;
+  color:#dbf9ff;border-color:#66dce7;
+  background:linear-gradient(110deg,#124a5e,#251546);
+  text-overflow:ellipsis;overflow:hidden;white-space:nowrap
+}
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-l23-focus.active{
+  color:#fff7c6;border-color:#ffd487;
+  box-shadow:0 0 10px #f8d78488
+}
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-l23-target-panel{
+  position:fixed;right:max(10px,env(safe-area-inset-right));
+  top:clamp(124px,34vh,168px);z-index:120;
+  width:min(298px,68vw);max-height:57vh;overflow-y:auto;
+  display:flex;flex-direction:column;gap:6px;
+  pointer-events:auto;touch-action:pan-y;
+  padding:10px;border-radius:13px;
+  border:2px solid #67d3ec;
+  background:linear-gradient(150deg,#0d223aee,#1e1239f8);
+  box-shadow:0 0 28px #04152a;overscroll-behavior:contain
+}
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-l23-target-panel[hidden]{display:none!important}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-l23-panel-title{
+  color:#ceefff;font-size:10px;font-weight:900;letter-spacing:.3px;
+  padding:3px 5px;text-align:center
+}
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-l23-target-panel button{
+  width:100%;text-align:left;min-height:34px;
+  font-size:10px;padding:7px 9px;
+  touch-action:manipulation
+}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-l23-target-row{
+  border-color:#6ab4d7
+}
 /* Scoped P15 lab UI. Existing Tianjie HUD / joystick / inventory remain intact. */
 #hf-tianjie-skills-lab {
   display:none;position:fixed;inset:0;z-index:53;pointer-events:none;
