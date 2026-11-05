@@ -1,5 +1,5 @@
 /**
- * HIGHFLY P21 full 3-target FURY P16 Skills Lab graphical smoke test for GitHub Actions (not an Android proof).
+ * HIGHFLY L21 full 3-target FURY P16 Skills Lab graphical smoke test for GitHub Actions (not an Android proof).
  * Starts on the same origin and in a mobile-landscape simulated viewport.
  * Requires playwright-core and system google-chrome.
  */
@@ -159,7 +159,7 @@ try{
    };
    raf(frame);
  }));
- console.info('P19 Chrome software WebGL FPS P95 ms '+frameP95.p95.toFixed(1)+
+ console.info('L21 Chrome software WebGL FPS P95 ms '+frameP95.p95.toFixed(1)+
    ' (simulator only, not Samsung P95)');
  assert.ok(await page.locator('#hf-p810-bag').isVisible(),'bag shortcut visible');
  if(await page.evaluate(()=>window.game.p15Enabled)){
