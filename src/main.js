@@ -47,6 +47,7 @@ class Game {
     this.p14Enabled=this.p13Enabled && !new URLSearchParams(location.search).has('hf_p14_off');
     this.p15Enabled=this.p14Enabled && !new URLSearchParams(location.search).has('hf_p15_off');
     this.p16Enabled=this.p15Enabled && !new URLSearchParams(location.search).has('hf_p16_off');
+    this.p18Build=true;
     this.p18Enabled=!new URLSearchParams(location.search).has('hf_p18_off');
     this.p163Enabled=!new URLSearchParams(location.search).has('hf_p163_off');
     this.p812Eco=false;
