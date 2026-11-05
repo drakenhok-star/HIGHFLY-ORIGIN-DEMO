@@ -1,5 +1,5 @@
 /** HIGHFLY P15 directional fourth-strike finisher. 
- * Camera-relative input sampled on ATK 4, independent of camera movement.
+ * Input sampled from the ATK button through the impact frame. Movement joystick ignored.
  * No new animations or button; CC respects boss/size/guard eligibility.
  */
 export const FURY_FINISHER_P15=Object.freeze({
@@ -8,11 +8,14 @@ export const FURY_FINISHER_P15=Object.freeze({
  maxRadius:1.75
 });
 export function finisherInput(input,yaw=0){
- const analog=input?.touchMove||{x:0,y:0};
- let x=Math.max(-1,Math.min(1,Number(analog.x)||0));
- let y=Math.max(-1,Math.min(1,Number(analog.y)||0));
- // Keyboard fallback for desktop: do not add joystick/cardinal input twice.
- if(Math.abs(x)+Math.abs(y)<.12){
+ // P19: ONLY the dedicated ATK gesture may steer a touch finisher.
+ // The movement joystick MUST NOT influence the fourth attack.
+ // A finished/released gesture persists until the impact frame.
+ const analog=input?.furyFinisherGesture;
+ let x=analog?Math.max(-1,Math.min(1,Number(analog.x)||0)):0;
+ let y=analog?Math.max(-1,Math.min(1,Number(analog.y)||0)):0;
+ // Keyboard fallback is allowed only when NO touch finisher gesture exists.
+ if(!analog){
   const keys=input?.keys;
   if(keys){x=(keys.has('KeyD')?1:0)-(keys.has('KeyA')?1:0);
     y=(keys.has('KeyS')?1:0)-(keys.has('KeyW')?1:0);}

@@ -4,6 +4,7 @@
  */
 import { PremiumHudP5 } from './premium-hud-p5.js';
 import {responsiveJoystick,shouldClaimJoyContact} from '../combat/hit-confirm-p16.js';
+import {aimFromAttackDrag,attackArrow} from './atk-gesture-p19.js';
 
 export class TouchControls {
   constructor(game) {
@@ -141,6 +142,7 @@ export class TouchControls {
     this.addButton(actions,'ATK','hf-btn-atk',()=>{this.game.input.leftClick=true;},(pressed)=>{
       if(this.game.p812Enabled)this.game.input.touchAttackHold=pressed;
     });
+    this.installAtkGesture(actions.lastElementChild);
     this.addButton(actions,'GRITO','',()=>this.key('KeyF'));
     const pause = document.createElement('button');
     pause.type='button'; pause.className='hf-btn hf-menu'; pause.textContent='PAUSA';
@@ -158,6 +160,79 @@ export class TouchControls {
     root.appendChild(hint);
   }
 
+  installAtkGesture(button) {
+    // The SAME native ATK button drives swings and P19 finisher direction.
+    // Existing addButton owns tap/hold and pointer capture; no new ATK button.
+    this.atkButton=button;
+    this._atkPointer=null;
+    this._atkArmed=false;
+    const arrow=document.createElement('span');
+    arrow.className='hf-p19-atk-arrow';
+    arrow.setAttribute('aria-hidden','true');
+    arrow.hidden=true;
+    arrow.style.cssText='position:absolute;right:1px;top:-20px;min-width:24px;'+
+      'height:22px;line-height:22px;border-radius:12px;color:#ffdfa4;'+
+      'background:#11132bdc;border:1px solid #c39cff;pointer-events:none;'+
+      'font:bold 17px system-ui;text-align:center;z-index:2;box-shadow:0 0 8px #a86cfa';
+    button.style.position='relative';
+    button.appendChild(arrow);
+    this.atkArrow=arrow;
+    button.addEventListener('pointerdown',e=>{
+      if(this.game.state!=='playing'||!this.game.p16Enabled||
+          this.game.input.hudEditing||this._atkPointer!==null)return;
+      e.stopPropagation();
+      this._atkPointer=e.pointerId;
+      this._atkContact={x:e.clientX,y:e.clientY,lastX:e.clientX,lastY:e.clientY};
+      this._atkArmed=false;
+      this.game.input.furyFinisherGesture={x:0,y:0,active:false};
+      arrow.hidden=true;
+    });
+    button.addEventListener('pointermove',e=>{
+      if(e.pointerId!==this._atkPointer||!this._atkContact)return;
+      e.preventDefault();e.stopPropagation();
+      this._atkContact.lastX=e.clientX;
+      this._atkContact.lastY=e.clientY;
+      if(!this._atkArmed)return;
+      const vec=aimFromAttackDrag(e.clientX-this._atkContact.x,
+        e.clientY-this._atkContact.y);
+      this.game.input.furyFinisherGesture={...vec,active:true};
+      arrow.textContent=attackArrow(vec.x,vec.y);
+    });
+    const release=e=>{
+      if(e.pointerId!==this._atkPointer)return;
+      if(this._atkArmed&&this._atkContact){
+        const vec=aimFromAttackDrag(e.clientX-this._atkContact.x,
+          e.clientY-this._atkContact.y);
+        this.game.input.furyFinisherGesture={...vec,active:false};
+        arrow.textContent=attackArrow(vec.x,vec.y);
+      }
+      this._atkPointer=null;this._atkContact=null;
+      this._atkArmed=false; // final vector remains through impact frame
+    };
+    for(const event of ['pointerup','pointercancel','lostpointercapture'])
+      button.addEventListener(event,release);
+  }
+  armFinisherGesture() {
+    this._atkArmed=!!this._atkContact;
+    if(this._atkArmed)
+      this.game.input.furyFinisherGesture={x:0,y:0,active:true};
+    else delete this.game.input.furyFinisherGesture; // desktop keyboard fallback
+    if(this._atkContact){
+      // In ATK HOLD, use the current finger position as the new 4th-hit
+      // gesture origin, never the pointerdown from ATK 1.
+      this._atkContact.x=this._atkContact.lastX;
+      this._atkContact.y=this._atkContact.lastY;
+    }
+    if(this.atkArrow){
+      this.atkArrow.hidden=!this._atkArmed;
+      this.atkArrow.textContent='•';
+    }
+  }
+  clearFinisherGesture() {
+    this._atkArmed=false;
+    delete this.game.input.furyFinisherGesture;
+    if(this.atkArrow)this.atkArrow.hidden=true;
+  }
   addButton(parent, label, cls, action, hold) {
     const b = document.createElement('button');
     b.type='button'; b.className='hf-btn '+cls; b.textContent=label;

@@ -29,7 +29,10 @@ export class Stats {
     if (this.game.state !== 'playing') return;
     // P15: successful directional dodge preserves combo and takes no HP damage.
     // Guard/parry is intentionally not faked: no active guard action exists yet.
-    if(this.game.p15Enabled && this.game.player?.dodgeInvulnT>0)return 0;
+    if(this.game.p15Enabled && this.game.player?.dodgeInvulnT>0){
+      this.game.combat?.ports?.emit('dodge-success',{avoided:amount});
+      return 0;
+    }
     const reduced = amount * (1 - Math.min(this.armorValue() * 0.006, 0.6));
     if(reduced<=0)return 0;
     if(this.game.p15Enabled)this.game.combat?.breakCombo('hit');

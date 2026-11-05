@@ -47,6 +47,8 @@ export class Player {
     this.onGround = false;
     this.firstPerson = false;
     this.camDist = 6;
+    this.camTargetHeight = 1.7; // P19 camera focus only; FURY P16 physics untouched.
+    this.cameraSmoothing = 12;
     this.attackT = -1;
     this.castT = -1;
     this.shakeT = 0;
@@ -741,7 +743,7 @@ export class Player {
     } else {
       this.rig.root.visible = true;
       const target = _tmpV1.copy(this.group.position);
-      target.y += 1.7;
+      target.y += this.camTargetHeight ?? 1.7;
       const cp = Math.cos(this.pitch), sp = Math.sin(this.pitch);
       _tmpV2.set(
         Math.sin(this.yaw) * cp * this.camDist,
@@ -755,7 +757,7 @@ export class Player {
         const safeDistance=this.camDist*fraction;
         if(!this._cameraReady || (fraction<0.99 && cam.position.distanceTo(target)>safeDistance+0.25))
           cam.position.copy(goal);
-        else cam.position.lerp(goal,1-Math.exp(-(this.game.p810Enabled?(this.cameraSmoothing||12):12)*dt));
+        else cam.position.lerp(goal,1-Math.exp(-(this.cameraSmoothing??12)*dt));
       }else cam.position.copy(goal);
       this._cameraReady=true;
       const minY=terrain.getHeight(cam.position.x,cam.position.z)+0.5;

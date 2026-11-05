@@ -1,0 +1,86 @@
+name: HIGHFLY P19 - FURY P16 authoritative + Skills Lab (QA only)
+on:
+  push:
+    branches:
+      - p19-fury-p16-skilllab-isolated-20261105
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-and-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check all JS modules and browser harness syntax
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+          node --check scripts/p19-browser-smoke.mjs
+          node --check tests/p19-fury-skills.test.mjs
+      - name: P5-P16 native FURY regression (no replacement of native combat)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          node tests/premium-hud.test.mjs
+          node tests/p6-integral.test.mjs
+          node tests/p7-fury.test.mjs
+          node tests/p810-integral.test.mjs
+          node tests/p812-polish.test.mjs
+          node tests/p13-fury.test.mjs
+          node tests/p14-air-chain.test.mjs
+          node tests/p15-fury.test.mjs
+          node tests/p15-finisher.test.mjs
+          node tests/p15-interruption.test.mjs
+          node tests/p16-hit-confirm.test.mjs
+      - name: P19 ATK gesture, ballistic initial aim, camera hybrid, skills/VFX
+        run: node tests/p19-fury-skills.test.mjs
+      - name: Animation audit and third-party safety
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          node scripts/audit_animation_p6.mjs
+          node scripts/p14-mountain-scan.mjs
+          test -s LICENSE
+          test -s PROVENANCE.md
+          test -s assets/models/player_barbarian.glb
+          test -s src/combat/hit-confirm-p16.js
+          test -s src/skillslab/aim-guide-p16.js
+          test -s src/skillslab/lab-vfx.js
+          ! find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .
+  browser-mobile-simulated:
+    needs: source-and-contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install disposable Playwright/Chrome driver
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          printf '{"private":true,"type":"module"}\n' > package.json
+          npm install --no-save --no-package-lock playwright-core@1.58.0
+          command -v google-chrome || command -v chromium
+      - name: Real WebGL game in simulated 915 x 412 Android landscape
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m http.server 8957 --bind 127.0.0.1 > /tmp/hf-p19-http.log 2>&1 &
+          HF_CAPTURE=1 CHROME_PATH="$(command -v google-chrome || command -v chromium)" node scripts/p19-browser-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: highfly-p19-mobile-simulated
+          path: audit-output/p19-mobile-landscape.png
+          if-no-files-found: ignore
+          retention-days: 7
+# No deployment or publishing permissions; NO Vercel production/Pages step.

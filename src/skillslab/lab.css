@@ -1,0 +1,146 @@
+/* Scoped P15 lab UI. Existing Tianjie HUD / joystick / inventory remain intact. */
+#hf-tianjie-skills-lab {
+  display:none;position:fixed;inset:0;z-index:53;pointer-events:none;
+  font:600 12px/1.2 system-ui,Arial,sans-serif;color:#f6f7ff;
+  -webkit-user-select:none;user-select:none;touch-action:none;
+}
+#hf-tianjie-skills-lab.playing {display:block}
+#hf-tianjie-skills-lab .hf-lab-top {
+  position:absolute;top:max(6px,env(safe-area-inset-top));left:50%;
+  transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;
+  gap:4px;width:min(850px,66vw);max-height:30vh;overflow:visible;
+  text-shadow:0 1px 4px #000b;
+}
+#hf-tianjie-skills-lab .hf-lab-title {
+  font-size:12px;letter-spacing:1.1px;font-weight:950;
+  color:#fce5a0;background:#100b29d9;border:1px solid #7b6ab06b;
+  padding:4px 12px;border-radius:9px;
+}
+#hf-tianjie-skills-lab .hf-lab-title span {font-size:10px;color:#d2c0ff;font-weight:750}
+#hf-tianjie-skills-lab .hf-lab-modes,
+#hf-tianjie-skills-lab .hf-lab-sub {display:flex;gap:5px;align-items:center;justify-content:center;max-width:100%;flex-wrap:wrap}
+#hf-tianjie-skills-lab button {
+  pointer-events:auto;cursor:pointer;min-height:27px;border-radius:8px;
+  font:850 10px system-ui,sans-serif;
+  color:#f4ecff;background:#201239e9;border:1px solid #a87fe3;
+  padding:5px 9px;box-shadow:0 3px 8px #0008;touch-action:none;
+}
+#hf-tianjie-skills-lab button.active {background:#6c348c;color:#fff;border-color:#ffdc9f}
+#hf-tianjie-skills-lab .hf-lab-sub>span {
+  display:block;max-width:100%;font-size:9px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  background:#090c23dc;border:1px solid #6f60b955;border-radius:6px;
+  padding:5px 8px;color:#d8ecff;
+}
+#hf-tianjie-skills-lab #hf-lab-cancel {
+  background:#7e264e;border-color:#ff9ab1;color:white;
+}
+#hf-tianjie-skills-lab #hf-lab-message {
+  color:#efdbff;font-size:10px;text-align:center;max-width:100%;
+  background:#10102cbe;padding:3px 8px;border-radius:8px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+body.hf-skills-lab #hf-touch .hf-p5-s1,
+body.hf-skills-lab #hf-touch .hf-p5-s2,
+body.hf-skills-lab #hf-touch .hf-p5-s3 {
+  position:relative; font-size:0!important;white-space:pre-line;
+  opacity:1!important;filter:none!important;
+}
+body.hf-skills-lab #hf-touch .hf-p5-s1::after,
+body.hf-skills-lab #hf-touch .hf-p5-s2::after,
+body.hf-skills-lab #hf-touch .hf-p5-s3::after {
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  text-align:center;content:attr(data-hf-lab-label);
+  white-space:pre-line;font:900 11px/1.15 system-ui,sans-serif;
+  color:#fff6ff;text-shadow:0 1px 5px #000;
+  pointer-events:none;
+}
+body.hf-skills-lab #hf-touch .hf-p5-s1 {border-color:#8ce9ff!important}
+body.hf-skills-lab #hf-touch .hf-p5-s2 {border-color:#d39aff!important}
+body.hf-skills-lab #hf-touch .hf-p5-s3 {border-color:#ffc689!important}
+body.hf-skills-lab #hf-touch .hf-lab-cooling {filter:saturate(.5)!important}
+@media(max-height:440px){
+  #hf-tianjie-skills-lab .hf-lab-top {gap:2px;width:min(850px,66vw)}
+  #hf-tianjie-skills-lab .hf-lab-title {font-size:10px;padding:2px 8px}
+  #hf-tianjie-skills-lab .hf-lab-title span {font-size:9px}
+  #hf-tianjie-skills-lab button {padding:3px 7px;min-height:24px;font-size:9px}
+  #hf-tianjie-skills-lab #hf-lab-message {font-size:9px;padding:2px}
+}
+@media(max-width:800px) and (orientation:landscape){
+  #hf-tianjie-skills-lab .hf-lab-top {left:47%;width:54vw}
+  #hf-tianjie-skills-lab .hf-lab-sub>span {display:none}
+  #hf-tianjie-skills-lab #hf-lab-message {display:none}
+}
+
+/* P16 / SUPER-AIM: the gameplay telegraph is a true 3D ground decal
+   rendered by aim-guide-p16.js, never an HTML or one-pixel CSS line.
+   Keep the original FURY controls, header and map fully accessible. */
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-top {
+  width:min(930px,72vw);
+  max-height:35vh;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes {
+  display:flex;flex-wrap:nowrap;gap:5px;
+  max-width:min(710px,100%);width:auto;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes button {
+  min-width:0;white-space:nowrap;
+  padding:6px 10px;letter-spacing:.2px;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes button:nth-child(4) {
+  border-color:#ffae77;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes button:nth-child(5) {
+  border-color:#79dfff;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-sub {
+  flex-wrap:nowrap;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-cancel:not([hidden]) {
+  animation:hf-lab-cancel-pulse 1.0s ease-in-out infinite alternate;
+}
+@keyframes hf-lab-cancel-pulse {
+  from {box-shadow:0 0 2px #f7749d}
+  to {box-shadow:0 0 13px #fc557b}
+}
+body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-title {
+  white-space:nowrap;
+}
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-message {
+  max-width:min(680px,70vw);
+}
+@media(max-height:460px) {
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-top {
+    top:3px;left:50%;max-height:34vh;gap:2px;
+    width:min(780px,70vw);
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-title {
+    font-size:10px;padding:2px 7px;
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes {
+    gap:4px;
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes button {
+    font-size:9px;min-height:24px;padding:3px 5px;
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-sub>span {
+    display:none;
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-message {
+    font-size:9px;padding:2px 6px;
+  }
+}
+@media(max-width:900px) and (orientation:landscape) {
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-top {
+    left:49%;width:min(660px,68vw);
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-title span {
+    font-size:8px;
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab .hf-lab-modes button {
+    font-size:8px;padding:3px 4px;
+  }
+  body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-message {
+    display:none;
+  }
+}

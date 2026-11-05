@@ -1,0 +1,108 @@
+/* HIGHFLY P18 — camera presets and aiming controls, isolated to /lab.html */
+#hf-tianjie-skills-lab #hf-p18-camera-dock {
+ display:flex;align-items:center;justify-content:center;gap:5px;
+ flex-wrap:nowrap;max-width:100%;
+ background:linear-gradient(100deg,#12142bcf,#24153ee6,#111c38db);
+ border:1px solid #9a7dda7d;border-radius:13px;padding:4px 7px;
+ backdrop-filter:blur(8px);box-shadow:0 3px 18px #090b21aa;
+ pointer-events:auto;color:#dff4ff;font:700 10px system-ui;
+}
+#hf-tianjie-skills-lab #hf-p18-camera-dock button{
+ border:1px solid #819bd3;background:#202749d9;
+ font:bold 9px system-ui;min-height:26px;padding:4px 9px;
+ white-space:nowrap;border-radius:8px;color:#e9f8ff;
+}
+#hf-tianjie-skills-lab #hf-p18-camera-dock button.active{
+ background:linear-gradient(135deg,#6942b0,#1876a2);border-color:#ffe5b5;
+ box-shadow:0 0 9px #82b8ffaa;
+}
+#hf-tianjie-skills-lab #hf-p18-camera-dock .hf-p18-dock-caption{
+ color:#ffdf9b;font:bold 9px system-ui;letter-spacing:.6px;
+}
+#hf-tianjie-skills-lab #hf-p18-live-mini{
+ color:#b6f4ff;font:700 9px system-ui;
+ white-space:nowrap;min-width:68px;text-align:center;
+}
+#hf-tianjie-skills-lab #hf-p18-camera-panel{
+ box-sizing:border-box;position:fixed;
+ top:max(72px,calc(env(safe-area-inset-top) + 62px));
+ right:max(8px,env(safe-area-inset-right));
+ width:min(348px,46vw);max-height:calc(100vh - 85px);
+ z-index:63;overflow-x:hidden;overflow-y:auto;
+ padding:12px 13px;pointer-events:auto;
+ color:#effaff;background:linear-gradient(140deg,#16112bf5,#071e35f6);
+ border:1px solid #caa6ff;border-radius:15px;
+ box-shadow:0 15px 45px #000d,inset 0 0 15px #876ada21;
+ backdrop-filter:blur(12px);
+ touch-action:pan-y;overscroll-behavior:contain;
+ scrollbar-color:#9d7dda #172039;
+ font:600 11px/1.4 system-ui,sans-serif;
+}
+#hf-tianjie-skills-lab #hf-p18-camera-panel[hidden] {display:none!important}
+#hf-tianjie-skills-lab .hf-p18-head{
+ display:flex;align-items:start;justify-content:space-between;gap:8px;margin-bottom:9px;
+}
+#hf-tianjie-skills-lab .hf-p18-head strong{
+ display:block;letter-spacing:.45px;font-size:12px;color:#ffe5af;
+}
+#hf-tianjie-skills-lab .hf-p18-head small{
+ display:block;color:#b8c7ec;font-size:9px;font-weight:500;margin-top:4px;
+}
+#hf-tianjie-skills-lab .hf-p18-head button{
+ background:#4b244d;color:#fff2ff;min-width:30px;min-height:28px;
+ font:700 15px system-ui;
+}
+#hf-tianjie-skills-lab .hf-p18-status{
+ border:1px solid #719cce77;background:#1c2b4e92;border-radius:9px;
+ padding:7px;color:#b7f0ff;font-size:10px;line-height:1.35;margin:0 0 7px;
+}
+#hf-tianjie-skills-lab .hf-p18-fields{
+ display:grid;grid-template-columns:1fr;gap:5px;
+}
+#hf-tianjie-skills-lab .hf-p18-field {
+ display:grid;grid-template-columns:1fr auto;column-gap:8px;row-gap:1px;
+ background:#ffffff08;border-bottom:1px solid #ffffff1b;border-radius:7px;
+ padding:5px 6px;pointer-events:auto;
+}
+#hf-tianjie-skills-lab .hf-p18-field-title{
+ color:#ebebff;font-weight:650;
+}
+#hf-tianjie-skills-lab .hf-p18-field output{
+ color:#ffe0a0;font-variant-numeric:tabular-nums;
+ font-size:10px;justify-self:end;
+}
+#hf-tianjie-skills-lab .hf-p18-field input{
+ width:100%;grid-column:1 / -1;margin:0;min-height:19px;height:20px;
+ accent-color:#a387ef;touch-action:pan-x;pointer-events:auto;
+}
+#hf-tianjie-skills-lab #hf-p18-camera-panel footer{
+ display:flex;gap:6px;align-items:center;margin-top:9px;
+ border-top:1px solid #8976b761;padding-top:8px;
+}
+#hf-tianjie-skills-lab #hf-p18-camera-panel footer button {
+ flex:none;background:#31254c;color:#ffe1ad;border:1px solid #cca583;
+}
+#hf-tianjie-skills-lab #hf-p18-camera-panel footer small{
+ color:#b6c7e4;font-size:9px;font-weight:500;
+}
+@media (max-height:480px) and (orientation:landscape){
+ #hf-tianjie-skills-lab .hf-lab-top{gap:2px!important}
+ #hf-tianjie-skills-lab #hf-p18-camera-dock {gap:3px;padding:2px 4px;border-radius:10px}
+ #hf-tianjie-skills-lab #hf-p18-camera-dock button{min-height:21px;font-size:8px;padding:2px 6px}
+ #hf-tianjie-skills-lab #hf-p18-camera-dock .hf-p18-dock-caption {display:none}
+ #hf-tianjie-skills-lab #hf-p18-live-mini {font-size:8px;min-width:54px}
+ #hf-tianjie-skills-lab #hf-p18-camera-panel{
+  top:max(65px,calc(env(safe-area-inset-top) + 58px));
+  max-height:calc(100vh - 70px);padding:8px 10px;
+  width:min(355px,54vw);
+ }
+ #hf-tianjie-skills-lab .hf-p18-head strong{font-size:11px}
+ #hf-tianjie-skills-lab .hf-p18-status{padding:4px}
+ #hf-tianjie-skills-lab .hf-p18-field{padding:3px 5px}
+ #hf-tianjie-skills-lab .hf-p18-fields{gap:3px}
+ #hf-tianjie-skills-lab .hf-p18-field input{height:18px;min-height:18px}
+}
+@media (max-width:760px) and (orientation:landscape){
+ #hf-tianjie-skills-lab #hf-p18-live-mini {display:none}
+ #hf-tianjie-skills-lab #hf-p18-camera-panel{width:min(360px,64vw)}
+}

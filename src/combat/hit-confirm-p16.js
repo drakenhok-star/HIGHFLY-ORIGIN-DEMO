@@ -1,5 +1,5 @@
 /** HIGHFLY P16: pure input response and confirmed-hit combo math. */
-export const P16_RESPONSE={deadzone:.055,fullTravel:.56,acceleration:40};
+export const P16_RESPONSE={deadzone:.045,fullTravel:.52,acceleration:46};
 export function responsiveJoystick(rawX,rawY){
  const x=Number.isFinite(rawX)?rawX:0,y=Number.isFinite(rawY)?rawY:0;
  const len=Math.hypot(x,y);

@@ -7,6 +7,7 @@ import {strikeProfile,resolveCombatContext,reactionPolicy,pickMeleeTarget,
   canCancelAction,FURY_CANCEL_P15} from './fury-combat-p15.js';
 import {finisherInput,finisherAllowed} from './fury-finisher-p15.js';
 import {nextSwing,confirmedDamage,commitConfirmedHit} from './hit-confirm-p16.js';
+import {FuryCombatPortsP19} from './fury-ports-p19.js';
 
 const MELEE_CD = 0.5;
 const CAST_CD = 0.6;
@@ -25,6 +26,7 @@ const COMBO_CLIPS=[
 export class Combat {
   constructor(game) {
     this.game = game;
+    this.ports=new FuryCombatPortsP19();
     this.meleeCd = 0;
     this.castCd = 0;
     this.shouts = [
@@ -99,11 +101,13 @@ export class Combat {
     this.comboStep=0;this.comboTimer=0;this.airComboGrace=0;
     this.attackBuffer=0;this._meleeStep=1;this._finisher=null;
     this._attackTarget=null;this.meleeHitT=-1;
+    this.game.touch?.clearFinisherGesture?.();
     // Brief recovery prevents ATK hold from making the broken chain invisible.
     this.meleeCd=Math.max(this.meleeCd,.22);
     const p=this.game.player;
     if(p){p.attackT=-1;p._attackAnimStarted=false;p._queuedDashT=0;}
     this.lastComboBreak=reason;
+    this.ports.emit('combo-interrupted',{reason});
     return true;
   }
 
@@ -146,6 +150,24 @@ export class Combat {
     this.shoutCdMax = eq.cd;
 
     if (this.meleeHitT >= 0) {
+      if(this.game.p16Enabled&&this._meleeStep===4&&this._finisher&&
+         this.game.input.furyFinisherGesture){
+        const mode=finisherInput(this.game.input,this.game.player.yaw);
+        if(mode.mode!==this._finisher.mode){
+          this._finisher=mode;
+          // Only verified FURY GLB clips; direction can affect wind-up early.
+          const p=this.game.player,clips=[
+            '1H_Melee_Attack_Slice_Diagonal',
+            '1H_Melee_Attack_Slice_Horizontal',
+            '1H_Melee_Attack_Stab','1H_Melee_Attack_Chop'
+          ];
+          const choice=mode.mode==='launch'?clips[0]:
+            (mode.mode==='left'||mode.mode==='right')?clips[1]:clips[3];
+          if(p.attackT>=0&&p.attackT<.20&&p.rig.clips.has(choice)){
+            p.attackClip=choice;p._attackAnimStarted=false;
+          }
+        }
+      }
       this.meleeHitT -= dt;
       if (this.meleeHitT <= 0) {
         this.meleeHitT = -1;
@@ -236,7 +258,12 @@ export class Combat {
     if(!g.p16Enabled)this.comboStep=step;
     this._meleeStep=step;
     if(g.p16Enabled){this.lastSwingStep=step;this.lastConfirmedHit=false;this.lastSwingReason='swing-pending';}
-    // Snapshot the joystick ON the fourth ATK, never on the delayed damage frame.
+    // FURY P16 owns ATK. P19 only supplies the directional input.
+    // Fourth strike begins NOW; finger may drag until the impact frame.
+    if(g.p16Enabled){
+      if(step===4)g.touch?.armFinisherGesture?.();
+      else g.touch?.clearFinisherGesture?.();
+    }
     this._finisher=g.p15Enabled && step===4?finisherInput(g.input,g.player.yaw):null;
     const context=g.p15Enabled?resolveCombatContext({grounded:g.player.onGround,
       verticalSpeed:g.player.vel.y,dashRecovery:g.player._dashFollowupT>0,
@@ -280,6 +307,12 @@ export class Combat {
   resolveMelee() {
     const g = this.game;
     const player = g.player;
+    if(g.p16Enabled&&this._meleeStep===4&&this._finisher){
+      // Sample at hit-confirm time, NOT when fourth ATK starts.
+      // No joystick input is used. Released gesture direction is retained.
+      this._finisher=finisherInput(g.input,player.yaw);
+      g.touch?.clearFinisherGesture?.();
+    }
     const locked=g.p7Enabled?this._attackTarget:
       g.p6Enabled && g.targeting?g.targeting.get(4.8):null;
     const forward=this._fwd.copy(g.p7Enabled?player.getCombatForward():player.getForward());
@@ -348,7 +381,12 @@ export class Combat {
       this.lastConfirmedHit=connected;
       this.lastSwingReason=connected?'confirmed-damage':'miss';
       this.comboStep=commitConfirmedHit(priorConfirmedStep,this._meleeStep,connected);
-      if(connected){this.comboTimer=1.60;this.airComboGrace=0;}
+      if(connected){
+        this.comboTimer=1.60;this.airComboGrace=0;
+        this.ports.emit('confirmed-basic-hit',{step:this._meleeStep,source:'FURY_P16'});
+        if(this._meleeStep===4)this.ports.emit('finisher-impact',{
+          mode:this._finisher?.mode||'forward',source:'FURY_P16'});
+      }
     }
   }
 
