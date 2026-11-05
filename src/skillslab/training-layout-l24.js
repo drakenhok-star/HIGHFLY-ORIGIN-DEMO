@@ -5,7 +5,7 @@
 export function unifiedIslandLayout24(origin,forward){
   if(!origin||!forward)throw Error('Island layout requires an anchor and heading');
   const n=Math.hypot(forward.x||0,forward.z||0)||1;
-  const fx=(forward.x||0)/n,fz=(forward.z||-1)/n;
+  const fx=(Number(forward.x)||0)/n,fz=(Number.isFinite(Number(forward.z))?Number(forward.z):-1)/n;
   const rx=-fz,rz=fx;
   const at=(dist,side)=>({
     x:origin.x+fx*dist+rx*side,
