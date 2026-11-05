@@ -63,6 +63,10 @@ const setup = (mode) => {
   return terrain;
 };
 
+const unchanged=setup(false);
+unchanged.update(0);
+assert.equal(unchanged.chunks.size,3,'unflagged P16 still builds up to three chunks per frame');
+
 const baseline=setup(false);
 baseline._buildChunk(0,0);
 const budget=setup(true);
