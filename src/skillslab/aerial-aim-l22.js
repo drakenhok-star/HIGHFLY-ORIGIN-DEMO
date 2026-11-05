@@ -75,3 +75,31 @@ export function lockedLaunchDirection22(origin,enemy,{range=22,visible=()=>true}
  if(dist>range||!visible(enemy,target))return null;
  return {direction:dir,target:enemy,distance:dist};
 }
+
+/**
+ * L22 design rule: never soft-aim a skill at an enemy ON THE GROUND.
+ * The optional airborne auto-aim may acquire only a genuinely elevated,
+ * visible living target within the projectile's finite travel range.
+ * The user can always override with manual drag.
+ */
+export function flyingAutoTarget22(origin,forward,enemies,groundHeight,{
+  range=22,halfAngle=17,visible=()=>true,flightThreshold=1.65
+}={}){
+ if(!origin||!forward||typeof groundHeight!=='function')return null;
+ const len=Math.hypot(forward.x||0,forward.y||0,forward.z||0)||1;
+ const f={x:(forward.x||0)/len,y:(forward.y||0)/len,z:(forward.z||0)/len};
+ const h=Math.hypot(f.x,f.z)||1;
+ let winner=null,best=Infinity;
+ for(const enemy of enemies||[]){
+  if(!enemy?.alive||!isFlying22(enemy,groundHeight,flightThreshold))continue;
+  const candidate=lockedLaunchDirection22(origin,enemy,{range,visible});
+  if(!candidate)continue;
+  const d=candidate.direction;
+  const horizontal=Math.hypot(d.x,d.z)||1;
+  const dot=(d.x*f.x+d.z*f.z)/(horizontal*h);
+  if(dot<Math.cos(halfAngle*Math.PI/180))continue;
+  const score=(1-dot)*30+candidate.distance*.03;
+  if(score<best){best=score;winner=candidate;}
+ }
+ return winner;
+}
