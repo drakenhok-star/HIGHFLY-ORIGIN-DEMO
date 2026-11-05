@@ -5,7 +5,7 @@ export const CAMERA_PRESETS_P18=Object.freeze({
  hybrid:Object.freeze({label:'HÍBRIDA',distance:8.5,pitch:-34,aim:.145}),
  moba:Object.freeze({label:'MOBA',distance:10,pitch:-46,aim:.145})
 });
-const STORE='hf_l22_fury_p16_camera_settings';
+const STORE='hf_l23_fury_p16_camera_settings';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const num=(v,fallback,min,max)=>{
  const n=Number(v);return Number.isFinite(n)?clamp(n,min,max):fallback;
