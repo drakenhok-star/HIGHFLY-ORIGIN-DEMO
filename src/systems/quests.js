@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { nearestFrontierTargetP181 } from '../ui/frontier-tracking-p181.js';
+import { P18_FRONTIER_QUEST } from '../world/living-world-runtime-p18.js';
 
 const QUEST_DEFS = {
   q1: { name: 'Amenaza de lobos', giver: 'olaf', desc: 'Eliminá 5 lobos para ayudar a Olaf.', kind: 'kill', target: 'wolf', need: 5, rewardGold: 100, rewardXp: 80 },
@@ -32,6 +34,7 @@ export class Quests {
   }
 
   getState(id) {
+    if(id==='p18_frontier'&&this.game.p18Enabled)return this.game.livingWorld?.quest?.status||'available';
     return this.states[id];
   }
 
@@ -117,7 +120,9 @@ export class Quests {
     if(frontier)quests.push({
       id:'p18_frontier',name:'Centinelas de la frontera',
       desc:'Eliminá 3 lobos de la frontera este u oeste. Volvé con Bjorn.',
-      state:frontier.status,progress:frontier.progress,need:3
+      state:frontier.status,progress:frontier.progress,need:P18_FRONTIER_QUEST.need,
+      rewardGold:P18_FRONTIER_QUEST.rewardGold,rewardXp:P18_FRONTIER_QUEST.rewardXp,
+      giver:'Bjorn · aldea',kind:'secundaria',secret:false
     });
     return quests;
   }
@@ -141,23 +146,11 @@ export class Quests {
       }
     }
     const frontier=this.game.p18Enabled?this.game.livingWorld?.quest:null;
-    if(frontier?.status==='active'){
-      const p=this.game.player.pos;
-      let nearest=null,best=Infinity;
-      for(const wolf of this.game.enemies.list){
-        if(!wolf.p18Frontier||!wolf.alive)continue;
-        const d=wolf.group.position.distanceToSquared(p);
-        if(d<best){nearest=wolf;best=d;}
-      }
-      if(nearest)out.push({
-        pos:this._markerVecs.p18.copy(nearest.group.position),
-        label:'Centinelas de la frontera'
-      });
-    }else if(frontier?.status==='complete'){
-      const bjorn=this.game.npcs.list.find(n=>n.id==='bjorn');
-      if(bjorn)out.push({
-        pos:this._markerVecs.p18.copy(bjorn.pos),
-        label:'Regresá con Bjorn'
+    if(frontier?.status==='active'||frontier?.status==='complete'){
+      const goal=nearestFrontierTargetP181(this.game);
+      if(goal)out.push({
+        pos:this._markerVecs.p18.set(goal.x,this.game.terrain.getHeight(goal.x,goal.z),goal.z),
+        label:goal.label
       });
     }
     return out;
