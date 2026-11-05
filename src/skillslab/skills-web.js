@@ -744,6 +744,7 @@ export class TianjieMobaSkillsLab {
         if(this.game.state!=='playing'||this.game.input.hudEditing)return;
         e.preventDefault();e.stopImmediatePropagation();
         this.cancelAim();
+        if(this.focusPanelOpen){this.focusPanelOpen=false;this.renderMonsterSelector();}
         try{b.setPointerCapture(e.pointerId);}catch(_){}
         const p=this.game.player;
         this.aim={
