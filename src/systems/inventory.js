@@ -117,6 +117,10 @@ export class Inventory {
 
   pickupDrop(drop) {
     this.game.audio.play('chest');
+    if(this.game.p183Enabled && ['rare','epic','legendary'].includes(drop.rarity)){
+      const titles={rare:'RARO',epic:'ÉPICO',legendary:'LEGENDARIO'};
+      this.game.hud.notify('✦ BOTÍN '+titles[drop.rarity]);
+    }
     if (drop.gold > 0) {
       this.gold += drop.gold;
       this.game.hud.notify('Obtuviste ' + drop.gold + ' de oro');
