@@ -51,6 +51,7 @@ class Game {
     this.p182Build=true; // P18.1 save remains read-only when testing a new P18.2 game
     this.p183Build=true; // new isolated save; prior P18.2 state read-only
     this.p183Enabled=!new URLSearchParams(location.search).has('hf_p183_off');
+    this.p183bEnabled=this.p183Enabled&&!new URLSearchParams(location.search).has('hf_p183b_off');
     this.p18Enabled=!new URLSearchParams(location.search).has('hf_p18_off');
     this.p163Enabled=!new URLSearchParams(location.search).has('hf_p163_off');
     this.p812Eco=false;

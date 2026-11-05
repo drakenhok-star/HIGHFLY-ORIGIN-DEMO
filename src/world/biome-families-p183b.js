@@ -10,7 +10,7 @@ export const P183B_FAMILIES=Object.freeze({
 const camp=(id,type,biome,x,z,count,opts={})=>Object.freeze({id,type,biome,x,z,count,
   family:opts.family||'beast',aggressive:opts.aggressive!==false,model:opts.model||type,
   hp:opts.hp||38,dmg:opts.dmg||7,speed:opts.speed||4,
-  aggro:opts.aggro||15,attackRange:opts.range||1.8,attackCd:opts.cd||1.6,
+  aggro:opts.aggressive===false?0:(opts.aggro??15),attackRange:opts.range||1.8,attackCd:opts.cd||1.6,
   respawn:opts.respawn||105,rarity:opts.rarity||'common',
   xp:opts.xp||20,drop:opts.drop||'wolf_pelt',gold:opts.gold||6,
   clips:Object.freeze(opts.clips||{idle:'Idle',walk:'Walk',attack:'Attack',death:'Death'}),

@@ -4,6 +4,7 @@ import { dryPackCenterP182, groundedStepP182 } from '../world/terrestrial-habita
 import { shallowStepP183, waterSpeedP183 } from '../world/shallow-water-p183.js';
 import { rollBonusLootP183 } from '../systems/loot-table-p183.js';
 import { P183_PENDING_SPECIES, speciesReadyP183 } from '../world/species-gate-p183.js';
+import { P183B_CAMPS,P183B_COAST_TEMPLATE,resolveBiomeCampP183b,resolveCoastSitesP183b,biomeValidP183b } from '../world/biome-families-p183b.js';
 
 const P183_SPIDER_DENS = [{x:-228,z:183},{x:-245,z:192}]; // independent spawn / no quest ownership
 const WOLF_PACK_HOMES = [
@@ -64,6 +65,7 @@ export class Enemies {
     this.packs = [];
     this.pendingRespawns = [];
     this.p183VenomTicks=0;this.p183VenomTime=0;
+    this.p183bSites=[];
     this.geoCache = new Map();
     this.sackMat = new THREE.MeshStandardMaterial({ color: 0x7a5c34, roughness: 0.8, metalness: 0, emissive: 0xc9a86a, emissiveIntensity: 0.45 });
     // Reuse existing loot sack geometry; only material changes with rarity.
@@ -156,6 +158,7 @@ export class Enemies {
         for(const den of P183_SPIDER_DENS)this._spawnSpider(den.x,den.z);
       }
     }
+    if(this.game.p183bEnabled)this._spawnBiomeWorldP183b();
     if(this.game.p16Enabled && new URLSearchParams(location.search).has('hf_training'))
       this._spawnTrainingDummy();
   }
@@ -319,6 +322,59 @@ export class Enemies {
     return e;
   }
 
+
+  _spawnBiomeWorldP183b(){
+    const t=this.game.terrain,allow=(x,z)=>!worldIsSafeP18(x,z)&&Math.abs(x)<1100&&Math.abs(z)<1100;
+    this.p183bSites=[];
+    for(const spec of P183B_CAMPS){
+      if(!this.game.assets.has(spec.model))continue;
+      const site=resolveBiomeCampP183b(t,spec,allow);
+      if(!site)continue;
+      let count=0;
+      for(let k=0;k<spec.count;k++){
+        const x=site.x+(k%2)*4.1,z=site.z+(k?3.3:0);
+        if(!biomeValidP183b(t,x,z,spec.biome,allow))continue;
+        if(this._spawnBiomeMobP183b(spec,x,z))count++;
+      }
+      if(count)this.p183bSites.push({spec,site});
+    }
+    if(this.game.assets.has('crab')){
+      for(const [i,site] of resolveCoastSitesP183b(t,allow).entries()){
+        const spec={...P183B_COAST_TEMPLATE,id:'shore_crab_'+(i+1)};
+        if(this._spawnBiomeMobP183b(spec,site.x,site.z))this.p183bSites.push({spec,site});
+      }
+    }
+    if(typeof window!=='undefined')window.highflyBiomeReport=()=>this.p183bSites.map(({spec,site})=>({
+      camp:spec.id,biome:spec.biome,family:spec.family,type:spec.type,
+      x:Math.round(site.x),z:Math.round(site.z)
+    }));
+  }
+  _spawnBiomeMobP183b(spec,x,z){
+    if(!this.game.p183bEnabled||!this.game.assets.has(spec.model))return null;
+    const names={boar:'Jabalí salvaje',crab:'Cangrejo costero',goblin:'Goblin del bosque',
+      bandit:'Bandido del camino',orc:'Orco de las ruinas',yeti:'Yeti',
+      stag:'Ciervo',fox:'Zorro del bosque',snow_alpha:'Lobo alfa helado',forest_wolf:'Lobo forestal'};
+    const e=this._base(spec.type,names[spec.type]||spec.type,spec.hp,
+      spec.type==='orc'?1.2:spec.type==='crab'?.70:.85,x,z);
+    e.speciesId=spec.type;e.p183bSpec=spec;
+    e.dmg=spec.dmg;e.speed=spec.speed;e.aggroR=spec.aggro;
+    e.attackRange=spec.attackRange;e.attackCd=spec.attackCd;
+    e.passive=!spec.aggressive;e.chargeCd=0;e.chargeT=0;
+    this._attachRig(e,spec.model);
+    if(spec.tint){
+      const tint=new THREE.Color(spec.tint);
+      for(const m of e.mats)if(m.m.color)m.m.color.lerp(tint,.28);
+    }
+    if(spec.type==='bandit'){
+      for(const m of e.mats)if(m.m.color)m.m.color.multiplyScalar(.66);
+      const hand=e.rig.root.getObjectByName('handslotr');
+      if(hand&&this.game.assets.has('sword'))hand.add(this.game.assets.spawn('sword').root);
+    }
+    for(const m of e.mats){m.e=m.m.emissive.getHex();m.i=m.m.emissiveIntensity;}
+    e.rig.play(spec.clips.idle);e.rig.update((Math.abs(x*3+z*7)%20)/10);
+    return e;
+  }
+
   _spawnSpider(x,z){
     if(!this.game.p183Enabled||!this.game.assets.has('spider'))return null;
     const dry=dryPackCenterP182(this.game.terrain,{x,z},[[0,0]],(nx,nz)=>!worldIsSafeP18(nx,nz));
@@ -448,6 +504,19 @@ export class Enemies {
         }
       }
     }
+    if(e.p183bSpec && e.hp>0){
+      if(e.passive || (e.type==='bandit' && e.hp<e.maxHp*.35)){
+        e.state='flee';e.fleeT=5.5;
+      }else if(e.type==='bandit'||e.type==='goblin'||e.type==='forest_wolf'){
+        let alerted=0;
+        for(const other of this.list){
+          if(other===e||!other.alive||other.type!==e.type||other.state!=='idle')continue;
+          if(other.group.position.distanceToSquared(e.group.position)>28*28)continue;
+          other.state='chase';other.aggroT=6;
+          if(++alerted>=2)break;
+        }
+      }
+    }
     if (e.hp <= 0) {
       e.hp = 0;
       this._die(e);
@@ -470,7 +539,7 @@ export class Enemies {
     e.kbVel.set(0, 0, 0);
     e.boltPending = -1;
     e.hitPending = -1;
-    this._once(e,e.type==='draugr'?'Death_A':e.type==='spider'?'Spider_Death':'Death');
+    this._once(e,e.p183bSpec?e.p183bSpec.clips.death:e.type==='draugr'?'Death_A':e.type==='spider'?'Spider_Death':'Death');
     e.animLock = 1e9;
     e.slowT = 0;
     e.slowDur = 0;
@@ -495,6 +564,9 @@ export class Enemies {
       }
     } else if(e.type==='spider'){
       xp=28;items=['spider_silk'];gold=6+Math.floor(Math.random()*10);
+    } else if(e.p183bSpec){
+      xp=e.p183bSpec.xp;items=[e.p183bSpec.drop];
+      gold=e.p183bSpec.gold+Math.floor(Math.random()*5);
     } else {
       xp = 300; items = ['dragon_bone', 'dragon_scale'];
       gold = 300;
@@ -515,6 +587,7 @@ export class Enemies {
     this._spawnDrop(e.group.position.x, e.group.position.z, items, gold, rarity);
 
     if(e.type==='spider')this.pendingRespawns.push({kind:'spider',t:105,x:e.home.x,z:e.home.z});
+    if(e.p183bSpec)this.pendingRespawns.push({kind:'biome',t:e.p183bSpec.respawn,sp:e.p183bSpec,x:e.home.x,z:e.home.z});
     if (e.type === 'draugr' && !e.boss) {
       this.pendingRespawns.push({ kind: 'draugr', t: 120, x: e.home.x, z: e.home.z, variant: e.variant });
     }
@@ -622,6 +695,7 @@ export class Enemies {
     }
 
     if (e.cdT > 0) e.cdT -= dt;
+    if(e.chargeCd>0)e.chargeCd-=dt;
     if (e.aggroT > 0) e.aggroT -= dt;
     if (e.hitPending >= 0) {
       e.hitPending -= dt;
@@ -653,6 +727,10 @@ export class Enemies {
       // Suppress enemy movement/attack while hit-reacting, but preserve kbVel physics.
       e.hitPending=-1;e.boltPending=-1;
       e.cdT=Math.max(e.cdT,.12);
+    } else if(e.state==='flee'){
+      e.fleeT=(e.fleeT||0)-dt;
+      if(e.fleeT<=0||homeDist>38)e.state='return';
+      else if(dist>.01){mx=-dx/dist;mz=-dz/dist;sp=e.speed*1.12;faceX=mx;faceZ=mz;hasFace=true;}
     } else if (e.state === 'return') {
       const hx = e.home.x - pos.x;
       const hz = e.home.z - pos.z;
@@ -734,13 +812,16 @@ export class Enemies {
         e.cdT = e.attackCd;
         e.hitPending = 0.2;
         if(e.type==='wolf')this._once(e,'Attack',.8);
+        else if(e.p183bSpec)this._once(e,e.p183bSpec.clips.attack,.85);
         else if(e.type==='spider')this._once(e,'Spider_Attack',.8);
         else this._once(e,'1H_Melee_Attack_Slice_Diagonal');
       }
     }
 
+    if(e.type==='boar'&&e.state==='chase'&&dist>3.5&&dist<17&&e.chargeCd<=0){e.chargeCd=8;e.chargeT=.85;}
+    if(e.chargeT>0){sp*=1.65;e.chargeT-=dt;}
     if (e.slowT > 0) sp *= e.slowFactor; // 凛冬之息减速（动画速率随 sp 同步变慢）
-    if(g.p183Enabled)sp*=waterSpeedP183(g.terrain,pos.x,pos.z);
+    if(g.p183Enabled&&e.type!=='crab')sp*=waterSpeedP183(g.terrain,pos.x,pos.z);
 
     const stepX=(mx * sp + e.kbVel.x) * dt;
     const stepZ=(mz * sp + e.kbVel.z) * dt;
@@ -788,7 +869,9 @@ export class Enemies {
     e.animLock -= dt;
     if (e.animLock <= 0) {
       if (sp > 0.1) {
-        if (e.type === 'wolf') {
+        if(e.p183bSpec){
+          this._loco(e,e.p183bSpec.clips.walk,Math.max(.45,sp/Math.max(1,e.speed)));
+        } else if (e.type === 'wolf') {
           if (e.state === 'chase') this._loco(e, 'Gallop', sp / 7);
           else this._loco(e, 'Walk');
         } else if(e.type==='spider'){
@@ -799,7 +882,7 @@ export class Enemies {
           this._loco(e, 'Walking_D_Skeletons');
         }
       } else {
-        this._loco(e,e.type==='spider'?'Spider_Idle':'Idle');
+        this._loco(e,e.p183bSpec?e.p183bSpec.clips.idle:e.type==='spider'?'Spider_Idle':'Idle');
       }
     }
     e.rig.update(dt);
@@ -1039,6 +1122,10 @@ export class Enemies {
         this.pendingRespawns.splice(i, 1);
         if (r.kind === 'draugr') this._spawnDraugr(r.x, r.z, r.variant);
         if (r.kind === 'spider' && g.p183Enabled) this._spawnSpider(r.x,r.z);
+        if(r.kind==='biome'&&g.p183bEnabled&&this.game.assets.has(r.sp.model)){
+          if(biomeValidP183b(g.terrain,r.x,r.z,r.sp.biome,(x,z)=>!worldIsSafeP18(x,z)))
+            this._spawnBiomeMobP183b(r.sp,r.x,r.z);
+        }
       }
     }
 
@@ -1123,6 +1210,7 @@ export class Enemies {
     this.bolts = [];
     this.pendingRespawns = [];
     this.p183VenomTicks=0;this.p183VenomTime=0;
+    this.p183bSites=[];
     this.packs = [];
     this.dragon = null;
     this.spawnAll();
