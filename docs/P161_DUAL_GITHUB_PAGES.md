@@ -1,33 +1,25 @@
-# HIGHFLY TIANJIE — Publicación y backups por proyectos
+# HIGHFLY — PUBLICACIONES PARALELAS Y BACKUPS · decisión corregida 2026-11-05
 
-**Decisión definitiva del 5 de noviembre de 2026** — HIGHFLY tiene **dos proyectos públicos paralelos y dos GitHub Pages**, cada uno con su propio objetivo.
+## Repositorios y Pages (esquema definitivo)
 
-## A. ESTE CHAT: HIGHFLY TIANJIE / PERFORMANCE / RPG
+**A. Demo HIGHFLY TIANJIE (ESTE CHAT):** `drakenhok-star/HIGHFLY-ORIGIN-DEMO`, única GitHub Pages de la demo: `https://drakenhok-star.github.io/HIGHFLY-ORIGIN-DEMO/`.
+- P16 estable: commit fijado `a83e7993d84da33c8d0792277c08d69a56bd1906`, rama `p16-fury-hitconfirm-20261105`, backup adicional `backup-p16-fury-hitconfirm-20261105`, versión jugable congelada en `/p16/`.
+- P16.1 performance + training UI: rama experimental `p16-1-performance-foundation-20261105`, nueva publicación `/p161/` **dentro de la misma GitHub Pages**. Se pueden agregar versiones posteriores en directorios nuevos: `/p17/`, etc., sin borrar las anteriores. La raíz `/` no cambia.
+- Se publica desde un workflow en `main` usando un SHA exacto, verificando sintaxis/tests/medios. No se hace merge indiscriminado de P16.1 sobre main.
 
-**Repositorio:** `drakenhok-star/HIGHFLY-ORIGIN-DEMO`  
-**GitHub Pages:** https://drakenhok-star.github.io/HIGHFLY-ORIGIN-DEMO/
+**B. Laboratorio independiente de SKILLS/APUNTADO (OTRO CHAT):** repositorio `drakenhok-star/HIGHFLY-FURY-SKILL-LAB`; publica su propia GitHub Pages desde `.github/workflows/pages.yml`. No se sustituye ni se mezcla con la demo; el objetivo futuro será integrar solo habilidades validadas.
 
-- **Última base estable aprobada:** P16, commit `a83e7993d84da33c8d0792277c08d69a56bd1906`.
-- **Backup doble:** rama `p16-fury-hitconfirm-20261105` y rama `backup-p16-fury-hitconfirm-20261105`, ambas apuntando al mismo commit estable; nunca forzar ni borrar ninguna.
-- **Backup web de juego:** ruta `/p16/` en la MISMA GitHub Pages, publicada a partir del commit fijado.
-- **Desarrollo de este chat:** rama `p16-1-performance-foundation-20261105` a partir de P16.
-- **Nueva versión pública:** ruta `/p161/` en la MISMA GitHub Pages de HIGHFLY ORIGIN DEMO; es experimental, y se publica mediante un paso validado y fijado por SHA en `main:.github/workflows/deploy-live.yml`.
-- **Importante:** NO crear un repositorio nuevo ni un tercer Pages para PERFORMANCE. Versiones futuras P16.2/P17 etc. se agregan a esta misma Pages solo al superar tests, manteniendo la ruta anterior accesible.
-- `main` alberga el workflow de publicación de la demo; no fusionar el trabajo experimental de P16.1 directamente a `main` para desplegar; el workflow toma solamente el snapshot aprobado y lo publica bajo su propia ruta.
+## Condiciones operativas
+- Exclusivamente GitHub + GitHub Actions + GitHub Pages durante la etapa de medios MIT/CC0 revisados; **no desplegar en Vercel y no exigir Codespaces**.
+- Una vinculación anterior de Vercel con el repositorio puede lanzar compilaciones Vercel automáticamente al subir commits a GitHub: eso **no equivale a que este workflow despliegue en Vercel**. Su administración y desconexión se resuelven aparte, sin interferir con Pages ni con otros proyectos existentes.
+- No subir ZIP SOURCE de KayKit Complete ni assets de licencia restrictiva a páginas públicas.
+- Guardar backup antes de cada versión aprobada. Mantener funcionamiento reversible con flags para comparar mejoras P16.1.
+- Probar en S23 Ultra Android horizontal y comparar P16 vs P16.1 en la misma red/navegador/preset, con ECO desactivado, 3 corridas, P95/P99 y regresión de controles/combate.
+- El entrenamiento de P16.1 es **una vista previa** sin mutaciones del RPG; Training Core real y P17 RPG se integrarán por interfaces y pruebas, no copiando sistemas enteros.
 
-## B. OTRO CHAT: HIGHFLY FURY SKILL LAB
-
-**Repositorio público independiente:** `drakenhok-star/HIGHFLY-FURY-SKILL-LAB`  
-**Su propio Pages:** `https://drakenhok-star.github.io/HIGHFLY-FURY-SKILL-LAB/` (verificar la publicación efectiva).
-
-- Skills, apuntado, VFX y combos se estudian en ese laboratorio.
-- Su propio workflow es `.github/workflows/pages.yml`; toma un snapshot del origen P16 del repositorio demo bajo un `source_ref` y despliega únicamente al entorno Pages del repositorio Skill Lab.
-- No modificar ni desplegar este laboratorio desde el flujo de PERFORMANCE; tampoco introducir su código de combate a P16.1 sin aprobación y validación.
-
-## Condiciones de seguridad
-
-- **GitHub y GitHub Pages** durante la etapa de archivos públicos MIT/CC0 auditados; no requerir Codespaces para este trabajo. Cuando se integren recursos propietarios de KayKit, trabajar en un repositorio privado sin publicarlos en Pages.
-- No usar un único workflow para desplegar dos repositorios: cada uno publica a su propia Pages.
-- P16 estable sigue jugable incluso si falla CI de P16.1; en fallo no se sube el artefacto nuevo.
-- P16.1 no altera `/p16/`, y el Skill Lab tampoco.
-- Antes de dar por hecho un despliegue, verificar el resultado de GitHub Actions; un commit en el workflow no demuestra que la página ya esté disponible.
+## URLs de seguimiento
+- Código: https://github.com/drakenhok-star/HIGHFLY-ORIGIN-DEMO/tree/p16-1-performance-foundation-20261105
+- CI: https://github.com/drakenhok-star/HIGHFLY-ORIGIN-DEMO/actions
+- P16 backup: https://drakenhok-star.github.io/HIGHFLY-ORIGIN-DEMO/p16/
+- P16.1: https://drakenhok-star.github.io/HIGHFLY-ORIGIN-DEMO/p161/ (solo al confirmar deploy correcto)
+- Skills: https://github.com/drakenhok-star/HIGHFLY-FURY-SKILL-LAB
