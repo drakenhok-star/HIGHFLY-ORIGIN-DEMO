@@ -1,4 +1,5 @@
 import { ITEM_DB } from '../systems/inventory.js';
+import { TrainingPreviewP161 } from './training-p161.js';
 
 const EMBLEM_SVG =
   '<svg viewBox="0 0 160 96" width="150" height="90" aria-hidden="true">' +
@@ -54,6 +55,7 @@ export class Menus {
     this.buildQuests();
     this.buildDialogue();
     this.buildDeath();
+    this.training = new TrainingPreviewP161(game, this);
     this.onState(game.state);
   }
 
@@ -121,6 +123,7 @@ export class Menus {
       this.mainBtns.appendChild(this.btn('CONTINUAR', 'btn-continue', () => this.game.continueGame()));
     }
     this.mainBtns.appendChild(this.btn('NUEVA PARTIDA', 'btn-new', () => this.game.newGame()));
+    this.mainBtns.appendChild(this.btn('ENTRENAMIENTO · TRAINING', 'btn-training-p161', () => this.training.open('menu')));
     this.mainBtns.appendChild(
       this.btn('CONTROLES', 'btn-help', () => {
         this.helpReturn = 'main';
@@ -149,6 +152,7 @@ export class Menus {
     el('h2', 'menu-h2', panel, 'PAUSA');
     this.pauseMain = el('div', 'menu-btn-col', panel);
     this.pauseMain.appendChild(this.btn('CONTINUAR', 'btn-resume', () => this.game.setState('playing')));
+    this.pauseMain.appendChild(this.btn('ENTRENAMIENTO · TRAINING', 'btn-pause-training-p161', () => this.training.open('paused')));
     const saveBtn = this.btn('GUARDAR PARTIDA', 'btn-save', () => {
       this.game.saveSys.save();
       saveBtn.textContent = 'GUARDADO';
@@ -357,6 +361,8 @@ export class Menus {
       this.showMain();
     } else if (s === 'paused') {
       this.showPause();
+    } else if (s === 'training') {
+      this.training.show();
     } else if (s === 'inventory') {
       this.refreshInventory();
       this.showScreen('inventory');
