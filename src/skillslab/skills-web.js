@@ -275,11 +275,17 @@ export class TianjieMobaSkillsLab {
     if(slot===1){
       let shotDir=dir.clone();
       // Explicit aerial lock overrides soft aim, but NEVER overrides a manual gesture.
-      if(!options.manualAim&&g.targeting?.locked&&g.targeting.valid(g.targeting.locked,17,true)){
+      if(!options.manualAim){
         const from={x:at.x,y:at.y+1.2,z:at.z};
-        const selected=lockedLaunchDirection22(from,g.targeting.locked,{
-          range:17,visible:(_e,q)=>hasLineOfSight(g,from,q)});
-        if(selected)shotDir=vec(selected.direction.x,selected.direction.y,selected.direction.z);
+        const terrain=(x,z)=>g.terrain.getHeight(x,z);
+        const visible=(_e,q)=>hasLineOfSight(g,from,q);
+        const locked=g.targeting?.locked;
+        const selected=locked&&isFlying22(locked,terrain)&&
+          g.targeting.valid(locked,17,true)?
+          lockedLaunchDirection22(from,locked,{range:17,visible}):null;
+        const soft=selected||flyingAutoTarget22(from,shotDir,
+          g.combat.collectTargets(),terrain,{range:17,visible});
+        if(soft)shotDir=vec(soft.direction.x,soft.direction.y,soft.direction.z);
       }
       this.fx.launch(at,shotDir,0);
       // Violet cast now gets a proper multi-layer 3D projectile and instanced sparks.
