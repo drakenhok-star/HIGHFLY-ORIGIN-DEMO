@@ -1,0 +1,66 @@
+name: HIGHFLY L22 · Aerial aim + VFX and MOBA combat QA
+on:
+  push:
+    branches:
+      - l22-aerial-target-vfx-combat-20261105
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax-check all source / test modules
+        run: |
+          set -Eeuo pipefail
+          find src -type f -name '*.js' -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+          node --check tests/l22-aerial-vfx.test.mjs
+          node --check scripts/l22-browser-smoke.mjs
+      - name: P16 combat and L21 compatibility
+        run: |
+          set -Eeuo pipefail
+          node tests/p16-hit-confirm.test.mjs
+          node tests/p19-fury-skills.test.mjs
+          node tests/p20-static-lab.test.mjs
+          node tests/l22-aerial-vfx.test.mjs
+          node scripts/audit_animation_p6.mjs
+          test -s LICENSE
+          test -s PROVENANCE.md
+          test -s docs/L22_VFX_AUDIT_AND_AERIAL_TARGETING.md
+          ! find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .
+  mobile-browser:
+    needs: regressions
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install ephemeral browser driver
+        run: |
+          set -Eeuo pipefail
+          printf '{"type":"module","private":true}\n' > package.json
+          npm install --no-save --no-package-lock playwright-core@1.58.0
+          command -v google-chrome || command -v chromium
+      - name: Simulated Galaxy S23 horizontal 3D regression
+        run: |
+          set -Eeuo pipefail
+          cp lab.html index.html
+          python3 -m http.server 8957 --bind 127.0.0.1 >/tmp/hf-l22-http.log 2>&1 &
+          HF_LAB_ENTRY=/index.html HF_CAPTURE=1 CHROME_PATH="$(command -v google-chrome || command -v chromium)" node scripts/l22-browser-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: L22-Galaxy-S23-landscape-simulated
+          path: audit-output/l22-mobile-landscape.png
+          if-no-files-found: ignore
+          retention-days: 7
+# Source branch QA only. DOES NOT publish to or modify principal HIGHFLY Pages.
