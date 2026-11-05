@@ -232,6 +232,29 @@ export class HighflyPanelsP9 {
     ['Defensa equipada',inv.armorValue()],['Habilidades aprendidas',g.combat.learnedShouts.length]];
    for(const [k,v] of lines){const row=el('label',null,undefined,content);
     el('span',null,k,row);el('strong',null,String(v),row);}
+  }else if(st==='camera'&&window.highflyCameraLab){
+   // L22 LAB ONLY: camera controls live in the native AJUSTES menu, not HUD.
+   const lab=window.highflyCameraLab,c=lab.config;
+   const presets=el('div','hf-p9-meta',undefined,content);
+   for(const [id,name] of [['adventure','AVENTURA'],['hybrid','HÍBRIDA'],['moba','MOBA']]){
+     const b=el('button',null,(c.preset===id?'● ':'○ ')+name,presets);
+     b.addEventListener('click',()=>{lab.selectProfile(id);this.renderSettings();});
+   }
+   const fields=[
+     ['Distancia','distance',4.5,13,.1],
+     ['Inclinación','pitch',-60,4,1],
+     ['Altura de enfoque','height',.9,3.4,.1],
+     ['Campo de visión','fov',55,85,1],
+     ['Sensibilidad de skill','aim',.08,.25,.005],
+     ['Zona muerta','deadZone',0,12,1],
+     ['Giro de cámara','turn',.8,2.4,.1],
+     ['Suavizado','smoothing',6,24,1]
+   ];
+   for(const [name,key,min,max,step] of fields)
+     slider(name,min,max,step,c[key],v=>lab.setValue(key,v));
+   click('RESTABLECER CÁMARA HÍBRIDA',()=>{
+     lab.reset();this.renderSettings();
+   });
   }else if(st==='camera'){
    slider('Sensibilidad táctil',.8,2.4,.1,this.hud.touch.cameraSensitivity,v=>this.hud.touch.setCameraSensitivity(v));
    slider('Distancia',2.5,12,.5,g.player.camDist,v=>{
