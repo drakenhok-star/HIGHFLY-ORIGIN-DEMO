@@ -11,7 +11,7 @@ const entry=(id,chance,rarity)=>Object.freeze({id,chance,rarity});
 export const P183_BONUS_TABLES=Object.freeze({
   wolf:Object.freeze([entry('health_potion',.06,'uncommon'),entry('hide_armor',.009,'rare')]),
   prairie_wolf:Object.freeze([entry('wolf_fang',.45,'common'),entry('health_potion',.055,'uncommon')]),
-  prairie_alpha:Object.freeze([entry('wolf_fang',1,'common'),entry('hide_armor',.20,'rare'),entry('steel_sword',.08,'rare')]),
+  prairie_alpha:Object.freeze([entry('wolf_fang',.95,'common'),entry('hide_armor',.20,'rare'),entry('steel_sword',.08,'rare')]),
   wolf_sentinel:Object.freeze([entry('health_potion',.10,'uncommon'),entry('steel_sword',.018,'rare')]),
   ice_wolf:Object.freeze([entry('mana_potion',.09,'uncommon'),entry('hide_armor',.025,'rare')]),
   draugr:Object.freeze([entry('mana_potion',.10,'uncommon'),entry('steel_sword',.025,'rare')]),
