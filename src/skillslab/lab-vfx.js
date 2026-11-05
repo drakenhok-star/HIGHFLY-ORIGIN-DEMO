@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {makeFireballVisual22} from './fireball-vfx-l22.js';
+import {L22SignatureVfx} from './signature-vfx-l22.js';
 
 // Fully original shader-free Three.js VFX, specifically for the Tianjie WebGL
 // renderer. Uses the existing particle emitter and owns/disposes added meshes.
@@ -14,7 +15,8 @@ export class TianjieSkillVfx {
   constructor(game) {
     this.game=game;
     this.active=[];
-    this.poolLimit=36;
+    this.poolLimit=48;
+    this.signature=new L22SignatureVfx(this);
     this.quality=1;
     this._sparkAt=0;
   }
@@ -166,6 +168,7 @@ export class TianjieSkillVfx {
   energyBolt(style=3){
     // L22: actual MIT-port fireball structure, not an isolated prototype sphere.
     if(style===3)return makeFireballVisual22();
+    if(style===0)return makeFireballVisual22('violet');
     // Original GLSL animated plasma. No copyrighted textures/audio/mesh.
     const palette=this.palette(style);
     const mat=new THREE.ShaderMaterial({
