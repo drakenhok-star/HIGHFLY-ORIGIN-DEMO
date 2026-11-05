@@ -53,9 +53,9 @@ export function castClaudeSkill(lab,slot,direction,target=null){
       // Visible wind-up + falling meteor; resolves once, at destination,
       // not instantly on button release.
       lab.schedule(.75,()=>{
-        const hit=lab.hitSphere(center,4.15,138,{});
+        const hit=lab.hitSphere(center,4.15,138,{height:2.15});
         fx.meteorImpact(center,4.15);
-        for(const enemy of lab.candidates(center,4.15)){
+        for(const enemy of lab.candidates(center,4.15,null,180,2.15)){
           enemy.applySlow?.(.57,1.2);
           lab.applyBurn(enemy,3,6,.45);
         }
@@ -64,8 +64,8 @@ export function castClaudeSkill(lab,slot,direction,target=null){
       return;
     }
     if(slot===3){
-      const hit=lab.hitSphere(pos,5,32,{});
-      for(const enemy of lab.candidates(pos,5)){
+      const hit=lab.hitSphere(pos,5,32,{height:2.8});
+      for(const enemy of lab.candidates(pos,5,null,180,2.8)){
         enemy.applySlow?.(.04,1.8);
         if(!enemy.boss&&enemy.type!=='dragon'){
           enemy.cdT=Math.max(enemy.cdT||0,1.35);
