@@ -1,0 +1,43 @@
+name: "HIGHFLY P18.3 · Ecology, Loot & Water CI"
+on:
+  push:
+    branches:
+      - p183-ecosystem-loot-water-20261105
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-p183:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout P18.3 working branch
+        uses: actions/checkout@v4
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Syntax check all game modules
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -name '*.js' -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+      - name: Run previous P6-P18.2.1 regressions and new P18.3 tests
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          for test in tests/*.test.mjs; do
+            echo "::group::$test"
+            node "$test"
+            echo "::endgroup::"
+          done
+      - name: Ensure no restricted binaries or archives
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' -o -iname '*Sketchfab*' \) | grep -q .; then
+            echo "P18.3 stopped: restricted/unknown asset"
+            exit 1
+          fi
