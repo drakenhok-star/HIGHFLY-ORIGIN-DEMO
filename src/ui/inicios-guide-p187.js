@@ -19,7 +19,7 @@ export class P187VillageGuide{
    if(this.button)return;
    this.tick+=dt;
    if(this.tick<.45)return;this.tick=0;
-   const quick=this.game.touch?.premium?.p810?.quick;
+   const quick=this.game.touch?.premium?.p810?.quick || document.getElementById('hf-p810-quick');
    if(!quick)return;
    this.button=make('button',quick,'🏘 PUEBLO · OFICIOS 1–20');
    this.button.type='button';
