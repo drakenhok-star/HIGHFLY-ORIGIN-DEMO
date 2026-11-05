@@ -219,3 +219,12 @@ body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-cancel::after {
 body.hf-skills-lab #hf-tianjie-skills-lab #hf-lab-cancel[hidden] {
   display:none!important;
 }
+
+
+/* L26: let the actual HUD editor own size and coordinates, including smaller
+   than 43px or bigger than the L25 shortcut. Old max-width:43px capped it. */
+body.hf-skills-lab #hf-tianjie-skills-lab #hf-l23-focus{
+  min-width:26px!important;max-width:none!important;
+  min-height:26px!important;max-height:none!important;
+  overflow:hidden;
+}
