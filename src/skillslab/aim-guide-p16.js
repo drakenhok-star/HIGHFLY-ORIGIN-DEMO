@@ -192,7 +192,9 @@ export class TianjieAimGuide {
   const q=this.profile,g=this.game,origin=g.player.pos;
   const trueDir=direction?.clone()?.normalize()||g.player.getForward();
   const dir=trueDir.clone().setY(0).normalize();
-  if(this.airborneLine){
+  // L23: NO manual altitude drag. Show elevated beam ONLY for explicit
+  // selected flying monster (trueDir gained elevation from focus).
+  if(this.airborneLine&&trueDir.y>.065){
     const from=origin.clone().add(new THREE.Vector3(0,1.25,0));
     const to=from.clone().addScaledVector(trueDir,q.range);
     const beamDelta=to.clone().sub(from),length=beamDelta.length();
