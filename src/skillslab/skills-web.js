@@ -3,7 +3,7 @@ import { hasLineOfSight, insideBlockingObject } from '../combat/targeting-p6.js'
 import { TianjieSkillVfx } from './lab-vfx.js';
 import { TianjieAimGuide, AIM_PROFILES } from './aim-guide-p16.js';
 import { castClaudeSkill } from './claudecraft-kit-p16.js';
-import {aerialDirection22,enemyChest22,directionToTarget22,targetWithinSkillVolume22,isCancelDrop22} from './aerial-aim-l22.js';
+import {aerialDirection22,enemyChest22,directionToTarget22,targetWithinSkillVolume22,isCancelDrop22,sweptProjectileHit22} from './aerial-aim-l22.js';
 
 // FURY P16 hit-confirm and ATK gesture are authoritative for movement and combat.
 // This skill lab never replaces g.combat.melee or g.player.update.
@@ -103,10 +103,11 @@ export class TianjieMobaSkillsLab {
     this.original={cast:originalCast,shout:originalShout,update:originalUpdate};
   }
 
-  aimDirection(request,maxRange=17){
+  aimDirection(request,maxRange=17,slot=1){
     // Preserve actual elevation for projectile skills; all others stay terrain-facing.
     if(request&&request.lengthSq()>0.01){
-      if((this.style===0||this.style===3)&&request.y!==undefined)
+      if((this.style===0||this.style===3) &&
+          AIM_PROFILES[this.style][slot-1].kind==='line' && request.y!==undefined)
         return request.clone().normalize();
       return request.clone().setY(0).normalize();
     }
@@ -169,7 +170,7 @@ export class TianjieMobaSkillsLab {
     const g=this.game;
     if(g.state!=='playing'||slot<1||slot>3)return false;
     if(g.stats.hp<=0)return false;
-    const t=this.now(),dir=this.aimDirection(requested);
+    const t=this.now(),dir=this.aimDirection(requested,17,slot);
     // Gravity ultimate has two explicit phases; second press is free.
     if(this.style===2&&slot===3&&this.guardianPull){
       if(t>this.guardianPull.started+.12){this.finishGuardianPull();return true;}
@@ -506,12 +507,14 @@ export class TianjieMobaSkillsLab {
       if(!hasLineOfSight(g,{x:old.x,y:old.y,z:old.z},{
         x:pr.mesh.position.x,y:pr.mesh.position.y,z:pr.mesh.position.z}))impact=true;
       if(!impact){
-        const possible=this.candidates(old,step+1.3);
+        // Full 3D swept hitbox. Never filter flying targets using ground distance.
+        const possible=g.combat.collectTargets();
         for(const e of possible){
-          const to=e.group.position.clone().add(vec(0,1,0)).sub(old);
-          const projection=clamp(to.dot(pr.dir),0,step);
-          const closest=old.clone().addScaledVector(pr.dir,projection);
-          if(closest.distanceTo(e.group.position.clone().add(vec(0,1,0)))<(e.hitRadius||1)+.39){
+          if(!e?.alive||!e.group)continue;
+          const contact=sweptProjectileHit22(old,pr.mesh.position,
+            enemyChest22(e),Math.max(.4,e.hitRadius||.9)+.39);
+          if(contact){
+            const closest=old.clone().lerp(pr.mesh.position,contact.t);
             this.struck(e,pr.damage??65,pr.dir);
             if(pr.burn)this.applyBurn(e,pr.burn.ticks,pr.burn.perTick,pr.burn.interval);
             else e.applySlow?.(.72,1.3);
@@ -734,7 +737,7 @@ export class TianjieMobaSkillsLab {
     const recastProfile=recast?{kind:'dash',range:4.4,width:2.7,radius:0}:null;
     this.aimGuide.begin(this.style,slot,recastProfile);
     this.preview=this.aimGuide.root;
-    let dir=this.aimDirection(null,this.aimGuide.profile.range||17);
+    let dir=this.aimDirection(null,this.aimGuide.profile.range||17,slot);
     if((this.style===0||this.style===3)&&slot===1){
       const e=this.game.targeting?.get(this.aimGuide.profile.range||17);
       const p=this.game.player.pos,enemy=e?enemyChest22(e):null;
