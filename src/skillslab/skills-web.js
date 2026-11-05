@@ -41,6 +41,7 @@ export class TianjieMobaSkillsLab {
     this.aimGuide=new TianjieAimGuide(game);
     this.activeLeap=null;
     this.guardianPull=null;
+    this.guardianDash=null;
     this.aim=null;
     this.preview=null;
     this.aimPoint=null;
@@ -208,6 +209,15 @@ export class TianjieMobaSkillsLab {
       }
       if(g.player.dashT>=0)return false;
       this.recastUntil=0;
+      if(this.style===2){
+        // Tigreal S2 second phase: rising hook NOW, never a second dash.
+        const hits=this.hitCone(at,dir,3.8,80,70,{launch:true,stun:1.05,height:3.8});
+        this.fx.slash(at,dir,2);
+        this.fx.impact(at.clone().addScaledVector(dir,1.2),2,2.8);
+        this.announce('¡GANCHO ASCENDENTE! '+hits+' enemigo(s) elevados');
+        this.animatePlayer(2);
+        return true;
+      }
       g.player.startDash({direction:{x:dir.x,z:dir.z},speed:19,duration:.17,style:'dodge'});
       this.fx.launch(at,dir,this.style);
       if(this.style===2)this.schedule(.18,()=>{
@@ -283,9 +293,10 @@ export class TianjieMobaSkillsLab {
     }
     if(slot===3){
       this.busyUntil=this.now()+.25;
+      this.fx.tornado(g.player.pos.clone(),4,0,2.15);
       for(let tick=0;tick<11;tick++){
         this.schedule(tick*(2/11),()=>{
-          this.hitSphere(g.player.pos,4.0,tick===10?55:22,{launch:true,stun:.34});
+          this.hitSphere(g.player.pos,4.0,tick===10?55:22,{launch:true,stun:.34,height:7.3});
           this.fx.tick(g.player.pos.clone(),0,tick);
         });
       }
@@ -294,8 +305,12 @@ export class TianjieMobaSkillsLab {
   rift(slot,dir){
     const p=this.game.player,at=p.pos.clone();
     if(slot===1){
-      this.hitCone(p.pos,dir,6.7,47,54);
-      this.fx.slash(at,dir,1);
+      // Dyrroth S1: THREE distinct travelling slash-wave hit beats.
+      for(let i=0;i<3;i++)this.schedule(.11*i,()=>{
+        const now=p.pos.clone(),forward=dir.clone();
+        this.hitCone(now,forward,4.7+i*.95,47,i===2?30:21,{height:2.7});
+        this.fx.slash(now.clone().addScaledVector(forward,i*.6),forward,1);
+      });
     }
     if(slot===2){
       p.startDash({direction:{x:dir.x,z:dir.z},speed:23,duration:.27,style:'dodge'});
@@ -322,35 +337,56 @@ export class TianjieMobaSkillsLab {
   guardian(slot,dir){
     const p=this.game.player,at=p.pos.clone();
     if(slot===1){
-      for(const e of this.candidates(p.pos,7,dir,57)){
-        this.struck(e,50,dir);
-        e.applySlow?.(.55,1.3);
-      }
-      this.fx.slash(at,dir,2);
-      this.fx.ring(at,5,PALETTE[2],.5);
+      // Tigreal S1: three expanding iron-wave fronts, each individually hittable.
+      for(let i=0;i<3;i++)this.schedule(.12*i,()=>{
+        const now=p.pos.clone();
+        for(const e of this.candidates(now,3.7+i*1.7,dir,57,2.6)){
+          this.struck(e,22,dir);e.applySlow?.(.55,1.3);
+        }
+        this.fx.slash(now.clone().addScaledVector(dir,i*.85),dir,2);
+        this.fx.ring(now,2.8+i*.7,PALETTE[2],.32);
+      });
     }
     if(slot===2){
       p.startDash({direction:{x:dir.x,z:dir.z},speed:17,duration:.36,style:'dodge'});
+      this.guardianDash={until:this.now()+.36,dir:dir.clone(),touched:new Set()};
       this.fx.launch(at,dir,2);
       this.schedule(.37,()=>{
-        this.hitSphere(p.pos,3,45,{push:4.6});
+        this.guardianDash=null;
+        this.hitSphere(p.pos,2.5,34,{push:1.8,height:2.8});
         this.fx.impact(p.pos.clone(),2,3);
       });
     }
     if(slot===3){
-      // First tap: pull only. Second tap: lift and slam; NO auto explosion.
-      this.guardianPull={started:this.now(),expires:this.now()+2.8,lastTick:-1,
+      // Tigreal ultimate: automatic suction, then terminal slam once.
+      this.guardianPull={started:this.now(),expires:this.now()+1.75,lastTick:-1,
         targets:new Set()};
       this.fx.vortex(p.pos.clone(),4.8,2);
-      this.announce('COLAPSO: atraé enemigos · TOCÁ S3 OTRA VEZ para elevar');
+      this.announce('COLAPSO: absorbiendo enemigos hasta impacto final');
     }
   }
 
+  updateGuardianDash(){
+    const state=this.guardianDash;if(!state)return;
+    if(this.now()>=state.until){this.guardianDash=null;return;}
+    const center=this.game.player.pos,dir=state.dir;
+    for(const e of this.candidates(center,2.1,dir,75,2.7)){
+      if(e.boss||e.type==='dragon')continue;
+      if(!state.touched.has(e)){
+        state.touched.add(e);this.struck(e,16,dir,{height:2.7});
+      }
+      // Training targets travel IN FRONT of the caster on dash, not only at its end.
+      const goal=center.clone().addScaledVector(dir,1.6);
+      e.group.position.x+=(goal.x-e.group.position.x)*.6;
+      e.group.position.z+=(goal.z-e.group.position.z)*.6;
+      if(e.kbVel){e.kbVel.x=0;e.kbVel.z=0;}
+    }
+  }
   updateGuardianPull(){
     const state=this.guardianPull;
     if(!state)return;
     const t=this.now();
-    if(t>=state.expires){this.guardianPull=null;this.announce('Atracción finalizada');return;}
+    if(t>=state.expires){this.finishGuardianPull();return;}
     if(state.lastTick>=0&&t-state.lastTick<.085)return;
     state.lastTick=t;
     const center=this.game.player.pos.clone();
@@ -425,6 +461,7 @@ export class TianjieMobaSkillsLab {
       this.recastUntil=0;
       this.activeLeap=null;
       this.guardianPull=null;
+      this.guardianDash=null;
       this.busyUntil=0;
     }
     if(this.lastSpawn<0){
@@ -435,6 +472,7 @@ export class TianjieMobaSkillsLab {
       this.syncTrainingUI();
     }
     this.updateLeap();
+    this.updateGuardianDash();
     this.updateGuardianPull();
     for(let i=this.events.length-1;i>=0;i--){
       const ev=this.events[i];
