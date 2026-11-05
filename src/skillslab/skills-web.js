@@ -3,7 +3,8 @@ import { hasLineOfSight, insideBlockingObject } from '../combat/targeting-p6.js'
 import { TianjieSkillVfx } from './lab-vfx.js';
 import { TianjieAimGuide, AIM_PROFILES } from './aim-guide-p16.js';
 import { castClaudeSkill } from './claudecraft-kit-p16.js';
-import {aerialDirection22,enemyChest22,directionToTarget22,targetWithinSkillVolume22,isCancelDrop22,sweptProjectileHit22,lockedLaunchDirection22,isFlying22,flyingAutoTarget22} from './aerial-aim-l22.js';
+import {targetWithinSkillVolume22,isCancelDrop22,sweptProjectileHit22,enemyChest22} from './aerial-aim-l22.js';
+import {availableMonsters23,focusedFlightShot23} from './monster-focus-l23.js';
 
 // FURY P16 hit-confirm and ATK gesture are authoritative for movement and combat.
 // This skill lab never replaces g.combat.melee or g.player.update.
@@ -42,6 +43,8 @@ export class TianjieMobaSkillsLab {
     this.activeLeap=null;
     this.guardianPull=null;
     this.guardianDash=null;
+    this.focusTarget=null; // L23: only user-selected monster gets opt-in aerial focus.
+    this.focusPanelOpen=false;
     this.aim=null;
     this.preview=null;
     this.aimPoint=null;
@@ -104,32 +107,21 @@ export class TianjieMobaSkillsLab {
   }
 
   aimDirection(request,maxRange=17,slot=1){
-    // Preserve actual elevation for projectile skills; all others stay terrain-facing.
-    if(request&&request.lengthSq()>0.01){
-      if((this.style===0||this.style===3) &&
-          AIM_PROFILES[this.style][slot-1].kind==='line' && request.y!==undefined)
-        return request.clone().normalize();
-      return request.clone().setY(0).normalize();
+    // Always PURE MANUAL horizontal aiming unless a flying monster has been
+    // deliberately selected through ENFOCAR. Swipe never controls altitude.
+    if(request&&request.lengthSq()>.01)return request.clone().normalize();
+    const g=this.game,p=g.player,f=p.getCombatForward();
+    const forward=f.lengthSq()>.01?f.normalize():p.getForward();
+    const profile=AIM_PROFILES[this.style]?.[slot-1];
+    if((this.style===0||this.style===3)&&profile?.kind==='line'){
+      const pos=p.pos,origin={x:pos.x,y:pos.y+1.25,z:pos.z};
+      const aimed=focusedFlightShot23(origin,this.focusTarget,
+        (x,z)=>g.terrain.getHeight(x,z),{
+          range:maxRange,visible:(_enemy,target)=>hasLineOfSight(g,origin,target)
+        });
+      if(aimed)return vec(aimed.direction.x,aimed.direction.y,aimed.direction.z);
     }
-    const g=this.game,p=g.player;
-    const f=p.getCombatForward();
-    const forward=f.lengthSq()>0.01?f.normalize():p.getForward();
-    const projectile=(this.style===0||this.style===3)&&
-      AIM_PROFILES[this.style][slot-1].kind==='line';
-    // NO automatic aim for ground enemies or ground-placed / melee skills.
-    if(projectile){
-      const muzzle={x:p.pos.x,y:p.pos.y+1.25,z:p.pos.z};
-      const terrain=(x,z)=>g.terrain.getHeight(x,z);
-      const visible=(_e,q)=>hasLineOfSight(g,muzzle,q);
-      const locked=g.targeting?.locked;
-      const explicit=locked&&isFlying22(locked,terrain)&&
-        g.targeting.valid(locked,maxRange,true)?
-        lockedLaunchDirection22(muzzle,locked,{range:maxRange,visible}):null;
-      const auto=explicit||flyingAutoTarget22(muzzle,forward,
-        g.combat.collectTargets(),terrain,{range:maxRange,visible});
-      if(auto)return vec(auto.direction.x,auto.direction.y,auto.direction.z);
-    }
-    return forward;
+    return forward.setY(0).normalize();
   }
   candidates(center,range,dir=null,halfAngle=180,verticalRange=2.6){
     const g=this.game,origin={x:center.x,y:center.y+1.2,z:center.z};
@@ -274,18 +266,15 @@ export class TianjieMobaSkillsLab {
     const g=this.game,p=g.player,at=p.pos.clone();
     if(slot===1){
       let shotDir=dir.clone();
-      // Explicit aerial lock overrides soft aim, but NEVER overrides a manual gesture.
-      if(!options.manualAim){
+      // L23: no automatic sky steering. Only an explicitly selected flying
+      // monster can elevate a projectile, and only without a manual drag.
+      if(!options.manualAim&&this.focusTarget){
         const from={x:at.x,y:at.y+1.2,z:at.z};
-        const terrain=(x,z)=>g.terrain.getHeight(x,z);
-        const visible=(_e,q)=>hasLineOfSight(g,from,q);
-        const locked=g.targeting?.locked;
-        const selected=locked&&isFlying22(locked,terrain)&&
-          g.targeting.valid(locked,17,true)?
-          lockedLaunchDirection22(from,locked,{range:17,visible}):null;
-        const soft=selected||flyingAutoTarget22(from,shotDir,
-          g.combat.collectTargets(),terrain,{range:17,visible});
-        if(soft)shotDir=vec(soft.direction.x,soft.direction.y,soft.direction.z);
+        const shot=focusedFlightShot23(from,this.focusTarget,
+          (x,z)=>g.terrain.getHeight(x,z),{
+            range:17,visible:(_enemy,q)=>hasLineOfSight(g,from,q)
+          });
+        if(shot)shotDir=vec(shot.direction.x,shot.direction.y,shot.direction.z);
       }
       this.fx.launch(at,shotDir,0);
       // Violet cast now gets a proper multi-layer 3D projectile and instanced sparks.
@@ -492,6 +481,9 @@ export class TianjieMobaSkillsLab {
 
   update(dt){
     const now=this.now(),g=this.game;
+    if(this.focusTarget&&(!this.focusTarget.alive||this.focusTarget.removed||!this.focusTarget.group)){
+      this.focusTarget=null;this.renderFocusLabel();
+    }
     if(this.enemiesList!==g.enemies.list){
       this.enemiesList=g.enemies.list;this.training=[];this.lastSpawn=-1;
       this.events.length=0;
@@ -605,7 +597,7 @@ export class TianjieMobaSkillsLab {
     root.id='hf-tianjie-skills-lab';
     root.setAttribute('translate','no');
     root.innerHTML=`<div class="hf-lab-top">
-      <strong class="hf-lab-title">HIGHFLY <span>FURY P16 + SKILL LAB L22 · CÁMARA HÍBRIDA</span></strong>
+      <strong class="hf-lab-title">HIGHFLY <span>FURY P16 + SKILL LAB L23 · AIM TERRESTRE + ENFOCAR</span></strong>
       <div class="hf-lab-modes">
         <button type="button" data-style="0">✦ AÉREA</button>
         <button type="button" data-style="1">⚔ ABISAL</button>
@@ -617,16 +609,19 @@ export class TianjieMobaSkillsLab {
         <span id="hf-lab-readout">S1 · S2 · S3 NUEVAS | S4 WULD ORIGINAL</span>
         <button type="button" id="hf-lab-train">OBJ: 1 / 3</button>
         <button type="button" id="hf-lab-reset">REINICIAR</button>
+        <button type="button" id="hf-l23-focus" aria-expanded="false">◎ ENFOCAR</button>
 
         <button type="button" id="hf-lab-cancel" hidden>CANCELAR</button>
       </div>
       <div id="hf-lab-message" role="status">FURY P16 intacto · Objetivos inmóviles · Daño real · Sin agresión</div>
-    </div>`;
+    </div><div id="hf-l23-target-panel" hidden aria-label="Seleccionar monstruo"></div>`;
     document.body.appendChild(root);
     this.root=root;
     this.readout=root.querySelector('#hf-lab-readout');
     this.note=root.querySelector('#hf-lab-message');
     this.cancelBtn=root.querySelector('#hf-lab-cancel');
+    this.focusBtn=root.querySelector('#hf-l23-focus');
+    this.focusPanel=root.querySelector('#hf-l23-target-panel');
     // Move X outside the transformed top dock: CSS fixed must anchor to screen.
     root.appendChild(this.cancelBtn);
     for(const b of root.querySelectorAll('[data-style]'))
@@ -639,6 +634,12 @@ export class TianjieMobaSkillsLab {
       e.preventDefault();e.stopPropagation();this.resetTraining();
     });
     this.syncTrainingUI();
+    this.focusBtn.addEventListener('pointerdown',e=>{
+      e.preventDefault();e.stopPropagation();
+      this.focusPanelOpen=!this.focusPanelOpen;
+      this.renderMonsterSelector();
+    });
+    this.renderFocusLabel();
 
     this.cancelBtn.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();this.cancelAim();});
     this.renderHud(true);
@@ -647,6 +648,7 @@ export class TianjieMobaSkillsLab {
     if(!this.root)return;
     const playing=this.game.state==='playing';
     this.root.classList.toggle('playing',playing);
+    this.renderFocusLabel();
     if(!playing&&!force)return;
     const def=this.styleDef();
     for(const b of this.root.querySelectorAll('[data-style]'))
@@ -667,6 +669,60 @@ export class TianjieMobaSkillsLab {
       b.setAttribute('aria-label',def.names[slot-1]);
       b.classList.toggle('hf-lab-cooling',cd>.05);
       b.classList.remove('hf-p5-locked');
+    }
+  }
+  renderFocusLabel(){
+    if(!this.focusBtn)return;
+    const e=this.focusTarget;
+    if(e&&(!e.alive||!e.group||e.removed))this.focusTarget=null;
+    const f=this.focusTarget;
+    this.focusBtn.textContent=f?'◎ '+(f.name||'OBJETIVO').slice(0,22):'◎ ENFOCAR';
+    this.focusBtn.classList.toggle('active',!!f);
+    this.focusBtn.setAttribute('aria-expanded',String(!!this.focusPanelOpen));
+  }
+  renderMonsterSelector(){
+    const panel=this.focusPanel;if(!panel)return;
+    panel.hidden=!this.focusPanelOpen;
+    this.renderFocusLabel();
+    if(!this.focusPanelOpen)return;
+    panel.replaceChildren();
+    const heading=document.createElement('div');
+    heading.className='hf-l23-panel-title';
+    heading.textContent='ENFOCAR MONSTRUO · ELEGÍ TU OBJETIVO';
+    panel.appendChild(heading);
+    const clear=document.createElement('button');
+    clear.type='button';clear.textContent='✕ LIBERAR ENFOQUE';
+    clear.addEventListener('pointerdown',ev=>{
+      ev.preventDefault();ev.stopPropagation();
+      this.focusTarget=null;this.focusPanelOpen=false;
+      this.renderMonsterSelector();this.announce('Enfoque liberado · AIM manual');
+    });
+    panel.appendChild(clear);
+    const g=this.game,p=g.player.pos,from={x:p.x,y:p.y+1.25,z:p.z};
+    const candidates=availableMonsters23(g.combat.collectTargets(),
+      from,(x,z)=>g.terrain.getHeight(x,z),{
+        range:38,visible:(_enemy,q)=>hasLineOfSight(g,from,q)
+      });
+    if(!candidates.length){
+      const note=document.createElement('p');
+      note.textContent='No hay monstruos visibles dentro del alcance.';
+      panel.appendChild(note);return;
+    }
+    for(const item of candidates.slice(0,14)){
+      const b=document.createElement('button');b.type='button';
+      b.className='hf-l23-target-row';
+      const selected=this.focusTarget===item.enemy;
+      b.textContent=(selected?'✓ ':'○ ')+(item.air?'🪽 AÉREO · ':'⚔ TIERRA · ')+item.name+
+        (item.air?' · S1 enfocada':' · AIM manual');
+      b.addEventListener('pointerdown',ev=>{
+        ev.preventDefault();ev.stopPropagation();
+        this.focusTarget=item.enemy;
+        this.focusPanelOpen=false;this.renderMonsterSelector();
+        g.hud?.showEnemyHP?.(item.enemy);
+        this.announce('Enfocado: '+item.name+
+          (item.air?' · proyectiles S1 elevados':' · skills con AIM manual'));
+      });
+      panel.appendChild(b);
     }
   }
   bindKeyboard(){
@@ -725,9 +781,6 @@ export class TianjieMobaSkillsLab {
           target.y=this.game.terrain.getHeight(target.x,target.z);
           a.target=target;
           if(delta.lengthSq()>.001)a.dir=delta.normalize();
-        }else if(pr.kind==='line'&&(this.style===0||this.style===3)&&slot===1){
-          const v=aerialDirection22(forward,dx,dy,(this.aimSensitivity??.145)/.145);
-          a.dir=vec(v.x,v.y,v.z);
         }else{
           const aimScale=(this.aimSensitivity??.145)/.145;
           const delta=right.multiplyScalar(dx*1.35*aimScale)
