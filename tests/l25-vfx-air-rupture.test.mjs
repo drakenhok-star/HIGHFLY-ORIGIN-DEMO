@@ -40,9 +40,9 @@ assert.ok(lab.includes('}).filter(item=>item.air);')&&
  lab.includes('this.focusTarget=this.focusTarget===selected?null:selected'),
  'only flyers eligible, with explicit one-tap toggle');
 assert.ok(lab.includes('root.appendChild(this.focusBtn)')&&
- lab.includes("document.querySelector('#hf-touch .hf-p5-atk')")&&
+ lab.includes("editor.register('focus',this.focusBtn)")&&
  lab.includes("document.querySelector('#hf-p810-bag')"),
- 'focus follows original ATK and cancel follows original MOCHILA');
+ 'L26 focus is editable by HUD and cancel follows original MOCHILA');
 assert.ok(css.includes('/* L25: flight-only ENFOCAR')&&
  css.includes('#hf-lab-cancel[hidden]'));
 assert.ok(lab.includes('if(shouldCancel)return; // zero resource, zero cooldown'),
