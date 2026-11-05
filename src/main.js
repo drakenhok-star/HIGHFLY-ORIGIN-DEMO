@@ -34,6 +34,7 @@ import { PerfFoundationP161 } from './ui/performance-p161.js';
 import { PerfGovernorP163 } from './ui/performance-p163.js';
 import { LivingWorldP18 } from './world/living-world-runtime-p18.js';
 import { installP186Combat } from './combat/skill-bridge-p186.js';
+import { consumeP186TransferFromUrl } from './ui/p186-profile.js';
 
 class Game {
   constructor(assets) {
@@ -49,6 +50,8 @@ class Game {
     this.p14Enabled=this.p13Enabled && !new URLSearchParams(location.search).has('hf_p14_off');
     this.p15Enabled=this.p14Enabled && !new URLSearchParams(location.search).has('hf_p15_off');
     this.p16Enabled=this.p15Enabled && !new URLSearchParams(location.search).has('hf_p16_off');
+    // Explicit L27 -> P186 transfer occurs before the asynchronous HUD editor loads.
+    this.p186Transfer=consumeP186TransferFromUrl();
     this.p18Build=true;
     this.p182Build=true; // P18.1 save remains read-only when testing a new P18.2 game
     this.p183Build=true; // new isolated save; prior P18.2 state read-only
