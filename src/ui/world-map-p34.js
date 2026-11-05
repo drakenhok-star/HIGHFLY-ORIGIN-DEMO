@@ -1,3 +1,5 @@
+import { FRONTIER_ZONES_P181, FRONTIER_QUEST_ID_P181,
+  frontierQuestTargetsP181, nearestFrontierTargetP181 } from './frontier-tracking-p181.js';
 /**
  * HIGHFLY P3/P4 A: minimap + browsable world map. No gameplay mutations.
  * Positions grounded in Tianjie5's structures/enemies/terrain source.
@@ -13,6 +15,8 @@ const POIS = [
   ["Lobos de hielo",380,-150,"#a8e3ff"],
   ["Torre del dragón",300,-300,"#ff987d"],
 ];
+const P181_POIS=FRONTIER_ZONES_P181.map(z=>[z.label,z.x,z.z,'#ffb659']);
+const P181_ALL_POIS=[...POIS,...P181_POIS];
 
 export class WorldMapP34 {
   constructor(game) {
@@ -26,6 +30,15 @@ export class WorldMapP34 {
     this.opened = false;
     this.mount();
     this.setState(game.state);
+    // On mobile P18.1, label the actual objective immediately under the round radar;
+    // the radar itself may be draggable/scaled by the P810 HUD editor.
+    this.frontierLabel=document.createElement('div');
+    this.frontierLabel.id='hf-p181-radar-target';
+    this.frontierLabel.style.cssText='position:fixed;z-index:51;display:none;pointer-events:none;'+
+      'border:1px solid #f9ba69;border-radius:7px;padding:3px 7px;'+
+      'background:#2b1942ea;color:#ffdd9c;font:800 9px system-ui;'+
+      'max-width:205px;white-space:nowrap;text-align:center;box-shadow:0 0 9px #f6a45e33';
+    document.body.appendChild(this.frontierLabel);
     this.timer = window.setInterval(() => this.tick(), 280);
     document.addEventListener("keydown", e => {
       if (this.opened && e.code === "Escape") {
@@ -76,6 +89,7 @@ export class WorldMapP34 {
   }
   setState(s) {
     this.mini.style.display = s === "playing" ? "flex" : "none";
+    if(this.frontierLabel && s!=='playing')this.frontierLabel.style.display='none';
     if(s !== "playing")this.toggle(false);
   }
   toggle(open) {
@@ -111,6 +125,36 @@ export class WorldMapP34 {
     };
     window.setTimeout(step,40);
   }
+  pointsOfInterest(){return this.game.p18Enabled?P181_ALL_POIS:POIS;}
+  // More visible than a normal wolf POI: gold diamond with C for Centinela.
+  frontierDiamond(ctx,px,py,label,offscreen=false){
+    ctx.save();
+    ctx.shadowColor='#ff8c38';ctx.shadowBlur=offscreen?6:12;
+    ctx.beginPath();ctx.moveTo(px,py-8);ctx.lineTo(px+7,py);
+    ctx.lineTo(px,py+8);ctx.lineTo(px-7,py);ctx.closePath();
+    ctx.fillStyle='#e98220';ctx.strokeStyle='#fff0bc';ctx.lineWidth=2;
+    ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.font='bold 9px system-ui';ctx.fillText('C',px,py+.5);
+    ctx.restore();
+  }
+  updateFrontierLabel(){
+    const status=this.game.p18Enabled?this.game.livingWorld?.quest?.status:null;
+    const q=this.game.livingWorld?.quest;
+    const playing=this.game.state==='playing';
+    const target=nearestFrontierTargetP181(this.game);
+    if(!playing||!target||(status!=='active'&&status!=='complete')){
+      this.frontierLabel.style.display='none';return;
+    }
+    const box=this.mini.getBoundingClientRect();
+    const text=status==='complete'?'↩ ENTREGAR · BJORN':
+      '✦ LOBO CENTINELA · '+(target.id.includes('east')?'ESTE':'OESTE')+
+        ' · '+q.progress+'/3';
+    this.frontierLabel.textContent=text;
+    this.frontierLabel.style.display='block';
+    this.frontierLabel.style.top=Math.min(window.innerHeight-23,box.bottom+3)+'px';
+    this.frontierLabel.style.right=Math.max(4,window.innerWidth-box.right)+'px';
+  }
   dot(ctx,x,y,r,color) {
     ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
     ctx.fillStyle=color;ctx.fill();ctx.strokeStyle="#0c2530";ctx.lineWidth=2;ctx.stroke();
@@ -122,18 +166,30 @@ export class WorldMapP34 {
     if(this.atlasReady)ctx.drawImage(this.atlas,0,0,n,n);
     const at=v=>(v+700)/1400*n;
     ctx.font="bold 14px system-ui";ctx.textBaseline="middle";
-    for(const [name,x,z,color] of POIS) {
+    for(const [name,x,z,color] of this.pointsOfInterest()) {
       const px=at(x),py=at(z);
       this.dot(ctx,px,py,5,color);
       ctx.lineWidth=3;ctx.strokeStyle="#06141a";ctx.fillStyle="#fff";
       ctx.strokeText(name,px+8,py);ctx.fillText(name,px+8,py);
     }
-    const quest=this.game.p812Enabled?this.missionPosition():null;
+    const quest=this.game.p812Enabled && this.pinnedQuestId!==FRONTIER_QUEST_ID_P181?
+      this.missionPosition():null;
     if(quest){
       const qx=at(quest.x),qy=at(quest.z);
       this.dot(ctx,qx,qy,9,'#ffd36d');
       ctx.fillStyle='#ffe9a4';ctx.font='bold 14px system-ui';
       ctx.fillText('✦ '+this.pinnedLabel,qx+10,qy-10);
+    }
+    // Both frontier zones are quest targets, visible simultaneously on the map.
+    if(this.game.p18Enabled){
+      for(const z of frontierQuestTargetsP181(this.game)){
+        const px=at(z.x),py=at(z.z);
+        this.frontierDiamond(ctx,px,py,z.label);
+        ctx.font='bold 13px system-ui';ctx.textBaseline='middle';
+        ctx.lineWidth=3;ctx.strokeStyle='#140b28';ctx.fillStyle='#ffe3a9';
+        ctx.strokeText(z.label,px+10,py-12);
+        ctx.fillText(z.label,px+10,py-12);
+      }
     }
     const p=this.game.player.pos,px=at(p.x),py=at(p.z);
     if(px>=0&&px<n&&py>=0&&py<n)this.dot(ctx,px,py,7,"#52ffd8");
@@ -142,17 +198,28 @@ export class WorldMapP34 {
     if(!this.atlasReady)ctx.fillText("Calculando relieve...",n-170,n-14);
   }
   trackQuest(id){
-    if(!['q1','q2','q3'].includes(id))return false;
+    if(!['q1','q2','q3'].includes(id) &&
+      !(this.game.p18Enabled && id===FRONTIER_QUEST_ID_P181))return false;
     const state=this.game.quests.getState(id);
     if(state==='done'||state==='locked')return false;
     this.pinnedQuestId=id;
-    this.pinnedLabel=({q1:'Lobos',q2:'Espada ancestral',q3:'Dragón'})[id];
+    this.pinnedLabel=({q1:'Lobos',q2:'Espada ancestral',q3:'Dragón',
+      p18_frontier:'Lobo centinela · Frontera'})[id];
     this.drawMini();return true;
   }
   missionPosition(){
     const id=this.pinnedQuestId,g=this.game;
     if(!id)return null;
     const state=g.quests.getState(id);
+    if(id===FRONTIER_QUEST_ID_P181){
+      const target=nearestFrontierTargetP181(g);
+      if(target)return target;
+      if(state==='available'){
+        const bjorn=g.npcs?.list?.find(n=>n.id==='bjorn');
+        return bjorn?.pos||null;
+      }
+      return null;
+    }
     if(state==='done'||state==='locked')return null;
     if(state==='complete'){
       const npcId=id==='q2'?'sigrid':'olaf';
@@ -176,13 +243,24 @@ export class WorldMapP34 {
       ctx.beginPath();ctx.moveTo(n/2+offset,0);ctx.lineTo(n/2+offset,n);ctx.stroke();
       ctx.beginPath();ctx.moveTo(0,n/2+offset);ctx.lineTo(n,n/2+offset);ctx.stroke();
     }
-    for(const [,x,z,color] of POIS) {
+    for(const [,x,z,color] of this.pointsOfInterest()) {
       const px=n/2+(x-p.x)*scale,py=n/2+(z-p.z)*scale;
       if(px<6||py<6||px>n-6||py>n-6)continue;
       this.dot(ctx,px,py,4,color);
     }
+    // World quest markers are tracked independently of q1-q3.
+    // Offscreen centinelas clamp to the rim instead of disappearing from radar.
+    if(this.game.p18Enabled){
+      const frontier=frontierQuestTargetsP181(this.game);
+      for(const target of frontier){
+        const dx=(target.x-p.x)*scale,dz=(target.z-p.z)*scale;
+        const len=Math.hypot(dx,dz),limit=n/2-15;
+        const t=len>limit?limit/Math.max(len,1):1;
+        this.frontierDiamond(ctx,n/2+dx*t,n/2+dz*t,target.label,len>limit);
+      }
+    }
     if(this.game.p812Enabled){
-      const quest=this.missionPosition();
+      const quest=this.pinnedQuestId===FRONTIER_QUEST_ID_P181?null:this.missionPosition();
       if(quest){
         const dx=(quest.x-p.x)*scale,dz=(quest.z-p.z)*scale;
         const limit=n/2-14,len=Math.hypot(dx,dz);
@@ -204,5 +282,6 @@ export class WorldMapP34 {
     if(this.game.state!=="playing")return;
     this.drawMini();
     if(this.opened)this.drawBig();
+    if(this.game.p18Enabled)this.updateFrontierLabel();
   }
 }
