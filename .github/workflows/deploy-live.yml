@@ -558,6 +558,39 @@ jobs:
           test -s .site/p182/index.html
           echo "P18.2.1 marker fix pinned 5fd9e844c313c7d856739e5fae20a1b924a3d31e published at /p1821/, older games kept"
 
+      - name: Add verified P18.3 ecosystem + loot + shallow water preview (older releases frozen)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags --depth=1 origin refs/heads/p183-ecosystem-loot-water-20261105
+          test "$(git rev-parse FETCH_HEAD)" = "78dda20e007a2f8ff09c2b43809e1a1c82b14ae3"
+          mkdir -p .p183-validate .site/p183
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets tests scripts docs | tar -x -C .p183-validate
+          (
+            cd .p183-validate
+            test -s index.html
+            test -s src/world/shallow-water-p183.js
+            test -s src/systems/loot-table-p183.js
+            test -s src/world/species-gate-p183.js
+            test -s tests/p183-ecology-loot.test.mjs
+            find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+              node --input-type=module --check < "$file"
+            done
+            for test in tests/*.test.mjs; do node "$test"; done
+            if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' -o -iname '*Sketchfab*' \) | grep -q .; then
+              echo "P18.3 blocked: restricted or unverified assets found"
+              exit 1
+            fi
+            cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets ../.site/p183/
+          )
+          touch .site/p183/.nojekyll
+          for previous in p16 p161 p163 p18 p181 p182 p1821; do
+            test -s ".site/$previous/index.html"
+          done
+          test -s .site/p183/index.html
+          echo "P18.3 pinned 78dda20e007a2f8ff09c2b43809e1a1c82b14ae3 at /p183/"
+          echo "All previous Page builds and Skill Lab remain untouched"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
