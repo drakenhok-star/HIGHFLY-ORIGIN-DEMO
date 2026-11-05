@@ -228,3 +228,21 @@ body.hf-skills-lab #hf-tianjie-skills-lab #hf-l23-focus{
   min-height:26px!important;max-height:none!important;
   overflow:hidden;
 }
+
+
+/* L26 native HUD control, now a sibling of ATK/USAR in #hf-touch. */
+body.hf-skills-lab #hf-touch #hf-l23-focus{
+  position:fixed;z-index:65;
+  min-width:26px!important;min-height:26px!important;
+  max-width:none!important;max-height:none!important;
+  pointer-events:auto;touch-action:none;white-space:normal;
+  color:#e7faff;font:800 9px/1.15 system-ui,sans-serif;text-align:center;
+  border:2px solid #67e3eb;border-radius:50%;
+  background:radial-gradient(circle at 38% 24%,#217793,#19234f 69%,#0c112e);
+  box-shadow:0 0 10px #24a9ed7a;
+  padding:3px;overflow:hidden;
+}
+body.hf-skills-lab #hf-touch #hf-l23-focus.active{
+  color:#fff4cb;border-color:#ffd795;
+  box-shadow:0 0 14px #ffc77eaa;
+}
