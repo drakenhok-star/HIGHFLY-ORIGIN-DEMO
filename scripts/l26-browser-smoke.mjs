@@ -33,7 +33,21 @@ try {
  await page.waitForFunction(()=>window.game?.state==='playing'&&
   !!window.highflySkillsLab?.claudeFx,null,{timeout:20000});
  await page.waitForFunction(()=>window.game.touch.premium.p810.editor.elements.has('focus'),
-  null,{timeout:10000});
+  null,{timeout:12000}).catch(async error=>{
+   const diagnostic=await page.evaluate(()=>{
+    const g=window.game,l=window.highflySkillsLab;
+    const ed=g?.touch?.premium?.p810?.editor;
+    return {state:g?.state,time:g?.time?.elapsed,lab:!!l,
+      styles:l?.style,editor:!!ed,registered:ed?.elements?.has('focus'),
+      ids:ed?.layout?Object.keys(ed.layout):null,
+      focusInDom:!!document.querySelector('#hf-l23-focus'),
+      lastHud:l?.lastHud,focusEditor:!!l?.focusEditor};
+   });
+   try{await mkdir('audit-output',{recursive:true});await page.screenshot({
+      path:'audit-output/l26-failure.png',timeout:8000});}catch(_){}
+   throw new Error('ENFOCAR HUD registration timeout: '+JSON.stringify(diagnostic)+
+     ' errors='+errs.slice(0,5).join(' | ')+' cause='+error.message);
+  });
  const hud=await page.evaluate(()=>{
   const g=window.game,e=g.touch.premium.p810.editor;
   const lab=window.highflySkillsLab;
