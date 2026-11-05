@@ -53,6 +53,10 @@ export class Enemies {
     this.dragon = null;
     this.packs = [];
     this.pendingRespawns = [];
+    // Active ONLY in /lab.html: no wandering packs, NPC attackers or bosses.
+    this.trainingLab = location.pathname.endsWith('/lab.html');
+    this.trainingCount = this.trainingLab &&
+      new URLSearchParams(location.search).get('hf_targets') === '3' ? 3 : 1;
     this.geoCache = new Map();
     this.sackMat = new THREE.MeshStandardMaterial({ color: 0x7a5c34, roughness: 0.8, metalness: 0, emissive: 0xc9a86a, emissiveIntensity: 0.45 });
     this.knotMat = new THREE.MeshStandardMaterial({ color: 0x5a4426, roughness: 1, metalness: 0 });
@@ -113,6 +117,13 @@ export class Enemies {
   }
 
   spawnAll() {
+    // In training lab there are exactly 1 or 3 actual skeleton rig targets.
+    // P16 normal game at / is entirely unaffected.
+    if (this.trainingLab) {
+      this.packs = [];
+      this.configureTrainingTargets(this.trainingCount);
+      return;
+    }
     this.packs = WOLF_PACK_HOMES.map((h) => ({ home: h, members: [], respawnT: -1, ice: false, respawnDelay: 90 }));
     this.packs.push({ home: ICE_PACK_HOME, members: [], respawnT: -1, ice: true, respawnDelay: 120 });
     for (let pi = 0; pi < this.packs.length; pi++) this._spawnPack(pi);
@@ -128,19 +139,52 @@ export class Enemies {
       this._spawnTrainingDummy();
   }
 
-  _spawnTrainingDummy(){
+  configureTrainingTargets(count = 1) {
+    if (!this.trainingLab) return false;
+    this.trainingCount = count === 3 ? 3 : 1;
+    // Remove only training targets, never a shared enemy object or P16 world entity.
+    for (const e of this.list) if (e.training && !e.removed) this._removeEnemy(e);
+    this.list = this.list.filter(e => !e.training);
+    this.pendingRespawns.length = 0;
+    this.bolts.length = 0;
+    this.packs.length = 0;
+    const p = this.game.player;
+    const forward = p.getForward();
+    const right = new THREE.Vector3(-forward.z, 0, forward.x);
+    const offsets = this.trainingCount === 1 ? [[6.7, 0]]
+      : [[6.8, -3.0], [7.2, 0], [6.8, 3.0]];
+    offsets.forEach(([distance,side],i) => {
+      const spot = p.pos.clone().addScaledVector(forward, distance)
+        .addScaledVector(right, side);
+      this._spawnTrainingDummy(spot.x, spot.z, i);
+    });
+    return true;
+  }
+
+  _spawnTrainingDummy(x=null,z=null,index=0){
     const p=this.game.player.group.position;
-    const e=this._base('training','ENTRENAMIENTO · 4 IMPACTOS',99999,.9,p.x+5,p.z-3);
+    const px=x??p.x+5,pz=z??p.z-3;
+    // Real licensed animated enemy, no geometric placeholder.
+    const e=this._base('training','OBJETIVO '+(index+1)+' · COMBATE',2400,.9,px,pz);
     this._attachRig(e,'skeleton_warrior');
-    e.training=true;e.aggroR=0;e.attackRange=0;e.speed=0;
+    e.training=true;e.aggroR=0;e.attackRange=0;e.speed=0;e.dmg=0;
+    e.hitPending=-1;e.boltPending=-1;e.attackCd=99;
+    e.trainingLastHit=-1e6;e.hitstunT=0;
     e.rig.play('Idle');
-    // Noncombat QA target. No kill, XP, quest progress, drops or rewards.
-    e.takeDamage=amount=>{
-      const damage=Math.max(0,Math.min(200,Number(amount)||0));
-      if(!damage)return;
+    // Uses REAL HP loss for P16 hit-confirm, never dies, rewards or drops.
+    // Idle stance is static, but its physics REACTS to P16 4th-hit launch.
+    e.takeDamage=(amount,impulse)=>{
+      const damage=Math.max(0,Math.min(500,Number(amount)||0));
+      if(!Number.isFinite(damage)||damage<=0)return;
       e.hp=Math.max(1,e.hp-damage);
+      e.trainingLastHit=this.game.time.elapsed;
       e.flashT=.12;
-      for(const mat of e.mats){mat.m.emissive.setHex(0xff3030);mat.m.emissiveIntensity=.9;}
+      if(impulse)e.kbVel.add(impulse);
+      e.hitstunT=.25;
+      if(e.rig.clips.has('HitReact'))e.rig.play('HitReact',{once:true,fade:.08});
+      for(const mat of e.mats){
+        mat.m.emissive.setHex(0xff3030);mat.m.emissiveIntensity=.9;
+      }
     };
     return e;
   }
@@ -917,9 +961,27 @@ export class Enemies {
         }
       }
       if(e.training){
-        e.hp=e.maxHp;
-        e.kbVel.set(0,0,0);e.hitstunT=0;
-        e.rig.play('Idle');e.rig.update(dt);
+        // Stationary AI but REAL directional knockback/launch physics.
+        e.hitPending=-1;e.boltPending=-1;
+        const pos=e.group.position;
+        pos.x+=e.kbVel.x*dt;pos.z+=e.kbVel.z*dt;
+        const ground=this._groundAt(pos.x,pos.z);
+        if(e.kbVel.y>0||pos.y>ground+.015){
+          pos.y+=e.kbVel.y*dt;e.kbVel.y-=26*dt;
+          if(pos.y<=ground){pos.y=ground;e.kbVel.y=0;}
+        }else{pos.y=ground;e.kbVel.y=0;}
+        const friction=Math.exp(-5*dt);
+        e.kbVel.x*=friction;e.kbVel.z*=friction;
+        e.hitstunT=Math.max(0,e.hitstunT-dt);
+        if(this.game.time.elapsed-e.trainingLastHit>3.5){
+          // Restore HP and positions only BETWEEN combo sequences.
+          e.hp=e.maxHp;
+          pos.x+=(e.home.x-pos.x)*Math.min(1,2.8*dt);
+          pos.z+=(e.home.z-pos.z)*Math.min(1,2.8*dt);
+          e.kbVel.set(0,0,0);
+        }
+        if(e.hitstunT<=0)e.rig.play('Idle');
+        e.rig.update(dt);
         continue;
       }
       if (!e.alive) {
