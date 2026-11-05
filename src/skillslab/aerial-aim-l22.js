@@ -48,3 +48,16 @@ export function isCancelDrop22(x,y,rect,margin=12){
     x>=rect.left-margin&&x<=rect.right+margin&&
     y>=rect.top-margin&&y<=rect.bottom+margin;
 }
+
+/** Swept sphere collision: world-space X/Y/Z, not horizontal-only radius. */
+export function sweptProjectileHit22(from,to,center,radius){
+ if(!from||!to||!center||!Number.isFinite(radius)||radius<=0)return null;
+ const vx=to.x-from.x,vy=to.y-from.y,vz=to.z-from.z;
+ const lenSq=vx*vx+vy*vy+vz*vz;
+ if(lenSq<1e-10)return null;
+ const wx=center.x-from.x,wy=center.y-from.y,wz=center.z-from.z;
+ const t=clamp22((wx*vx+wy*vy+wz*vz)/lenSq,0,1);
+ const dx=wx-vx*t,dy=wy-vy*t,dz=wz-vz*t;
+ const distanceSq=dx*dx+dy*dy+dz*dz;
+ return distanceSq<=radius*radius?{t,distanceSq}:null;
+}
