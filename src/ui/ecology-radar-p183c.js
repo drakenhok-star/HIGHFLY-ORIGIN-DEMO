@@ -2,7 +2,7 @@
 import { realForestP183c,banditTrailP183c } from '../world/habitat-p183c.js';
 export const ECO_NAMES_P183C=Object.freeze({
  boar:'Jabalí',crab:'Cangrejo',goblin:'Goblin',orc:'Orco',fox:'Zorro',stag:'Ciervo',
- forest_wolf:'Lobo forestal',prairie_wolf:'Lobo común',prairie_alpha:'Lobo alfa Greyjaw',snow_alpha:'Lobo alfa',yeti:'Yeti',
+ forest_wolf:'Lobo forestal',prairie_wolf:'Lobo común',prairie_alpha:'Lobo alfa Greyjaw',snow_alpha:'Lobo alfa glacial',yeti:'Yeti de la cordillera',
  bandit:'Bandido',forest_spider:'Araña'
 });
 export const ECO_COLORS_P183C=Object.freeze({

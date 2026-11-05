@@ -1,0 +1,31 @@
+name: HIGHFLY P18.3e · Creature scale and localization CI
+on:
+  push:
+    branches: [p183e-creature-scale-ui-20261105]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Obtain pinned original Gobkit boar
+        run: bash scripts/fetch_gobkit_boar_p183b.sh
+      - name: Syntax and ALL existing plus P18.3e regressions
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -name '*.js' -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+          export HF_REQUIRE_BOAR=1
+          for t in tests/*.test.mjs; do node "$t"; done
+      - name: No project-only media in whitelist build
+        shell: bash
+        run: |
+          if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' -o -iname '*Sketchfab*' -o -iname '*Meshy*' \) | grep -q .; then exit 1; fi

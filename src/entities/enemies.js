@@ -107,7 +107,7 @@ export class Enemies {
     const rig = this.game.assets.spawn(key);
     // Skinned Quaternius GLBs can carry stale static bounding boxes; disable
     // false frustum rejection for a handful of the new species only.
-    if(this.game.p183cEnabled&&['goblin','spider','crab','yeti','orc','fox','stag','wolf_claude'].includes(key)){
+    if(this.game.p183cEnabled&&['goblin','spider','crab','yeti','yeti_highland','orc','fox','stag','wolf_claude'].includes(key)){
       rig.root.traverse(o=>{if(o.isSkinnedMesh)o.frustumCulled=false;});
     }
     e.rig = rig;
@@ -403,14 +403,14 @@ export class Enemies {
         y:+e.group.position.y.toFixed(1),meshes,visibleMeshes:visible,skins,
         model:e.p183bSpec?.model||'spider'};
     });
-    return {version:this.game.p183dEnabled?'P18.3d':'P18.3c',models:this.p183cSpawnAudit.slice(),creatures,
+    return {version:this.game.p183eEnabled?'P18.3e':this.game.p183dEnabled?'P18.3d':'P18.3c',models:this.p183cSpawnAudit.slice(),creatures,
       assetScale:this.game.assets.p183dAssets,loadErrors:this.game.assets.loadErrors};
   }
   _spawnBiomeMobP183b(spec,x,z){
     if(!this.game.p183bEnabled||!this.game.assets.has(spec.model))return null;
     const names={boar:'Jabalí salvaje',crab:'Cangrejo costero',goblin:'Goblin del bosque',
       bandit:'Bandido del camino',orc:'Orco de las ruinas',yeti:'Yeti',
-      stag:'Ciervo',fox:'Zorro del bosque',snow_alpha:'Lobo alfa helado',forest_wolf:'Lobo forestal',prairie_wolf:'Lobo común (ClaudeCraft)',prairie_alpha:'Lobo alfa Greyjaw'};
+      stag:'Ciervo',fox:'Zorro del bosque',snow_alpha:'Lobo alfa helado',forest_wolf:'Lobo forestal',prairie_wolf:'Lobo común',prairie_alpha:'Lobo alfa Greyjaw'};
     const e=this._base(spec.type,names[spec.type]||spec.type,spec.hp,
       spec.type==='orc'?1.2:spec.type==='crab'?.70:.85,x,z);
     e.speciesId=spec.type;e.p183bSpec=spec;
@@ -420,14 +420,30 @@ export class Enemies {
       e.p183dBaseAttackCd=e.attackCd;
       e.p183dFrenzyT=0;
       if(spec.type==='prairie_alpha'){
-        e.name='Lobo Alfa · Greyjaw';e.hitRadius=1.4;
+        e.name='Lobo Alfa · Greyjaw';e.hitRadius=2.3;
+        e.attackRange=Math.max(e.attackRange,3.8);
         e.rarity='rare';
       }
     }
     e.passive=!spec.aggressive;e.chargeCd=0;e.chargeT=0;
     this._attachRig(e,spec.model);
     if(this.game.p183dEnabled&&spec.type==='prairie_alpha')
-      e.rig.root.scale.multiplyScalar(1.45); // unmistakable 2.32u silhouette versus 1.6u wolves
+      e.rig.root.scale.multiplyScalar(2.5); // ~4m tall vs 1.9m player; WOC CC0 rig, not restricted Greyjaw art
+    if(this.game.p183eEnabled&&spec.type==='snow_alpha'){
+      e.name='Lobo alfa glacial';
+      e.hitRadius=1.65;
+      e.attackRange=Math.max(e.attackRange,2.9);
+      e.rig.root.scale.multiplyScalar(2.7);
+    }
+    if(this.game.p183eEnabled&&spec.type==='yeti'){
+      e.name='Yeti de la cordillera';
+      e.hitRadius=1.75;
+      e.attackRange=Math.max(e.attackRange,2.9);
+    }
+    if(this.game.p183eEnabled&&spec.type==='orc'){
+      e.hitRadius=1.5;
+      e.attackRange=Math.max(e.attackRange,2.5);
+    }
     if(spec.tint){
       const tint=new THREE.Color(spec.tint);
       for(const m of e.mats)if(m.m.color)m.m.color.lerp(tint,.28);

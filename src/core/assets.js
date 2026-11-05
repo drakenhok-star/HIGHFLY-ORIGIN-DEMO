@@ -22,6 +22,8 @@ const FILES = {
   stag: './assets/models/stag_quaternius_cc0.glb',
   fox: './assets/models/fox_quaternius_cc0.glb',
   yeti: './assets/models/yeti_quaternius_cc0.glb',
+  // Proper CC0 humanoid yeti from WOC 0.44.7 Quaternius pack (43-bone rig).
+  yeti_highland: './assets/models/yetialt_quaternius_cc0.glb',
   boar: './assets/models/boar_gobkit_cc0.glb',
   dragon: './assets/models/dragon_evolved_quaternius.glb',
   pine1: './assets/models/env_pine_01.glb',
@@ -54,12 +56,13 @@ const SCALE = {
   // World of ClaudeCraft's verified Quaternius wolf, distinct from our existing wolf.
   wolf_claude: { targetHeight: 1.6, animatedBounds: true },
   spider: { targetHeight: 1.4, animatedBounds: true },
-  crab: { targetHeight: 1.7, animatedBounds: true },
+  crab: { targetHeight: 1.35, animatedBounds: true },
   goblin: { targetHeight: 2.1, animatedBounds: true },
-  orc: { targetHeight: 2.6, animatedBounds: true },
+  orc: { targetHeight: 3.15, animatedBounds: true },
   stag: { targetHeight: 1.9, animatedBounds: true },
   fox: { targetHeight: 1.0, animatedBounds: true },
   yeti: { targetHeight: 2.6, animatedBounds: true },
+  yeti_highland: { targetHeight: 3.3, animatedBounds: true },
   boar: { targetHeight: 1.12 },
   dragon: { fixed: 3.9 }
 };
@@ -301,7 +304,7 @@ export class AssetLib {
     const entries = Object.entries(FILES);
     const total = entries.length;
     let done = 0;
-    const optional=new Set(['boar','crab','goblin','orc','stag','fox','yeti']);
+    const optional=new Set(['boar','crab','goblin','orc','stag','fox','yeti','yeti_highland']);
     await Promise.all(entries.map(async ([key, url]) => {
       try {
         const gltf = await loader.loadAsync(url);

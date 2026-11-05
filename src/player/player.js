@@ -822,7 +822,7 @@ export class Player {
         const d = _tmpV3.copy(chest.pos).sub(p).length();
         if (d < 3 && d < bestDist) {
           bestDist = d;
-          best = { text: 'E 打开宝箱', exec: () => g.inventory.openChest(chest) };
+          best = { text: 'E Abrir cofre', exec: () => g.inventory.openChest(chest) };
         }
       }
     }
@@ -832,7 +832,7 @@ export class Player {
         const d = _tmpV3.copy(drop.pos).sub(p).length();
         if (d < 3 && d < bestDist) {
           bestDist = d;
-          best = { text: 'E 拾取战利品', exec: () => g.inventory.pickupDrop(drop) };
+          best = { text: 'E Recoger botín', exec: () => g.inventory.pickupDrop(drop) };
         }
       }
     }
