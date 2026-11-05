@@ -107,7 +107,7 @@ export class Enemies {
     const rig = this.game.assets.spawn(key);
     // Skinned Quaternius GLBs can carry stale static bounding boxes; disable
     // false frustum rejection for a handful of the new species only.
-    if(this.game.p183cEnabled&&['goblin','spider','crab','yeti','orc'].includes(key)){
+    if(this.game.p183cEnabled&&['goblin','spider','crab','yeti','orc','fox','stag','wolf_claude'].includes(key)){
       rig.root.traverse(o=>{if(o.isSkinnedMesh)o.frustumCulled=false;});
     }
     e.rig = rig;
@@ -783,7 +783,7 @@ export class Enemies {
           if(g.p183Enabled&&e.type==='spider'){
             if(Math.random() < (g.p183dEnabled?.35:.30)){
               this.p183VenomTicks=Math.max(this.p183VenomTicks,g.p183dEnabled?5:3);
-              this.p183VenomTime=1;
+              this.p183VenomTime=g.p183dEnabled?2:1;
               g.hud.notify('Envenenado por araña');
             }
             if(g.p183dEnabled&&Math.random()<.25){
@@ -844,8 +844,12 @@ export class Enemies {
             e.wanderTarget.copy(pos);
           } else {
             const a = Math.random() * Math.PI * 2;
-            const r = Math.random() * 25;
-            e.wanderTarget.set(e.home.x + Math.cos(a) * r, 0, e.home.z + Math.sin(a) * r);
+            const r = Math.random() * (g.p183dEnabled && e.type==='bandit'?16:25);
+            if(g.p183dEnabled&&e.type==='bandit'){
+              // Bandit patrol follows the visible dirt trail (two authored segments).
+              const signed=(Math.random()-.5)*32;
+              e.wanderTarget.set(e.home.x+signed,0,e.home.z+signed*.34);
+            }else e.wanderTarget.set(e.home.x + Math.cos(a) * r, 0, e.home.z + Math.sin(a) * r);
           }
         }
         const wx = e.wanderTarget.x - pos.x;
@@ -1195,7 +1199,7 @@ export class Enemies {
     this._updateBolts(dt,p);
     if(g.p183Enabled&&this.p183VenomTicks>0){
       this.p183VenomTime-=dt;
-      if(this.p183VenomTime<=0){g.stats.damage(2);this.p183VenomTicks--;this.p183VenomTime+=1;}
+      if(this.p183VenomTime<=0){g.stats.damage(2);this.p183VenomTicks--;this.p183VenomTime+=g.p183dEnabled?2:1;}
     }
 
     for (let i = this.pendingRespawns.length - 1; i >= 0; i--) {
