@@ -563,7 +563,7 @@ export class TianjieMobaSkillsLab {
     root.id='hf-tianjie-skills-lab';
     root.setAttribute('translate','no');
     root.innerHTML=`<div class="hf-lab-top">
-      <strong class="hf-lab-title">HIGHFLY <span>FURY P16 + SKILL LAB L21 · CÁMARA HÍBRIDA</span></strong>
+      <strong class="hf-lab-title">HIGHFLY <span>FURY P16 + SKILL LAB L22 · CÁMARA HÍBRIDA</span></strong>
       <div class="hf-lab-modes">
         <button type="button" data-style="0">✦ AÉREA</button>
         <button type="button" data-style="1">⚔ ABISAL</button>
@@ -585,6 +585,8 @@ export class TianjieMobaSkillsLab {
     this.readout=root.querySelector('#hf-lab-readout');
     this.note=root.querySelector('#hf-lab-message');
     this.cancelBtn=root.querySelector('#hf-lab-cancel');
+    // Move X outside the transformed top dock: CSS fixed must anchor to screen.
+    root.appendChild(this.cancelBtn);
     for(const b of root.querySelectorAll('[data-style]'))
       b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();this.setStyle(Number(b.dataset.style));});
     root.querySelector('#hf-lab-train').addEventListener('pointerdown',e=>{
