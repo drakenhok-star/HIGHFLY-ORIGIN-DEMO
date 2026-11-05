@@ -621,7 +621,7 @@ export class TianjieMobaSkillsLab {
     root.id='hf-tianjie-skills-lab';
     root.setAttribute('translate','no');
     root.innerHTML=`<div class="hf-lab-top">
-      <strong class="hf-lab-title">HIGHFLY <span>FURY P16 · LAB L25 ÚNICO · 15 VFX · RUPTURA AÉREA</span></strong>
+      <strong class="hf-lab-title">HIGHFLY <span>FURY P16 · LAB L26 ÚNICO · VFX RECUPERADOS · HUD EDITABLE</span></strong>
       <div class="hf-lab-modes">
         <button type="button" data-style="0">✦ AÉREA</button>
         <button type="button" data-style="1">⚔ ABISAL</button>
