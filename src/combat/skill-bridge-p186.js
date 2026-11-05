@@ -414,6 +414,7 @@ export class P186CombatBridge{
    const open=document.createElement('button');
    open.type='button';open.textContent='⚔ ESTILOS · 15 SKILLS';
    ui.quick.appendChild(open);
+   ui.quickNav?.addAction(open,'combate');
    open.addEventListener('click',()=>{
     ui.toggleQuickMenu(false);
     this.openStyleMenu();
