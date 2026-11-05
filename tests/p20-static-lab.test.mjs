@@ -9,13 +9,14 @@ const main=read('src/main.js');
 const boot=read('src/skillslab/boot.js');
 const camera=read('src/skillslab/camera-lab-p18.js');
 const page=read('lab.html');
-assert.ok(enemies.includes("this.trainingLab = location.pathname.endsWith('/lab.html')"),
+assert.ok(enemies.includes("location.pathname.endsWith('/lab.html')")&&
+ enemies.includes('document.querySelector('),
  'isolated training only in lab.html');
 assert.ok(enemies.includes('if (this.trainingLab) {')&&
  enemies.includes('this.configureTrainingTargets(this.trainingCount);'),
  'normal world enemy spawning replaced only in standalone lab');
 assert.ok(enemies.includes('this.trainingCount === 1 ? [[6.7, 0]]'),
- 'exactly one default target');
+ 'single-target option still available');
 assert.ok(enemies.includes('[[6.8, -3.0], [7.2, 0], [6.8, 3.0]]'),
  'three target test lineup');
 assert.ok(enemies.includes("this._attachRig(e,'skeleton_warrior')"),
@@ -30,6 +31,8 @@ assert.ok(enemies.includes('if(impulse)e.kbVel.add(impulse)')&&
  'directional finisher physics and gravity remain testable');
 assert.ok(enemies.includes('this.game.time.elapsed-e.trainingLastHit>3.5'),
  'HP and location reset only after idle window longer than combo timer');
+assert.ok(enemies.includes("get('hf_targets') !== '1' ? 3 : 1"),
+ 'three bots by default, one by optional URL');
 assert.ok(skills.includes('this.trainingCount===1?3:1')&&
  skills.includes('this.resetTraining()'),
  'in-game UI toggles between 1 and 3 and explicitly resets');
@@ -53,4 +56,4 @@ assert.ok(boot.includes('if(!g.p16Enabled)')&&
 assert.ok(!main.includes('this.trainingLab')&&
  !main.includes('p20Enabled'),
  'no modifications needed in default P16 game bootstrap');
-console.log('P20 PASS: 1/3 idle training rig(s), true hit/damage, native launch reactions, no mob spam; FURY P16 untouched.');
+console.log('L21 PASS: 1/3 idle training rig(s), true hit/damage, native launch reactions, no mob spam; FURY P16 untouched.');
