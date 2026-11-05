@@ -350,6 +350,9 @@ function loop(time) {
   if (perf161) perf161.endSection('terrain');
   game.structures.update(dt);
   game.interiors.update(dt);
+  // P16.1 only: prewarm incremental grass while the menu is open so there is
+  // no bare field upon entering the world. P16 production remains unchanged.
+  if (game.scatter?.p161GrassEnabled && game.state !== 'playing') game.scatter.update(dt);
   game.p6Perf.mark('world');
 
   if (game.state === 'playing') {
