@@ -5,6 +5,8 @@ export const HUD_DEFAULTS=Object.freeze({
  joy:{x:.025,y:.66,size:122},run:{x:.43,y:.75,size:54},
  jump:{x:.51,y:.75,size:58},dash:{x:.59,y:.75,size:58},
  use:{x:.67,y:.75,size:56},s1:{x:.75,y:.75,size:58},atk:{x:.85,y:.695,size:90},
+ // L26: optional Skill Lab-only control, registered after HUD mounts.
+ focus:{x:.915,y:.845,size:43},
  s2:{x:.75,y:.625,size:51},s3:{x:.825,y:.52,size:51},s4:{x:.905,y:.555,size:51},
  lock:{x:.61,y:.57,size:43},next:{x:.665,y:.49,size:42},clear:{x:.72,y:.445,size:37},
  radar:{x:.845,y:.014,size:122},bag:{x:.855,y:.395,size:50},
