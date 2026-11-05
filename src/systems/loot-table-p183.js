@@ -15,7 +15,13 @@ export const P183_BONUS_TABLES=Object.freeze({
   draugr:Object.freeze([entry('mana_potion',.10,'uncommon'),entry('steel_sword',.025,'rare')]),
   draugr_boss:Object.freeze([entry('steel_sword',.15,'rare'),entry('ancient_sword',.025,'epic')]),
   dragon:Object.freeze([entry('dragonbone_sword',.08,'epic'),entry('dragonscale_armor',.09,'epic')]),
-  spider:Object.freeze([entry('health_potion',.08,'uncommon'),entry('hide_armor',.008,'rare')])
+  spider:Object.freeze([entry('health_potion',.08,'uncommon'),entry('hide_armor',.008,'rare')]),
+  boar:Object.freeze([entry('health_potion',.12,'uncommon'),entry('hide_armor',.018,'rare')]),
+  goblin:Object.freeze([entry('health_potion',.075,'uncommon'),entry('steel_sword',.02,'rare')]),
+  bandit:Object.freeze([entry('health_potion',.11,'uncommon'),entry('steel_sword',.035,'rare')]),
+  orc:Object.freeze([entry('steel_sword',.055,'rare'),entry('ancient_sword',.009,'epic')]),
+  yeti:Object.freeze([entry('hide_armor',.07,'rare'),entry('ancient_sword',.012,'epic')]),
+  crab:Object.freeze([entry('mana_potion',.06,'uncommon')])
 });
 export const P183_BASE_RARITY=Object.freeze({
   wolf:'common',wolf_sentinel:'common',ice_wolf:'uncommon',
@@ -25,6 +31,7 @@ export function lootSpeciesP183(enemy){
   if(!enemy)return null;
   if(enemy.type==='wolf')return enemy.p18Frontier?'wolf_sentinel':enemy.ice?'ice_wolf':'wolf';
   if(enemy.type==='draugr')return enemy.boss?'draugr_boss':'draugr';
+  if(enemy.p183bSpec)return enemy.type;
   return enemy.type==='dragon'?'dragon':enemy.type==='spider'?'spider':null;
 }
 /** Returns only bonus items: legacy guaranteed drops are always kept. */

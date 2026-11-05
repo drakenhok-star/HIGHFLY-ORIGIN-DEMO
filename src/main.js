@@ -4,6 +4,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { AssetLib } from './core/assets.js';
+import { installBiomeTourP183b } from './ui/biome-tour-p183b.js';
 import { Terrain } from './world/terrain.js';
 import { Sky } from './world/sky.js';
 import { WaterSurface } from './world/water.js';
@@ -340,6 +341,7 @@ try {
 }
 
 const game = new Game(assets);
+if(game.p183bEnabled)installBiomeTourP183b(game);
 game.setState('menu');
 game.menus.showMain();
 window.game = game;
