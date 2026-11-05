@@ -323,6 +323,64 @@ jobs:
           echo "P16 backup frozen; P16.1 playable; P16.3 pinned cfca2a6f0fd229f60685657bbb35d77c4f5c32af under /p163/"
           echo "HIGHFLY-FURY-SKILL-LAB separate repo and Pages untouched"
 
+      - name: Add P18 PLAYABLE Living World pilot (keep P16, P16.1, P16.3 frozen)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags --depth=1 origin refs/heads/p18-living-village-world-foundation-20261105
+          test "$(git rev-parse FETCH_HEAD)" = "596a209fc36fc0958a7c88c878e38a7009474c56"
+          mkdir -p .p18-validate .site/p18
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets tests scripts docs | tar -x -C .p18-validate
+          (
+            cd .p18-validate
+            test -s index.html
+            test -s src/world/world-registry-p18.js
+            test -s src/world/living-ecology-p18.js
+            test -s src/world/living-world-runtime-p18.js
+            test -s src/entities/enemies.js
+            test -s src/entities/npc.js
+            test -s src/systems/save.js
+            test -s assets/models/wolf_quaternius.glb
+            test -s docs/P18_PLAYABLE_W1.md
+            find src -name '*.js' -type f -print0 | while IFS= read -r -d '' file; do
+              node --input-type=module --check < "$file"
+            done
+            node tests/premium-hud.test.mjs
+            node tests/p6-integral.test.mjs
+            node tests/p7-fury.test.mjs
+            node tests/p810-integral.test.mjs
+            node tests/p812-polish.test.mjs
+            node tests/p13-fury.test.mjs
+            node tests/p14-air-chain.test.mjs
+            node tests/p15-fury.test.mjs
+            node tests/p15-finisher.test.mjs
+            node tests/p15-interruption.test.mjs
+            node tests/p16-hit-confirm.test.mjs
+            node tests/p161-performance.test.mjs
+            node tests/p161-grass-budget.test.mjs
+            node tests/p161-terrain-budget.test.mjs
+            node tests/p161-training-ui.test.mjs
+            node tests/p163-render-governor.test.mjs
+            node tests/p17-rpg-core.test.mjs
+            node tests/p18-world-registry.test.mjs
+            node tests/p18-living-ecology.test.mjs
+            node tests/p18-playable-integration.test.mjs
+            node scripts/p14-mountain-scan.mjs
+            node scripts/audit_animation_p6.mjs
+            if find . -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
+              echo "Restricted asset found: refuse P18 publication"; exit 1
+            fi
+            cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets ../.site/p18/
+          )
+          touch .site/p18/.nojekyll
+          test -s .site/p18/index.html
+          test -s .site/p18/src/world/living-world-runtime-p18.js
+          test -s .site/p16/index.html
+          test -s .site/p161/index.html
+          test -s .site/p163/index.html
+          echo "HIGHFLY P18 playable pinned 596a209fc36fc0958a7c88c878e38a7009474c56 under /p18/"
+          echo "P16 and P16.1 and P16.3 frozen, no Skill Lab or Vercel publishing"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
