@@ -43,6 +43,7 @@ class Game {
     this.p13Enabled=!new URLSearchParams(location.search).has('hf_p13_off');
     this.p14Enabled=this.p13Enabled && !new URLSearchParams(location.search).has('hf_p14_off');
     this.p15Enabled=this.p14Enabled && !new URLSearchParams(location.search).has('hf_p15_off');
+    this.p16Enabled=this.p15Enabled && !new URLSearchParams(location.search).has('hf_p16_off');
     this.p812Eco=false;
     if(this.p812Enabled){
       try{this.p812Eco=localStorage.getItem('hf_p812_eco')==='1';}catch(err){}
