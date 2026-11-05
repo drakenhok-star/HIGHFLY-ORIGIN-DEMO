@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { makeNoise2D, fbm } from '../core/noise.js';
+import { banditTrailP183c } from './habitat-p183c.js';
 
 const CHUNK = 200;
 const RES = 96;
@@ -48,6 +49,7 @@ export class Terrain {
     this._cRockB = new THREE.Color(0x5c5650);
     this._cSand = new THREE.Color(0x7e7460);
     this._cSubmerged = new THREE.Color(0x2e4438);
+    this._cRoadP183c = new THREE.Color(0x88785c);
     this._cGrassA = new THREE.Color(0x55763f);
     this._cGrassB = new THREE.Color(0x6f8347);
     this._tmpColor = new THREE.Color();
@@ -123,6 +125,11 @@ export class Terrain {
       c.lerp(this._tmpSnow, snowT);
     }
 
+    // Visible dirt trail by the bandit camp. Terrain paint only: no fake road boxes.
+    if(this.game.p183cEnabled&&y>this.waterY+.85&&y<40){
+      const track=banditTrailP183c(wx,wz);
+      if(track>0)c.lerp(this._cRoadP183c,track*.91);
+    }
     if (y < 0.3) {
       c.lerp(this._cSand, smooth01((0.3 - y) / 0.8));
       const subT = smooth01((this.waterY + 0.6 - y) / 2.0);

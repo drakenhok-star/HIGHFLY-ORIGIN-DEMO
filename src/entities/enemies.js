@@ -5,8 +5,9 @@ import { shallowStepP183, waterSpeedP183 } from '../world/shallow-water-p183.js'
 import { rollBonusLootP183 } from '../systems/loot-table-p183.js';
 import { P183_PENDING_SPECIES, speciesReadyP183 } from '../world/species-gate-p183.js';
 import { P183B_CAMPS,P183B_COAST_TEMPLATE,resolveBiomeCampP183b,resolveCoastSitesP183b,biomeValidP183b } from '../world/biome-families-p183b.js';
+import { realForestP183c } from '../world/habitat-p183c.js';
 
-const P183_SPIDER_DENS = [{x:-228,z:183},{x:-245,z:192}]; // independent spawn / no quest ownership
+const P183_SPIDER_DENS = [{x:-210,z:420},{x:-220,z:432}]; // independent spawn / no quest ownership
 const WOLF_PACK_HOMES = [
   { x: 120, z: 160 },
   { x: -150, z: 120 },
@@ -66,6 +67,7 @@ export class Enemies {
     this.pendingRespawns = [];
     this.p183VenomTicks=0;this.p183VenomTime=0;
     this.p183bSites=[];
+    this.p183cSpawnAudit=[];
     this.geoCache = new Map();
     this.sackMat = new THREE.MeshStandardMaterial({ color: 0x7a5c34, roughness: 0.8, metalness: 0, emissive: 0xc9a86a, emissiveIntensity: 0.45 });
     // Reuse existing loot sack geometry; only material changes with rarity.
@@ -103,6 +105,11 @@ export class Enemies {
 
   _attachRig(e, key, parent = e.group) {
     const rig = this.game.assets.spawn(key);
+    // Skinned Quaternius GLBs can carry stale static bounding boxes; disable
+    // false frustum rejection for a handful of the new species only.
+    if(this.game.p183cEnabled&&['goblin','spider','crab','yeti','orc'].includes(key)){
+      rig.root.traverse(o=>{if(o.isSkinnedMesh)o.frustumCulled=false;});
+    }
     e.rig = rig;
     parent.add(rig.root);
     rig.root.traverse((o) => {
@@ -326,17 +333,25 @@ export class Enemies {
   _spawnBiomeWorldP183b(){
     const t=this.game.terrain,allow=(x,z)=>!worldIsSafeP18(x,z)&&Math.abs(x)<1100&&Math.abs(z)<1100;
     this.p183bSites=[];
+    this.p183cSpawnAudit=[];
     for(const spec of P183B_CAMPS){
-      if(!this.game.assets.has(spec.model))continue;
+      if(!this.game.assets.has(spec.model)){
+        this.p183cSpawnAudit.push({id:spec.id,type:spec.type,status:'modelo-no-cargado',spawned:0});
+        continue;
+      }
       const site=resolveBiomeCampP183b(t,spec,allow);
-      if(!site)continue;
+      if(!site){
+        this.p183cSpawnAudit.push({id:spec.id,type:spec.type,status:'terreno-no-valido',spawned:0});
+        continue;
+      }
       let count=0;
       for(let k=0;k<spec.count;k++){
         const x=site.x+(k%2)*4.1,z=site.z+(k?3.3:0);
         if(!biomeValidP183b(t,x,z,spec.biome,allow))continue;
         if(this._spawnBiomeMobP183b(spec,x,z))count++;
       }
-      if(count)this.p183bSites.push({spec,site});
+      if(count)this.p183bSites.push({spec,site,spawned:count});
+      this.p183cSpawnAudit.push({id:spec.id,type:spec.type,status:count?'creado':'spawn-rechazado',spawned:count,x:site.x,z:site.z});
     }
     if(this.game.assets.has('crab')){
       // Shore crabs must not overlap existing wolf frontier camps or new dens.
@@ -346,13 +361,29 @@ export class Enemies {
         this.p183bSites.every(({site})=>(x-site.x)**2+(z-site.z)**2>=60*60);
       for(const [i,site] of resolveCoastSitesP183b(t,shoreAllow).entries()){
         const spec={...P183B_COAST_TEMPLATE,id:'shore_crab_'+(i+1)};
-        if(this._spawnBiomeMobP183b(spec,site.x,site.z))this.p183bSites.push({spec,site});
+        if(this._spawnBiomeMobP183b(spec,site.x,site.z)){
+          this.p183bSites.push({spec,site,spawned:1});
+          this.p183cSpawnAudit.push({id:spec.id,type:spec.type,status:'creado',spawned:1,x:site.x,z:site.z});
+        }
       }
     }
+    if(this.game.p183cEnabled&&typeof window!=='undefined')
+      window.highflyP183cReport=()=>this.ecologyReportP183c();
     if(typeof window!=='undefined')window.highflyBiomeReport=()=>this.p183bSites.map(({spec,site})=>({
       camp:spec.id,biome:spec.biome,family:spec.family,type:spec.type,
       x:Math.round(site.x),z:Math.round(site.z)
     }));
+  }
+  ecologyReportP183c(){
+    const creatures=this.list.filter(e=>e.p183bSpec||e.type==='spider').map(e=>{
+      let meshes=0,visible=0,skins=0;
+      e.rig?.root.traverse(o=>{if(o.isMesh){meshes++;if(o.visible&&o.material?.visible!==false)visible++;if(o.isSkinnedMesh)skins++;}});
+      return {species:e.speciesId||e.type,name:e.name,alive:!!e.alive,
+        x:+e.group.position.x.toFixed(1),z:+e.group.position.z.toFixed(1),
+        y:+e.group.position.y.toFixed(1),meshes,visibleMeshes:visible,skins,
+        model:e.p183bSpec?.model||'spider'};
+    });
+    return {version:'P18.3c',models:this.p183cSpawnAudit.slice(),creatures};
   }
   _spawnBiomeMobP183b(spec,x,z){
     if(!this.game.p183bEnabled||!this.game.assets.has(spec.model))return null;
@@ -382,7 +413,8 @@ export class Enemies {
 
   _spawnSpider(x,z){
     if(!this.game.p183Enabled||!this.game.assets.has('spider'))return null;
-    const dry=dryPackCenterP182(this.game.terrain,{x,z},[[0,0]],(nx,nz)=>!worldIsSafeP18(nx,nz));
+    const dry=dryPackCenterP182(this.game.terrain,{x,z},[[0,0]],
+      (nx,nz)=>!worldIsSafeP18(nx,nz)&&(!this.game.p183cEnabled||realForestP183c(this.game.terrain,nx,nz)));
     if(!dry)return null;
     const e=this._base('spider','Araña del bosque',44,.85,dry.x,dry.z);
     e.speciesId='forest_spider';e.dmg=8;e.speed=3.9;e.aggroR=14;e.attackRange=1.65;e.attackCd=1.7;
@@ -1216,6 +1248,7 @@ export class Enemies {
     this.pendingRespawns = [];
     this.p183VenomTicks=0;this.p183VenomTime=0;
     this.p183bSites=[];
+    this.p183cSpawnAudit=[];
     this.packs = [];
     this.dragon = null;
     this.spawnAll();

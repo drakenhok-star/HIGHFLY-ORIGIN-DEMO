@@ -3,6 +3,7 @@ import { makeNoise2D, mulberry32, fbm } from '../core/noise.js';
 import { NatureObstaclesP7 } from './obstacles-p7.js';
 import { GridDiskCursorP161 } from './grass-cursor-p161.js';
 import { includeGrassP163 } from './grass-lod-p163.js';
+import { P183C_FOREST_GROVES,banditTrailP183c } from './habitat-p183c.js';
 
 const REGION = 700;
 const GRASS_COUNT = 36000;
@@ -99,6 +100,19 @@ export class Scatter {
       if (y <= 1 || y >= 50) continue;
       if (terrain.getSlope(x, z) >= 0.95) continue;
       placements.push({ x, y, z, s, rot });
+    }
+
+    // P18.3c: reuse exact KayKit pines, instanced with existing forest, not primitive placeholders.
+    if(this.game.p183cEnabled){
+      const extra=mulberry32(18330);
+      for(const grove of P183C_FOREST_GROVES)for(let j=0;j<19;j++){
+        const angle=(j+extra()*.25)*(2*Math.PI/19);
+        const radius=12+(j%4)*6+extra()*3;
+        const x=grove.x+Math.cos(angle)*radius,z=grove.z+Math.sin(angle)*radius;
+        const y=terrain.getHeight(x,z);
+        if(y<=1||y>=45||terrain.getSlope(x,z)>=.78||!outsideLandmarks(x,z))continue;
+        placements.push({x,y,z,s:.75+extra()*.5,rot:extra()*Math.PI*2});
+      }
     }
 
     // 按接受顺序定变体：高海拔雪松（原生 3.34u，放大 ~2.2x 才齐其他松），低处 pine1/pine2 五五开。
@@ -363,6 +377,7 @@ export class Scatter {
     const z = iz * GRASS_SPACING + (cellHash(ix, iz, 2) - 0.5) * GRASS_SPACING * 0.9;
     const y = terrain.getHeight(x, z);
     if (y <= 0.4 || y >= 30 || y <= terrain.waterY + 1.2) return null;
+    if(this.game.p183cEnabled&&banditTrailP183c(x,z)>.2)return null;
     // 前向差分坡度：共用中心采样，比 getSlope 少两次取高（全量重建 3.6 万格，省得值）
     const e = 1.2;
     const gx = (terrain.getHeight(x + e, z) - y) / e;

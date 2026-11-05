@@ -1,3 +1,4 @@
+import { realForestP183c } from './habitat-p183c.js';
 /**
  * HIGHFLY P18.3b: stable, explicitly separated family/camp registry.
  * All mobs exist independently of quest acceptance.
@@ -24,16 +25,16 @@ export const P183B_CAMPS=Object.freeze([
   camp('pradera_jabali_2','boar','prairie',272,65,1,{family:'beast',hp:49,dmg:10,speed:4.8,aggro:15,
     behavior:'charge',xp:30,drop:'boar_meat',gold:8,respawn:130,
     clips:{idle:'idle',walk:'walk',attack:'attack',death:'dead'}}),
-  camp('bosque_goblins','goblin','forest',-332,64,2,{family:'goblinoid',hp:40,dmg:9,speed:5.1,
+  camp('bosque_goblins','goblin','forest',-190,505,2,{family:'goblinoid',hp:40,dmg:9,speed:5.1,
     behavior:'social',xp:32,drop:'goblin_token',gold:11,respawn:125,
     clips:q('goblin',{idle:'Idle',walk:'Run',attack:'Attack',death:'Death'}).clips}),
-  camp('bosque_zorros','fox','forest',-320,314,1,{aggressive:false,hp:24,speed:6.8,aggro:0,
+  camp('bosque_zorros','fox','forest',-180,340,1,{aggressive:false,hp:24,speed:6.8,aggro:0,
     behavior:'flee',xp:12,drop:'fox_fur',gold:0,respawn:160,
     clips:{idle:'Idle',walk:'Gallop',attack:'Attack',death:'Death'}}),
   camp('pradera_ciervos','stag','prairie',-180,278,1,{aggressive:false,hp:38,speed:6.6,aggro:0,
     behavior:'flee',xp:15,drop:'deer_antler',gold:0,respawn:180,
     clips:{idle:'Idle',walk:'Gallop',attack:'Attack_Headbutt',death:'Death'}}),
-  camp('bosque_lobos','forest_wolf','forest',-427,218,2,{model:'wolf',family:'beast',hp:39,dmg:9,speed:7.1,
+  camp('bosque_lobos','forest_wolf','forest',-350,470,2,{model:'wolf',family:'beast',hp:39,dmg:9,speed:7.1,
     behavior:'pack',xp:25,drop:'wolf_pelt',gold:7,respawn:110,tint:0x806e56,
     clips:{idle:'Idle',walk:'Gallop',attack:'Attack',death:'Death'}}),
   camp('nieve_lobo_alfa','snow_alpha','snow',450,-72,1,{model:'wolf',family:'mountain',
@@ -45,7 +46,7 @@ export const P183B_CAMPS=Object.freeze([
   camp('camino_bandidos','bandit','road',215,-112,2,{model:'npc_rogue',family:'humanoid',hp:63,dmg:11,speed:4.9,
     behavior:'social',xp:46,drop:'bandit_emblem',gold:22,respawn:150,
     clips:{idle:'Idle',walk:'Walking_A',attack:'1H_Melee_Attack_Chop',death:'Death_A'}}),
-  camp('ruinas_orco','orc','ruins',-266,-255,1,{family:'goblinoid',hp:98,dmg:17,speed:3.5,aggro:17,
+  camp('ruinas_orco','orc','ruins',-470,-300,1,{family:'goblinoid',hp:98,dmg:17,speed:3.5,aggro:17,
     xp:78,drop:'orc_tusk',gold:18,respawn:190,
     clips:{idle:'Idle',walk:'Walk',attack:'Punch',death:'Death'}})
 ]);
@@ -68,6 +69,7 @@ export function biomeValidP183b(terrain,x,z,biome,allow=()=>true){
       .some(([dx,dz])=>terrain.getHeight(x+dx,z+dz)<water-.03))return false;
  }
  if(typeof terrain.getSlope==='function'&&terrain.getSlope(x,z)>(biome==='snow'?.8:biome==='coast'?.95:.65))return false;
+ if(biome==='forest'&&!realForestP183c(terrain,x,z))return false;
  return true;
 }
 export function resolveBiomeCampP183b(terrain,camp,allow=()=>true){
