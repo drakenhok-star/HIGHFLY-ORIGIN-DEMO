@@ -81,15 +81,12 @@ map.drawMini=MapClass.prototype.drawMini.bind(map);
 map.drawMini();
 assert.equal(op.filter(x=>x==='C').length,2,'both sentinel diamonds drawn on radar');
 assert.ok(map.pointsOfInterest().some(x=>/Lobo centinela/.test(x[0])));
-map.frontierLabel={style:{},textContent:''};
-map.mini={getBoundingClientRect:()=>({right:1000,bottom:201})};
-map.updateFrontierLabel();
-assert.match(map.frontierLabel.textContent,/LOBO CENTINELA/);
-assert.match(map.frontierLabel.textContent,/1\/3/);
-assert.equal(map.frontierLabel.style.display,'block');
+assert.equal('frontierLabel' in map,false,
+ 'no redundant badge below radar: mission is top-center in LivingWorld');
+assert.doesNotMatch(srcMap,/hf-p181-radar-target/);
+assert.match(srcMap,/hunterArrow\(ctx/,'cyan arrow replaces circular hunter marker');
 game.livingWorld.quest.status='complete';
-map.updateFrontierLabel();
-assert.match(map.frontierLabel.textContent,/BJORN/);
+assert.equal(map.missionPosition().x,3,'map still points to Bjorn after removing badge');
 
 // Render actual P9 quest panel with a minimal DOM. This reproduced the
 // previously undefined REWARDS[q.id].gold crash / blank black menu.
