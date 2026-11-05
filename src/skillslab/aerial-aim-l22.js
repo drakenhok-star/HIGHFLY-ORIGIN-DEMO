@@ -18,7 +18,8 @@ export function isFlying22(entity,groundHeight,threshold=1.65){
   return flightHeight22(entity,groundHeight)>threshold;
 }
 export function aerialDirection22(forward,dragX=0,dragY=0,scale=1){
-  const fx=Number(forward?.x)||0,fz=Number(forward?.z)||-1;
+  const fx=Number.isFinite(Number(forward?.x))?Number(forward.x):0;
+  const fz=Number.isFinite(Number(forward?.z))?Number(forward.z):-1;
   const len=Math.hypot(fx,fz)||1;
   const nx=fx/len,nz=fz/len;
   const rightX=-nz,rightZ=nx;
