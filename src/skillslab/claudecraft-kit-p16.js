@@ -14,7 +14,7 @@ import {chooseLaunchVector} from './projectile-aim-p19.js';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const vec=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z);
 
-export function castClaudeSkill(lab,slot,direction,target=null){
+export function castClaudeSkill(lab,slot,direction,target=null,options={}){
   const g=lab.game,p=g.player,fx=lab.fx,pos=p.pos.clone();
   if(lab.style===3){
     if(slot===1){
@@ -30,9 +30,10 @@ export function castClaudeSkill(lab,slot,direction,target=null){
           position:{x:e.group.position.x,
             y:e.group.position.y+Math.min(1.3,Math.max(.75,e.hitRadius||.9)),
             z:e.group.position.z}}));
-      const chosen=chooseLaunchVector({
-        origin:muzzle,forward:direction,targets,range:22,halfAngle:17,visible
-      });
+      // Manual gesture owns full 3D elevation; no near-ground auto-assist steals a sky shot.
+      const chosen=options.manualAim?
+        {direction:{x:direction.x,y:direction.y,z:direction.z},target:null}:
+        chooseLaunchVector({origin:muzzle,forward:direction,targets,range:22,halfAngle:17,visible});
       const shot=new THREE.Vector3(chosen.direction.x,chosen.direction.y,
         chosen.direction.z).normalize();
       const mesh=fx.energyBolt(3);
