@@ -271,6 +271,40 @@ jobs:
           echo "P16.1 Performance experimental: /p161/ -> 2c76436c81c67791f355bfe5087c325592989816"
           echo "Skill Lab deploy is entirely separate (no changes to the Skill Lab repository)."
 
+      - name: Add P16.1 PERFORMANCE + TRAINING preview (preserve P16 and Skill Lab)
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch --no-tags --depth=1 origin refs/heads/p16-1-performance-foundation-20261105
+          test "$(git rev-parse FETCH_HEAD)" = "de853a300416d4ac72a5e4d8279af410be3288ef"
+          mkdir -p .site/p161
+          git archive FETCH_HEAD index.html styles.css LICENSE PROVENANCE.md src lib assets tests scripts | tar -x -C .site/p161
+          test -s .site/p161/index.html
+          test -s .site/p161/src/ui/performance-p161.js
+          test -s .site/p161/src/world/grass-cursor-p161.js
+          test -s .site/p161/src/ui/training-p161.js
+          test -s .site/p161/src/ui/training-p161.css
+          test -s .site/p161/src/ui/training-schedule-p161.js
+          test -s .site/p161/assets/models/player_barbarian.glb
+          (
+            cd .site/p161
+            find src -type f -name '*.js' -print0 | while IFS= read -r -d '' file; do
+              node --input-type=module --check < "$file"
+            done
+            node tests/p16-hit-confirm.test.mjs
+            node tests/p161-performance.test.mjs
+            node tests/p161-grass-budget.test.mjs
+            node tests/p161-terrain-budget.test.mjs
+            node tests/p161-training-ui.test.mjs
+          )
+          if find .site/p161 -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .; then
+            echo "Restricted assets detected in P16.1"; exit 1
+          fi
+          rm -rf .site/p161/tests .site/p161/scripts
+          echo "P16.1 validated and pinned to de853a300416d4ac72a5e4d8279af410be3288ef"
+          echo "Demo Pages: / (original), /p16/ backup, /p161/ performance + Training"
+          echo "FURY-SKILL-LAB repo and separate Pages remain unchanged"
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
