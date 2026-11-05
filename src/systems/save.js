@@ -6,12 +6,15 @@ const KEY_P13 = 'highfly_p13_save';
 const KEY_P14 = 'highfly_p14_save';
 const KEY_P15 = 'highfly_p15_save';
 const KEY_P16 = 'highfly_p16_save';
+const KEY_FURY_SKILL_LAB = 'highfly_fury_skill_lab_p21_save';
 
 export class SaveSys {
   constructor(game) {
     this.game = game;
+    // Same github.io origin across repos: never read/write the real demo save.
+    this.isTrainingLab=!!game.enemies?.trainingLab;
     this.autosaveTimer = 0;
-    this.key=game.p16Enabled?KEY_P16:game.p15Enabled?KEY_P15:game.p14Enabled?KEY_P14:game.p13Enabled?KEY_P13:game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
+    this.key=this.isTrainingLab?KEY_FURY_SKILL_LAB:game.p16Enabled?KEY_P16:game.p15Enabled?KEY_P15:game.p14Enabled?KEY_P14:game.p13Enabled?KEY_P13:game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
   }
 
   save() {
@@ -39,6 +42,7 @@ export class SaveSys {
   }
 
   hasSave() {
+    if(this.isTrainingLab)return localStorage.getItem(this.key)!==null;
     return localStorage.getItem(this.key) !== null ||
       (this.game.p16Enabled && localStorage.getItem(KEY_P15)!==null) ||
       (this.game.p15Enabled && localStorage.getItem(KEY_P14)!==null) ||
@@ -50,6 +54,12 @@ export class SaveSys {
   }
 
   loadRaw() {
+    // Never import the real demo's P15/P16 save into a separate Pages lab.
+    if(this.isTrainingLab){
+      const saved=localStorage.getItem(this.key);
+      if(!saved)return null;
+      try{return JSON.parse(saved);}catch(_){return null;}
+    }
     // First P7 visit reads P6 progress, but writes ONLY P7: original never overwritten.
     const raw = localStorage.getItem(this.key) ||
       (this.game.p16Enabled?localStorage.getItem(KEY_P15):null) ||
