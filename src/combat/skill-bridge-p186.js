@@ -419,7 +419,10 @@ export class P186CombatBridge{
    }
   }else if(style===3){
    if(slot===1){
-    fx.launch(pos,dir,3);cf.fireCharge(pos,dir);
+    // No ground-level energy ring or blade-cut VFX on Fireball startup.
+    // Hand charge and real projectile retain their original impact visuals.
+    fx.sparks(pos.clone().add(V(0,1.3,0)),'#ffb15b',8,1.2,.20,.07);
+    cf.fireCharge(pos,dir);
     const start=pos.clone().add(V(0,1.32,0)).addScaledVector(dir,.45);
     const airborne=this.focus&&p186IsFlying(this.focus,g)?this.focus:null;
     const aim=airborne?this.targetPoint(airborne).sub(start).normalize():dir;
