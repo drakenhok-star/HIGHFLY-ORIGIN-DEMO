@@ -12,6 +12,7 @@
  */
 import {mulberry32} from '../core/noise.js';
 import {ITEM_DB} from '../systems/inventory.js';
+import {siteForP193,entityForP193,adjustHouseP193} from './world-layout-p193.js';
 import {INICIOS_HUBS_P186,INICIOS_TRAINERS_P186,INICIOS_PROFESSIONS_P186}
  from './inicios-v2-p186.js';
 
@@ -123,7 +124,8 @@ export class P192Hamlets{
   this.sites=new Map();this._acc=0;this._lastHub=null;
   for(const hub of INICIOS_HUBS_P186.filter(x=>x.id!=='central_village')){
    const taken=[...this.sites.values()].filter(x=>x.pos).map(x=>x.pos);
-   const pos=findHamletSiteP192(game.terrain,game.structures,hub.id,taken);
+   const computed=findHamletSiteP192(game.terrain,game.structures,hub.id,taken);
+   const pos=siteForP193(game,hub.id,computed);
    this.sites.set(hub.id,{hub,pos,houses:[],trainers:new Set(),
     status:pos?'approved_existing_model_site':'unsafe_site_skipped'});
   }
@@ -208,9 +210,14 @@ export class P192Hamlets{
    const site=nextBuild,i=site.houses.length,{x,z}=site.pos;
    // Existing *finished* house builder, not geometry placeholders.
    const ox=i===0?0:14,oz=i===0?0:4;
-   if(safeHamletSiteP192(g.terrain,g.structures,x+ox,z+oz)){
-    const house=g.structures._buildHouse(x+ox,z+oz,false,
+   const id='hamlet:'+site.hub.id+':house:'+i;
+   const override=entityForP193(g,id);
+   const hx=override?.x??x+ox,hz=override?.z??z+oz;
+   if(safeHamletSiteP192(g.terrain,g.structures,hx,hz)){
+    const house=g.structures._buildHouse(hx,hz,false,
       mulberry32((x*1019+z*37+i*2229)>>>0));
+    house.userData.p193Id=id;
+    if(override)adjustHouseP193(g,house,override);
     site.houses.push(house);
    }else site.houses.push(null);
    return; // one house max per update slice
@@ -232,6 +239,9 @@ export class P192Hamlets{
      if(g.npcs.list.some(n=>Math.hypot(n.pos.x-x,n.pos.z-z)<3.3))continue;
      chosen={x,z};break;
     }
+   const fixed=entityForP193(g,'npc:'+trainer.id);
+   if(fixed&&g.terrain.getHeight(fixed.x,fixed.z)>g.terrain.waterY+.8 &&
+      g.terrain.getSlope(fixed.x,fixed.z)<.55)chosen={x:fixed.x,z:fixed.z};
    if(chosen){
     // Spawn and animate ONLY genuine pre-existing KayKit NPC rigs.
     const npc=g.npcs._makeNPC({id:trainer.id,
@@ -239,6 +249,8 @@ export class P192Hamlets{
       x:chosen.x,z:chosen.z,model:P192_TRAINER_MODELS[trainer.id]});
     npc.p192TrainerId=trainer.id;
     npc.p192HubId=site.hub.id;
+    if(fixed){npc.yaw=fixed.rotation;npc.group.rotation.y=fixed.rotation;
+      npc.group.scale.setScalar(fixed.scale);npc.group.visible=!fixed.hidden;}
     g.npcs.list.push(npc);
     site.trainers.add(trainer.id);
    }else site.trainers.add(trainer.id); // unplaced; never fabricate an invalid NPC location
