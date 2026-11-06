@@ -1,0 +1,77 @@
+name: HIGHFLY P190 — Unified 18 skills in six editable slots
+on:
+  push:
+    branches: [p190-six-skills-unified-hud-20261106]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  p186-migration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify all JS source and portable 15-skill/world contracts
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          find src -name '*.js' -type f -print0 | while IFS= read -r -d '' f; do
+            node --input-type=module --check < "$f"
+          done
+          node --experimental-default-type=module tests/p185-world-portals.test.mjs
+          node --experimental-default-type=module tests/p186-skill-transfer.test.mjs
+          node --experimental-default-type=module tests/p186-inicios-v2.test.mjs
+          node --experimental-default-type=module tests/p187-integrated-contracts.test.mjs
+          node --experimental-default-type=module tests/p188-skill-progression.test.mjs
+          node --experimental-default-type=module tests/p190-six-skills.test.mjs
+          test -s src/combat/hit-confirm-p16.js
+          test -s src/world/world-zones-p185.js
+          test -s src/world/inicios-v2-p186.js
+          test -s src/world/inicios-site-planner-p186.js
+          test -s src/combat/skill-bridge-p186.js
+          test -s src/ui/p186-profile.js
+          test -s src/skillslab/aim-guide-p16.js
+          test -s src/combat/l27-aim-adapter-p189.js
+          test -s src/combat/skill-progression-p190.js
+          test -s assets/models/player_barbarian.glb
+          ! find src -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .
+      - name: Prepare real models and verify asset provenance
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -s PROVENANCE.md
+          test -s assets/manifest.json
+          if test -f scripts/fetch_gobkit_boar_p183b.sh; then
+            bash scripts/fetch_gobkit_boar_p183b.sh
+          fi
+      - name: Setup Chrome for mobile-landscape integration smoke
+        id: chrome
+        uses: browser-actions/setup-chrome@v2
+        with:
+          chrome-version: stable
+      - name: Install test-only Playwright
+        run: npm install --no-save --no-audit --no-fund playwright-core@1.51.1
+      - name: Real 1030x480 browser boot, skill UI and avatar marker check
+        shell: bash
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+        run: |
+          set -Eeuo pipefail
+          node server.mjs >/tmp/highfly-p186.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:5520/index.html >/dev/null; then break; fi
+            sleep .5
+          done
+          node scripts/p190-browser-smoke.mjs
+      - name: Save P186 screenshot as inspectable artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p190-six-skills-mobile-screenshot
+          path: audit-output/p190-landscape.png
+          if-no-files-found: ignore
