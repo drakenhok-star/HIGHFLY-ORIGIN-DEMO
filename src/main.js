@@ -35,6 +35,7 @@ import { PerfGovernorP163 } from './ui/performance-p163.js';
 import { LivingWorldP18 } from './world/living-world-runtime-p18.js';
 import { installP186Combat } from './combat/skill-bridge-p186.js';
 import {SkillProgressP188} from './combat/skill-progression-p188.js';
+import {GpuDiagnosticsP188} from './ui/gpu-diagnostics-p188.js';
 import { P187ProfessionRuntime } from './world/professions-runtime-p187.js';
 import { P187VillageGuide } from './ui/inicios-guide-p187.js';
 import { consumeP186TransferFromUrl } from './ui/p186-profile.js';
@@ -124,6 +125,7 @@ class Game {
     this.audio = new AudioSys(this);
     this.saveSys = new SaveSys(this);
     this.hud = new HUD(this);
+    this.gpuDiagnosticsP188=this.p188Build?new GpuDiagnosticsP188(this):null;
     this.menus = new Menus(this);
     this.livingWorld = this.p18Enabled ? new LivingWorldP18(this) : null;
     this.touch = new TouchControls(this);
