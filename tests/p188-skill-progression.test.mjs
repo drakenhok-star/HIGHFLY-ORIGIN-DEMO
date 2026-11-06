@@ -71,7 +71,9 @@ assert.ok(save.includes("const KEY_P188 = 'highfly_p188_save'"));
 assert.ok(save.includes('skillsP188:g.p188Skills.serialize()'));
 assert.ok(save.includes('this.game.p188Build?localStorage.getItem(KEY_P187):null'));
 assert.ok(hud.includes("['skills','HABILIDADES']"));
-assert.ok(hud.includes("if(g.p188Build && i<3 && g.p186Skills)continue;"));
+assert.ok(hud.includes("if(g.p188Build && i<3 && g.p186Skills)continue;") ||
+ hud.includes("if((g.p190Build || (g.p188Build && i<3)) && g.p186Skills)continue;"),
+ 'the old native HUD must never override the unified skill buttons');
 assert.ok(panel.includes("renderSkillbookP188(this.hud,this)"));
 assert.ok(panel.includes("renderProfessionbookP188(this.hud,this)"));
 console.log('P188 PASS: 15 skills locked by default, 4 real quest discovery paths, learn/equip separate, no duplicate rewards, save migrated, preview and full size overlay wired.');

@@ -144,7 +144,9 @@ export class P186CombatBridge{
    event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
    this.airAttack();return;
   }
-  for(const [cls,slot] of [['.hf-p5-s1',1],['.hf-p5-s2',2],['.hf-p5-s3',3]]){
+  for(const [cls,slot] of [['.hf-p5-s1',1],['.hf-p5-s2',2],['.hf-p5-s3',3],
+    ['.hf-p5-s4',4],['.hf-p5-s5',5],['.hf-p5-s6',6]]){
+   if(!g.p190Build&&slot>3)continue;
    if(!target.matches(cls))continue;
    event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
    if(g.p188Build){this.beginAim(slot,event);return;}
@@ -158,7 +160,8 @@ export class P186CombatBridge{
   const now=this.now();
   const recast=this.recast&&this.recast.slot===sk.slot&&
    this.recast.style===KITS.indexOf(sk.kit)&&now<=this.recast.until;
-  if(!recast&&now<(this.cooldowns[sk.id]||0)){
+  if(!recast&&(sk.nativeId?(this.game.combat.shoutCooldowns[sk.nativeId]||0)>.01:
+    now<(this.cooldowns[sk.id]||0))){
    this.message('Skill en cooldown');return;
   }
   const stats=this.game.stats;
@@ -192,7 +195,7 @@ export class P186CombatBridge{
   b.setAttribute('title','CANCELAR SKILL · sin gasto de maná ni energía');
   // Only the circular X occupies touch space. Opacity and screen position
   // are owned by the HUD editor, not by a transient P188 rectangle.
-  b.style.cssText='position:fixed;z-index:76;left:78.8%;top:31%;'+
+  b.style.cssText='position:fixed;z-index:119;left:78.8%;top:31%;'+
    'width:45px;height:45px;display:flex;align-items:center;justify-content:center;'+
    'border:2px solid rgba(255,124,132,.92);border-radius:50%;'+
    'background:rgba(171,26,48,.62);color:#fff3f3;'+
@@ -204,7 +207,9 @@ export class P186CombatBridge{
    e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
    this.cancelAim();
   });
-  (this.game.touch?.root||document.body).appendChild(b);
+  // Overlay above coords/FPS; a child of #hf-touch can be trapped underneath
+  // the radar's stacking context even if its own z-index is larger.
+  document.body.appendChild(b);
   this.cancelButton=b;
   this.syncCancelButton();
  }
@@ -283,7 +288,8 @@ export class P186CombatBridge{
  }
  onKey(event){
   if(this.game.state!=='playing'||this.game.input.hudEditing||event.repeat)return;
-  const key={Digit1:1,Digit2:2,Digit3:3}[event.code];
+  const key={Digit1:1,Digit2:2,Digit3:3,Digit4:4,Digit5:5,Digit6:6}[event.code];
+  if(!this.game.p190Build&&key>3)return;
   if(!key)return;
   event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
   this.cast(key);
@@ -299,8 +305,15 @@ export class P186CombatBridge{
   // A loadout may equip any of the fifteen styles; each ability retains its
   // original internal skill slot and family for correct damage and VFX.
   const style=KITS.indexOf(skill.kit);
-  if(style<0)return false;
   const dir=aim?.direction?.clone()?.normalize()||this.facing();
+  // Native word-wall skills are regular equipped abilities, but their
+  // original combat code remains the authoritative hit/resource owner.
+  if(this.game.p190Build&&skill.nativeId){
+   const worked=g.combat.shout(skill.nativeId,dir);
+   this.drawSkillButtons();
+   return worked===true;
+  }
+  if(style<0)return false;
   const skillSlot=skill.slot;
   const oldRecast=this.recast&&this.recast.slot===skillSlot&&
    this.recast.style===style&&now<=this.recast.until;
@@ -328,7 +341,7 @@ export class P186CombatBridge{
    if(slot===1){
     const start=pos.clone().add(V(0,1.25,0));
     fx.launch(pos,dir,0);
-    this.spawnBolt(start,dir,0,47,17,65);
+    this.spawnBolt(start,dir,0,47,17,38); // P190: visible travel, swept collision retained
    }else if(slot===2){
     if(!recast){
      const landing=ahead(5.8);
@@ -410,7 +423,7 @@ export class P186CombatBridge{
     const start=pos.clone().add(V(0,1.32,0)).addScaledVector(dir,.45);
     const airborne=this.focus&&p186IsFlying(this.focus,g)?this.focus:null;
     const aim=airborne?this.targetPoint(airborne).sub(start).normalize():dir;
-    this.spawnBolt(start,aim,3,75,23,73,{burn:4});
+    this.spawnBolt(start,aim,3,75,23,34,{burn:4}); // L27 ~28, P190 readable ~34
    }else if(slot===2){
     const target=aimTarget?.clone()||ahead(12.5);target.y=this.ground(target.x,target.z);
     fx.meteorWarning(target,4);fx.fallingMeteor(target,.75);
@@ -616,12 +629,14 @@ export class P186CombatBridge{
  drawSkillButtons(){
   if(!this.game.touch?.premium?.p810)return;
   const g=this.game,now=this.now();
-  for(let slot=1;slot<=3;slot++){
+  for(let slot=1;slot<=(g.p190Build?6:3);slot++){
    const btn=g.touch.root.querySelector('.hf-p5-s'+slot);
    if(!btn)continue;
    const sk=g.p188Build?g.p188Skills?.selected(slot):
     HIGHFLY_SKILL_EXPORT_L26.find(s=>s.kit===KITS[this.style]&&s.slot===slot);
-   const remaining=sk?Math.ceil(Math.max(0,(this.cooldowns[sk.id]||0)-now)):0;
+   const remaining=sk?Math.ceil(Math.max(0,sk.nativeId?
+     (g.combat.shoutCooldowns[sk.nativeId]||0):
+     (this.cooldowns[sk.id]||0)-now)):0;
    const title=sk?(sk.name.length>10?sk.name.split(' ')[0]:sk.name):'VACÍA';
    const label='S'+slot+'\n'+title+(remaining?'\n'+remaining+'s':'');
    // Never rebuild DOM on every frame: write only when the visible text changes.

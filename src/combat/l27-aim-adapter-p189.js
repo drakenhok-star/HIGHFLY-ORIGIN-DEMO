@@ -5,6 +5,12 @@
 import * as THREE from 'three';
 import {TianjieAimGuide,AIM_PROFILES} from '../skillslab/aim-guide-p16.js';
 const FAMILIES=['GUINEVERE','DYRROTH','TIGREAL','CLAUDE_MAGE','CLAUDE_ROGUE'];
+// Legacy word-wall abilities now display through the SAME L27 telegraph engine.
+export const NATIVE_AIM_PROFILES_P190=Object.freeze({
+ native_fus:Object.freeze({kind:'cone',range:14,width:0,radius:0,halfAngle:35}),
+ native_frost:Object.freeze({kind:'cone',range:15,width:0,radius:0,halfAngle:40}),
+ native_wuld:Object.freeze({kind:'dash',range:13.2,width:2.3,radius:0,halfAngle:0})
+});
 const SPECS=AIM_PROFILES.flatMap((kit,i)=>kit.map((profile,slot)=>({
  kit:FAMILIES[i],slot:slot+1,profile
 })));
@@ -16,6 +22,7 @@ export const AIM_SPECS_P189=Object.freeze(Object.fromEntries(SPECS.map(s=>[
 ])));
 export function getLabAimProfileP189(skill,recast=false){
  const style=FAMILIES.indexOf(skill?.kit),slot=skill?.slot;
+ if(skill?.nativeId)return NATIVE_AIM_PROFILES_P190[skill.id]||null;
  if(style<0||!Number.isInteger(slot)||slot<1||slot>3)return null;
  if(recast&&style===0&&slot===2)return Object.freeze({kind:'dash',range:4.4,width:2.7,radius:0});
  return AIM_PROFILES[style][slot-1];
@@ -49,9 +56,12 @@ export class L27AimAdapterP189{
  }
  begin(skill,recast=false){
   const index=FAMILIES.indexOf(skill?.kit);
-  if(index<0)return false;
+  const native=!!skill?.nativeId;
+  if(index<0&&!native)return false;
   this.skill=skill;this.spec=getLabAimProfileP189(skill,recast);
-  this.guide.begin(index,skill.slot,recast?this.spec:null);
+  if(!this.spec)return false;
+  this.guide.begin(native?0:index,native?1:skill.slot,
+   native||recast?this.spec:null);
   this.lastResult=null;return true;
  }
  update(_player,direction,target=null){

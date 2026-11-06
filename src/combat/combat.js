@@ -168,7 +168,7 @@ export class Combat {
     if (input.rightClick) this.cast();
     if (input.justPressed.has('KeyF')) this.shout();
     if (input.justPressed.has('KeyQ')) this.cycleShout();
-    if(this.game.p6Enabled){
+    if(this.game.p6Enabled&&!this.game.p190Build){
       if(input.justPressed.has('Digit1'))this.cast();
       if(input.justPressed.has('Digit2'))this.shout('fus');
       if(input.justPressed.has('Digit3'))this.shout('frost');
@@ -467,37 +467,43 @@ export class Combat {
     }
   }
 
-  shout(id=null) {
+  shout(id=null,aimDir=null) {
     const g = this.game;
     const def=this.shoutDef(id||this.equippedShout)||this.shouts[0];
+    if(g.p190Build&&(!g.p188Skills?.state?.learned?.['native_'+def.id]||
+      !g.p188Skills.state.equipped.includes('native_'+def.id))){
+      g.hud.notify('Aprendé y equipá esa habilidad antes de usarla');
+      return false;
+    }
     if(!this.learnedShouts.includes(def.id)){
-      g.hud.notify('Habilidad todavía bloqueada');return;
+      g.hud.notify('Habilidad todavía bloqueada');return false;
     }
     if (this.shoutCooldowns[def.id] > 0) {
-      g.hud.notify('Habilidad recargando');return;
+      g.hud.notify('Habilidad recargando');return false;
     }
     const ability=abilityForShout(def.id);
     if(g.p6Enabled && !spendAbilityResource(g.stats,ability)){
       g.hud.notify(ability && ability.resource==='mp'?'MP insuficiente':'Energía insuficiente');
-      return;
+      return false;
     }
-    this.equippedShout=def.id;
+    if(!g.p190Build)this.equippedShout=def.id;
     this.shoutCooldowns[def.id] = def.cd;
     this.shoutCd = def.cd;
     this.shoutCdMax = def.cd;
-    if (def.id === 'frost') this.shoutFrost();
-    else if (def.id === 'wuld') this.shoutWuld();
-    else this.shoutFus();
+    if (def.id === 'frost') this.shoutFrost(aimDir);
+    else if (def.id === 'wuld') this.shoutWuld(aimDir);
+    else this.shoutFus(aimDir);
+    return true;
   }
 
-  shoutFus() {
+  shoutFus(aimDir=null) {
     const g = this.game;
     g.audio.play('shout');
     g.hud.shoutText('FUS · RO · DAH');
     g.player.addShake(0.5);
-    const target=g.p7Enabled?g.targeting?.attackTarget(14):g.p6Enabled && g.targeting ? g.targeting.get(14) : null;
+    const target=aimDir?null:(g.p7Enabled?g.targeting?.attackTarget(14):g.p6Enabled && g.targeting ? g.targeting.get(14) : null);
     if(g.p7Enabled){this._castTarget=target;g.player.castT=0;g.player._castAnimStarted=false;}
-    const forward=this._fwd.copy(g.p7Enabled?g.player.getCombatForward():g.player.getForward());
+    const forward=this._fwd.copy(aimDir|| (g.p7Enabled?g.player.getCombatForward():g.player.getForward()));
     if(target){forward.copy(target.group.position).sub(g.player.pos).setY(0).normalize();}
     const burstPos = this._v1.copy(g.player.pos).addScaledVector(forward, 2);
     burstPos.y += 1.4;
@@ -517,16 +523,16 @@ export class Combat {
     }
   }
 
-  shoutFrost() {
+  shoutFrost(aimDir=null) {
     const g = this.game;
     const player = g.player;
     g.audio.play('frost');
     g.hud.shoutText('FO · KRAH · DIIN');
     player.addShake(0.3);
-    const target=g.p7Enabled?g.targeting?.attackTarget(15):g.p6Enabled && g.targeting ? g.targeting.get(15) : null;
+    const target=aimDir?null:(g.p7Enabled?g.targeting?.attackTarget(15):g.p6Enabled && g.targeting ? g.targeting.get(15) : null);
     if(g.p7Enabled){this._castTarget=target;g.player.castT=0;g.player._castAnimStarted=false;}
     const frostForward=this._frostForward||(this._frostForward=new THREE.Vector3());
-    frostForward.copy(g.p7Enabled?player.getCombatForward():player.getForward());
+    frostForward.copy(aimDir||(g.p7Enabled?player.getCombatForward():player.getForward()));
     if(target)frostForward.copy(target.group.position).sub(player.pos).setY(0).normalize();
     if (g.effects.frostCone) {
       const origin = new THREE.Vector3();
@@ -558,11 +564,14 @@ export class Combat {
     }
   }
 
-  shoutWuld() {
+  shoutWuld(aimDir=null) {
     const g = this.game;
     g.audio.play('dash');
     g.hud.shoutText('WULD · NAH · KEST');
-    if (g.player.startDash) g.player.startDash(g.p6Enabled?{speed:44,duration:0.30}:{});
+    if (g.player.startDash) g.player.startDash(g.p6Enabled?
+      {speed:44,duration:0.30,...(aimDir?
+        {direction:{x:aimDir.x,z:aimDir.z},style:'dodge'}:{})}:{});
+
     const burstPos = this._v1.copy(g.player.pos);
     burstPos.y += 1;
     g.effects.spawnBurst(burstPos, '#f0f6ff', 16, 8, 0.4, 0.22);

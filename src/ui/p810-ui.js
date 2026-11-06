@@ -14,6 +14,7 @@ const BUTTONS=[
  ['run','.hf-p5-run','CORRER'],['jump','.hf-p5-jump','SALTO'],['dash','.hf-p5-dash','DASH'],
  ['use','.hf-p5-use','USAR'],['s1','.hf-p5-s1','S1'],['atk','.hf-p5-atk','ATK'],
  ['s2','.hf-p5-s2','S2'],['s3','.hf-p5-s3','S3'],['s4','.hf-p5-s4','S4'],
+ ['s5','.hf-p5-s5','S5'],['s6','.hf-p5-s6','S6'],
  ['lock','.hf-p6-lock','FIJAR'],['next','.hf-p6-next','SIG.'],['clear','.hf-p6-clear','✕']
 ];
 export class HighflyP810{
@@ -39,6 +40,14 @@ export class HighflyP810{
  }
  mountHud(){
   const root=this.touch.root;
+  if(this.game.p190Build){
+   const actions=root.querySelector('.hf-actions');
+   // 2 extra real touch buttons: no lab controls, no click-side double casts.
+   for(const slot of [5,6]){
+    if(!root.querySelector('.hf-p5-s'+slot))
+     this.touch.addButton(actions,'S'+slot+'\nVACÍA','hf-p5-s'+slot,()=>{});
+   }
+  }
   const nativePause=root.querySelector('.hf-menu');
   if(nativePause)nativePause.style.setProperty('display','none','important');
   const joy=root.querySelector('.hf-joy');

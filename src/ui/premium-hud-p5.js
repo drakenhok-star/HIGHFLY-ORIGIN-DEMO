@@ -170,8 +170,11 @@ export class PremiumHudP5 {
     this.fireButton=add('S1\nMAGIA','s1',()=>{this.game.input.rightClick=true;});
     this.fusButton=add('S2\nFUS','s2',()=>this.shout('fus'));
     this.frostButton=add('S3\nHIELO','s3',()=>this.shout('frost'));
-    this.wuldButton=add('S4\nTÉCNICA','s4',()=>this.shout(
-      this.game.p189Build?this.game.combat.equippedShout:'wuld'));
+    this.wuldButton=add('S4\nVACÍA','s4',()=>{
+      // P190: the six-slot bridge owns the skill touch; no legacy double-cast.
+      if(this.game.p190Build)return;
+      this.shout(this.game.p189Build?this.game.combat.equippedShout:'wuld');
+    });
     this.skillButtons = [this.frostButton,this.wuldButton];
     if(this.game.p6Enabled){
       add('FIJAR','p6-lock',()=>this.game.input.justPressed.add('KeyL'));
@@ -256,7 +259,7 @@ export class PremiumHudP5 {
     }
     const learned=(g.combat&&g.combat.learnedShouts)||[];
     if(!(g.p188Build&&g.p186Skills))this.frostButton.classList.toggle('hf-p5-locked',!learned.includes('frost'));
-    this.wuldButton.classList.toggle('hf-p5-locked',
+    if(!g.p190Build)this.wuldButton.classList.toggle('hf-p5-locked',
       !learned.includes(g.p189Build?g.combat.equippedShout:'wuld'));
     if(g.p6Enabled && g.targeting){
       const lock=g.targeting.locked,soft=g.targeting.soft,target=lock||soft;
@@ -270,7 +273,7 @@ export class PremiumHudP5 {
       const labels=['MAGIA','FUS','HIELO','WULD'];
       for(let i=0;i<4;i++){
         const button=[this.fireButton,this.fusButton,this.frostButton,this.wuldButton][i];
-        if(g.p188Build && i<3 && g.p186Skills)continue;
+        if((g.p190Build || (g.p188Build && i<3)) && g.p186Skills)continue;
         if(g.p189Build&&i===3){
          const selected=g.combat.equippedShout||'fus';
          const rem=g.combat.shoutCooldowns[selected]||0;
@@ -284,6 +287,7 @@ export class PremiumHudP5 {
     }else this.targetLine.style.display='none';
   }
   shout(id) {
+    if(this.game.p190Build)return; // no former S4 side channel in the six-slot HUD
     const combat=this.game.combat;
     if(!combat.learnedShouts.includes(id)){this.game.hud.notify('Habilidad todavía bloqueada');return;}
     combat.equippedShout=id;
