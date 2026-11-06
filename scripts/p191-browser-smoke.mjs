@@ -198,7 +198,8 @@ try{
   const pct=ed.sizeHint.textContent;
   const scaled=ed.layout.s5.size;
   ed.choose('s1');
-  ed.panel.querySelector('.hf-p10-editor-buttons button:nth-child(2)')?.click();
+  [...ed.panel.querySelectorAll('.hf-p10-editor-buttons button')]
+   .find(el=>el.textContent.includes('IGUALAR S1'))?.click();
   const sizes=Array.from({length:6},(_,i)=>ed.layout['s'+(i+1)].size);
   // The FPS element is normally pointer-inert, but draggable during edit.
   const fps= document.getElementById('hf-p810-perf');
