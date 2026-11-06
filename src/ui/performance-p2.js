@@ -126,7 +126,12 @@ export class PerformanceP2 {
     game.renderer.shadowMap.enabled = isLight ? false : this.originalShadow;
     // Pixel resolution is the key GPU fill-rate diagnostic. Full original quality
     // is recoverable at any moment by pressing the preset button.
-    const targetDpr = isFluid ? Math.min(window.devicePixelRatio || 1, game.p812Enabled?(game.p812Eco?.72:.88):1.0)
+    // P191: the 0.88 DPR on S23 (0.72 ECO) is responsible for part of the
+    // jagged/pixelated character appearance. Prefer 1 CSS px per render px
+    // in normal FLUID (still no bloom/shadows). ECO retains the lower
+    // resolution for genuinely GPU-limited devices. A higher DPR has a real
+    // pixel-fill cost; mobile performance needs to be measured, not promised.
+    const targetDpr = isFluid ? Math.min(window.devicePixelRatio || 1, game.p812Enabled?(game.p812Eco?.78:1.0):1.0)
       : isBalanced ? Math.min(window.devicePixelRatio || 1, 1.15) : this.defaultDpr;
     game.renderer.setPixelRatio(targetDpr);
     game.onResize();
