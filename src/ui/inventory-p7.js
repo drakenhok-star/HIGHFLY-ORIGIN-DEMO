@@ -4,8 +4,8 @@ const CSS="\nbody.hf-p7 #hf-p5-overlay{background:#020415cc;backdrop-filter:blur
 import * as THREE from 'three';
 import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
 import { ITEM_DB } from '../systems/inventory.js';
-const ICON={weapon:'⚔',armor:'🛡',potion:'◉',misc:'✦'};
-const TABS=[['all','✥ TODOS'],['weapon','⚔ ARMAS'],['armor','⛨ ARMADURA'],['potion','◉ CONSUMIBLES'],['misc','✦ MATERIALES']];
+const ICON={weapon:'⚔',armor:'🛡',gear:'♧',potion:'◉',misc:'✦'};
+const TABS=[['all','✥ TODOS'],['weapon','⚔ ARMAS'],['armor','⛨ ARMADURA'],['gear','♧ EQUIPO'],['potion','◉ CONSUMIBLES'],['misc','✦ MATERIALES']];
 const RARITY={steel_sword:'rare',ancient_sword:'epic',dragonbone_sword:'gold',dragonscale_armor:'epic',frost_essence:'rare'};
 const make=(tag,cls,text,parent)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;if(parent)parent.appendChild(e);return e;};
 const label=id=>ITEM_DB[id]?.name||'Vacío';
@@ -128,16 +128,23 @@ export class PremiumInventoryP7 {
    }else if(db.type==='armor'){
     act('EQUIPAR ARMADURA',()=>inv.useOrEquip(id),inv.equipped.armor===id);
     if(inv.equipped.armor===id)act('DESEQUIPAR ARMADURA',()=>inv.unequip('armor'));
+   }else if(db.type==='gear'){
+    const slot=db.gearSlot;
+    act('EQUIPAR EN '+slot.toUpperCase(),()=>inv.useOrEquip(id,slot),inv.equipped[slot]===id);
+    if(inv.equipped[slot]===id)
+     act('DESEQUIPAR '+slot.toUpperCase(),()=>inv.unequip(slot));
    }else if(db.type==='potion')act('USAR POCIÓN',()=>{
     inv.useOrEquip(id);if(!inv.has(id))this.hud.selected=null;
    });
   }
   if(this.game.p812Enabled && this.tab==='equipment' && !db && this.selectedSlot){
    const slot=this.selectedSlot;
-   const desired=slot==='weapon'||slot==='offhand'?'weapon':slot==='armor'?'armor':null;
+   const desired=slot==='weapon'||slot==='offhand'?'weapon':slot==='armor'?'armor':
+     ['head','neck','shoulders','gloves','legs','boots','rings'].includes(slot)?'gear':null;
    make('p',null,desired?'Podés elegir un objeto compatible desde Mochila.':'Este espacio está preparado para equipamiento futuro.',p);
    if(desired){
-    const matches=Array.from(inv.slots.entries()).filter(([item,n])=>n>0&&ITEM_DB[item]?.type===desired);
+    const matches=Array.from(inv.slots.entries()).filter(([item,n])=>n>0&&ITEM_DB[item]?.type===desired&&
+     (desired!=='gear'||ITEM_DB[item].gearSlot===slot));
     if(matches.length){
      const suggested=make('button',null,'ABRIR MOCHILA · '+matches.length+' OPCIONES',p);
      suggested.type='button';suggested.addEventListener('click',()=>{
