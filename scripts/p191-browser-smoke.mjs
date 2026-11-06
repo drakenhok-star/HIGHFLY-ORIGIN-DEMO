@@ -271,8 +271,8 @@ try{
   g.saveSys.save({silent:true});
   const newdata=JSON.parse(localStorage.getItem('highfly_p190_save'));
   return {key:g.saveSys.key,oldUnchanged:old===localStorage.getItem('highfly_p187_save'),
-   learned:newdata.skillsP191?.learned?.woc_fireball,
-   equipped:newdata.skillsP191?.equipped?.[0]};
+   learned:newdata.skillsP190?.learned?.woc_fireball,
+   equipped:newdata.skillsP190?.equipped?.[0]};
  });
  assert.equal(save.key,'highfly_p190_save');
  assert.equal(save.oldUnchanged,true,'old game keys never overwritten');
