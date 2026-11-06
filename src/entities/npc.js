@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { npcRoutineP18 } from '../world/world-registry-p18.js';
+import {safeTownWalkP196,trainerMayWanderP196} from '../world/living-town-p196.js';
 import {SIGRID_STARTER_RECIPES_P191,craftWithSigridP191} from '../world/sigrid-forge-p191.js';
 import {openCraftPreviewP192} from '../ui/crafting-preview-p192.js';
 import {HAMLET_QUESTS_P192} from '../world/hamlets-p192.js';
@@ -411,18 +412,24 @@ export class NPCs {
         }
       }
 
-      if (npc.wander && !playerNear && (!schedule || schedule.activity==='village_wander')) {
+      if (npc.wander && !playerNear &&
+          (!schedule || schedule.activity==='village_wander'||npc.p196Town) &&
+          (!npc.p196Town||trainerMayWanderP196(game,npc))) {
         const w = npc.wander;
         if (w.idleT > 0) {
           w.idleT -= dt;
         } else {
           if (!w.target) {
-            const a = Math.random() * Math.PI * 2;
-            const r = 2 + Math.random() * (w.r - 2);
-            w.target = { x: w.homeX + Math.cos(a) * r, z: w.homeZ + Math.sin(a) * r };
+            for(let tries=0;tries<(w.p196Safe?12:1);tries++){
+              const a=Math.random()*Math.PI*2,r=2+Math.random()*(w.r-2);
+              const px=w.homeX+Math.cos(a)*r,pz=w.homeZ+Math.sin(a)*r;
+              if(w.p196Safe&&!safeTownWalkP196(game,px,pz))continue;
+              w.target={x:px,z:pz};break;
+            }
+            if(!w.target)w.idleT=2+Math.random()*2;
           }
-          const dx = w.target.x - npc.pos.x;
-          const dz = w.target.z - npc.pos.z;
+          const dx = (w.target?.x??npc.pos.x) - npc.pos.x;
+          const dz = (w.target?.z??npc.pos.z) - npc.pos.z;
           const d = Math.hypot(dx, dz);
           if (d < 0.5) {
             w.target = null;
@@ -430,10 +437,15 @@ export class NPCs {
           } else {
             const speed = 1.7;
             npc.yaw = lerpAngle(npc.yaw, Math.atan2(dx, dz), 1 - Math.exp(-8 * dt));
-            npc.pos.x += (dx / d) * speed * dt;
-            npc.pos.z += (dz / d) * speed * dt;
-            npc.pos.y = game.terrain.getHeight(npc.pos.x, npc.pos.z);
-            moving = true;
+            const nextX=npc.pos.x+(dx/d)*speed*dt;
+            const nextZ=npc.pos.z+(dz/d)*speed*dt;
+            if(!w.p196Safe||safeTownWalkP196(game,nextX,nextZ)){
+              npc.pos.x=nextX;npc.pos.z=nextZ;
+              npc.pos.y=game.terrain.getHeight(nextX,nextZ);
+              moving=true;
+            }else{
+              w.target=null;w.idleT=2.5;
+            }
           }
         }
       }
