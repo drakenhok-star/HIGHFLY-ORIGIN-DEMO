@@ -89,7 +89,7 @@ export class HighflyP810{
    e.preventDefault();e.stopPropagation();this.toggleQuickMenu();
   });
   this.editor.register('menu',menu);
-  const perf=node('div',null,'FPS — · GPU —',document.body);
+  const perf=node('div',null,'FPS — · — ms',document.body);
   perf.id='hf-p810-perf';this.perf=perf;
   this.editor.register('perf',perf);
   const combo=node('div',null,'',document.body);
