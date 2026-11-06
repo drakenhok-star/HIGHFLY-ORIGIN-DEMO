@@ -33,7 +33,7 @@ try{
  assert.equal(blank.p188,true);assert.equal(blank.p185,true);
  assert.equal(blank.cast,false,'brand-new character cannot use 15 lab skills for free');
  assert.equal(blank.original,blank.after,'locked skill cannot consume MP');
- assert.deepEqual(blank.eq,[null,null,null]);
+ assert.deepEqual(blank.eq,[null,null,null,null,null,null]);
  assert.deepEqual(blank.known,[]);
  assert.ok(blank.aimPreview&&blank.nativeCombat);
  const mission=await page.evaluate(()=>{
@@ -244,7 +244,7 @@ try{
  assert.deepEqual(fatal,[],'browser fatal errors');
  console.log(JSON.stringify({status:'PASS',mobile:'1030x480',
    combat:'locked-until-learned',aim:'3D+drag+cancel+confirm',
-   skills:15,professions:15,oldSave:'preserved',main:'P185 world retained',
+   skills:18,professions:15,oldSave:'preserved',main:'P185 world retained',
    panel:'native full-sized',mainMenu:'full-sized with close',sixSlots:true,chromeErrors:errors},null,2));
  await context.close();
 }finally{await browser.close();}
