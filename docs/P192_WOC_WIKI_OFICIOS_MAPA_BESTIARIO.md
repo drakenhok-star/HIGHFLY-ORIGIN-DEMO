@@ -222,5 +222,7 @@ Las **78** entradas incluyen fauna, humanoides y criaturas. Eso no significa que
 - Reglas profesionales: https://github.com/levy-street/world-of-claudecraft/blob/493c35a108cef6c8aa290e8793107b1cd117886e/src/sim/content/professions.ts
 - Licencias: https://github.com/levy-street/world-of-claudecraft/blob/493c35a108cef6c8aa290e8793107b1cd117886e/LICENSE y CREDITS.md
 - Índice generado HIGHFLY: [WOC0447_WIKI_CROSSWALK_P192.json](audit/WOC0447_WIKI_CROSSWALK_P192.json)
+- **Las 209 recetas completas:** [WOC0447_RECIPES_209_P192.json](audit/WOC0447_RECIPES_209_P192.json)
+- **Las 78 criaturas, 15 zonas y 6 instancias completas:** [WOC0447_BESTIARY_78_WORLD_15_P192.json](audit/WOC0447_BESTIARY_78_WORLD_15_P192.json)
 
 *Nota de actualización: al 06/11/2026, los conteos de las tablas principales de profesiones/zonas/mazmorras/bestiario coincidían entre el commit auditado y la rama principal. Eso no garantiza identidad de cada balance ni derechos de medios entre versiones.*
