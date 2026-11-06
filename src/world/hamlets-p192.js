@@ -78,10 +78,10 @@ export function safeHamletSiteP192(terrain,structures,x,z,{shore=false}={}){
  }
  return true;
 }
-export function findHamletSiteP192(terrain,structures,id){
+export function findHamletSiteP192(terrain,structures,id,reserved=[]){
  const origin=SITE_PREFS[id];if(!origin)return null;
  const shore=id==='fishing_hamlet';
- const step=shore?13:12,max=shore?156:68;
+ const step=shore?13:12,max=shore?156:228;
  // Deterministic nearest valid site, preserving the proposed biomes.
  for(let radius=0;radius<=max;radius+=step){
   for(let a=0;a<16;a++){
@@ -89,7 +89,12 @@ export function findHamletSiteP192(terrain,structures,id){
    const t=a*Math.PI*2/16;
    const x=Math.round(origin.x+Math.cos(t)*radius);
    const z=Math.round(origin.z+Math.sin(t)*radius);
-   if(safeHamletSiteP192(terrain,structures,x,z,{shore}))
+   const insideExistingTown=Math.hypot(x,z-40)<64;
+   const distinct=reserved.every(p=>Math.hypot(p.x-x,p.z-z)>46);
+   // Only artisan/arcane QUARTERS may share the central village footprint.
+   if(distinct&&(!insideExistingTown||
+      ['artisan_quarter','arcane_quarter'].includes(id))&&
+      safeHamletSiteP192(terrain,structures,x,z,{shore}))
     return Object.freeze({x,z,y:terrain.getHeight(x,z)});
   }
  }
@@ -108,7 +113,8 @@ export class P192Hamlets{
   this.game=game;this.quests=newHamletQuestStateP192();
   this.sites=new Map();this._acc=0;this._lastHub=null;
   for(const hub of INICIOS_HUBS_P186.filter(x=>x.id!=='central_village')){
-   const pos=findHamletSiteP192(game.terrain,game.structures,hub.id);
+   const taken=[...this.sites.values()].filter(x=>x.pos).map(x=>x.pos);
+   const pos=findHamletSiteP192(game.terrain,game.structures,hub.id,taken);
    this.sites.set(hub.id,{hub,pos,houses:[],trainers:new Set(),
     status:pos?'approved_existing_model_site':'unsafe_site_skipped'});
   }
