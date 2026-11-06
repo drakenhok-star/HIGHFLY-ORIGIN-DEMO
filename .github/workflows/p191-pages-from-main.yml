@@ -100,4 +100,6 @@ jobs:
           path: .site
       - name: Deploy verified P191 to GitHub Pages
         uses: actions/deploy-pages@v4
+        with:
+          timeout: 900000
         id: deployment
