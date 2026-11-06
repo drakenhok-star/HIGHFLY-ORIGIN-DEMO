@@ -5,6 +5,7 @@
  */
 import {HIGHFLY_SKILLS_P190,SKILL_ORIGINS_P190} from '../combat/skill-progression-p190.js';
 import {AIM_SPECS_P189,NATIVE_AIM_PROFILES_P190} from '../combat/l27-aim-adapter-p189.js';
+import {SIGRID_STARTER_RECIPES_P191} from '../world/sigrid-forge-p191.js';
 import {INICIOS_PROFESSIONS_P186,INICIOS_HUBS_P186,INICIOS_CHAPTERS_P186,
  INICIOS_TRAINERS_P186} from '../world/inicios-v2-p186.js';
 const E=(tag,cls,text,parent)=>{
@@ -194,11 +195,12 @@ export function renderSkillbookP188(hud,ui){
 export function renderProfessionbookP188(hud,ui){
  initStyles();
  const g=hud.game,list=hud.list,detail=hud.detail;
+ const listTop=list.scrollTop,innerTop=list.querySelector('.hf-p188-book')?.scrollTop||0;
  list.replaceChildren();detail.replaceChildren();
  list.style.display='';list.style.flexDirection='column';
  const box=E('div','hf-p188-book',undefined,list);
  E('h3',null,'⚒ PUEBLO DE LOS INICIOS · OFICIOS',box);
- E('p',null,'Las 15 profesiones empiezan acá. Los maestros planificados todavía no son NPC jugables.',box);
+ E('p',null,'15 oficios planificados para 1–20. Ya podés aprender fabricación de armas y armaduras con Sigrid y fabricar equipo usando loot real.',box);
  const current=ui.p188SelectedProfession||INICIOS_PROFESSIONS_P186[0].id;
  for(const prof of INICIOS_PROFESSIONS_P186){
   const trainer=INICIOS_TRAINERS_P186.find(x=>x.id===prof.trainerId);
@@ -206,7 +208,7 @@ export function renderProfessionbookP188(hud,ui){
   const b=E('button','hf-p188-card'+(current===prof.id?' active':''),undefined,box);
   b.type='button';E('strong',null,prof.name,b);
   E('small',null,(known?'APRENDIDO':trainer?.existing?'MAESTRO DISPONIBLE':'MAESTRO FUTURO')+
-   ' · nivel '+prof.introLevel,b);
+   ' · nivel '+prof.introLevel+' · Oficio '+(g.p187Professions?.state?.experience?.[prof.id]||0)+'/'+prof.maxSkill,b);
   b.addEventListener('click',()=>{ui.p188SelectedProfession=prof.id;ui.render('professions');});
  }
  const prof=INICIOS_PROFESSIONS_P186.find(x=>x.id===current)||INICIOS_PROFESSIONS_P186[0];
@@ -216,8 +218,22 @@ export function renderProfessionbookP188(hud,ui){
  tag(detail,'Primera lección: '+prof.starterLesson.replaceAll('_',' '));
  const trainer=INICIOS_TRAINERS_P186.find(x=>x.id===prof.trainerId);
  tag(detail,'Maestro: '+trainer?.role+' · '+(trainer?.existing?'NPC existente':'pendiente de integrar'));
+ const starter=SIGRID_STARTER_RECIPES_P191.find(x=>x.profession===prof.id);
+ if(starter){
+  E('h3',null,'PRIMER TRABAJO JUGABLE · SIGRID',detail);
+  tag(detail,starter.name+' · '+starter.inputs.map(i=>i.qty+' '+(
+   i.id==='wolf_pelt'?'pieles de lobo':'colmillos de lobo')).join(' + ')+
+   ' · '+starter.gold+' oro');
+  const material=starter.inputs.every(i=>(g.inventory?.slots?.get(i.id)||0)>=i.qty);
+  const learned=!!g.p187Professions?.state?.learned?.[prof.id];
+  tag(detail,'Estado: '+(!learned?'Aprendé el oficio hablando con Sigrid (nivel 2).':
+   material&&g.inventory.gold>=starter.gold?'Materiales listos. Hablá con Sigrid para fabricar.':
+   'Conseguí materiales cazando lobos de pradera y regresá a la forja.'));
+  tag(detail,'Cada fabricación real suma '+starter.exp+' puntos de oficio hasta el máximo. No hay recompensas por tocar esta ficha.');
+ }
  E('h3',null,'PROGRESIÓN 1–20',detail);
  for(const chapter of INICIOS_CHAPTERS_P186)
   E('p',null,chapter.levels.join('–')+' · '+chapter.title,detail);
- E('p',null,'Esta sección describe el progreso actual. No otorga materiales ni profesiones al tocarla.',detail);
+ E('p',null,'Las demás aldeas y maestros continúan pendientes hasta integrar edificios, NPC y rutas comprobables.',detail);
+ list.scrollTop=listTop;box.scrollTop=innerTop;
 }
