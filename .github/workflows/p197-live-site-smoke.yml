@@ -1,0 +1,42 @@
+name: HIGHFLY P197 · LIVE Pages Smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/p197-live-site-smoke.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check exact deployed versions, shared models and editor import map
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          base=https://drakenhok-star.github.io/HIGHFLY-ORIGIN-DEMO
+          get() {
+            curl --fail --silent --show-error --location --retry 6 \
+              --retry-delay 3 --max-time 25 "${base}$1"
+          }
+          headcheck() {
+            curl --fail --silent --show-error --location --head --retry 6 \
+              --retry-delay 3 --max-time 25 "${base}$1" >/dev/null
+          }
+          [[ "$(get /p197/BUILD_P197.txt | tr -d '\r\n')" = 0f9c3cfd3af1d8ffc2df374722502ddf1e678450 ]]
+          [[ "$(get /p194/BUILD_P194.txt | tr -d '\r\n')" = 57889b92df8b693736397a5bddb3504c9b55a7e5 ]]
+          [[ "$(get /p193/BUILD_P193.txt | tr -d '\r\n')" = 3814935442c23b2fe055f6040e0dcc5e52150e59 ]]
+          [[ "$(get /BUILD_P192.txt | tr -d '\r\n')" = 3a4aa2615bf3f0cff1958967865b18d39b9fe53b ]]
+          get /p197/ | grep -q 'HIGHFLY ORIGIN'
+          get /p197/editor.html | grep -q '../lib/three.module.js'
+          get /p197/src/core/assets.js | grep -q '../assets/models/player_barbarian.glb'
+          get /p197/src/world/claudecraft-quests-p197.js | grep -q 'cc_q_spiders'
+          get /p197/src/world/world-layout-p193.js | grep -q './assets/world-layout-p193.json'
+          get /p197/assets/world-layout-p193.json | grep -q 'schemaVersion'
+          headcheck /assets/models/player_barbarian.glb
+          headcheck /assets/models/boar_gobkit_cc0.glb
+          headcheck /lib/three.module.js
+          headcheck /basis/basis_transcoder.js
+          echo 'LIVE P197 PAGES: PASS. Playable, World Forge and shared media reachable; P192/P193/P194 exact builds retained.'
