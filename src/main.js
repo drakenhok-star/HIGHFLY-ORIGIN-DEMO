@@ -40,6 +40,7 @@ import { P187ProfessionRuntime } from './world/professions-runtime-p187.js';
 import {P192Hamlets} from './world/hamlets-p192.js';
 import {installCentralTownP194} from './world/central-town-p194.js';
 import {loadWorldLayoutP193, applyCentralLayoutP193} from './world/world-layout-p193.js';
+import {prepareEditorEnvironmentP195} from './editor/editor-environment-p195.js';
 import { P187VillageGuide } from './ui/inicios-guide-p187.js';
 import { consumeP186TransferFromUrl } from './ui/p186-profile.js';
 
@@ -392,6 +393,7 @@ const game = new Game(assets,worldLayoutP193);
 applyCentralLayoutP193(game);
 installCentralTownP194(game); // one safe town, real 13 trainers; no satellite buildings
 if(game.p193EditorMode)game.terrain.prewarmCentralEditorP194();
+if(game.p193EditorMode)prepareEditorEnvironmentP195(game);
 if(game.p183cEnabled && !game.p193EditorMode)installBiomeTourP183c(game);
 if(game.p193EditorMode){
   game.setState('world_editor');
