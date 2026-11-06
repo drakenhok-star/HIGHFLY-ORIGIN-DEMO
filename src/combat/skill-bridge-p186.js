@@ -552,7 +552,7 @@ export class P186CombatBridge{
     HIGHFLY_SKILL_EXPORT_L26.find(s=>s.kit===KITS[this.style]&&s.slot===slot);
    const remaining=sk?Math.ceil(Math.max(0,(this.cooldowns[sk.id]||0)-now)):0;
    const title=sk?(sk.name.length>10?sk.name.split(' ')[0]:sk.name):'VACÍA';
-   const label='S'+slot+'\\n'+title+(remaining?'\\n'+remaining+'s':'');
+   const label='S'+slot+'\n'+title+(remaining?'\n'+remaining+'s':'');
    // Never rebuild DOM on every frame: write only when the visible text changes.
    if(btn.textContent!==label)btn.textContent=label;
    btn.classList.toggle('hf-p5-locked',!sk);
