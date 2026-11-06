@@ -139,7 +139,15 @@ export class NPCs {
         });
       }
     }
+    this.addClaudeQuestOptionsP197(npc,dialogue);
     this.game.menus.showDialogue(dialogue);
+  }
+
+  addClaudeQuestOptionsP197(npc,dialogue){
+    const bridge=this.game.quests.claudeP197;
+    if(!bridge||!dialogue||!Array.isArray(dialogue.options))return;
+    const offers=bridge.dialogueOptions(npc.id,()=>this.startDialogue(npc));
+    if(offers.length)dialogue.options.splice(Math.max(0,dialogue.options.length-1),0,...offers);
   }
 
   hamletDialogueP192(npc){
