@@ -272,6 +272,24 @@ export class Terrain {
     }
   }
 
+  /**
+   * P194 editor: complete the four real terrain chunks crossing the central
+   * village BEFORE the first render. The original P161 incremental queue is
+   * excellent for gameplay but too slow in an idle/on-demand world editor.
+   * These are finished terrain meshes, not visual stand-ins.
+   */
+  prewarmCentralEditorP194() {
+    if(!this.game.p193EditorMode)return;
+    if(this._p161ChunkJob){
+      this._p161ChunkJob.geo.dispose();
+      this._p161ChunkJob=null;
+      if(this.p161TerrainStats)this.p161TerrainStats.pending=false;
+    }
+    for(const [cx,cz] of [[0,0],[-1,0],[0,-1],[-1,-1]]){
+      if(!this.chunks.has(cx+','+cz))this._buildChunk(cx,cz);
+    }
+  }
+
   update(dt) {
     const p = this.game.p193EditorMode && window.highflyWorldEditorP193?.focus ?
       window.highflyWorldEditorP193.focus :
