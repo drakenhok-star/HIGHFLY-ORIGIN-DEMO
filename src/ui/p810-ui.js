@@ -64,6 +64,8 @@ export class HighflyP810{
   this.editor.register('bag',bag);
   const menu=node('button','hf-p810-control hf-p810-icon','✥\nMENÚ',root);
   menu.type='button';menu.id='hf-p810-menu';
+  // Above the radar in stacking order, even with a personally edited HUD.
+  menu.style.setProperty('z-index','77','important');
   menu.addEventListener('pointerdown',e=>{
    if(this.editor.editing)return;
    e.preventDefault();e.stopPropagation();this.toggleQuickMenu();
@@ -115,6 +117,7 @@ export class HighflyP810{
  toggleQuickMenu(on){
   const next=on===undefined?!this.quickOpen:Boolean(on);
   if(next && this.game.state!=='playing')return;
+  if(next&&this.game.worldMapP34?.opened)this.game.worldMapP34.toggle(false);
   this.quickOpen=next;this.quick.classList.toggle('open',next);
  }
  mountMap(){
