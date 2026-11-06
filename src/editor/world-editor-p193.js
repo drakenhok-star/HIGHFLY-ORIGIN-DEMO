@@ -5,6 +5,7 @@
  * Editor controls use a separate top-down/orbit camera and a versioned JSON draft.
  */
 import * as THREE from 'three';
+import {installEditorSpawnHandlesP196} from './spawn-markers-p196.js';
 import {emptyWorldLayoutP193,normalizeWorldLayoutP193,WORLD_FORGE_DRAFT_KEY_P195,
   safeTransformP193,P193_LIBRARY,P193_REFERENCE_MODELS,spawnAddedP193,adjustHouseP193} from '../world/world-layout-p193.js';
 
@@ -73,6 +74,7 @@ export class WorldEditorP193{
   this.raycaster=new THREE.Raycaster();this.pointer=new THREE.Vector2();
   this.g.renderer.domElement.style.touchAction='none';
   this.materializeHamlets();
+  installEditorSpawnHandlesP196(game);
   this.mountUI();
   this.scan();
   this.captureHistory();
@@ -176,6 +178,7 @@ export class WorldEditorP193{
   for(const f of this.g.p194CentralTown?.features||[]){
     put(f.id,f.label,'model',f.group,f);
   }
+  for(const s of this.g.p196SpotMarkers||[]){put(s.id,s.label,'model',s.group,s);}
   for(const [id,site] of this.g.p192Hamlets?.sites||[]){
     put('hub:'+id,site.hub.name,'hub',null,site);
     (site.houses||[]).forEach((o,i)=>{
@@ -324,7 +327,8 @@ export class WorldEditorP193{
       }
     }
   }else{
-    const y=h.id==='p194:pier'?this.g.terrain.waterY+1.05:this.g.terrain.getHeight(x,z);
+    const y=h.id==='p194:pier'?this.g.terrain.waterY+1.05:
+      this.g.terrain.getHeight(x,z)+(h.id.startsWith('p196:spot:')?.3:0);
     h.object.position.set(x,y,z);
     if(h.ref?.wander){h.ref.wander.homeX=x;h.ref.wander.homeZ=z;h.ref.wander.target=null;}
   }
