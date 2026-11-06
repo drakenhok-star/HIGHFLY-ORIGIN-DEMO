@@ -147,11 +147,13 @@ export class P186CombatBridge{
   if(!sk){this.message('Primero descubrí, aprendé y equipá una habilidad');return;}
   if(this.pendingAim)this.cancelAim();
   const now=this.now();
-  if(now<(this.cooldowns[sk.id]||0)){
+  const recast=this.recast&&this.recast.slot===sk.slot&&
+   this.recast.style===KITS.indexOf(sk.kit)&&now<=this.recast.until;
+  if(!recast&&now<(this.cooldowns[sk.id]||0)){
    this.message('Skill en cooldown');return;
   }
   const stats=this.game.stats;
-  if((sk.resource==='MP'?stats.mp:stats.sp)<sk.cost){
+  if(!recast&&(sk.resource==='MP'?stats.mp:stats.sp)<sk.cost){
    this.message('No tenés suficiente '+(sk.resource==='MP'?'maná':'energía'));return;
   }
   const dir=this.facing();
