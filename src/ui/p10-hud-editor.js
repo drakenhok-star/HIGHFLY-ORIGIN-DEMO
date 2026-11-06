@@ -96,19 +96,35 @@ export class HudEditorP10{
    input.type='range';input.min=String(min);input.max=String(max);input.step=String(step);
    input.addEventListener('input',()=>onInput(Number(input.value)));return input;
   };
-  this.size=makeSlider('TAMAÑO',28,230,1,v=>this.change('size',v));
+  this.size=makeSlider('TAMAÑO %',50,200,5,v=>{
+   this.change('size',Math.round(HUD_DEFAULTS[this.selected].size*v/100));
+   this.sizeHint.textContent=v+'%';
+  });
+  this.sizeHint=node('strong',null,'100%',row);
   this.opacity=makeSlider('OPACIDAD',.25,1,.05,v=>this.change('opacity',v));
   const buttons=node('div','hf-p10-editor-buttons',undefined,this.panel);
   const action=(text,fn)=>{const b=node('button',null,text,buttons);b.type='button';b.addEventListener('click',fn);};
   action('CENTRAR SELECCIÓN',()=>{this.change('x',.5);this.change('y',.48);});
   action('RESTAURAR TODO',()=>{this.layout=sanitizeHudLayout();this.apply();this.choose(this.selected);this.persist();});
+  action('IGUALAR S1–S6',()=>{
+   const px=this.layout[this.selected]?.size||HUD_DEFAULTS.s1.size;
+   for(let i=1;i<=6;i++){
+    const key='s'+i;this.layout[key].size=px;
+    this.applyOne(key);
+   }
+   this.persist();
+   this.game.hud.notify('S1–S6 igualadas a '+px+' px');
+  });
   action('GUARDAR',()=>{this.persist();this.game.hud.notify('HUD guardado');});
   this.caption=node('div','hf-p10-editor-hint','Arrastrá los botones directamente. También podés modificar tamaño y opacidad.',this.panel);
   this.choose('atk');
  }
  choose(id){
   if(!this.layout[id])return;
-  this.selected=id;this.select.value=id;this.size.value=String(this.layout[id].size);
+  this.selected=id;this.select.value=id;
+  const percentage=Math.round(100*this.layout[id].size/HUD_DEFAULTS[id].size);
+  this.size.value=String(Math.min(200,Math.max(50,percentage)));
+  this.sizeHint.textContent=percentage+'%';
   this.opacity.value=String(this.layout[id].opacity);
   this.apply();
  }
