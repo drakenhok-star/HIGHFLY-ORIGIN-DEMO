@@ -1,0 +1,40 @@
+name: P193 World Editor checks
+on:
+  push:
+    branches: [p193-world-editor-poc-20261106]
+  pull_request:
+    branches: [p192-pueblitos-crafting-log-20261106]
+permissions:
+  contents: read
+jobs:
+  syntax-and-layout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Check all editor and runtime JavaScript syntax
+        run: |
+          set -euo pipefail
+          for path in src/main.js src/world/world-layout-p193.js src/world/hamlets-p192.js src/editor/world-editor-p193.js; do
+            node --input-type=module --check < "$path"
+          done
+      - name: Validate checked-in layout and adapters
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          const raw=JSON.parse(fs.readFileSync('assets/world-layout-p193.json','utf8'));
+          assert.equal(raw.schemaVersion,193);
+          assert.equal(raw.worldId,'village_01');
+          assert.ok(Array.isArray(raw.added));
+          assert.equal(raw.added.length,0,'Initial editor must not overwrite the real P192 world');
+          const main=fs.readFileSync('src/main.js','utf8');
+          const ham=fs.readFileSync('src/world/hamlets-p192.js','utf8');
+          assert.ok(main.includes('loadWorldLayoutP193()'));
+          assert.ok(main.includes('applyCentralLayoutP193(game)'));
+          assert.ok(main.includes("import('./editor/world-editor-p193.js')"));
+          assert.ok(ham.includes('siteForP193(game,hub.id,computed)'));
+          assert.ok(ham.includes('entityForP193(g,id)'));
+          console.log('P193 OK · layout non destructive · P192 runtime integrated');
+          NODE
