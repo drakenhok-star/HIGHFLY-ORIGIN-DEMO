@@ -7,6 +7,7 @@
  */
 import * as THREE from 'three';
 import {HIGHFLY_SKILL_EXPORT_L26} from '../skillslab/skill-catalog-export-l26.js';
+import {AimPreviewP188,aimDirectionFromDragP188,previewPointP188,AIM_SPECS_P188} from './aim-preview-p188.js';
 import {TianjieSkillVfx} from '../skillslab/lab-vfx.js';
 import {L25PremiumSkillVfx} from '../skillslab/premium-vfx-l25.js';
 import {ClaudeVfxL26} from '../skillslab/claudecraft-vfx-l26.js';
@@ -61,8 +62,13 @@ export class P186CombatBridge{
   this.prevState='';this._cameraApplied=false;
   this.airHits={enemy:null,count:0,lastAt:-999};
   this.enabled=true;this._uiRefresh=0;
+  this.preview=game.p188Build?new AimPreviewP188(game):null;
+  this.pendingAim=null;this.cancelButton=null;
   installP186VisualSafety();
   document.addEventListener('pointerdown',e=>this.onPointer(e),true);
+  document.addEventListener('pointermove',e=>this.onAimMove(e),true);
+  document.addEventListener('pointerup',e=>this.onAimEnd(e),true);
+  document.addEventListener('pointercancel',e=>this.onAimEnd(e,true),true);
   document.addEventListener('keydown',e=>this.onKey(e),true);
  }
  loadStyle(){
@@ -132,8 +138,80 @@ export class P186CombatBridge{
   for(const [cls,slot] of [['.hf-p5-s1',1],['.hf-p5-s2',2],['.hf-p5-s3',3]]){
    if(!target.matches(cls))continue;
    event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+   if(g.p188Build){this.beginAim(slot,event);return;}
    this.cast(slot);return;
   }
+ }
+ beginAim(slot,event){
+  const sk=this.game.p188Skills?.selected(slot);
+  if(!sk){this.message('Primero descubrí, aprendé y equipá una habilidad');return;}
+  if(this.pendingAim)this.cancelAim();
+  const now=this.now();
+  if(now<(this.cooldowns[sk.id]||0)){
+   this.message('Skill en cooldown');return;
+  }
+  const stats=this.game.stats;
+  if((sk.resource==='MP'?stats.mp:stats.sp)<sk.cost){
+   this.message('No tenés suficiente '+(sk.resource==='MP'?'maná':'energía'));return;
+  }
+  const dir=this.facing();
+  this.pendingAim={pointerId:event.pointerId,slot,skillId:sk.id,
+   startX:event.clientX,startY:event.clientY,x:event.clientX,y:event.clientY,dir};
+  try{event.target.setPointerCapture?.(event.pointerId);}catch(_){}
+  this.preview?.begin(sk);
+  this.preview?.update(this.game.player.pos,dir);
+  this.ensureCancelButton();
+  this.cancelButton.style.display='flex';
+ }
+ ensureCancelButton(){
+  if(this.cancelButton)return;
+  const b=document.createElement('button');
+  b.id='hf-p188-skill-cancel';b.type='button';b.textContent='✕ CANCELAR';
+  b.setAttribute('aria-label','Cancelar habilidad sin gastar maná ni energía');
+  b.style.cssText='position:fixed;z-index:300;top:31%;right:17%;'+
+   'width:105px;height:39px;display:none;align-items:center;justify-content:center;'+
+   'border:2px solid #ff859d;background:#491735eb;color:#fff;border-radius:10px;'+
+   'font:800 11px system-ui;touch-action:none;pointer-events:auto';
+  b.addEventListener('pointerdown',e=>{
+   e.preventDefault();e.stopPropagation();
+   this.cancelAim();
+  });
+  document.body.appendChild(b);this.cancelButton=b;
+ }
+ onAimMove(event){
+  const p=this.pendingAim;
+  if(!p||event.pointerId!==p.pointerId)return;
+  event.preventDefault();
+  p.x=event.clientX;p.y=event.clientY;
+  const f=this.game.camera.getWorldDirection(V());
+  p.dir=aimDirectionFromDragP188(p.startX,p.startY,p.x,p.y,f,this.facing());
+  this.preview?.update(this.game.player.pos,p.dir);
+ }
+ onAimEnd(event,cancelled=false){
+  const p=this.pendingAim;
+  if(!p||event.pointerId!==p.pointerId)return;
+  event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+  if(cancelled||this.game.state!=='playing'){
+   this.cancelAim();return;
+  }
+  const bounds=this.cancelButton?.getBoundingClientRect();
+  if(bounds&&event.clientX>=bounds.left&&event.clientX<=bounds.right&&
+    event.clientY>=bounds.top&&event.clientY<=bounds.bottom){
+    this.cancelAim();return;
+  }
+  p.x=event.clientX;p.y=event.clientY;
+  const f=this.game.camera.getWorldDirection(V());
+  p.dir=aimDirectionFromDragP188(p.startX,p.startY,p.x,p.y,f,this.facing());
+  const skill=this.game.p188Skills?.selected(p.slot);
+  const spec=AIM_SPECS_P188[skill?.id];
+  const aim={direction:p.dir,target:previewPointP188(this.game.player.pos,p.dir,spec,this.game.terrain)};
+  this.cancelAim();
+  if(skill?.id===p.skillId)this.cast(p.slot,aim);
+ }
+ cancelAim(){
+  this.pendingAim=null;
+  this.preview?.stop();
+  if(this.cancelButton)this.cancelButton.style.display='none';
  }
  onKey(event){
   if(this.game.state!=='playing'||this.game.input.hudEditing||event.repeat)return;
@@ -142,35 +220,40 @@ export class P186CombatBridge{
   event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
   this.cast(key);
  }
- cast(slot){
-  const g=this.game,now=this.now(),pos=this.playersAt(),dir=this.facing();
-  const oldRecast=this.recast&&this.recast.slot===slot&&
-   this.recast.style===this.style&&now<=this.recast.until;
-  let skill;
-  if(oldRecast){skill=HIGHFLY_SKILL_EXPORT_L26.find(s=>s.kit===KITS[this.style]&&s.slot===slot);}
-  else{
-   const verdict=p186CanCast(slot,KITS[this.style],g.stats,this.cooldowns,now);
-   if(!verdict.ok){
-    if(verdict.reason==='resource')this.message('No tenés suficiente '+verdict.skill.resource);
-    else if(verdict.reason==='cooldown')this.message('Skill en cooldown');
-    return false;
+ cast(slot,aim=null){
+  const g=this.game,now=this.now(),pos=this.playersAt();
+  const skill=g.p188Build?g.p188Skills?.selected(slot):
+   HIGHFLY_SKILL_EXPORT_L26.find(s=>s.kit===KITS[this.style]&&s.slot===slot);
+  if(!skill){
+   this.message('Esta ranura no tiene una habilidad aprendida y equipada');
+   return false;
+  }
+  // A loadout may equip any of the fifteen styles; each ability retains its
+  // original internal skill slot and family for correct damage and VFX.
+  const style=KITS.indexOf(skill.kit);
+  if(style<0)return false;
+  const dir=aim?.direction?.clone()?.setY(0)?.normalize()||this.facing();
+  const skillSlot=skill.slot;
+  const oldRecast=this.recast&&this.recast.slot===skillSlot&&
+   this.recast.style===style&&now<=this.recast.until;
+  if(!oldRecast){
+   if(now<(this.cooldowns[skill.id]||0)){
+    this.message('Skill en cooldown');return false;
    }
-   skill=verdict.skill;
-   if(skill.resource==='MP'? !g.stats.useMagicka(skill.cost):!g.stats.useStamina(skill.cost))
-    return false;
+   const left=skill.resource==='MP'?g.stats.mp:g.stats.sp;
+   if(left<skill.cost){this.message('No tenés suficiente '+(skill.resource==='MP'?'maná':'energía'));return false;}
+   if(skill.resource==='MP'?!g.stats.useMagicka(skill.cost):!g.stats.useStamina(skill.cost))return false;
    this.cooldowns[skill.id]=now+skill.cd;
   }
-  if(!skill)return false;
   if(oldRecast)this.recast=null;
-  if(skill.resource==='MP'){
-   g.player.castT=0;g.player._castAnimStarted=false;
-  }
-  this.execute(this.style,slot,pos,dir,oldRecast);
-  if(this.style<3)this.premium.onCast(this.style,slot,pos,dir);
+  if(skill.resource==='MP'){g.player.castT=0;g.player._castAnimStarted=false;}
+  const target=aim?.target||null;
+  this.execute(style,skillSlot,pos,dir,oldRecast,target);
+  if(style<3)this.premium.onCast(style,skillSlot,pos,dir);
   this.drawSkillButtons();
   return true;
  }
- execute(style,slot,pos,dir,recast){
+ execute(style,slot,pos,dir,recast,aimTarget=null){
   const g=this.game,fx=this.fx,cf=this.claude;
   const ahead=(range)=>pos.clone().addScaledVector(dir,range);
   if(style===0){
@@ -261,7 +344,7 @@ export class P186CombatBridge{
     const aim=airborne?this.targetPoint(airborne).sub(start).normalize():dir;
     this.spawnBolt(start,aim,3,75,23,73,{burn:4});
    }else if(slot===2){
-    const target=ahead(12.5);target.y=this.ground(target.x,target.z);
+    const target=aimTarget?.clone()||ahead(12.5);target.y=this.ground(target.x,target.z);
     fx.meteorWarning(target,4);fx.fallingMeteor(target,.75);
     cf.meteorSkybeam(target,.75);
     this.schedule(.75,()=>{
@@ -412,7 +495,7 @@ export class P186CombatBridge{
   if(!this.menuInstalled&&ui.quick){
    this.menuInstalled=true;
    const open=document.createElement('button');
-   open.type='button';open.textContent='⚔ ESTILOS · 15 SKILLS';
+   open.type='button';open.textContent=g.p188Build?'📖 LIBRO DE HABILIDADES':'⚔ ESTILOS · 15 SKILLS';
    ui.quick.appendChild(open);
    ui.quickNav?.addAction(open,'combate');
    open.addEventListener('click',()=>{
@@ -424,6 +507,7 @@ export class P186CombatBridge{
   this.drawSkillButtons();
  }
  openStyleMenu(){
+  if(this.game.p188Build){this.game.touch?.premium?.show('skills');return;}
   if(this.stylePanel){this.stylePanel.remove();this.stylePanel=null;return;}
   const panel=document.createElement('div');panel.id='hf-p186-styles';
   panel.style.cssText='position:fixed;z-index:250;right:5%;top:7%;width:330px;max-width:88vw;max-height:82vh;overflow-y:auto;touch-action:pan-y;background:#140d36f5;border:2px solid #a978ff;border-radius:16px;color:white;padding:12px;font:700 13px system-ui;display:flex;flex-direction:column;gap:7px';
@@ -460,15 +544,18 @@ export class P186CombatBridge{
  }
  drawSkillButtons(){
   if(!this.game.touch?.premium?.p810)return;
-  const kit=KITS[this.style],now=this.now();
-  for(const sk of HIGHFLY_SKILL_EXPORT_L26.filter(s=>s.kit===kit)){
-   const btn=this.game.touch.root.querySelector('.hf-p5-s'+sk.slot);
+  const g=this.game,now=this.now();
+  for(let slot=1;slot<=3;slot++){
+   const btn=g.touch.root.querySelector('.hf-p5-s'+slot);
    if(!btn)continue;
-   const t=Math.ceil(Math.max(0,(this.cooldowns[sk.id]||0)-now));
-   const short={1:'S1',2:'S2',3:'S3'}[sk.slot];
-   const title=sk.name.length>10?sk.name.split(' ')[0]:sk.name;
-   const copy=short+'\n'+title+(t?'\n'+t+'s':'');
-   if(btn.textContent!==copy)btn.textContent=copy;
+   const sk=g.p188Build?g.p188Skills?.selected(slot):
+    HIGHFLY_SKILL_EXPORT_L26.find(s=>s.kit===KITS[this.style]&&s.slot===slot);
+   const remaining=sk?Math.ceil(Math.max(0,(this.cooldowns[sk.id]||0)-now)):0;
+   const title=sk?(sk.name.length>10?sk.name.split(' ')[0]:sk.name):'VACÍA';
+   const label='S'+slot+'\\n'+title+(remaining?'\\n'+remaining+'s':'');
+   // Never rebuild DOM on every frame: write only when the visible text changes.
+   if(btn.textContent!==label)btn.textContent=label;
+   btn.classList.toggle('hf-p5-locked',!sk);
   }
  }
  renderFocus(){
@@ -484,6 +571,7 @@ export class P186CombatBridge{
   this.ensureHud();
  }
  reset(){
+  this.cancelAim();
   this.recast=null;this.focus=null;
   this.airHits={enemy:null,count:0,lastAt:-999};
   this.cooldowns=Object.create(null);this.tasks.length=0;
@@ -493,7 +581,7 @@ export class P186CombatBridge{
  }
  update(dt){
   const g=this.game;
-  if(g.state!=='playing'){this.prevState=g.state;return;}
+  if(g.state!=='playing'){if(this.pendingAim)this.cancelAim();this.prevState=g.state;return;}
   if(this.prevState!=='playing')this.enterPlaying();
   this._uiRefresh+=dt;
   if(this._uiRefresh>.35){
@@ -507,6 +595,7 @@ export class P186CombatBridge{
    this.tasks.splice(i,1);task.fn();
   }
   this.updateShots(dt);
+  if(this.pendingAim)this.preview?.update(g.player.pos,this.pendingAim.dir);
   this.fx.setQuality(g.performanceP2?.preset==='FLUID'?0:1);
   this.fx.update(dt);
  }
