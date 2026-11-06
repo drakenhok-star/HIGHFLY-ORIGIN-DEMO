@@ -38,12 +38,15 @@ import {SkillProgressP190} from './combat/skill-progression-p190.js';
 import {GpuDiagnosticsP188} from './ui/gpu-diagnostics-p188.js';
 import { P187ProfessionRuntime } from './world/professions-runtime-p187.js';
 import {P192Hamlets} from './world/hamlets-p192.js';
+import {loadWorldLayoutP193, applyCentralLayoutP193} from './world/world-layout-p193.js';
 import { P187VillageGuide } from './ui/inicios-guide-p187.js';
 import { consumeP186TransferFromUrl } from './ui/p186-profile.js';
 
 class Game {
-  constructor(assets) {
+  constructor(assets,worldLayoutP193) {
     this.assets = assets;
+    this.worldLayoutP193=worldLayoutP193;
+    this.p193EditorMode=new URLSearchParams(location.search).has('hf_world_editor');
     this.worldSeed = 1337;
     this.state = 'menu';
     this.time = { elapsed: 0, dayTime: 0.35, dayLength: 600 };
@@ -382,10 +385,19 @@ try {
   throw err;
 }
 
-const game = new Game(assets);
-if(game.p183cEnabled)installBiomeTourP183c(game);
-game.setState('menu');
-game.menus.showMain();
+const worldLayoutP193=await loadWorldLayoutP193();
+const game = new Game(assets,worldLayoutP193);
+applyCentralLayoutP193(game);
+if(game.p183cEnabled && !game.p193EditorMode)installBiomeTourP183c(game);
+if(game.p193EditorMode){
+  game.setState('world_editor');
+  game.menus.hideAll();
+  const {installWorldEditorP193}=await import('./editor/world-editor-p193.js');
+  installWorldEditorP193(game);
+}else{
+  game.setState('menu');
+  game.menus.showMain();
+}
 window.game = game;
 
 const clock = new THREE.Clock();
