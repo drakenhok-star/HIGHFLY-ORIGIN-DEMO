@@ -151,6 +151,7 @@ try{
     trainers:g.npcs.list.filter(n=>n.p192TrainerId).length,
     townAudit:g.p196TownAudit,
     enemySpots:g.enemies.p196Spots||[],
+    boarSpotCenter:g.enemies.p196Spots?.find(s=>s.id==='boar_meadow_p196')?.center||null,
     lanterns:g.p194CentralTown.features.filter(f=>f.id.startsWith('p196:lantern:')).length,
     outlyingBuildings:[...g.p192Hamlets.sites.values()]
       .reduce((sum,v)=>sum+v.houses.filter(Boolean).length,0),
