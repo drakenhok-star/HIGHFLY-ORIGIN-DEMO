@@ -279,6 +279,38 @@ try{
  assert.equal(save.key,'highfly_p190_save');
  assert.equal(save.oldUnchanged,true,'old game keys never overwritten');
  assert.equal(save.learned,true);assert.equal(save.equipped,'woc_fireball');
+ const sigrid=await page.evaluate(()=>{
+  const g=window.game,npc=g.npcs.list.find(n=>n.id==='sigrid'),inv=g.inventory;
+  const original={pos:g.player.pos.clone(),level:g.stats.level,
+   pelt:inv.slots.get('wolf_pelt')||0,armor:inv.slots.get('hide_armor')||0,gold:inv.gold};
+  const originalDialogue=g.menus.showDialogue;
+  let supplied=null,got=null;
+  try{
+   g.stats.level=8;g.player.pos.copy(npc.pos);
+   g.p187Professions.learnAtTrainer('armorcrafting','sigrid');
+   inv.slots.set('wolf_pelt',2);inv.gold=100;
+   g.menus.showDialogue=(d)=>{supplied=d.options;};
+   g.npcs.startDialogue(npc);
+   const option=supplied?.find(x=>x.label.includes('Confeccionar armadura de cazador'));
+   const before=inv.slots.get('hide_armor')||0;
+   const expBefore=g.p187Professions.state.experience.armorcrafting;
+   option?.action();
+   got={found:!!option,crafted:(inv.slots.get('hide_armor')||0)===before+1,
+    exp:g.p187Professions.state.experience.armorcrafting-expBefore,
+    cost:100-inv.gold,consumed:inv.slots.get('wolf_pelt')===0,
+    saved:!!JSON.parse(localStorage.getItem('highfly_p190_save')).professionsP187};
+  }finally{
+   g.menus.showDialogue=originalDialogue;
+   g.player.pos.copy(original.pos);g.stats.level=original.level;
+   inv.slots.set('wolf_pelt',original.pelt);
+   inv.slots.set('hide_armor',original.armor);
+   inv.gold=original.gold;g.setState('playing');
+  }
+  return got;
+ });
+ assert.ok(sigrid.found&&sigrid.crafted&&sigrid.consumed&&sigrid.saved);
+ assert.equal(sigrid.cost,20);
+ assert.equal(sigrid.exp,3);
  await mkdir('audit-output',{recursive:true});
  try{await page.screenshot({path:'audit-output/p191-landscape.png',timeout:15000,animations:'disabled'});}
  catch(e){console.log('Screenshot issue:',e.message);}
