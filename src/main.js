@@ -61,6 +61,7 @@ class Game {
     this.p183Build=true; // new isolated save; prior P18.2 state read-only
     this.p187Build=true; // P187 compatibility (P185 world remains active)
     this.p188Build=true; // independent P188 save and RPG skill discovery
+    this.p189Build=true; // L27 real aim + editor refinement, same protected P188 save
     this.p183Enabled=!new URLSearchParams(location.search).has('hf_p183_off');
     this.p183bEnabled=this.p183Enabled&&!new URLSearchParams(location.search).has('hf_p183b_off');
     this.p183cEnabled=this.p183bEnabled&&!new URLSearchParams(location.search).has('hf_p183c_off');

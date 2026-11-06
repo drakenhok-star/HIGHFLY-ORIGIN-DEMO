@@ -28,6 +28,7 @@ export class HudEditorP10{
   el.dataset.hfHudId=id;
   this.elements.set(id,el);
   if(id==='focus'&&this.focusOption){this.focusOption.hidden=false;this.focusOption.disabled=false;}
+  if(id==='skillCancel'&&this.skillCancelOption){this.skillCancelOption.hidden=false;this.skillCancelOption.disabled=false;}
   this.applyOne(id);
  }
  applyOne(id){
@@ -40,7 +41,7 @@ export class HudEditorP10{
     ['opacity',String(it.opacity)],['display',it.hidden?'none':(id==='combo'&&this.game.p14Enabled&&!el.textContent?'none':(id==='header'||id==='combo'||id==='perf'||id==='joy'?'block':'flex'))]]){
     el.style.setProperty(k,v,'important');
   }
-  if(['radar','joy','run','jump','dash','use','s1','atk','s2','s3','s4','lock','next','clear','bag','menu','focus'].includes(id)){
+  if(['radar','joy','run','jump','dash','use','s1','atk','s2','s3','s4','lock','next','clear','bag','menu','focus','skillCancel'].includes(id)){
    el.style.setProperty('width',p.size+'px','important');
    el.style.setProperty('height',p.size+'px','important');
   }else if(id==='combo'||id==='perf'||id==='header'){
@@ -48,6 +49,12 @@ export class HudEditorP10{
    el.style.setProperty('height','auto','important');
   }
   el.classList.toggle('hf-p10-selected',this.editing && this.selected===id);
+  if(id==='skillCancel'){
+   // Editing shows the movable ring; in gameplay only active skill-aim shows it.
+   const visible=this.editing||!!this.game.p186Skills?.pendingAim;
+   el.style.setProperty('visibility',visible?'visible':'hidden','important');
+   el.style.setProperty('pointer-events',visible?'auto':'none','important');
+  }
  }
  apply(){for(const id of this.elements.keys())this.applyOne(id);}
  persist(){
@@ -71,11 +78,12 @@ export class HudEditorP10{
   this.select=node('select',null,undefined,label);
   const NAMES={joy:'JOYSTICK',run:'CORRER',jump:'SALTO',dash:'DASH',use:'USAR',
    s1:'S1 MAGIA',s2:'S2 FUS',s3:'S3 HIELO',s4:'S4 WULD',atk:'ATK',
-   lock:'FIJAR',next:'SIGUIENTE',clear:'CANCELAR',radar:'RADAR',perf:'FPS/GPU',
+   lock:'FIJAR',next:'SIGUIENTE',clear:'BORRAR OBJETIVO',skillCancel:'✕ CANCELAR SKILL',radar:'RADAR',perf:'FPS/GPU',
    bag:'MOCHILA',menu:'MENÚ',focus:'ENFOCAR VOLADOR',combo:'COMBO',header:'HP / MP'};
   for(const id of HUD_IDS){
    const opt=node('option',null,NAMES[id]||id,this.select);opt.value=id;
    if(id==='focus'){this.focusOption=opt;opt.hidden=true;opt.disabled=true;}
+   if(id==='skillCancel'){this.skillCancelOption=opt;opt.hidden=true;opt.disabled=true;}
   }
   this.select.addEventListener('change',()=>this.choose(this.select.value));
   const makeSlider=(text,min,max,step,onInput)=>{
