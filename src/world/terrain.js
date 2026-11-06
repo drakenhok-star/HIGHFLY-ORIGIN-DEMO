@@ -229,12 +229,13 @@ export class Terrain {
   }
 
   _updateBudgetedTerrain(ccx, ccz) {
+    const viewRadius=this.game.p193EditorMode?1:VIEW_RADIUS;
     let job = this._p161ChunkJob;
     // If player crosses into a not-yet-built chunk, it must take priority
     // over an unfinished distant chunk; this avoids extending near-field gaps.
     const centerMissing = !this.chunks.has(ccx + ',' + ccz);
     if (job && (
-      Math.max(Math.abs(job.cx - ccx), Math.abs(job.cz - ccz)) > VIEW_RADIUS + 1 ||
+      Math.max(Math.abs(job.cx - ccx), Math.abs(job.cz - ccz)) > viewRadius + 1 ||
       (centerMissing && (job.cx !== ccx || job.cz !== ccz))
     )) {
       // Teleports cancel unfinished geometry so stale work never leaks resources.
@@ -245,7 +246,7 @@ export class Terrain {
       job = null;
     }
     if (!job) {
-      for (let ring = 0; ring <= VIEW_RADIUS && !job; ring++) {
+      for (let ring = 0; ring <= viewRadius && !job; ring++) {
         for (let cx = ccx - ring; cx <= ccx + ring && !job; cx++) {
           for (let cz = ccz - ring; cz <= ccz + ring; cz++) {
             if (Math.max(Math.abs(cx - ccx), Math.abs(cz - ccz)) !== ring) continue;
@@ -263,7 +264,7 @@ export class Terrain {
     for (const [key, mesh] of this.chunks) {
       const dx = Math.abs(mesh.userData.cx - ccx);
       const dz = Math.abs(mesh.userData.cz - ccz);
-      if (Math.max(dx, dz) > VIEW_RADIUS + 1) {
+      if (Math.max(dx, dz) > viewRadius + 1) {
         this.game.scene.remove(mesh);
         mesh.geometry.dispose();
         this.chunks.delete(key);
@@ -272,7 +273,10 @@ export class Terrain {
   }
 
   update(dt) {
-    const p = this.game.player ? this.game.player.pos : this.game.camera.position;
+    const p = this.game.p193EditorMode && window.highflyWorldEditorP193?.focus ?
+      window.highflyWorldEditorP193.focus :
+      (this.game.player ? this.game.player.pos : this.game.camera.position);
+    const viewRadius=this.game.p193EditorMode?1:VIEW_RADIUS;
     const ccx = Math.floor(p.x / CHUNK);
     const ccz = Math.floor(p.z / CHUNK);
 
@@ -282,7 +286,7 @@ export class Terrain {
     }
 
     let built = 0;
-    for (let ring = 0; ring <= VIEW_RADIUS && built < BUILD_PER_FRAME; ring++) {
+    for (let ring = 0; ring <= viewRadius && built < BUILD_PER_FRAME; ring++) {
       for (let cx = ccx - ring; cx <= ccx + ring && built < BUILD_PER_FRAME; cx++) {
         for (let cz = ccz - ring; cz <= ccz + ring && built < BUILD_PER_FRAME; cz++) {
           if (Math.max(Math.abs(cx - ccx), Math.abs(cz - ccz)) !== ring) continue;
@@ -297,7 +301,7 @@ export class Terrain {
     for (const [key, mesh] of this.chunks) {
       const dx = Math.abs(mesh.userData.cx - ccx);
       const dz = Math.abs(mesh.userData.cz - ccz);
-      if (Math.max(dx, dz) > VIEW_RADIUS + 1) {
+      if (Math.max(dx, dz) > viewRadius + 1) {
         this.game.scene.remove(mesh);
         mesh.geometry.dispose();
         this.chunks.delete(key);
