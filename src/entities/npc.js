@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { npcRoutineP18 } from '../world/world-registry-p18.js';
 import {SIGRID_STARTER_RECIPES_P191,craftWithSigridP191} from '../world/sigrid-forge-p191.js';
+import {openCraftPreviewP192} from '../ui/crafting-preview-p192.js';
 
 const BJORN_LINES = [
   'Dicen que vieron un dragón cerca de la torre de la montaña.',
@@ -102,14 +103,14 @@ export class NPCs {
          x.id==='wolf_pelt'?'pieles de lobo':'colmillos de lobo')).join(' + ')+
          ' + '+recipe.gold+' oro)',
         action:()=>{
+         if(this.game.p192Build){
+          openCraftPreviewP192(this,npc,recipe,
+            ()=>craftWithSigridP191(this.game,recipe.id));
+          return;
+         }
          const result=craftWithSigridP191(this.game,recipe.id);
          if(result.ok)this.startDialogue(npc);
-         else this.game.hud.notify({
-          MISSING_MATERIALS:'Necesitás los materiales indicados de lobos del mundo',
-          MISSING_GOLD:'No tenés suficiente oro',
-          PROFESSION_NOT_LEARNED:'Primero aprendé el oficio con Sigrid',
-          NOT_AT_FORGE:'Acercate a Sigrid y su forja'
-         }[result.reason]||'No se pudo realizar esa fabricación');
+         else this.game.hud.notify('No se pudo fabricar: '+result.reason);
         }
        }));
        dialogue.options=Array.isArray(dialogue.options)?
@@ -234,6 +235,19 @@ export class NPCs {
         const craft = (label, materialId, cost, resultId, doneMsg) => ({
           label,
           action: () => {
+            if(game.p192Build){
+              const recipe={id:'dragon_'+resultId,name:label.split(' (')[0],
+               inputs:[{id:materialId,qty:1}],gold:cost,result:resultId};
+              openCraftPreviewP192(this,npc,recipe,()=>{
+                const inv=game.inventory;
+                if(game.quests.getState('q3')!=='done')return {ok:false,reason:'QUEST_LOCKED'};
+                if(!inv.has(materialId)||inv.gold<cost)return {ok:false,reason:'MISSING_MATERIALS'};
+                inv.removeItem(materialId,1);inv.gold-=cost;inv.addItem(resultId,1);
+                game.audio.play('craft');game.saveSys.save({silent:true});
+                return {ok:true,itemId:resultId};
+              });
+              return;
+            }
             const inv = game.inventory;
             if (!inv.has(materialId) || inv.gold < cost) {
               game.hud.notify('No tenés materiales u oro suficientes');
