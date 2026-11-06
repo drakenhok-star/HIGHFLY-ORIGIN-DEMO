@@ -390,6 +390,13 @@ export class NPCs {
 
     for (let i = 0; i < this.list.length; i++) {
       const npc = this.list[i];
+      if(game.p192Build&&npc.p192TrainerId&&player){
+        const dx=player.pos.x-npc.pos.x,dz=player.pos.z-npc.pos.z;
+        const visible=dx*dx+dz*dz<250*250;
+        npc.group.visible=visible;
+        // Do not waste mixer/animation time simulating distant trainer rigs.
+        if(!visible)continue;
+      }
       const schedule = game.p18Enabled ? npcRoutineP18(npc.id,game.time.dayTime) : null;
 
       let moving = false;
