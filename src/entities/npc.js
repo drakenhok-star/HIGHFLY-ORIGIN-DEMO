@@ -172,6 +172,16 @@ export class NPCs {
         });
       }
     }
+    if(status==='done'){
+      for(const recipe of GEAR_RECIPES_P192.filter(r=>r.trainerId===npc.id&&
+        game.p187Professions?.isLearned(r.profession))){
+        opts.push({
+          label:'VER RECETA · '+recipe.name,
+          action:()=>openCraftPreviewP192(this,npc,recipe,
+            ()=>craftGearP192(game,npc.id,recipe.id))
+        });
+      }
+    }
     opts.push(back);
     const description=status==='available'?
       'Este pueblo necesita ayuda. '+quest.desc+' Recompensa '+quest.gold+' oro y '+quest.xp+' XP.':
