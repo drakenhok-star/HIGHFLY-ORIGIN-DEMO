@@ -39,7 +39,7 @@ try{
  assert.equal(before.state,'world_editor');
  assert.equal(before.version,194);
  assert.equal(before.waterMaterial,'MeshStandardMaterial');
- assert.equal(before.gameplayMaterial,'ShaderMaterial');
+ assert.equal(before.gameplayMaterial,'MeshPhongMaterial'); // actual original HIGHFLY water material
  assert.ok(before.sunDistance>1400 && before.moonDistance>1400,
    'Celestial discs must not remain over the island at world origin');
  assert.equal(before.moonVisible,false,'Moon should not cover a daytime town');
@@ -138,7 +138,7 @@ try{
  console.log('P195 PLAYABLE draft transfer:',JSON.stringify(actual));
  assert.equal(actual.editorEnvironment,false,
    'Playable game must keep original environment');
- assert.equal(actual.gameWaterMaterial,'ShaderMaterial');
+ assert.equal(actual.gameWaterMaterial,'MeshPhongMaterial'); // original material must remain unchanged
  assert.equal(actual.savedSchema,193);
  assert.equal(actual.trainers,13);
  assert.equal(actual.outlyingBuildings,0);
