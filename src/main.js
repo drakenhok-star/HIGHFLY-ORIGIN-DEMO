@@ -38,6 +38,7 @@ import {SkillProgressP190} from './combat/skill-progression-p190.js';
 import {GpuDiagnosticsP188} from './ui/gpu-diagnostics-p188.js';
 import { P187ProfessionRuntime } from './world/professions-runtime-p187.js';
 import {P192Hamlets} from './world/hamlets-p192.js';
+import {installCentralTownP194} from './world/central-town-p194.js';
 import {loadWorldLayoutP193, applyCentralLayoutP193} from './world/world-layout-p193.js';
 import { P187VillageGuide } from './ui/inicios-guide-p187.js';
 import { consumeP186TransferFromUrl } from './ui/p186-profile.js';
@@ -47,6 +48,7 @@ class Game {
     this.assets = assets;
     this.worldLayoutP193=worldLayoutP193;
     this.p193EditorMode=new URLSearchParams(location.search).has('hf_world_editor');
+    this.p194Build=true;
     this.worldSeed = 1337;
     this.state = 'menu';
     this.time = { elapsed: 0, dayTime: 0.35, dayLength: 600 };
@@ -83,7 +85,7 @@ class Game {
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     // P1 quality HIGH baseline: restore original render scale on Android.
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.renderer.setPixelRatio(this.p193EditorMode ? 1 : Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -95,7 +97,7 @@ class Game {
      if(saved>=.4&&saved<=1.2)exposure=saved;
     }catch(e){}
     this.renderer.toneMappingExposure=exposure;
-    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.enabled = !this.p193EditorMode; // P194 edit: no costly live shadow pass
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(this.renderer.domElement);
 
@@ -388,6 +390,7 @@ try {
 const worldLayoutP193=await loadWorldLayoutP193();
 const game = new Game(assets,worldLayoutP193);
 applyCentralLayoutP193(game);
+installCentralTownP194(game); // one safe town, real 13 trainers; no satellite buildings
 if(game.p183cEnabled && !game.p193EditorMode)installBiomeTourP183c(game);
 if(game.p193EditorMode){
   game.setState('world_editor');
@@ -403,9 +406,28 @@ window.game = game;
 const clock = new THREE.Clock();
 let splashHidden = false;
 let lastEcoFrame=0;
+let lastP194EditorFrame=0;
 
 function loop(time) {
   requestAnimationFrame(loop);
+  if(game.p193EditorMode){
+    // A world-layout editor must not simulate the RPG 60 times per second.
+    // On-demand GPU render, limited terrain streaming and zero AI/combat/VFX.
+    const editor=window.highflyWorldEditorP193;
+    const dirty=editor?.renderDirty===true;
+    if(!dirty && time-lastP194EditorFrame<650)return;
+    if(dirty && time-lastP194EditorFrame<35)return;
+    lastP194EditorFrame=time;
+    game.terrain.update(0);
+    game.renderer.render(game.scene,game.camera); // no post-processing bloom
+    if(editor)editor.renderDirty=false;
+    if(!splashHidden){
+      splashHidden=true;
+      game.menus.hideSplash?.();
+      assetSplash.div.remove();
+    }
+    return;
+  }
   if(game.p812Enabled && game.p812Eco && game.touch?.enabled){
     // Skip world and GPU render together, never run physics with a fake tiny dt.
     // 30 fps saves energy while the existing 30-40 fps phone cannot sustain 60.
