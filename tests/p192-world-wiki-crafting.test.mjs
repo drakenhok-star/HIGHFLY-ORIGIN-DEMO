@@ -10,6 +10,8 @@ import {P192Hamlets,HAMLET_QUESTS_P192,P192_TRAINER_MODELS,
 import {INICIOS_HUBS_P186,INICIOS_TRAINERS_P186,
  INICIOS_PROFESSIONS_P186} from '../src/world/inicios-v2-p186.js';
 import {HUD_LAYOUT_KEY,HUD_DEFAULTS,sanitizeHudLayout} from '../src/ui/p10-layout.js';
+import {P183B_CAMPS,P183B_COAST_TEMPLATE} from '../src/world/biome-families-p183b.js';
+import {P183_BONUS_TABLES} from '../src/systems/loot-table-p183.js';
 const source=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const index=JSON.parse(source('docs/audit/WOC0447_WIKI_CROSSWALK_P192.json'));
 const entireRecipes=JSON.parse(source('docs/audit/WOC0447_RECIPES_209_P192.json'));
@@ -32,6 +34,18 @@ assert.deepEqual(
  index.professions.map(x=>x.id).sort(),
  INICIOS_PROFESSIONS_P186.map(x=>x.id).sort()
 );
+// Audit real LIVE W0 drops, not merely registered inventory IDs. Each
+// gathering errand and starter crafting input must be earnable from P183B
+// families (or original guaranteed wolf/draugr/spider loot).
+const obtainable=new Set(['wolf_pelt','draugr_bone','spider_silk']);
+for(const camp of [...P183B_CAMPS,P183B_COAST_TEMPLATE])obtainable.add(camp.drop);
+for(const rolls of Object.values(P183_BONUS_TABLES))
+ for(const entry of rolls)obtainable.add(entry.id);
+for(const q of HAMLET_QUESTS_P192)
+ assert.ok(obtainable.has(q.item),'P192 quest drop is not really obtainable: '+q.item);
+for(const recipe of GEAR_RECIPES_P192)
+ for(const item of recipe.inputs)
+  assert.ok(obtainable.has(item.id),'P192 gear material not really obtainable: '+item.id);
 assert.equal(HAMLET_QUESTS_P192.length,7);
 assert.equal(INICIOS_HUBS_P186.length,8);
 assert.equal(Object.keys(P192_TRAINER_MODELS).length,13);
