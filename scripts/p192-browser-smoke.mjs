@@ -294,16 +294,18 @@ try{
   return {report,built,npcCount:townNPCs.length,
    actualModels:townNPCs.map(x=>({id:x.id,realRig:!!x.rig?.root||!!x.rig?.mixer})),
    quests:g.quests.list().filter(q=>q.id.startsWith('p192_')).length,
+   mapLabels:g.worldMapP34?.pointsOfInterest()?.filter(x=>x[0]?.startsWith('🏘 ')).length||0,
    collisionSafe:built.every(x=>!x.center||Number.isFinite(x.center.y))};
  });
  console.log('P192 actual W0 towns / spawn:',JSON.stringify(villages));
  assert.equal(villages.report.length,7);
  assert.equal(villages.quests,7,'town quests in the actual journal');
- assert.ok(villages.report.filter(x=>x.center).length>=5,
-  'at least five grounded satellite village sites found in real terrain');
- assert.ok(villages.built.filter(x=>x.houses>=1).length>=5,
-  'at least five real completed HIGHFLY houses built, no placeholders');
- assert.ok(villages.npcCount>=5,'multiple real KayKit trainers spawned');
+ assert.equal(villages.report.filter(x=>x.center).length,7,
+  'ALL seven new village sites must be safe and grounded in real W0 terrain');
+ assert.equal(villages.built.filter(x=>x.houses>=1).length,7,
+  'ALL seven towns/districts actually build an existing finished house');
+ assert.equal(villages.npcCount,13,'all thirteen live KayKit profession masters in the world');
+ assert.equal(villages.mapLabels,7,'world map and minimap show only actual town sites');
  assert.ok(villages.actualModels.every(x=>x.realRig));
  assert.ok(villages.collisionSafe);
  const sigrid=await page.evaluate(()=>{
