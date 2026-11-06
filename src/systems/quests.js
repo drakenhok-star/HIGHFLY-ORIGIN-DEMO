@@ -95,6 +95,11 @@ export class Quests {
       this.states.q3 = 'available';
       this.game.hud.notify('Olaf, jefe de la aldea tiene una misión nueva');
     }
+    const skillFound=this.game.p188Skills?.rewardQuest(id);
+    if(skillFound){
+      const sk=this.game.p188Skills.state.discovered[skillFound];
+      if(sk)this.game.hud.notify('¡Nueva habilidad descubierta! Revisá COMBATE → HABILIDADES');
+    }
     this.game.saveSys.save();
     if (id === 'q3') {
       this.game.hud.questBanner('La región vuelve a estar en paz');
