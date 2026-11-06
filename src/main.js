@@ -432,6 +432,7 @@ function loop(time) {
     if (perf161) perf161.startSection('npcs');
     game.npcs.update(dt);
     game.livingWorld?.update(dt);
+    game.p188Skills?.tick(dt); // also detect Bjorn skill quests without reloading
     if (perf161) perf161.endSection('npcs');
     game.stats.update(dt);
     if (perf161) perf161.startSection('scatter');
