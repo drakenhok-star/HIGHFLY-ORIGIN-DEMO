@@ -32,6 +32,11 @@ export class P187VillageGuide{
  toggle(){if(this.panel){this.close();return;}this.open();}
  close(){this.panel?.remove();this.panel=null;}
  open(){
+   if(this.game.p188Build){
+     // Use the same 97.5vw × 95vh native overlay as MOCHILA, not the old tiny popover.
+     this.game.touch?.premium?.show('professions');
+     return;
+   }
    this.close();
    const p=make('section',document.body,undefined,
      'position:fixed;z-index:260;top:9%;left:50%;transform:translateX(-50%);'+

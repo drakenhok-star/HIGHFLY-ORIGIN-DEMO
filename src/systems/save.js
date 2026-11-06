@@ -10,12 +10,13 @@ const KEY_P18 = 'highfly_p18_save';
 const KEY_P182 = 'highfly_p182_save';
 const KEY_P183 = 'highfly_p183_save';
 const KEY_P187 = 'highfly_p187_save';
+const KEY_P188 = 'highfly_p188_save';
 
 export class SaveSys {
   constructor(game) {
     this.game = game;
     this.autosaveTimer = 0;
-    this.key=game.p187Build?KEY_P187:game.p183Build?KEY_P183:game.p182Build?KEY_P182:game.p18Build?KEY_P18:game.p16Enabled?KEY_P16:game.p15Enabled?KEY_P15:game.p14Enabled?KEY_P14:game.p13Enabled?KEY_P13:game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
+    this.key=game.p188Build?KEY_P188:game.p187Build?KEY_P187:game.p183Build?KEY_P183:game.p182Build?KEY_P182:game.p18Build?KEY_P18:game.p16Enabled?KEY_P16:game.p15Enabled?KEY_P15:game.p14Enabled?KEY_P14:game.p13Enabled?KEY_P13:game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
   }
 
   save({silent=false}={}) {
@@ -39,6 +40,7 @@ export class SaveSys {
       dragonDead: !dragon || !dragon.alive,
       ...(g.p18Enabled && g.livingWorld ? {livingWorld:g.livingWorld.serialize()} : {}),
       ...(g.p187Build && g.p187Professions ? {professionsP187:g.p187Professions.serialize()} : {}),
+      ...(g.p188Build && g.p188Skills ? {skillsP188:g.p188Skills.serialize()} : {}),
     };
     localStorage.setItem(this.key, JSON.stringify(data));
     if(!silent)g.hud.notify('Partida guardada');
@@ -46,6 +48,7 @@ export class SaveSys {
 
   hasSave() {
     return localStorage.getItem(this.key) !== null ||
+      (this.game.p188Build && localStorage.getItem(KEY_P187)!==null) ||
       (this.game.p187Build && localStorage.getItem(KEY_P183)!==null) ||
       (this.game.p183Build && localStorage.getItem(KEY_P182)!==null) ||
       (this.game.p182Build && localStorage.getItem(KEY_P18)!==null) ||
@@ -62,6 +65,7 @@ export class SaveSys {
   loadRaw() {
     // First P7 visit reads P6 progress, but writes ONLY P7: original never overwritten.
     const raw = localStorage.getItem(this.key) ||
+      (this.game.p188Build?localStorage.getItem(KEY_P187):null) ||
       (this.game.p187Build?localStorage.getItem(KEY_P183):null) ||
       (this.game.p183Build?localStorage.getItem(KEY_P182):null) ||
       (this.game.p182Build?localStorage.getItem(KEY_P18):null) ||
@@ -90,6 +94,11 @@ export class SaveSys {
     g.stats.applyData(d.stats);
     g.inventory.applyData(d.inv);
     g.quests.applyData(d.quests);
+    if(g.p188Build){
+      g.p188Skills?.applyData(d.skillsP188);
+      // Existing P185/P187 quest progress unlocks only its earned discoveries.
+      g.p188Skills?.syncExistingQuests();
+    }
     if(g.p187Build)g.p187Professions?.applyData(d.professionsP187);
     if(g.p18Enabled)g.livingWorld?.applyData(d.livingWorld);
     if (g.combat && g.combat.applyData) g.combat.applyData(d.combat);

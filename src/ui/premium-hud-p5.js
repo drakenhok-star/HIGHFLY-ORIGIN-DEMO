@@ -218,7 +218,7 @@ export class PremiumHudP5 {
     const panel=make('div','hf-p5-panel',undefined,overlay);
     const tabs=make('div','hf-p5-tabs',undefined,panel);
     this.tabButtons={};
-    for(const [key,text] of [['all','INVENTARIO'],['equipment','EQUIPO'],['bag','BOLSA'],['quests','MISIONES'],['settings','AJUSTES']]){
+    for(const [key,text] of [['all','INVENTARIO'],['equipment','EQUIPO'],['bag','BOLSA'],['quests','MISIONES'],['skills','HABILIDADES'],['professions','OFICIOS'],['settings','AJUSTES']]){
       const btn=make('button',null,text,tabs);btn.type='button';
       btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();this.tab=key;this.selected=null;this.render();});
       this.tabButtons[key]=btn;
@@ -254,18 +254,21 @@ export class PremiumHudP5 {
       this.bars[key].val.textContent=Math.ceil(values[0])+'/'+Math.ceil(values[1]);
     }
     const learned=(g.combat&&g.combat.learnedShouts)||[];
-    this.frostButton.classList.toggle('hf-p5-locked',!learned.includes('frost'));
+    if(!(g.p188Build&&g.p186Skills))this.frostButton.classList.toggle('hf-p5-locked',!learned.includes('frost'));
     this.wuldButton.classList.toggle('hf-p5-locked',!learned.includes('wuld'));
     if(g.p6Enabled && g.targeting){
       const lock=g.targeting.locked,soft=g.targeting.soft,target=lock||soft;
       const combo=!g.p810Enabled && g.p7Enabled && g.combat?.comboTimer>0?'⚔ COMBO '+g.combat.comboStep+'/4 · ':'';
       this.targetLine.textContent=combo+(target?(lock?'◎ FIJADO: ':'◌ CERCA: ')+target.name:'');
       this.targetLine.style.display=(target||combo)?'block':'none';
+      // P188: FURY bridge is sole owner of the S1-S3 labels and cooldowns.
+      // Legacy refresh overwrote these every 300 ms, creating visible flicker.
       const remaining=[g.combat.castCd,g.combat.shoutCooldowns.fus,
         g.combat.shoutCooldowns.frost,g.combat.shoutCooldowns.wuld];
       const labels=['MAGIA','FUS','HIELO','WULD'];
       for(let i=0;i<4;i++){
         const button=[this.fireButton,this.fusButton,this.frostButton,this.wuldButton][i];
+        if(g.p188Build && i<3 && g.p186Skills)continue;
         button.textContent='S'+(i+1)+'\n'+(remaining[i]>0.1?remaining[i].toFixed(1)+'s':labels[i]);
       }
     }else this.targetLine.style.display='none';

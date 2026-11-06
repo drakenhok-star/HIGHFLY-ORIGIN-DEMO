@@ -34,6 +34,8 @@ import { PerfFoundationP161 } from './ui/performance-p161.js';
 import { PerfGovernorP163 } from './ui/performance-p163.js';
 import { LivingWorldP18 } from './world/living-world-runtime-p18.js';
 import { installP186Combat } from './combat/skill-bridge-p186.js';
+import {SkillProgressP188} from './combat/skill-progression-p188.js';
+import {GpuDiagnosticsP188} from './ui/gpu-diagnostics-p188.js';
 import { P187ProfessionRuntime } from './world/professions-runtime-p187.js';
 import { P187VillageGuide } from './ui/inicios-guide-p187.js';
 import { consumeP186TransferFromUrl } from './ui/p186-profile.js';
@@ -57,7 +59,8 @@ class Game {
     this.p18Build=true;
     this.p182Build=true; // P18.1 save remains read-only when testing a new P18.2 game
     this.p183Build=true; // new isolated save; prior P18.2 state read-only
-    this.p187Build=true; // P187 writes a NEW key and imports P183/P185 saves read-only
+    this.p187Build=true; // P187 compatibility (P185 world remains active)
+    this.p188Build=true; // independent P188 save and RPG skill discovery
     this.p183Enabled=!new URLSearchParams(location.search).has('hf_p183_off');
     this.p183bEnabled=this.p183Enabled&&!new URLSearchParams(location.search).has('hf_p183b_off');
     this.p183cEnabled=this.p183bEnabled&&!new URLSearchParams(location.search).has('hf_p183c_off');
@@ -118,9 +121,11 @@ class Game {
     this.targeting=this.p6Enabled?new TargetingP6(this):null;
     this.npcs = new NPCs(this);
     this.p187Professions = new P187ProfessionRuntime(this);
+    this.p188Skills = new SkillProgressP188(this);
     this.audio = new AudioSys(this);
     this.saveSys = new SaveSys(this);
     this.hud = new HUD(this);
+    this.gpuDiagnosticsP188=this.p188Build?new GpuDiagnosticsP188(this):null;
     this.menus = new Menus(this);
     this.livingWorld = this.p18Enabled ? new LivingWorldP18(this) : null;
     this.touch = new TouchControls(this);
@@ -133,7 +138,8 @@ class Game {
     // without adding per-frame CPU work.
     if(this.livingWorld && this.mobileAudit){
       const baseReport=this.mobileAudit.report.bind(this.mobileAudit);
-      this.mobileAudit.report=()=>({...baseReport(),p18:this.livingWorld.report()});
+      this.mobileAudit.report=()=>({...baseReport(),p18:this.livingWorld.report(),
+        p188Gpu:this.gpuDiagnosticsP188?.report()||null});
     }
     this.worldMapP34 = null;
     if (!new URLSearchParams(location.search).has('hf_no_map')) {
@@ -150,6 +156,7 @@ class Game {
 
   setState(s) {
     this.state = s;
+    if(s!=='playing')this.p186Skills?.cancelAim?.();
     this.menus.onState(s);
     this.hud.setVisible(s === 'playing');
     if (this.touch) this.touch.setState(s);
@@ -213,6 +220,7 @@ class Game {
     this.enterImmersive();
     this.resetAll();
     this.saveSys.applyLoaded();
+    this.p188Skills?.syncExistingQuests(); // migrate prior P185/P187 completed quest rewards
     this.setState('playing');
     this.hud.questBanner('¡Bienvenido de nuevo!');
     if(this.p18Enabled)this.hud.notify('P18 · Consultá a Bjorn y el diario de misiones');
@@ -231,6 +239,7 @@ class Game {
     this.combat.reset();
     this.p186Skills?.reset(); // no projectiles, queued damage or cooldowns leak across save/new game
     this.p187Professions?.reset(); // load restores from the versioned P187 save when continuing
+    this.p188Skills?.reset(); // new characters have no lab skills for free
     if(this.targeting)this.targeting.cancel();
     // 室内重开新游戏/读档：立即恢复户外状态，不等 interiors.update 的远距自愈
     this.interiors.forceOutside();
@@ -423,6 +432,7 @@ function loop(time) {
     if (perf161) perf161.startSection('npcs');
     game.npcs.update(dt);
     game.livingWorld?.update(dt);
+    game.p188Skills?.tick(dt); // also detect Bjorn skill quests without reloading
     if (perf161) perf161.endSection('npcs');
     game.stats.update(dt);
     if (perf161) perf161.startSection('scatter');
