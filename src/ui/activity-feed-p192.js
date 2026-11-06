@@ -18,6 +18,7 @@ const CSS=[
  '#hf-p192-feed .hf-p192-line{color:#e7d7f4;white-space:nowrap;overflow:hidden;',
  'text-overflow:ellipsis}',
  '#hf-p192-feed.expanded{background:#170f2df4}',
+ '#hf-p192-feed:not(.expanded){max-height:43px}',
  '#hf-p192-feed.expanded .hf-p192-line{white-space:normal}',
  '#hf-p192-feed .hf-p192-line[data-kind=loot]{color:#f8dfa2}',
  '#hf-p192-feed .hf-p192-line[data-kind=quest]{color:#b6f1ff}'
@@ -61,7 +62,7 @@ export class ActivityFeedP192{
   this.toggle.textContent='▤ REGISTRO · '+this.entries.length+
    (this.expanded?'   ▲ CERRAR':'   ▾ VER TODO');
   this.lines.replaceChildren();
-  const entries=this.expanded?this.entries.slice(-40):this.entries.slice(-3);
+  const entries=this.expanded?this.entries.slice(-40):this.entries.slice(-1);
   for(const {text,kind} of entries){
    const line=document.createElement('div');
    line.className='hf-p192-line';line.dataset.kind=kind;
