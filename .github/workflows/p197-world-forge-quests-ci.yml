@@ -1,0 +1,68 @@
+name: HIGHFLY P197 · Quest Bridge + World Forge 2.0
+on:
+  push:
+    branches: [p197-claudecraft-quest-bridge-20261106]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - run: npm install --no-save three@0.180.0
+      - name: License and original CC0 animated boar verification
+        run: bash scripts/fetch_gobkit_boar_p183b.sh
+      - name: JavaScript and game regression tests
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -s LICENSE && test -s PROVENANCE.md
+          test -s src/world/claudecraft-quests-p197.js
+          test -s src/editor/editor-environment-p195.js
+          test -s src/world/living-town-p196.js
+          ! find src assets -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .
+          find src -type f -name '*.js' -print0 | while IFS= read -r -d '' file; do
+            node --input-type=module --check < "$file"
+          done
+          node --check scripts/p195-browser-smoke.mjs
+          node --experimental-default-type=module tests/p192-world-wiki-crafting.test.mjs
+          node --experimental-default-type=module tests/p190-six-skills.test.mjs
+          node --experimental-default-type=module tests/p191-ux-apprenticeship.test.mjs
+          node --experimental-default-type=module tests/p196-town-wilderness.test.mjs
+          node --experimental-default-type=module tests/p197-claudecraft-quests.test.mjs
+          grep -q 'KEY_P197' src/systems/save.js
+  browser:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.58.2
+      - run: npx playwright install --with-deps chromium
+      - name: Install verified Quaternius/Gobkit CC0 assets needed for quests
+        run: bash scripts/fetch_gobkit_boar_p183b.sh
+      - name: Start actual game and 3D editor
+        run: node server.mjs > /tmp/p197-game.log 2>&1 & echo $! > /tmp/p197-game.pid
+      - name: Full browser E2E for island, NPC, 3x5 mobs, camera, quests, editor/game map
+        run: node scripts/p195-browser-smoke.mjs
+      - name: Preserve browser proof
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: p197-highfly-complete-rpg-preview
+          path: |
+            p195-forge-verification.json
+            p195-editor-screenshot.png
+          if-no-files-found: ignore
