@@ -83,7 +83,14 @@ export class P186CombatBridge{
  ground(x,z){return this.game.terrain.getHeight(x,z);}
  facing(){return trimYaw(this.game.player);}
  playersAt(){return this.game.player.pos.clone();}
- message(t){this.game.hud?.notify?.(t);}
+ message(t){
+  // The user video showed 4 stacked 'Skill en cooldown' banners in seconds.
+  // Throttle *identical* HUD messages, never the skill/cast hit logic itself.
+  const now=performance.now();
+  if(t===this._lastNotice&&now-(this._lastNoticeAt||0)<900)return;
+  this._lastNotice=t;this._lastNoticeAt=now;
+  this.game.hud?.notify?.(t);
+ }
  living(){return this.game.enemies.list.filter(e=>e.alive&&!e.removed&&e.group);}
  enemiesNear(center,radius,height=3.5,forward=null,degrees=180){
   return this.living().filter(e=>{
