@@ -34,7 +34,7 @@ import { PerfFoundationP161 } from './ui/performance-p161.js';
 import { PerfGovernorP163 } from './ui/performance-p163.js';
 import { LivingWorldP18 } from './world/living-world-runtime-p18.js';
 import { installP186Combat } from './combat/skill-bridge-p186.js';
-import {SkillProgressP188} from './combat/skill-progression-p188.js';
+import {SkillProgressP190} from './combat/skill-progression-p190.js';
 import {GpuDiagnosticsP188} from './ui/gpu-diagnostics-p188.js';
 import { P187ProfessionRuntime } from './world/professions-runtime-p187.js';
 import { P187VillageGuide } from './ui/inicios-guide-p187.js';
@@ -61,7 +61,8 @@ class Game {
     this.p183Build=true; // new isolated save; prior P18.2 state read-only
     this.p187Build=true; // P187 compatibility (P185 world remains active)
     this.p188Build=true; // independent P188 save and RPG skill discovery
-    this.p189Build=true; // L27 real aim + editor refinement, same protected P188 save
+    this.p189Build=true; // L27 real aim + editor refinement
+    this.p190Build=true; // six equal skills / guarded P190 save migration
     this.p183Enabled=!new URLSearchParams(location.search).has('hf_p183_off');
     this.p183bEnabled=this.p183Enabled&&!new URLSearchParams(location.search).has('hf_p183b_off');
     this.p183cEnabled=this.p183bEnabled&&!new URLSearchParams(location.search).has('hf_p183c_off');
@@ -122,7 +123,7 @@ class Game {
     this.targeting=this.p6Enabled?new TargetingP6(this):null;
     this.npcs = new NPCs(this);
     this.p187Professions = new P187ProfessionRuntime(this);
-    this.p188Skills = new SkillProgressP188(this);
+    this.p188Skills = new SkillProgressP190(this); // P188 property retained for quest/UI adapters
     this.audio = new AudioSys(this);
     this.saveSys = new SaveSys(this);
     this.hud = new HUD(this);
