@@ -37,6 +37,7 @@ import { installP186Combat } from './combat/skill-bridge-p186.js';
 import {SkillProgressP190} from './combat/skill-progression-p190.js';
 import {GpuDiagnosticsP188} from './ui/gpu-diagnostics-p188.js';
 import { P187ProfessionRuntime } from './world/professions-runtime-p187.js';
+import {P192Hamlets} from './world/hamlets-p192.js';
 import { P187VillageGuide } from './ui/inicios-guide-p187.js';
 import { consumeP186TransferFromUrl } from './ui/p186-profile.js';
 
@@ -64,6 +65,7 @@ class Game {
     this.p189Build=true; // L27 real aim + editor refinement
     this.p190Build=true; // six equal skills / guarded P190 save migration
     this.p191Build=true; // skillbook UX, graphics clarity, HUD ergonomics; preserves P190 save
+    this.p192Build=true; // visitable hamlets + safe crafting + activity feed; P190 saves read-only
     this.p183Enabled=!new URLSearchParams(location.search).has('hf_p183_off');
     this.p183bEnabled=this.p183Enabled&&!new URLSearchParams(location.search).has('hf_p183b_off');
     this.p183cEnabled=this.p183bEnabled&&!new URLSearchParams(location.search).has('hf_p183c_off');
@@ -131,6 +133,7 @@ class Game {
     this.targeting=this.p6Enabled?new TargetingP6(this):null;
     this.npcs = new NPCs(this);
     this.p187Professions = new P187ProfessionRuntime(this);
+    this.p192Hamlets=new P192Hamlets(this);
     this.p188Skills = new SkillProgressP190(this); // P188 property retained for quest/UI adapters
     this.audio = new AudioSys(this);
     this.saveSys = new SaveSys(this);
@@ -249,6 +252,7 @@ class Game {
     this.combat.reset();
     this.p186Skills?.reset(); // no projectiles, queued damage or cooldowns leak across save/new game
     this.p187Professions?.reset(); // load restores from the versioned P187 save when continuing
+    this.p192Hamlets?.reset(); // new game resets seven W0 village introductions
     this.p188Skills?.reset(); // new characters have no lab skills for free
     if(this.targeting)this.targeting.cancel();
     // 室内重开新游戏/读档：立即恢复户外状态，不等 interiors.update 的远距自愈
@@ -440,6 +444,7 @@ function loop(time) {
     game.p187VillageGuide?.update(dt);
     if (perf161) perf161.endSection('enemies');
     if (perf161) perf161.startSection('npcs');
+    game.p192Hamlets?.update(dt);
     game.npcs.update(dt);
     game.livingWorld?.update(dt);
     game.p188Skills?.tick(dt); // also detect Bjorn skill quests without reloading
