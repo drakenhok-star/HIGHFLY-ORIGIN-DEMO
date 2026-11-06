@@ -254,7 +254,7 @@ export class PremiumHudP5 {
       this.bars[key].val.textContent=Math.ceil(values[0])+'/'+Math.ceil(values[1]);
     }
     const learned=(g.combat&&g.combat.learnedShouts)||[];
-    this.frostButton.classList.toggle('hf-p5-locked',!learned.includes('frost'));
+    if(!(g.p188Build&&g.p186Skills))this.frostButton.classList.toggle('hf-p5-locked',!learned.includes('frost'));
     this.wuldButton.classList.toggle('hf-p5-locked',!learned.includes('wuld'));
     if(g.p6Enabled && g.targeting){
       const lock=g.targeting.locked,soft=g.targeting.soft,target=lock||soft;
