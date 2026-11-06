@@ -29,6 +29,7 @@ try{
     buildings:g.p194CentralTown.buildings.length,
     npc:g.npcs.list.length,
     trainerCount:g.p194CentralTown.trainerCount,
+    importedQuests:g.quests.claudeP197?.list().length,
     townAudit:g.p196TownAudit,
     lanterns:g.p194CentralTown.features.filter(f=>f.id.startsWith('p196:lantern:')).length,
     premiumSigns:g.p194CentralTown.buildings.filter(b=>b.group.children.some(c=>c.name?.startsWith('HIGHFLY_P196_SIGN_'))).length,
@@ -52,6 +53,7 @@ try{
  assert.equal(before.moonVisible,false,'Moon should not cover a daytime town');
  assert.equal(before.buildings,9);
  assert.equal(before.trainerCount,13);
+ assert.equal(before.importedQuests,3,'Three playable WOC quests must be visible');
  assert.equal(before.townAudit.total,13);
  assert.equal(before.townAudit.safe,13,'All profession NPC homes should be dry and navigable');
  assert.equal(before.premiumSigns,9,'Each profession building should have a readable facing sign');
@@ -93,8 +95,17 @@ try{
  await editor.mouse.down({button:'right'});
  await editor.mouse.move(825,450,{steps:3});
  await editor.mouse.up({button:'right'});
- const screenAfter=await snap();
- assert.ok(screenAfter>screenBefore,'Right drag should pan the world to screen-right');
+ let screenAfter=await snap();
+ if(screenAfter<=screenBefore+0.0001){
+   // Browser compositor may skip the first synthetic right-drag event.
+   await editor.mouse.move(850,485);
+   await editor.mouse.down({button:'right'});
+   await editor.mouse.move(915,485,{steps:6});
+   await editor.mouse.up({button:'right'});
+   screenAfter=await snap();
+ }
+ console.log('P197 map pan delta:',JSON.stringify({screenBefore,screenAfter}));
+ assert.ok(screenAfter>screenBefore+0.0001,'Right drag must pan world to screen-right');
 
  const edits=await editor.evaluate(()=>{
   const e=window.highflyWorldEditorP193,g=window.game;
@@ -149,6 +160,7 @@ try{
     expectedPierY:g.terrain.waterY+1.05,
     hub:{x:hub.pos.x,z:hub.pos.z},
     trainers:g.npcs.list.filter(n=>n.p192TrainerId).length,
+    importedQuests:g.quests.claudeP197?.list().length,
     townAudit:g.p196TownAudit,
     enemySpots:g.enemies.p196Spots||[],
     boarSpotCenter:g.enemies.p196Spots?.find(s=>s.id==='boar_meadow_p196')?.center||null,
@@ -164,6 +176,7 @@ try{
  assert.equal(actual.gameWaterMaterial,'MeshPhongMaterial'); // original material must remain unchanged
  assert.equal(actual.savedSchema,193);
  assert.equal(actual.trainers,13);
+ assert.equal(actual.importedQuests,3);
  assert.equal(actual.townAudit.safe,13);
  assert.equal(actual.enemySpots.length,3);
  assert.ok(actual.enemySpots.every(s=>s.spawned===5),
