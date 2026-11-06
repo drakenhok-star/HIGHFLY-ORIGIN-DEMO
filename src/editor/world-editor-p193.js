@@ -6,7 +6,7 @@
  */
 import * as THREE from 'three';
 import {emptyWorldLayoutP193,normalizeWorldLayoutP193,
-  safeTransformP193,P193_LIBRARY,spawnAddedP193,adjustHouseP193} from '../world/world-layout-p193.js';
+  safeTransformP193,P193_LIBRARY,P193_REFERENCE_MODELS,spawnAddedP193,adjustHouseP193} from '../world/world-layout-p193.js';
 
 const DRAFT_KEY='hf_p193_world_editor_draft';
 const css=`
@@ -109,6 +109,10 @@ export class WorldEditorP193{
   this.addButton(top,'2D / 3D',()=>{this.mode=this.mode==='3d'?'2d':'3d';this.setView();});
   this.addButton(top,'Deshacer',()=>this.undo(),'undo');
   this.addButton(top,'Rehacer',()=>this.redo(),'redo');
+  this.addButton(top,'Sincronizar villas',()=>{
+    this.materializeHamlets();this.scan();this.captureHistory();
+    this.notify('Casas y maestros activos sincronizados con las ubicaciones elegidas.');
+  });
   this.addButton(top,'Guardar borrador',()=>this.saveDraft(),'draft');
   this.addButton(top,'Exportar JSON',()=>this.download(),'export');
   this.addButton(top,'Importar JSON',()=>this.fileInput.click(),'import');
@@ -358,6 +362,7 @@ export class WorldEditorP193{
       h.object.visible=!item.hidden;if(h.ref?.npc)h.ref.npc.yaw=item.rotation;}
   }
   g.worldLayoutP193=valid;
+  this.materializeHamlets();
   this.scan();if(addHistory)this.captureHistory();
   this.notify('Distribución cargada en escena. Aún no se ha publicado.');
  }
@@ -401,7 +406,15 @@ export class WorldEditorP193{
       ()=>this.newAdded(asset.id));
     b.disabled=!installed;b.title=asset.license;
   }
-  node('p',this.library,'hf-note','Los modelos adicionales KayKit SOURCE o ClaudeCraft solo se incorporan tras verificar licencia y alojarlos en repositorio privado si corresponde.');
+  const available=P193_REFERENCE_MODELS.filter(k=>this.g.assets.has(k));
+  const missing=P193_REFERENCE_MODELS.filter(k=>!this.g.assets.has(k));
+  node('p',this.library,'hf-note',
+    'Modelos ya cargados que no se colocan como decoración (combate, IA y equipamiento): '+
+    (available.join(', ')||'ninguno')+'.');
+  if(missing.length)node('p',this.library,'hf-warn','Modelos no cargados en esta sesión: '+missing.join(', '));
+  node('p',this.library,'hf-note',
+    'Catálogos WOC auditados: docs/audit/WOC0447_BESTIARY_78_WORLD_15_P192.json y catálogo de recetas. Referencias, no binarios para copiar.');
+  node('p',this.library,'hf-note','Los nuevos modelos KayKit SOURCE o ClaudeCraft se incorporan solo tras verificar licencias y almacenar lo propietario en un repositorio privado.');
  }
  saveDraft(){
   try{localStorage.setItem(DRAFT_KEY,JSON.stringify(this.captureLayout()));
