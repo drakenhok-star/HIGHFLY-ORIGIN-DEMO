@@ -5,10 +5,10 @@
  * Editor controls use a separate top-down/orbit camera and a versioned JSON draft.
  */
 import * as THREE from 'three';
-import {emptyWorldLayoutP193,normalizeWorldLayoutP193,
+import {emptyWorldLayoutP193,normalizeWorldLayoutP193,WORLD_FORGE_DRAFT_KEY_P195,
   safeTransformP193,P193_LIBRARY,P193_REFERENCE_MODELS,spawnAddedP193,adjustHouseP193} from '../world/world-layout-p193.js';
 
-const DRAFT_KEY='hf_p194_world_forge_central_draft'; // independent of older P193 draft
+const DRAFT_KEY=WORLD_FORGE_DRAFT_KEY_P195; // exactly same key read by the playable preview
 const css=`
 #hf-p193-editor{position:fixed;inset:0;z-index:9500;pointer-events:none;color:#ecf6ff;
   font:13px/1.35 system-ui,-apple-system,Segoe UI,sans-serif}
@@ -16,16 +16,17 @@ const css=`
 #hf-p193-editor button,#hf-p193-editor input,#hf-p193-editor select{font:inherit}
 #hf-p193-editor .hf-panel{pointer-events:auto;background:rgba(8,18,34,.94);
   border:1px solid #285471;box-shadow:0 12px 40px #0009;border-radius:12px;backdrop-filter:blur(12px)}
-#hf-p193-editor .hf-top{position:absolute;top:10px;left:10px;right:10px;padding:10px 12px;
- display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#hf-p193-editor .hf-top{position:absolute;top:10px;left:10px;right:10px;padding:9px 12px;
+ display:flex;gap:7px;align-items:center;flex-wrap:wrap;max-height:102px;overflow:auto}
+#hf-p193-editor .hf-toolbar-help{color:#84c8d2;font-size:11px}
 #hf-p193-editor .hf-title{font-size:15px;font-weight:750;letter-spacing:.07em;color:#80e6ff;margin-right:12px}
 #hf-p193-editor button{background:#17354a;border:1px solid #3b6b80;border-radius:6px;color:#e8f5ff;
  min-height:31px;padding:5px 9px;cursor:pointer}
 #hf-p193-editor button:hover{background:#235371}
 #hf-p193-editor button[aria-pressed=true]{border-color:#65e6e1;color:#65e6e1;background:#183a43}
 #hf-p193-editor button:disabled{opacity:.45;cursor:default}
-#hf-p193-editor .hf-left{position:absolute;top:76px;bottom:48px;left:10px;width:min(255px,26vw);display:flex;flex-direction:column}
-#hf-p193-editor .hf-right{position:absolute;top:76px;right:10px;width:min(260px,27vw);max-height:calc(100vh - 120px);overflow:auto}
+#hf-p193-editor .hf-left{position:absolute;top:124px;bottom:48px;left:10px;width:min(255px,26vw);display:flex;flex-direction:column}
+#hf-p193-editor .hf-right{position:absolute;top:124px;right:10px;width:min(260px,27vw);max-height:calc(100vh - 175px);overflow:auto}
 #hf-p193-editor .hf-scroll{overflow-y:auto;min-height:0;padding:8px}
 #hf-p193-editor .hf-head{padding:10px 11px;border-bottom:1px solid #23475d;font-weight:650}
 #hf-p193-editor .hf-row{display:flex;align-items:center;gap:6px;margin:7px 0;flex-wrap:wrap}
@@ -65,6 +66,8 @@ export class WorldEditorP193{
   this.g=game;this.selected=null;this.mode='3d';this.tool='select';
   this.focus=new THREE.Vector3(0,game.terrain.getHeight(0,40),40);
   this.renderDirty=true;
+  // Orbit parameters are stored so 2D/3D switches do not reset orientation.
+  this.orbitYaw=Math.PI/4;this.orbitElevation=Math.PI/4;
   this.distance=135;this.drag=null;this.handles=new Map();
   this.history=[];this.historyIndex=-1;this.dirty=false;this.search='';
   this.raycaster=new THREE.Raycaster();this.pointer=new THREE.Vector2();
@@ -78,7 +81,7 @@ export class WorldEditorP193{
   this.installHotkeys();
   this.loadDraft();
   this.cameraTick();
-  this.notify('P194: 15 profesiones en el pueblo central. Editá y exportá tu distribución.');
+  this.notify('FORGE 2.0: rueda pulsada = girar 360° · rueda desplazada = zoom · probar distribución en el juego.');
  }
  materializeHamlets(){
   const g=this.g,p=g.player?.pos;if(!p)return;
@@ -105,10 +108,12 @@ export class WorldEditorP193{
   const style=node('style',document.head);style.textContent=css;
   this.root=node('div',document.body);this.root.id='hf-p193-editor';
   const top=node('div',this.root,'hf-panel hf-top');
-  node('strong',top,'hf-title','HIGHFLY · WORLD FORGE P194');
+  node('strong',top,'hf-title','HIGHFLY · WORLD FORGE 2.0');
   this.addButton(top,'Seleccionar',()=>this.setTool('select'),'tool-select');
   this.addButton(top,'Mover',()=>this.setTool('move'),'tool-move');
   this.addButton(top,'2D / 3D',()=>{this.mode=this.mode==='3d'?'2d':'3d';this.setView();});
+  this.addButton(top,'↶ Girar',()=>{this.mode='3d';this.orbitYaw-=Math.PI/8;this.setView();});
+  this.addButton(top,'Girar ↷',()=>{this.mode='3d';this.orbitYaw+=Math.PI/8;this.setView();});
   this.addButton(top,'Centro del pueblo',()=>{
     this.focus.set(0,this.g.terrain.getHeight(0,40),40);this.distance=135;this.setView();
   });
@@ -125,6 +130,7 @@ export class WorldEditorP193{
     this.notify('Casas y maestros activos sincronizados con las ubicaciones elegidas.');
   });
   this.addButton(top,'Guardar borrador',()=>this.saveDraft(),'draft');
+  this.addButton(top,'▶ Probar en el juego',()=>this.openPlayablePreview(),'preview');
   this.addButton(top,'Exportar JSON',()=>this.download(),'export');
   this.addButton(top,'Importar JSON',()=>this.fileInput.click(),'import');
   const file=node('input',top);file.type='file';file.accept='.json,application/json';file.style.display='none';
@@ -147,7 +153,7 @@ export class WorldEditorP193{
   this.library=node('div',right,'hf-scroll hf-library');
   this.renderLibrary();
   this.status=node('div',this.root,'hf-panel hf-bottom');
-  this.status.textContent='Botón derecho: mover cámara · Rueda: zoom · Arrastrá objetos con Mover · Ctrl+Z';
+  this.status.textContent='Rueda pulsada + arrastrar: girar · Rueda: zoom · Botón derecho: mover · Guardar + Probar juego';
  }
  addButton(parent,text,action,id){
   const b=node('button',parent,null,text);if(id)b.dataset.action=id;
@@ -253,7 +259,7 @@ export class WorldEditorP193{
   }
   const warn=this.checkPlacement(h);
   if(warn)node('p',box,'hf-warn','⚠ '+warn);
-  node('p',box,'hf-note','Cambios en esta pestaña = borrador. Para publicarlos en la app, exportá el JSON y actualizá assets/world-layout-p193.json.');
+  node('p',box,'hf-note','Guardar + Probar en el juego usa tu distribución en la demo sin publicar. Exportar JSON permite integrar cambios validados para todos.');
  }
  checkPlacement(h){
   const p=this.coords(h),t=this.g.terrain;
@@ -438,8 +444,15 @@ export class WorldEditorP193{
  }
  saveDraft(){
   try{localStorage.setItem(DRAFT_KEY,JSON.stringify(this.captureLayout()));
-    this.dirty=false;this.notify('Borrador guardado en este navegador. Para llevarlo a la app, exportá JSON.');
-  }catch(error){this.notify('No se pudo guardar localmente: '+error.message,true);}
+    this.dirty=false;this.notify('Mapa guardado localmente. Tocá Probar en el juego para verlo funcionando, sin reemplazar el mundo publicado.');
+    return true;
+  }catch(error){this.notify('No se pudo guardar localmente: '+error.message,true);return false;}
+ }
+ openPlayablePreview(){
+  if(!this.saveDraft())return;
+  const url=new URL('./',location.href);
+  url.searchParams.set('hf_world_draft','1');
+  window.open(url.toString(),'_blank','noopener');
  }
  loadDraft(){
   try{
@@ -453,12 +466,18 @@ export class WorldEditorP193{
   const url=URL.createObjectURL(blob);const a=document.createElement('a');
   a.href=url;a.download='world-layout-p193.json';document.body.appendChild(a);a.click();
   a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
-  this.notify('JSON exportado. Aplicalo en assets/world-layout-p193.json para compartirlo con todos.');
+  this.notify('JSON exportado. Para publicar el mapa para todos se valida y versiona en GitHub; Probar en juego usa tu borrador local.');
  }
  setView(){
   const f=this.focus,d=this.distance;
-  if(this.mode==='2d')this.g.camera.position.set(f.x,f.y+d,f.z+.01);
-  else this.g.camera.position.set(f.x+d*.55,f.y+d*.75,f.z+d*.55);
+  if(this.mode==='2d'){
+    this.g.camera.position.set(f.x,f.y+d,f.z+0.01);
+  }else{
+    const h=Math.cos(this.orbitElevation)*d;
+    this.g.camera.position.set(f.x+Math.sin(this.orbitYaw)*h,
+      f.y+Math.sin(this.orbitElevation)*d,
+      f.z+Math.cos(this.orbitYaw)*h);
+  }
   this.g.camera.lookAt(f);
   this.g.camera.updateProjectionMatrix();
   this.renderDirty=true;
@@ -492,6 +511,11 @@ export class WorldEditorP193{
  installPointer(){
   const canvas=this.g.renderer.domElement;
   canvas.addEventListener('pointerdown',e=>{
+    if(e.button===1 || (e.button===0&&e.altKey)){
+      this.mode='3d';
+      this.drag={kind:'orbit',x:e.clientX,y:e.clientY};
+      canvas.setPointerCapture(e.pointerId);e.preventDefault();return;
+    }
     if(e.button===2){this.drag={kind:'camera',x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);return;}
     if(e.button!==0)return;
     if(this.tool==='place-hub'&&this.selected?.kind==='hub'){
@@ -512,9 +536,20 @@ export class WorldEditorP193{
     if(this.drag.kind==='camera'){
       const mx=e.clientX-this.drag.x,my=e.clientY-this.drag.y;
       this.drag.x=e.clientX;this.drag.y=e.clientY;
-      const scale=this.distance/Math.max(500,window.innerHeight);
-      this.focus.x+=mx*scale;this.focus.z+=my*scale; // P194: right-drag moves scene right
+      const scale=this.distance/Math.max(600,window.innerHeight);
+      const yaw=this.orbitYaw;
+      // Camera pan in screen-space, so dragging the map right moves it right
+      // independent of the yaw. Keep horizontal motion the natural way round.
+      this.focus.x-=mx*scale*Math.cos(yaw)+my*scale*Math.sin(yaw);
+      this.focus.z+=mx*scale*Math.sin(yaw)-my*scale*Math.cos(yaw);
       this.focus.y=this.g.terrain.getHeight(this.focus.x,this.focus.z);this.setView();
+    }else if(this.drag.kind==='orbit'){
+      const mx=e.clientX-this.drag.x,my=e.clientY-this.drag.y;
+      this.drag.x=e.clientX;this.drag.y=e.clientY;
+      this.orbitYaw-=mx*0.008;
+      this.orbitElevation=Math.max(0.14,Math.min(Math.PI/2-0.07,
+        this.orbitElevation+my*0.006));
+      this.setView();
     }else{
       const h=this.handles.get(this.drag.id),pos=this.screenTerrain(e);
       if(h&&pos){this.move(h,pos.x+this.drag.ox,pos.z+this.drag.oz);this.setView();}
@@ -529,10 +564,15 @@ export class WorldEditorP193{
   canvas.addEventListener('pointercancel',finish);
   canvas.addEventListener('wheel',e=>{
     if(this.root.contains(e.target))return;
-    this.distance=Math.max(25,Math.min(950,this.distance*Math.exp(e.deltaY*.001)));
+    if(e.shiftKey){
+      this.mode='3d';this.orbitYaw+=e.deltaY*.003;
+    }else{
+      this.distance=Math.max(16,Math.min(950,this.distance*Math.exp(e.deltaY*.001)));
+    }
     this.setView();e.preventDefault();
   },{passive:false});
   canvas.addEventListener('contextmenu',e=>e.preventDefault());
+  canvas.addEventListener('auxclick',e=>{if(e.button===1)e.preventDefault();});
  }
  installHotkeys(){
   window.addEventListener('keydown',e=>{
@@ -540,6 +580,10 @@ export class WorldEditorP193{
     if((e.ctrlKey||e.metaKey)&&e.code==='KeyZ'){
       e.preventDefault();if(e.shiftKey)this.redo();else this.undo();
     }
+    if(e.code==='Digit2'){this.mode='2d';this.setView();}
+    if(e.code==='Digit3'){this.mode='3d';this.setView();}
+    if(e.code==='KeyQ'){this.mode='3d';this.orbitYaw-=Math.PI/12;this.setView();}
+    if(e.code==='KeyE'){this.mode='3d';this.orbitYaw+=Math.PI/12;this.setView();}
     if(e.code==='KeyG')this.setTool('move');
     if(e.code==='Escape')this.setTool('select');
   });
