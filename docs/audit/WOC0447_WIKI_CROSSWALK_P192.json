@@ -1,0 +1,1753 @@
+{
+  "source": {
+    "project": "World of ClaudeCraft",
+    "commit": "493c35a108cef6c8aa290e8793107b1cd117886e",
+    "license": "MIT for source; media separately licensed",
+    "generator": "src/guide/content.generated.ts",
+    "fetched": "2026-11-06",
+    "siteVersion": "current live may advance independently"
+  },
+  "professions": [
+    {
+      "id": "engineering",
+      "name": "Ingeniería",
+      "category": "crafting",
+      "skillCap": 125,
+      "station": "toolworks",
+      "master": [
+        {
+          "name": "Tinker Gizzel",
+          "title": "Master of the Toolworks",
+          "hub": "Eastbrook"
+        }
+      ],
+      "recipeCount": 20,
+      "starterExamples": [
+        {
+          "id": "recipe_bronze_hoe",
+          "name": "Bronze Hoe",
+          "skillReq": 0,
+          "station": "toolworks",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Fine Vale Wheat",
+              "count": 4
+            },
+            {
+              "name": "Garden Hoe",
+              "count": 1
+            }
+          ],
+          "output": "Bronze Hoe"
+        },
+        {
+          "id": "recipe_cogwheel_blank",
+          "name": "Cogwheel Blank",
+          "skillReq": 0,
+          "station": "toolworks",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Copper Ore",
+              "count": 4
+            },
+            {
+              "name": "Smithing Flux",
+              "count": 2
+            }
+          ],
+          "output": "Cogwheel Blank"
+        }
+      ],
+      "targetVillage": "Villa del Aserradero",
+      "highflyStatus": "Maestro y encargo P192; herramientas, taller y recetas interactivas pendientes"
+    },
+    {
+      "id": "alchemy",
+      "name": "Alquimia",
+      "category": "crafting",
+      "skillCap": 125,
+      "station": "apothecary",
+      "master": [
+        {
+          "name": "Alchemist Verane",
+          "title": "Master of the Apothecary",
+          "hub": "Highwatch"
+        }
+      ],
+      "recipeCount": 20,
+      "starterExamples": [
+        {
+          "id": "recipe_minor_healing_potion",
+          "name": "Minor Healing Potion",
+          "skillReq": 0,
+          "station": null,
+          "acquisition": "known",
+          "materials": [
+            {
+              "name": "Linen Scrap",
+              "count": 1
+            },
+            {
+              "name": "Twitching Spider Leg",
+              "count": 1
+            },
+            {
+              "name": "Sheenleaf Herb",
+              "count": 2
+            }
+          ],
+          "output": "Minor Healing Potion"
+        },
+        {
+          "id": "recipe_silverleaf_healing_draught",
+          "name": "Sheenleaf Healing Draught",
+          "skillReq": 0,
+          "station": "apothecary",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Sheenleaf Herb",
+              "count": 4
+            },
+            {
+              "name": "Glass Vial",
+              "count": 1
+            }
+          ],
+          "output": "Sheenleaf Healing Draught"
+        },
+        {
+          "id": "recipe_silverleaf_mana_draught",
+          "name": "Sheenleaf Mana Draught",
+          "skillReq": 0,
+          "station": "apothecary",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Sheenleaf Herb",
+              "count": 3
+            },
+            {
+              "name": "Glass Vial",
+              "count": 1
+            }
+          ],
+          "output": "Sheenleaf Mana Draught"
+        },
+        {
+          "id": "recipe_elixir_of_the_boar",
+          "name": "Elixir of the Boar",
+          "skillReq": 0,
+          "station": "apothecary",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Venom Gland",
+              "count": 2
+            },
+            {
+              "name": "Vale Wheat",
+              "count": 1
+            },
+            {
+              "name": "Sheenleaf Herb",
+              "count": 2
+            },
+            {
+              "name": "Glass Vial",
+              "count": 1
+            }
+          ],
+          "output": "Elixir of the Boar"
+        }
+      ],
+      "targetVillage": "Aldea de los Herbolarios",
+      "highflyStatus": "Maestro y encargo P192; mesa de alquimia, pociones y consumibles pendientes"
+    },
+    {
+      "id": "cooking",
+      "name": "Cocina",
+      "category": "crafting",
+      "skillCap": 125,
+      "station": "kitchens",
+      "master": [
+        {
+          "name": "Cook Marlow",
+          "title": "Master of the Kitchens",
+          "hub": "Eastbrook"
+        }
+      ],
+      "recipeCount": 33,
+      "starterExamples": [
+        {
+          "id": "recipe_tough_jerky",
+          "name": "Salted Jerky",
+          "skillReq": 0,
+          "station": null,
+          "acquisition": "known",
+          "materials": [
+            {
+              "name": "Twitching Spider Leg",
+              "count": 1
+            }
+          ],
+          "output": "Salted Jerky"
+        },
+        {
+          "id": "recipe_pan_seared_perch",
+          "name": "Pan-Seared River Perch",
+          "skillReq": 0,
+          "station": "kitchens",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Raw River Perch",
+              "count": 2
+            },
+            {
+              "name": "Cooking Salt",
+              "count": 1
+            }
+          ],
+          "output": "Pan-Seared River Perch"
+        },
+        {
+          "id": "recipe_hunters_game_skewer",
+          "name": "Hunter's Game Skewer",
+          "skillReq": 0,
+          "station": "kitchens",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Game Meat",
+              "count": 2
+            },
+            {
+              "name": "Vale Wheat",
+              "count": 1
+            },
+            {
+              "name": "Cooking Salt",
+              "count": 1
+            }
+          ],
+          "output": "Hunter's Game Skewer"
+        },
+        {
+          "id": "recipe_herbed_marsh_pike",
+          "name": "Herbed Marsh Pike",
+          "skillReq": 0,
+          "station": "kitchens",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Raw Marsh Pike",
+              "count": 2
+            },
+            {
+              "name": "Sheenleaf Herb",
+              "count": 1
+            },
+            {
+              "name": "Cooking Salt",
+              "count": 1
+            }
+          ],
+          "output": "Herbed Marsh Pike"
+        }
+      ],
+      "targetVillage": "Villa de los Pescadores",
+      "highflyStatus": "Maestro y encargo P192; cocina y platos preparados pendientes"
+    },
+    {
+      "id": "leatherworking",
+      "name": "Peletería",
+      "category": "crafting",
+      "skillCap": 125,
+      "station": "tannery",
+      "master": [
+        {
+          "name": "Tanner Hesk",
+          "title": "Master of the Tannery",
+          "hub": "Fenbridge"
+        }
+      ],
+      "recipeCount": 36,
+      "starterExamples": [
+        {
+          "id": "recipe_tanned_leather_jerkin",
+          "name": "Tanned Leather Jerkin",
+          "skillReq": 0,
+          "station": null,
+          "acquisition": "known",
+          "materials": [
+            {
+              "name": "Rough Hide",
+              "count": 4
+            },
+            {
+              "name": "Twitching Spider Leg",
+              "count": 2
+            },
+            {
+              "name": "Spool of Thread",
+              "count": 5
+            }
+          ],
+          "output": "Tanned Leather Jerkin"
+        },
+        {
+          "id": "recipe_eastbrook_druids_hide",
+          "name": "Eastbrook Druid's Hide",
+          "skillReq": 0,
+          "station": null,
+          "acquisition": "known",
+          "materials": [
+            {
+              "name": "Rough Hide",
+              "count": 5
+            },
+            {
+              "name": "Twitching Spider Leg",
+              "count": 2
+            },
+            {
+              "name": "Spool of Thread",
+              "count": 5
+            }
+          ],
+          "output": "Eastbrook Druid's Hide"
+        },
+        {
+          "id": "recipe_fenbridge_hide_leggings",
+          "name": "Fenbridge Hide Leggings",
+          "skillReq": 0,
+          "station": "tannery",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Rough Hide",
+              "count": 3
+            },
+            {
+              "name": "Twitching Spider Leg",
+              "count": 2
+            },
+            {
+              "name": "Tanning Agent",
+              "count": 1
+            }
+          ],
+          "output": "Fenbridge Hide Leggings"
+        },
+        {
+          "id": "recipe_fenbridge_hide_boots",
+          "name": "Fenbridge Hide Boots",
+          "skillReq": 0,
+          "station": "tannery",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Rough Hide",
+              "count": 2
+            },
+            {
+              "name": "Tanning Agent",
+              "count": 1
+            }
+          ],
+          "output": "Fenbridge Hide Boots"
+        }
+      ],
+      "targetVillage": "Barrio de Artesanos",
+      "highflyStatus": "Maestro y encargo P192; fabricación P192 de guantes con loot existente"
+    },
+    {
+      "id": "tailoring",
+      "name": "Sastrería",
+      "category": "crafting",
+      "skillCap": 125,
+      "station": "loom",
+      "master": [
+        {
+          "name": "Weaver Ottilie",
+          "title": "Master of the Loom",
+          "hub": "Eastbrook"
+        }
+      ],
+      "recipeCount": 28,
+      "starterExamples": [
+        {
+          "id": "recipe_eastbrook_wool_trousers",
+          "name": "Eastbrook Wool Trousers",
+          "skillReq": 0,
+          "station": null,
+          "acquisition": "known",
+          "materials": [
+            {
+              "name": "Homespun Cloth",
+              "count": 3
+            },
+            {
+              "name": "Spool of Thread",
+              "count": 9
+            }
+          ],
+          "output": "Eastbrook Wool Trousers"
+        },
+        {
+          "id": "recipe_eastbrook_ritual_vestments",
+          "name": "Eastbrook Ritual Vestments",
+          "skillReq": 0,
+          "station": null,
+          "acquisition": "known",
+          "materials": [
+            {
+              "name": "Linen Scrap",
+              "count": 3
+            },
+            {
+              "name": "Twitching Spider Leg",
+              "count": 1
+            },
+            {
+              "name": "Homespun Cloth",
+              "count": 3
+            },
+            {
+              "name": "Spool of Thread",
+              "count": 5
+            }
+          ],
+          "output": "Eastbrook Ritual Vestments"
+        },
+        {
+          "id": "recipe_homespun_hood",
+          "name": "Homespun Hood",
+          "skillReq": 0,
+          "station": "loom",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Homespun Cloth",
+              "count": 4
+            },
+            {
+              "name": "Linen Scrap",
+              "count": 2
+            },
+            {
+              "name": "Spool of Thread",
+              "count": 1
+            }
+          ],
+          "output": "Homespun Hood"
+        },
+        {
+          "id": "recipe_homespun_mitts",
+          "name": "Homespun Mitts",
+          "skillReq": 0,
+          "station": "loom",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Homespun Cloth",
+              "count": 3
+            },
+            {
+              "name": "Spool of Thread",
+              "count": 1
+            }
+          ],
+          "output": "Homespun Mitts"
+        }
+      ],
+      "targetVillage": "Barrio de Artesanos",
+      "highflyStatus": "Maestro y encargo P192; fabricación P192 de pantalones y botas"
+    },
+    {
+      "id": "inscription",
+      "name": "Inscripción",
+      "category": "crafting",
+      "skillCap": 125,
+      "station": "apothecary",
+      "master": [
+        {
+          "name": "Alchemist Verane",
+          "title": "Master of the Apothecary",
+          "hub": "Highwatch"
+        }
+      ],
+      "recipeCount": 9,
+      "starterExamples": [
+        {
+          "id": "recipe_silverleaf_primer",
+          "name": "Sheenleaf Primer",
+          "skillReq": 0,
+          "station": "apothecary",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Sheenleaf Herb",
+              "count": 3
+            },
+            {
+              "name": "Chime Dust",
+              "count": 2
+            },
+            {
+              "name": "Glass Vial",
+              "count": 1
+            }
+          ],
+          "output": "Sheenleaf Primer"
+        },
+        {
+          "id": "recipe_silverleaf_scroll",
+          "name": "Sheenleaf Scroll",
+          "skillReq": 0,
+          "station": "apothecary",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Sheenleaf Herb",
+              "count": 2
+            },
+            {
+              "name": "Chime Dust",
+              "count": 1
+            },
+            {
+              "name": "Glass Vial",
+              "count": 1
+            }
+          ],
+          "output": "Sheenleaf Scroll"
+        }
+      ],
+      "targetVillage": "Barrio de Estudios",
+      "highflyStatus": "Maestro y encargo P192; pergaminos y consumibles pendientes"
+    },
+    {
+      "id": "enchanting",
+      "name": "Encantamiento",
+      "category": "crafting",
+      "skillCap": 125,
+      "station": null,
+      "master": [],
+      "recipeCount": 3,
+      "starterExamples": [],
+      "targetVillage": "Barrio de Estudios",
+      "highflyStatus": "Maestro y encargo P192; transferencia de encantamientos pendiente"
+    },
+    {
+      "id": "jewelcrafting",
+      "name": "Joyería",
+      "category": "crafting",
+      "skillCap": 125,
+      "station": "forge",
+      "master": [
+        {
+          "name": "Forgemistress Darva",
+          "title": "Master of the Forge",
+          "hub": "Eastbrook"
+        }
+      ],
+      "recipeCount": 13,
+      "starterExamples": [
+        {
+          "id": "recipe_hammered_copper_band",
+          "name": "Hammered Copper Band",
+          "skillReq": 0,
+          "station": "forge",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Copper Ore",
+              "count": 4
+            },
+            {
+              "name": "Chime Dust",
+              "count": 2
+            },
+            {
+              "name": "Smithing Flux",
+              "count": 1
+            }
+          ],
+          "output": "Hammered Copper Band"
+        },
+        {
+          "id": "recipe_polished_copper_loop",
+          "name": "Polished Copper Loop",
+          "skillReq": 0,
+          "station": "forge",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Copper Ore",
+              "count": 4
+            },
+            {
+              "name": "Chime Dust",
+              "count": 3
+            },
+            {
+              "name": "Smithing Flux",
+              "count": 1
+            }
+          ],
+          "output": "Polished Copper Loop"
+        },
+        {
+          "id": "recipe_coiled_copper_torc",
+          "name": "Coiled Copper Torc",
+          "skillReq": 0,
+          "station": "forge",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Copper Ore",
+              "count": 5
+            },
+            {
+              "name": "Chime Dust",
+              "count": 2
+            },
+            {
+              "name": "Smithing Flux",
+              "count": 1
+            }
+          ],
+          "output": "Coiled Copper Torc"
+        }
+      ],
+      "targetVillage": "Barrio de Artesanos",
+      "highflyStatus": "Maestro y encargo P192; P192 incluye colgantes y anillos"
+    },
+    {
+      "id": "weaponcrafting",
+      "name": "Fabricación de armas",
+      "category": "crafting",
+      "skillCap": 125,
+      "station": "forge",
+      "master": [
+        {
+          "name": "Forgemistress Darva",
+          "title": "Master of the Forge",
+          "hub": "Eastbrook"
+        }
+      ],
+      "recipeCount": 18,
+      "starterExamples": [
+        {
+          "id": "recipe_eastbrook_arming_sword",
+          "name": "Eastbrook Arming Sword",
+          "skillReq": 0,
+          "station": null,
+          "acquisition": "known",
+          "materials": [
+            {
+              "name": "Cracked Wolf Fang",
+              "count": 2
+            },
+            {
+              "name": "Bone Fragments",
+              "count": 4
+            },
+            {
+              "name": "Smithing Flux",
+              "count": 6
+            }
+          ],
+          "output": "Eastbrook Arming Sword"
+        },
+        {
+          "id": "recipe_copper_bearded_axe",
+          "name": "Copper Bearded Axe",
+          "skillReq": 0,
+          "station": "forge",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Copper Ore",
+              "count": 4
+            },
+            {
+              "name": "Ironbark Log",
+              "count": 2
+            },
+            {
+              "name": "Smithing Flux",
+              "count": 1
+            }
+          ],
+          "output": "Copper Bearded Axe"
+        },
+        {
+          "id": "recipe_copper_flanged_mace",
+          "name": "Copper Flanged Mace",
+          "skillReq": 0,
+          "station": "forge",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Copper Ore",
+              "count": 3
+            },
+            {
+              "name": "Bone Fragments",
+              "count": 2
+            },
+            {
+              "name": "Smithing Flux",
+              "count": 1
+            }
+          ],
+          "output": "Copper Flanged Mace"
+        },
+        {
+          "id": "recipe_ironbark_boar_spear",
+          "name": "Ironbark Boar Spear",
+          "skillReq": 0,
+          "station": "forge",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Curved Tusk",
+              "count": 2
+            },
+            {
+              "name": "Ironbark Log",
+              "count": 3
+            },
+            {
+              "name": "Copper Ore",
+              "count": 2
+            },
+            {
+              "name": "Smithing Flux",
+              "count": 1
+            }
+          ],
+          "output": "Ironbark Boar Spear"
+        }
+      ],
+      "targetVillage": "Pueblo de los Inicios (Sigrid)",
+      "highflyStatus": "Sigrid real y receta P191 de espada; ampliar variedad de armas"
+    },
+    {
+      "id": "armorcrafting",
+      "name": "Fabricación de armaduras",
+      "category": "crafting",
+      "skillCap": 125,
+      "station": "forge",
+      "master": [
+        {
+          "name": "Forgemistress Darva",
+          "title": "Master of the Forge",
+          "hub": "Eastbrook"
+        }
+      ],
+      "recipeCount": 29,
+      "starterExamples": [
+        {
+          "id": "recipe_eastbrook_chain_vest",
+          "name": "Eastbrook Chainmail Vest",
+          "skillReq": 0,
+          "station": null,
+          "acquisition": "known",
+          "materials": [
+            {
+              "name": "Copper Ore",
+              "count": 4
+            },
+            {
+              "name": "Smithing Flux",
+              "count": 9
+            }
+          ],
+          "output": "Eastbrook Chainmail Vest"
+        },
+        {
+          "id": "recipe_eastbrook_warded_leggings",
+          "name": "Eastbrook Warded Leggings",
+          "skillReq": 0,
+          "station": null,
+          "acquisition": "known",
+          "materials": [
+            {
+              "name": "Bone Fragments",
+              "count": 3
+            },
+            {
+              "name": "Copper Ore",
+              "count": 4
+            },
+            {
+              "name": "Smithing Flux",
+              "count": 4
+            }
+          ],
+          "output": "Eastbrook Warded Leggings"
+        },
+        {
+          "id": "recipe_riveted_copper_girdle",
+          "name": "Riveted Copper Girdle",
+          "skillReq": 0,
+          "station": "forge",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Copper Ore",
+              "count": 4
+            },
+            {
+              "name": "Bone Fragments",
+              "count": 2
+            },
+            {
+              "name": "Smithing Flux",
+              "count": 1
+            }
+          ],
+          "output": "Riveted Copper Girdle"
+        },
+        {
+          "id": "recipe_coppermail_sabatons",
+          "name": "Coppermail Sabatons",
+          "skillReq": 0,
+          "station": "forge",
+          "acquisition": "trainer",
+          "materials": [
+            {
+              "name": "Copper Ore",
+              "count": 4
+            },
+            {
+              "name": "Rough Hide",
+              "count": 2
+            },
+            {
+              "name": "Smithing Flux",
+              "count": 1
+            }
+          ],
+          "output": "Coppermail Sabatons"
+        }
+      ],
+      "targetVillage": "Pueblo de los Inicios (Sigrid)",
+      "highflyStatus": "Sigrid real, P191 coraza y P192 capucha/hombreras"
+    },
+    {
+      "id": "mining",
+      "name": "Minería",
+      "category": "gathering",
+      "skillCap": 100,
+      "tools": [
+        {
+          "name": "Copper Mining Pick",
+          "tier": 1,
+          "wieldProficiency": 0
+        },
+        {
+          "name": "Iron Mining Pick",
+          "tier": 2,
+          "wieldProficiency": 40
+        },
+        {
+          "name": "Skysilver Mining Pick",
+          "tier": 3,
+          "wieldProficiency": 70
+        },
+        {
+          "name": "Osmium Mining Pick",
+          "tier": 4,
+          "wieldProficiency": 85
+        }
+      ],
+      "nodeTypes": 17,
+      "respawnSeconds": 240,
+      "targetVillage": "Poblado Minero",
+      "highflyStatus": "Maestro y misión P192; todavía no hay nodos explotables/picos por tier"
+    },
+    {
+      "id": "logging",
+      "name": "Tala",
+      "category": "gathering",
+      "skillCap": 100,
+      "tools": [
+        {
+          "name": "Handaxe",
+          "tier": 1,
+          "wieldProficiency": 0
+        },
+        {
+          "name": "Felling Axe",
+          "tier": 2,
+          "wieldProficiency": 40
+        },
+        {
+          "name": "Ironbark Axe",
+          "tier": 3,
+          "wieldProficiency": 70
+        },
+        {
+          "name": "Ashwood Axe",
+          "tier": 4,
+          "wieldProficiency": 85
+        }
+      ],
+      "nodeTypes": 17,
+      "respawnSeconds": 240,
+      "targetVillage": "Villa del Aserradero",
+      "highflyStatus": "Maestro y misión P192; todavía no hay tala/árboles recolectables"
+    },
+    {
+      "id": "herbalism",
+      "name": "Herboristería",
+      "category": "gathering",
+      "skillCap": 100,
+      "tools": [
+        {
+          "name": "Gathering Sickle",
+          "tier": 1,
+          "wieldProficiency": 0
+        },
+        {
+          "name": "Bronze Sickle",
+          "tier": 2,
+          "wieldProficiency": 40
+        },
+        {
+          "name": "Sheenleaf Sickle",
+          "tier": 3,
+          "wieldProficiency": 70
+        },
+        {
+          "name": "Goldleaf Sickle",
+          "tier": 4,
+          "wieldProficiency": 85
+        }
+      ],
+      "nodeTypes": 17,
+      "respawnSeconds": 240,
+      "targetVillage": "Aldea de los Herbolarios",
+      "highflyStatus": "Maestro y misión P192; todavía no hay herbarios recolectables"
+    },
+    {
+      "id": "fishing",
+      "name": "Pesca",
+      "category": "gathering",
+      "skillCap": 200,
+      "tools": [
+        {
+          "name": "Simple Fishing Pole",
+          "tier": 1,
+          "wieldProficiency": 0
+        },
+        {
+          "name": "Ironreel Fishing Rod",
+          "tier": 2,
+          "wieldProficiency": 0
+        },
+        {
+          "name": "Silverstream Fishing Rod",
+          "tier": 3,
+          "wieldProficiency": 0
+        },
+        {
+          "name": "Stormreel Fishing Rod",
+          "tier": 4,
+          "wieldProficiency": 0
+        }
+      ],
+      "nodeTypes": 0,
+      "respawnSeconds": null,
+      "targetVillage": "Villa de los Pescadores",
+      "highflyStatus": "Maestro y misión P192; minijuego pesca y banco de peces pendiente"
+    },
+    {
+      "id": "farming",
+      "name": "Agricultura",
+      "category": "gathering",
+      "skillCap": 100,
+      "tools": [
+        {
+          "name": "Garden Hoe",
+          "tier": 1,
+          "wieldProficiency": 0
+        },
+        {
+          "name": "Bronze Hoe",
+          "tier": 2,
+          "wieldProficiency": 25
+        },
+        {
+          "name": "Skysilver Hoe",
+          "tier": 3,
+          "wieldProficiency": 50
+        },
+        {
+          "name": "Osmium Hoe",
+          "tier": 4,
+          "wieldProficiency": 75
+        }
+      ],
+      "nodeTypes": 0,
+      "respawnSeconds": null,
+      "targetVillage": "Pueblo de las Granjas",
+      "highflyStatus": "Maestro y misión P192; parcelas sembrables y crecimiento persistente pendientes"
+    }
+  ],
+  "world": {
+    "zones": [
+      {
+        "id": "eastbrook_vale",
+        "name": "Eastbrook Vale",
+        "levels": [
+          1,
+          7
+        ],
+        "hub": "Eastbrook",
+        "pointsOfInterest": [
+          "Eastbrook",
+          "Wolf Run",
+          "Boar Meadow",
+          "Mirror Lake",
+          "Sableweb",
+          "Copper Dig",
+          "Bandit Camp"
+        ]
+      },
+      {
+        "id": "mirefen_marsh",
+        "name": "Mirefen Marsh",
+        "levels": [
+          6,
+          13
+        ],
+        "hub": "Fenbridge",
+        "pointsOfInterest": [
+          "Fenbridge",
+          "Prowler Reeds",
+          "Deepfen Shallows",
+          "Widow Thicket",
+          "Drowned Chapel",
+          "Troll Mounds",
+          "Gravecaller Encampment"
+        ]
+      },
+      {
+        "id": "thornpeak_heights",
+        "name": "Thornpeak Heights",
+        "levels": [
+          13,
+          20
+        ],
+        "hub": "Highwatch",
+        "pointsOfInterest": [
+          "Highwatch",
+          "Stalker Ridge",
+          "Deeprock Burrows",
+          "Ogre Foothills",
+          "Drogmar's War-Camp",
+          "Stormcrag",
+          "The Glimmermere"
+        ]
+      },
+      {
+        "id": "veiled_hollow",
+        "name": "The Veiled Hollow",
+        "levels": [
+          15,
+          20
+        ],
+        "hub": "Eldershine",
+        "pointsOfInterest": [
+          "Eldershine",
+          "Duskfall Cave",
+          "Duskfall Overlook",
+          "Elder Grove",
+          "Starfall Basin",
+          "The Sunken Court",
+          "Crystalline Shallows"
+        ]
+      },
+      {
+        "id": "drakelands",
+        "name": "The Drakelands",
+        "levels": [
+          16,
+          20
+        ],
+        "hub": "Wyrmwatch",
+        "pointsOfInterest": [
+          "Wyrmwatch",
+          "The Gatewood",
+          "Cinder Dunes",
+          "Trollmoot",
+          "The Last Keep",
+          "Bloodglass Fields",
+          "Drakemaw Caldera"
+        ]
+      },
+      {
+        "id": "frostveil",
+        "name": "The Frostveil Reach",
+        "levels": [
+          17,
+          20
+        ],
+        "hub": "Icemantle",
+        "pointsOfInterest": [
+          "Icemantle",
+          "The Snowline",
+          "Glacier Tarn",
+          "The Aurora Steps",
+          "The Shiverfen",
+          "The Howling Terraces"
+        ]
+      },
+      {
+        "id": "amberfall",
+        "name": "The Amberfall",
+        "levels": [
+          18,
+          20
+        ],
+        "hub": "Lanternmere",
+        "pointsOfInterest": [
+          "Lanternmere",
+          "The Goldmelt",
+          "The Gilded Orchard",
+          "Harvest Hollow",
+          "The Great Mere",
+          "Cindermaple Rise",
+          "The Leaning Monolith"
+        ]
+      },
+      {
+        "id": "willowfen",
+        "name": "The Willowfen",
+        "levels": [
+          19,
+          20
+        ],
+        "hub": "Bridgemere",
+        "pointsOfInterest": [
+          "Bridgemere",
+          "The Amberfen Steps",
+          "The Lilymoors",
+          "Bogshine Pools",
+          "Willowweep",
+          "The Drowsy Flats"
+        ]
+      },
+      {
+        "id": "nightbloom",
+        "name": "The Nightbloom",
+        "levels": [
+          20,
+          20
+        ],
+        "hub": "Moonrest",
+        "pointsOfInterest": [
+          "Moonrest",
+          "The Nightgate",
+          "The Moonspring",
+          "Gloamfield",
+          "The Standing Vigil",
+          "The Sleepless Barrow"
+        ]
+      },
+      {
+        "id": "wraithwood",
+        "name": "The Wraithwood",
+        "levels": [
+          20,
+          20
+        ],
+        "hub": "Gibbetmere",
+        "pointsOfInterest": [
+          "Gibbetmere",
+          "The Crowgate",
+          "Widow's Thicket",
+          "The Hanging Glade",
+          "The Mournstone Chapel",
+          "The Huntsman's Clearing"
+        ]
+      },
+      {
+        "id": "palmreach",
+        "name": "The Palmreach",
+        "levels": [
+          20,
+          20
+        ],
+        "hub": "Drifthaven",
+        "pointsOfInterest": [
+          "Drifthaven",
+          "The Tanglemouth",
+          "The Palmstrand",
+          "The Emerald Tangle",
+          "The Vinefall",
+          "The Sapphire Lagoon",
+          "The Sunken Idol"
+        ]
+      },
+      {
+        "id": "evergarden",
+        "name": "The Evergarden",
+        "levels": [
+          20,
+          20
+        ],
+        "hub": "Hedgewick",
+        "pointsOfInterest": [
+          "Hedgewick",
+          "The Garden Gate",
+          "The Parterre Walk",
+          "Dawnhold Castle",
+          "The Petal Pond",
+          "The Great Maze",
+          "The Fountain Court"
+        ]
+      },
+      {
+        "id": "galecrest",
+        "name": "The Galecrest",
+        "levels": [
+          20,
+          20
+        ],
+        "hub": "Wickharbor",
+        "pointsOfInterest": [
+          "Wickharbor",
+          "The Windway",
+          "The Howling Downs",
+          "The Old Beacon",
+          "The Shear",
+          "The Wreckfields",
+          "The Mirror Tarn"
+        ]
+      },
+      {
+        "id": "farshore_isle",
+        "name": "The Farshore",
+        "levels": [
+          3,
+          7
+        ],
+        "hub": "Gullhaven",
+        "pointsOfInterest": [
+          "Gullhaven",
+          "The Landing",
+          "The Watch Meadow",
+          "The Sundered Cliffs",
+          "The Riftfields",
+          "The Wreck"
+        ]
+      },
+      {
+        "id": "proving_shore",
+        "name": "The Proving Shore",
+        "levels": [
+          1,
+          2
+        ],
+        "hub": "Dawnrest Camp",
+        "pointsOfInterest": [
+          "Dawnrest Camp",
+          "The Old Pier",
+          "The Practice Yard",
+          "The Wreck Line",
+          "The Gauntlet"
+        ]
+      }
+    ],
+    "dungeons": [
+      {
+        "id": "hollow_crypt",
+        "name": "The Hollow Crypt",
+        "levels": [
+          7,
+          10
+        ],
+        "raid": false
+      },
+      {
+        "id": "sunken_bastion",
+        "name": "The Sunken Bastion",
+        "levels": [
+          12,
+          13
+        ],
+        "raid": false
+      },
+      {
+        "id": "drowned_temple",
+        "name": "The Drowned Temple",
+        "levels": [
+          16,
+          18
+        ],
+        "raid": false
+      },
+      {
+        "id": "gravewyrm_sanctum",
+        "name": "Gravewyrm Sanctum",
+        "levels": [
+          19,
+          20
+        ],
+        "raid": false
+      },
+      {
+        "id": "wildheart_basin",
+        "name": "The Wildheart Basin",
+        "levels": [
+          20,
+          20
+        ],
+        "raid": false
+      },
+      {
+        "id": "raid",
+        "levels": [
+          20,
+          20
+        ],
+        "raid": true
+      }
+    ]
+  },
+  "bestiary": [
+    {
+      "family": "beast",
+      "count": 21,
+      "examples": [
+        {
+          "name": "Forest Wolf",
+          "levels": [
+            1,
+            2
+          ],
+          "templateId": "forest_wolf"
+        },
+        {
+          "name": "Shore Scuttler",
+          "levels": [
+            1,
+            2
+          ],
+          "templateId": "shore_scuttler"
+        },
+        {
+          "name": "Wild Boar",
+          "levels": [
+            2,
+            3
+          ],
+          "templateId": "wild_boar"
+        },
+        {
+          "name": "Old Greyjaw",
+          "levels": [
+            4,
+            4
+          ],
+          "templateId": "old_greyjaw"
+        },
+        {
+          "name": "Void Stalker",
+          "levels": [
+            5,
+            6
+          ],
+          "templateId": "void_stalker"
+        }
+      ]
+    },
+    {
+      "family": "spider",
+      "count": 5,
+      "examples": [
+        {
+          "name": "Sableweb Lurker",
+          "levels": [
+            2,
+            4
+          ],
+          "templateId": "webwood_spider"
+        },
+        {
+          "name": "Mirefen Widow",
+          "levels": [
+            8,
+            10
+          ],
+          "templateId": "mire_widow"
+        },
+        {
+          "name": "Broodmother Egg",
+          "levels": [
+            10,
+            10
+          ],
+          "templateId": "spider_egg"
+        },
+        {
+          "name": "Canopy Weaver",
+          "levels": [
+            20,
+            20
+          ],
+          "templateId": "canopy_weaver"
+        },
+        {
+          "name": "Widowsilk Spinner",
+          "levels": [
+            20,
+            20
+          ],
+          "templateId": "widowsilk_spinner"
+        }
+      ]
+    },
+    {
+      "family": "mudfin",
+      "count": 5,
+      "examples": [
+        {
+          "name": "Mudfin Skulker",
+          "levels": [
+            3,
+            5
+          ],
+          "templateId": "mudfin_murloc"
+        },
+        {
+          "name": "Deepfen Snapper",
+          "levels": [
+            8,
+            9
+          ],
+          "templateId": "deepfen_murloc"
+        },
+        {
+          "name": "Glimmermere Wader",
+          "levels": [
+            15,
+            16
+          ],
+          "templateId": "glimmermere_wader"
+        },
+        {
+          "name": "Bogtoad",
+          "levels": [
+            19,
+            20
+          ],
+          "templateId": "bogtoad"
+        },
+        {
+          "name": "Mere Lurker",
+          "levels": [
+            19,
+            20
+          ],
+          "templateId": "mere_lurker"
+        }
+      ]
+    },
+    {
+      "family": "burrower",
+      "count": 12,
+      "examples": [
+        {
+          "name": "Breach Wretch",
+          "levels": [
+            3,
+            5
+          ],
+          "templateId": "breach_wretch"
+        },
+        {
+          "name": "Deeprock Digger",
+          "levels": [
+            4,
+            6
+          ],
+          "templateId": "tunnel_rat"
+        },
+        {
+          "name": "Deeprock Tunneler",
+          "levels": [
+            14,
+            15
+          ],
+          "templateId": "deeprock_kobold"
+        },
+        {
+          "name": "Gleamfolk Pixie",
+          "levels": [
+            15,
+            16
+          ],
+          "templateId": "mushroom_pixie"
+        },
+        {
+          "name": "Sporeling Gatherer",
+          "levels": [
+            15,
+            15
+          ],
+          "templateId": "sporeling_gatherer"
+        }
+      ]
+    },
+    {
+      "family": "humanoid",
+      "count": 7,
+      "examples": [
+        {
+          "name": "Vale Bandit",
+          "levels": [
+            3,
+            5
+          ],
+          "templateId": "vale_bandit"
+        },
+        {
+          "name": "Gravecaller Cultist",
+          "levels": [
+            10,
+            12
+          ],
+          "templateId": "gravecaller_cultist"
+        },
+        {
+          "name": "Gravecaller Mender",
+          "levels": [
+            11,
+            12
+          ],
+          "templateId": "gravecaller_mender"
+        },
+        {
+          "name": "Gravecaller Summoner",
+          "levels": [
+            11,
+            12
+          ],
+          "templateId": "gravecaller_summoner"
+        },
+        {
+          "name": "Broodsworn Zealot",
+          "levels": [
+            17,
+            19
+          ],
+          "templateId": "wyrmcult_zealot"
+        }
+      ]
+    },
+    {
+      "family": "troll",
+      "count": 3,
+      "examples": [
+        {
+          "name": "Mirefen Troll",
+          "levels": [
+            10,
+            12
+          ],
+          "templateId": "fen_troll"
+        },
+        {
+          "name": "Grubjaw the Glutton",
+          "levels": [
+            12,
+            12
+          ],
+          "templateId": "grubjaw"
+        },
+        {
+          "name": "Dune Troll",
+          "levels": [
+            17,
+            19
+          ],
+          "templateId": "dune_troll"
+        }
+      ]
+    },
+    {
+      "family": "ogre",
+      "count": 1,
+      "examples": [
+        {
+          "name": "Thornpeak Ogre",
+          "levels": [
+            15,
+            16
+          ],
+          "templateId": "thornpeak_ogre"
+        }
+      ]
+    },
+    {
+      "family": "undead",
+      "count": 8,
+      "examples": [
+        {
+          "name": "Restless Bones",
+          "levels": [
+            5,
+            7
+          ],
+          "templateId": "restless_bones"
+        },
+        {
+          "name": "Drowned Dead",
+          "levels": [
+            9,
+            11
+          ],
+          "templateId": "drowned_dead"
+        },
+        {
+          "name": "Drowned Votary",
+          "levels": [
+            15,
+            16
+          ],
+          "templateId": "drowned_votary"
+        },
+        {
+          "name": "Ashbone Raider",
+          "levels": [
+            17,
+            18
+          ],
+          "templateId": "ashbone_raider"
+        },
+        {
+          "name": "Ashbone Warcaller",
+          "levels": [
+            18,
+            19
+          ],
+          "templateId": "ashbone_warcaller"
+        }
+      ]
+    },
+    {
+      "family": "elemental",
+      "count": 11,
+      "examples": [
+        {
+          "name": "Duskwisp",
+          "levels": [
+            15,
+            16
+          ],
+          "templateId": "duskwisp"
+        },
+        {
+          "name": "Glimmerwisp",
+          "levels": [
+            15,
+            16
+          ],
+          "templateId": "glimmerwisp"
+        },
+        {
+          "name": "Ice Wisp",
+          "levels": [
+            17,
+            18
+          ],
+          "templateId": "ice_wisp"
+        },
+        {
+          "name": "Stormcrag Elemental",
+          "levels": [
+            17,
+            18
+          ],
+          "templateId": "stormcrag_elemental"
+        },
+        {
+          "name": "Rime Elemental",
+          "levels": [
+            18,
+            19
+          ],
+          "templateId": "rime_elemental"
+        }
+      ]
+    },
+    {
+      "family": "dragonkin",
+      "count": 3,
+      "examples": [
+        {
+          "name": "Sethrael the Palecoil",
+          "levels": [
+            16,
+            16
+          ],
+          "templateId": "sethrael_palecoil"
+        },
+        {
+          "name": "Dragonkin Broodguard",
+          "levels": [
+            19,
+            20
+          ],
+          "templateId": "dragonkin_broodguard"
+        },
+        {
+          "name": "Dragonkin Egg",
+          "levels": [
+            20,
+            20
+          ],
+          "templateId": "dragonkin_egg"
+        }
+      ]
+    },
+    {
+      "family": "demon",
+      "count": 1,
+      "examples": [
+        {
+          "name": "Riftspawn",
+          "levels": [
+            3,
+            4
+          ],
+          "templateId": "riftspawn"
+        }
+      ]
+    },
+    {
+      "family": "reptile",
+      "count": 1,
+      "examples": [
+        {
+          "name": "Gloam Strider",
+          "levels": [
+            20,
+            20
+          ],
+          "templateId": "gloam_strider"
+        }
+      ]
+    }
+  ]
+}
