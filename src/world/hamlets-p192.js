@@ -202,20 +202,31 @@ export class P192Hamlets{
   }
   if(nextTrainer){
    const {site,trainer}=nextTrainer;
-   const idx=site.trainers.size,base=site.pos;
-   const offs=[[7,-8],[-8,-7],[9,10],[-10,8],[1,14]];
-   const [ox,oz]=offs[idx%offs.length];
-   const x=base.x+ox,z=base.z+oz;
-   if(safeHamletSiteP192(g.terrain,g.structures,x,z)){
-    // Spawn and animate ONLY genuine pre-existing KayKit NPC rig.
+   const base=site.pos;
+   let chosen=null;
+   // NPCs must stand on a WALKABLE footpath 4–24m from the real houses.
+   // House footprint safety differs from house-building 10.5m clearance.
+   for(let radius=8;radius<=24&&!chosen;radius+=4)
+    for(let i=0;i<20;i++){
+     const t=2*Math.PI*i/20+site.trainers.size*.3;
+     const x=base.x+Math.round(Math.cos(t)*radius);
+     const z=base.z+Math.round(Math.sin(t)*radius);
+     const height=g.terrain.getHeight(x,z);
+     if(height<=g.terrain.waterY+.8||g.terrain.getSlope(x,z)>.55)continue;
+     if(g.structures.colliders.some(h=>Math.hypot(h.x-x,h.z-z)<4.1))continue;
+     if(g.npcs.list.some(n=>Math.hypot(n.pos.x-x,n.pos.z-z)<3.3))continue;
+     chosen={x,z};break;
+    }
+   if(chosen){
+    // Spawn and animate ONLY genuine pre-existing KayKit NPC rigs.
     const npc=g.npcs._makeNPC({id:trainer.id,
       name:trainer.role+' · '+site.hub.name,
-      x,z,model:P192_TRAINER_MODELS[trainer.id]});
+      x:chosen.x,z:chosen.z,model:P192_TRAINER_MODELS[trainer.id]});
     npc.p192TrainerId=trainer.id;
     npc.p192HubId=site.hub.id;
     g.npcs.list.push(npc);
     site.trainers.add(trainer.id);
-   }else site.trainers.add(trainer.id); // never fabricate an invalid model site
+   }else site.trainers.add(trainer.id); // unplaced; never fabricate an invalid NPC location
   }
  }
  report(){
