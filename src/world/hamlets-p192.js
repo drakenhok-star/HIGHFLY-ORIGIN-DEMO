@@ -51,10 +51,10 @@ export const P192_TRAINER_MODELS=Object.freeze({
 const ALL_TRAINERS=INICIOS_TRAINERS_P186.filter(x=>x.id!=='sigrid');
 const SITE_PREFS=Object.freeze({
  sawmill_hamlet:{x:-90,z:195},
- mining_hamlet:{x:-125,z:-70},
+ mining_hamlet:{x:-180,z:-165}, // near existing rock-circle plateau, not coastal marsh
  herbal_hamlet:{x:170,z:220},
  fishing_hamlet:{x:202,z:-86},
- farming_hamlet:{x:115,z:15},
+ farming_hamlet:{x:170,z:150}, // flattened upland clearing, away from seawater
  artisan_quarter:{x:-56,z:56},
  arcane_quarter:{x:58,z:-24}
 });
@@ -90,9 +90,18 @@ export function findHamletSiteP192(terrain,structures,id,reserved=[]){
    const x=Math.round(origin.x+Math.cos(t)*radius);
    const z=Math.round(origin.z+Math.sin(t)*radius);
    const insideExistingTown=Math.hypot(x,z-40)<64;
+   // Mining belongs near the existing standing-stones rocky plateau,
+   // farming near the existing grassy upland clearing. A generic dry
+   // lowland/shoreline candidate would pass slope checks but be the wrong biome.
+   const terrainHeight=terrain.getHeight(x,z);
+   const habitatOk=id==='mining_hamlet'?
+     terrainHeight>4&&Math.hypot(x+220,z+180)>27&&
+       Math.hypot(x+220,z+180)<105:
+    id==='farming_hamlet'?
+     terrainHeight>3.5&&Math.hypot(x-150,z-150)<94:true;
    const distinct=reserved.every(p=>Math.hypot(p.x-x,p.z-z)>46);
    // Only artisan/arcane QUARTERS may share the central village footprint.
-   if(distinct&&(!insideExistingTown||
+   if(habitatOk&&distinct&&(!insideExistingTown||
       ['artisan_quarter','arcane_quarter'].includes(id))&&
       safeHamletSiteP192(terrain,structures,x,z,{shore}))
     return Object.freeze({x,z,y:terrain.getHeight(x,z)});
