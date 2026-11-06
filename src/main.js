@@ -138,7 +138,8 @@ class Game {
     // without adding per-frame CPU work.
     if(this.livingWorld && this.mobileAudit){
       const baseReport=this.mobileAudit.report.bind(this.mobileAudit);
-      this.mobileAudit.report=()=>({...baseReport(),p18:this.livingWorld.report()});
+      this.mobileAudit.report=()=>({...baseReport(),p18:this.livingWorld.report(),
+        p188Gpu:this.gpuDiagnosticsP188?.report()||null});
     }
     this.worldMapP34 = null;
     if (!new URLSearchParams(location.search).has('hf_no_map')) {
