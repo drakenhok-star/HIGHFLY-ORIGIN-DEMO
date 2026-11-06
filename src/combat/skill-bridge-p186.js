@@ -426,8 +426,8 @@ export class P186CombatBridge{
   }else if(style===3){
    if(slot===1){
     // No large caster-centered shock-ring on ordinary ranged fireball.
-    fx.sparks(pos.clone().add(V(0,1.32,0)),'#ffbe69',7,1.0,.21,.09);
-    cf.fireCharge(pos,dir);
+    // P192: no caster slash/sparks or residual charge at Fireball startup.
+    // Only its travelling projectile, trail and impact retain VFX.
     const start=pos.clone().add(V(0,1.32,0)).addScaledVector(dir,.45);
     const airborne=this.focus&&p186IsFlying(this.focus,g)?this.focus:null;
     const aim=airborne?this.targetPoint(airborne).sub(start).normalize():dir;
