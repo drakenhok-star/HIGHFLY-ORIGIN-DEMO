@@ -2,6 +2,7 @@
 const CSS="\nbody.hf-p810 .hf-p9-equipment-info{display:flex;flex-direction:column;gap:6px;margin-top:8px;border-top:1px solid #9f5db6;padding-top:8px}\nbody.hf-p810 .hf-p9-eqline{display:flex;justify-content:space-between;gap:12px;border:1px solid #75469b;\n background:#1c113b;border-radius:7px;padding:5px 8px;font:10px system-ui}\nbody.hf-p810 .hf-p9-eqline strong{color:#ffdf91}\nbody.hf-p810 .hf-p9-quest-layout{display:grid;grid-template-columns:minmax(105px,26%) minmax(0,1fr);\n gap:9px;min-height:0;overflow:hidden;flex:1}\nbody.hf-p810 .hf-p9-quest-sidebar{display:flex;flex-direction:column;gap:6px;min-width:0}\nbody.hf-p810 .hf-p9-quest-sidebar button{min-height:36px;background:#30144d;color:#f4d9fa;\n border:1px solid #a76ad3;border-radius:8px;padding:5px 7px;text-align:left;font:700 10px system-ui}\nbody.hf-p810 .hf-p9-quest-sidebar button.active{background:#855027;border-color:#ffca78;color:#ffdfac}\nbody.hf-p810 .hf-p9-quest-content{overflow:auto;display:flex;flex-direction:column;gap:7px;min-width:0}\nbody.hf-p810 .hf-p9-quest-title{color:#ffe4a7;font:700 19px Georgia,serif;border-bottom:1px solid #9652c2;margin-bottom:5px;padding:5px 1px}\nbody.hf-p810 .hf-p9-mission-row{touch-action:manipulation}\nbody.hf-p810 .hf-p9-quest-search{background:#21123c;color:#fff;border:1px solid #965dc9;border-radius:8px;\n padding:8px;min-width:0;font-size:11px}\nbody.hf-p810 .hf-p9-reward{display:flex;gap:10px;flex-wrap:wrap}\nbody.hf-p810 .hf-p9-reward span{border:1px solid #ad6bd2;border-radius:9px;background:#241442;color:#ffdfaf;\n padding:8px 12px;font:bold 11px system-ui}\nbody.hf-p810 .hf-p9-mission-action{width:100%;background:linear-gradient(90deg,#91592c,#6c2b88)!important;\n border:1px solid #ffd58a!important;min-height:39px;color:#fff0cc!important}\nbody.hf-p810 .hf-p9-meta{display:flex;flex-wrap:wrap;gap:6px;padding:6px;border-top:1px solid #9654b6}\nbody.hf-p810 .hf-p9-meta span{border:1px solid #8555b0;color:#e2c7f1;background:#1e1240;\n border-radius:7px;padding:6px;font:10px system-ui}\nbody.hf-p810 .hf-p9-suggest{font:10px system-ui;color:#cdb6d9}\n";
 
 import { PremiumInventoryP7 } from './inventory-p7.js';
+import {renderSkillbookP188,renderProfessionbookP188} from './rpg-books-p188.js';
 import { ITEM_DB } from '../systems/inventory.js';
 const el=(tag,cls,text,parent)=>{
  const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;
@@ -77,6 +78,8 @@ export class HighflyPanelsP9 {
    this.inv.render('all');this.enhanceBag();return;
   }
   if(tab==='quests'){this.renderQuests();return;}
+  if(this.game.p188Build&&tab==='skills'){renderSkillbookP188(this.hud,this);return;}
+  if(this.game.p188Build&&tab==='professions'){renderProfessionbookP188(this.hud,this);return;}
   if(tab==='settings'){this.renderSettings();return;}
  }
  enhanceEquipment(){
