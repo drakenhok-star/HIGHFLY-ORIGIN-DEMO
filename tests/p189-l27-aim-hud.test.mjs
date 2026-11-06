@@ -28,7 +28,7 @@ for(const p of ['src/skillslab/aim-guide-p16.js','src/combat/l27-aim-adapter-p18
 }
 const bridge=source('src/combat/skill-bridge-p186.js');
 const editor=source('src/ui/p10-hud-editor.js');
-assert.ok(bridge.includes("this.game.p189Build?new L27AimAdapterP189(game)"));
+assert.ok(bridge.includes("game.p189Build?new L27AimAdapterP189(game)"));
 assert.ok(bridge.includes("editor.register('skillCancel',this.cancelButton)"));
 assert.ok(bridge.includes("b.className='hf-p810-control hf-p189-skill-cancel'"));
 assert.ok(bridge.includes("b.textContent='✕'"));
