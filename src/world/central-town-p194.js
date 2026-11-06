@@ -10,6 +10,7 @@ import {INICIOS_TRAINERS_P186} from './inicios-v2-p186.js';
 import {P192_TRAINER_MODELS} from './hamlets-p192.js';
 import {entityForP193,adjustHouseP193} from './world-layout-p193.js';
 import {installLivingTownP196} from './living-town-p196.js';
+import {premiumSignP196,installTownLanternsP196} from './town-visuals-p196.js';
 
 export const P194_DISTRICTS=Object.freeze([
   {id:'communal',label:'Casa comunal · Olaf',x:-6,z:78,house:0},
@@ -255,7 +256,8 @@ export function installCentralTownP194(game){
       const saved=entityForP193(game,id);
       if(saved)adjustHouseP193(game,house,saved);
     }
-    facadeSign(game,house,district.label.split(' · ')[0]);
+    if(game.p196Build)premiumSignP196(house,district.label,district.id);
+    else facadeSign(game,house,district.label.split(' · ')[0]);
     buildings.push({id,label:district.label,kind:'house',group:house,district:district.id});
   }
   // Move well away from portal and keep its gameplay collision with the visual.
@@ -311,6 +313,9 @@ export function installCentralTownP194(game){
     features:[{id:'p194:portal',label:'Monumento · portal central',kind:'model',group:portal},
       ...(pier?[{id:'p194:pier',label:'Muelle de pesca · costa real',kind:'model',group:pier}]:[])]
   };
-  if(game.p196Build)installLivingTownP196(game);
+  if(game.p196Build){
+    installLivingTownP196(game);
+    game.p194CentralTown.features.push(...installTownLanternsP196(game));
+  }
   return game.p194CentralTown;
 }
