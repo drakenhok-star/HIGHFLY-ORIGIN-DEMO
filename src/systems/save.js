@@ -12,12 +12,13 @@ const KEY_P183 = 'highfly_p183_save';
 const KEY_P187 = 'highfly_p187_save';
 const KEY_P188 = 'highfly_p188_save';
 const KEY_P190 = 'highfly_p190_save';
+const KEY_P192 = 'highfly_p192_save';
 
 export class SaveSys {
   constructor(game) {
     this.game = game;
     this.autosaveTimer = 0;
-    this.key=game.p190Build?KEY_P190:game.p188Build?KEY_P188:game.p187Build?KEY_P187:game.p183Build?KEY_P183:game.p182Build?KEY_P182:game.p18Build?KEY_P18:game.p16Enabled?KEY_P16:game.p15Enabled?KEY_P15:game.p14Enabled?KEY_P14:game.p13Enabled?KEY_P13:game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
+    this.key=game.p192Build?KEY_P192:game.p190Build?KEY_P190:game.p188Build?KEY_P188:game.p187Build?KEY_P187:game.p183Build?KEY_P183:game.p182Build?KEY_P182:game.p18Build?KEY_P18:game.p16Enabled?KEY_P16:game.p15Enabled?KEY_P15:game.p14Enabled?KEY_P14:game.p13Enabled?KEY_P13:game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
   }
 
   save({silent=false}={}) {
@@ -41,6 +42,7 @@ export class SaveSys {
       dragonDead: !dragon || !dragon.alive,
       ...(g.p18Enabled && g.livingWorld ? {livingWorld:g.livingWorld.serialize()} : {}),
       ...(g.p187Build && g.p187Professions ? {professionsP187:g.p187Professions.serialize()} : {}),
+      ...(g.p192Build&&g.p192Hamlets?{hamletsP192:g.p192Hamlets.serialize()}:{}),
       ...(g.p190Build && g.p188Skills ? {skillsP190:g.p188Skills.serialize()} :
         g.p188Build&&g.p188Skills?{skillsP188:g.p188Skills.serialize()}:{}),
     };
@@ -50,6 +52,7 @@ export class SaveSys {
 
   hasSave() {
     return localStorage.getItem(this.key) !== null ||
+      (this.game.p192Build && localStorage.getItem(KEY_P190)!==null) ||
       (this.game.p190Build && (localStorage.getItem(KEY_P188)!==null || localStorage.getItem(KEY_P187)!==null)) ||
       (this.game.p188Build && localStorage.getItem(KEY_P187)!==null) ||
       (this.game.p187Build && localStorage.getItem(KEY_P183)!==null) ||
@@ -68,6 +71,7 @@ export class SaveSys {
   loadRaw() {
     // First P7 visit reads P6 progress, but writes ONLY P7: original never overwritten.
     const raw = localStorage.getItem(this.key) ||
+      (this.game.p192Build?localStorage.getItem(KEY_P190):null) ||
       (this.game.p190Build?localStorage.getItem(KEY_P188):null) ||
       (this.game.p188Build?localStorage.getItem(KEY_P187):null) ||
       (this.game.p187Build?localStorage.getItem(KEY_P183):null) ||
@@ -98,6 +102,7 @@ export class SaveSys {
     g.stats.applyData(d.stats);
     g.inventory.applyData(d.inv);
     g.quests.applyData(d.quests);
+    if(g.p192Build)g.p192Hamlets?.applyData(d.hamletsP192);
     if(g.p188Build){
       g.p188Skills?.applyData(g.p190Build?(d.skillsP190||d.skillsP188):d.skillsP188);
       // Existing P185/P187 quest progress unlocks only its earned discoveries.
