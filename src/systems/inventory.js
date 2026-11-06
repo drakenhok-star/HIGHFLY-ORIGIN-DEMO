@@ -27,6 +27,14 @@ export const ITEM_DB = {
   dragon_scale: { name: 'Escama de dragón', type: 'misc', value: 350, desc: 'Escamas extraordinariamente resistentes.' },
   ancient_relic: { name: 'Reliquia ancestral', type: 'misc', value: 220, desc: 'Reliquia encontrada en la cripta.' },
   frost_essence: { name: 'Esencia helada', type: 'misc', value: 60, desc: 'Esencia de un lobo helado.' },
+  // P192 equipment: full inventory-backed slots, no base STR/AGI/VIT stats changed.
+  hunter_hood:{name:'Capucha del cazador',type:'gear',gearSlot:'head',armor:3,value:90,desc:'Protección ligera para la cabeza.'},
+  hunter_shoulders:{name:'Hombreras del guardabosques',type:'gear',gearSlot:'shoulders',armor:4,value:105,desc:'Piezas protectoras hechas de cuero curtido.'},
+  hunter_gloves:{name:'Guantes de cuero',type:'gear',gearSlot:'gloves',armor:2,value:65,desc:'Guantes para los primeros talleres.'},
+  trail_leggings:{name:'Pantalones del sendero',type:'gear',gearSlot:'legs',armor:4,value:92,desc:'Pantalones reforzados para caminar.'},
+  trail_boots:{name:'Botas de explorador',type:'gear',gearSlot:'boots',armor:2,value:70,desc:'Calzado para viajar entre poblados.'},
+  antler_pendant:{name:'Colgante de astas',type:'gear',gearSlot:'neck',armor:1,value:115,desc:'Colgante elaborado por una joyera.'},
+  shore_ring:{name:'Anillo del litoral',type:'gear',gearSlot:'rings',armor:1,value:130,desc:'Una joya sencilla de los pueblos costeros.'},
 };
 
 export class Inventory {
@@ -41,7 +49,8 @@ export class Inventory {
       ['cloth_armor', 1],
       ['health_potion', 3],
     ]);
-    this.equipped = { weapon: 'iron_sword', offhand: null, armor: 'cloth_armor' };
+    this.equipped = { weapon: 'iron_sword', offhand: null, armor: 'cloth_armor',
+      head:null,neck:null,shoulders:null,gloves:null,legs:null,boots:null,rings:null };
     this.gold = 50;
   }
 
@@ -81,6 +90,10 @@ export class Inventory {
         this.game.hud.notify('Recuperaste ' + item.mana + ' MP');
       }
       this.game.audio.play('potion');
+    } else if(item.type==='gear'&&item.gearSlot){
+      if(slot&&slot!==item.gearSlot)return false;
+      this.equipped[item.gearSlot]=id;
+      this.game.hud.notify('Equipado: '+item.name);
     } else if (item.type === 'weapon' || item.type === 'armor') {
       const targetSlot=slot==='offhand'&&item.type==='weapon'?'offhand':item.type;
       if(targetSlot==='offhand' && this.equipped.weapon===id && this.slots.get(id)<2){
@@ -101,7 +114,7 @@ export class Inventory {
   }
 
   unequip(slot) {
-    if(!['weapon','offhand','armor'].includes(slot))return;
+    if(!['weapon','offhand','armor','head','neck','shoulders','gloves','legs','boots','rings'].includes(slot))return;
     this.equipped[slot]=null;
     this.game.hud.notify('Objeto desequipado');
   }
@@ -114,7 +127,9 @@ export class Inventory {
   }
 
   armorValue() {
-    return ITEM_DB[this.equipped.armor]?.armor || 0;
+    const chest=ITEM_DB[this.equipped.armor]?.armor||0;
+    return chest+['head','neck','shoulders','gloves','legs','boots','rings']
+      .reduce((total,slot)=>total+(ITEM_DB[this.equipped[slot]]?.armor||0),0);
   }
 
   openChest(chest) {
@@ -148,7 +163,7 @@ export class Inventory {
   serialize() {
     return {
       slots: Array.from(this.slots.entries()),
-      equipped: { weapon: this.equipped.weapon, offhand: this.equipped.offhand, armor: this.equipped.armor },
+      equipped: { ...this.equipped },
       gold: this.gold,
     };
   }
@@ -161,7 +176,9 @@ export class Inventory {
     this.equipped = {
       weapon:valid(eq.weapon,'weapon')?eq.weapon:'iron_sword',
       armor:valid(eq.armor,'armor')?eq.armor:'cloth_armor',
-      offhand:valid(eq.offhand,'weapon')?eq.offhand:null
+      offhand:valid(eq.offhand,'weapon')?eq.offhand:null,
+      ...Object.fromEntries(['head','neck','shoulders','gloves','legs','boots','rings']
+       .map(slot=>[slot,ITEM_DB[eq[slot]]?.gearSlot===slot&&this.has(eq[slot])?eq[slot]:null]))
     };
     if(this.equipped.weapon && this.equipped.offhand===this.equipped.weapon &&
        (this.slots.get(this.equipped.weapon)||0)<2)this.equipped.offhand=null;
