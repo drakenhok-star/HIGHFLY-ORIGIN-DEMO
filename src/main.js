@@ -72,6 +72,7 @@ class Game {
     this.p190Build=true; // six equal skills / guarded P190 save migration
     this.p191Build=true; // skillbook UX, graphics clarity, HUD ergonomics; preserves P190 save
     this.p192Build=true; // visitable hamlets + safe crafting + activity feed; P190 saves read-only
+    this.p196Build=true; // isolated Living Village, safe coastal NPC routines and extra monster spots
     this.p183Enabled=!new URLSearchParams(location.search).has('hf_p183_off');
     this.p183bEnabled=this.p183Enabled&&!new URLSearchParams(location.search).has('hf_p183b_off');
     this.p183cEnabled=this.p183bEnabled&&!new URLSearchParams(location.search).has('hf_p183c_off');
