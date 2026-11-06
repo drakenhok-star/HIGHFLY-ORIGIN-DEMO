@@ -114,6 +114,21 @@ try{
  await page.evaluate(()=>window.game.touch.premium.show('professions'));
  assert.equal(await page.locator('.hf-p188-card').count(),15,'all fifteen professions in native bag-sized panel');
  await page.evaluate(()=>window.game.touch.premium.hide());
+ const mainMenu=await page.evaluate(()=>{
+  const ui=window.game.touch.premium.p810;
+  ui.toggleQuickMenu(true);
+  const menu=document.getElementById('hf-p810-quick');
+  const bounds=menu.getBoundingClientRect();
+  const tabs=[...menu.querySelectorAll('.hf-p187-tab')].map(x=>x.textContent);
+  const close=menu.querySelector('.hf-p187-head button');
+  close.click();
+  return {width:bounds.width,height:bounds.height,tabs,
+   canClose:ui.quickOpen===false,hasClose:!!close};
+ });
+ assert.ok(mainMenu.width>880&&mainMenu.height>370,
+  'MAIN four-tab menu is also same size as backpack, not a tiny popover');
+ assert.equal(mainMenu.tabs.length,4);
+ assert.ok(mainMenu.hasClose&&mainMenu.canClose);
  const save=await page.evaluate(()=>{
   const g=window.game,old=localStorage.getItem('highfly_p187_save');
   g.saveSys.save({silent:true});
@@ -133,6 +148,6 @@ try{
  console.log(JSON.stringify({status:'PASS',mobile:'1030x480',
    combat:'locked-until-learned',aim:'3D+drag+cancel+confirm',
    skills:15,professions:15,oldSave:'preserved',main:'P185 world retained',
-   panel:'native full-sized',chromeErrors:errors.length},null,2));
+   panel:'native full-sized',mainMenu:'full-sized with close',chromeErrors:errors},null,2));
  await context.close();
 }finally{await browser.close();}
