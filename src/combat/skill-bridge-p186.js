@@ -8,6 +8,7 @@
 import * as THREE from 'three';
 import {HIGHFLY_SKILL_EXPORT_L26} from '../skillslab/skill-catalog-export-l26.js';
 import {AimPreviewP188,aimDirectionFromDragP188,previewPointP188,AIM_SPECS_P188} from './aim-preview-p188.js';
+import {L27AimAdapterP189,computeLabAimDragP189} from './l27-aim-adapter-p189.js';
 import {TianjieSkillVfx} from '../skillslab/lab-vfx.js';
 import {L25PremiumSkillVfx} from '../skillslab/premium-vfx-l25.js';
 import {ClaudeVfxL26} from '../skillslab/claudecraft-vfx-l26.js';
@@ -62,7 +63,8 @@ export class P186CombatBridge{
   this.prevState='';this._cameraApplied=false;
   this.airHits={enemy:null,count:0,lastAt:-999};
   this.enabled=true;this._uiRefresh=0;
-  this.preview=game.p188Build?new AimPreviewP188(game):null;
+  this.preview=game.p189Build?new L27AimAdapterP189(game):
+   game.p188Build?new AimPreviewP188(game):null;
   this.pendingAim=null;this.cancelButton=null;
   installP186VisualSafety();
   document.addEventListener('pointerdown',e=>this.onPointer(e),true);
@@ -163,11 +165,19 @@ export class P186CombatBridge{
   if(!recast&&(sk.resource==='MP'?stats.mp:stats.sp)<sk.cost){
    this.message('No tenés suficiente '+(sk.resource==='MP'?'maná':'energía'));return;
   }
-  const dir=this.facing();
+  const baseForward=this.facing();
+  let dir=baseForward.clone();
+  const flying=this.focus&&p186IsFlying(this.focus,this.game)&&
+   ['GUINEVERE','CLAUDE_MAGE'].includes(sk.kit)&&sk.slot===1;
+  if(flying){
+   const from=this.game.player.pos.clone().add(V(0,1.25,0));
+   dir=this.targetPoint(this.focus).sub(from).normalize();
+  }
   this.pendingAim={pointerId:event.pointerId,slot,skillId:sk.id,
-   startX:event.clientX,startY:event.clientY,x:event.clientX,y:event.clientY,dir};
+   startX:event.clientX,startY:event.clientY,x:event.clientX,y:event.clientY,
+   baseForward,dir,target:null,dragged:false};
   try{event.target.setPointerCapture?.(event.pointerId);}catch(_){}
-  this.preview?.begin(sk);
+  this.preview?.begin(sk,!!recast);
   this.preview?.update(this.game.player.pos,dir);
   this.ensureCancelButton();
   this.syncCancelButton();
@@ -211,33 +221,58 @@ export class P186CombatBridge{
    this.cancelButton.style.pointerEvents=visible?'auto':'none';
   }
  }
+ updateAimGesture(event){
+  const p=this.pendingAim;
+  if(!p||event.pointerId!==p.pointerId)return null;
+  p.x=event.clientX;p.y=event.clientY;
+  if(this.game.p189Build){
+   const gesture=computeLabAimDragP189({
+    dx:p.x-p.startX,dy:p.y-p.startY,forward:p.baseForward,
+    profile:this.preview?.spec,
+    sensitivity:this.game.p186AimSensitivity??.145,
+    deadZone:this.game.p186AimDeadzone??4,
+    playerPos:this.game.player.pos,terrain:this.game.terrain
+   });
+   // Ground skills never silently snap to an enemy. Only explicit focus can
+   // elevate a magic line that has NOT been manually dragged.
+   if(gesture.dragged){
+    p.dragged=true;p.dir=gesture.direction;p.target=gesture.target;
+   }else if(!p.dragged){
+    p.target=null;
+   }
+   return this.preview?.update(this.game.player.pos,p.dir,p.target);
+  }
+  const f=this.game.camera.getWorldDirection(V());
+  p.dir=aimDirectionFromDragP188(p.startX,p.startY,p.x,p.y,f,this.facing());
+  return this.preview?.update(this.game.player.pos,p.dir);
+ }
  onAimMove(event){
   const p=this.pendingAim;
   if(!p||event.pointerId!==p.pointerId)return;
   event.preventDefault();
-  p.x=event.clientX;p.y=event.clientY;
-  const f=this.game.camera.getWorldDirection(V());
-  p.dir=aimDirectionFromDragP188(p.startX,p.startY,p.x,p.y,f,this.facing());
-  this.preview?.update(this.game.player.pos,p.dir);
+  this.updateAimGesture(event);
  }
  onAimEnd(event,cancelled=false){
   const p=this.pendingAim;
   if(!p||event.pointerId!==p.pointerId)return;
   event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
-  if(cancelled||this.game.state!=='playing'){
-   this.cancelAim();return;
-  }
+  if(cancelled||this.game.state!=='playing'){this.cancelAim();return;}
   const bounds=this.cancelButton?.getBoundingClientRect();
   if(bounds&&Math.hypot(event.clientX-(bounds.left+bounds.width/2),
     event.clientY-(bounds.top+bounds.height/2))<=Math.min(bounds.width,bounds.height)*.58){
     this.cancelAim();return;
   }
-  p.x=event.clientX;p.y=event.clientY;
-  const f=this.game.camera.getWorldDirection(V());
-  p.dir=aimDirectionFromDragP188(p.startX,p.startY,p.x,p.y,f,this.facing());
+  const result=this.updateAimGesture(event);
+  if(this.game.p189Build&&result?.valid===false){
+   this.cancelAim();this.message('Apuntado bloqueado: elegí un lugar libre');return;
+  }
   const skill=this.game.p188Skills?.selected(p.slot);
   const spec=AIM_SPECS_P188[skill?.id];
-  const aim={direction:p.dir,target:previewPointP188(this.game.player.pos,p.dir,spec,this.game.terrain)};
+  const direction=p.dir?.clone()||this.facing();
+  const target=this.game.p189Build?
+   (this.preview?.spec?.kind==='zone'?result?.target?.clone()||null:null):
+   previewPointP188(this.game.player.pos,direction,spec,this.game.terrain);
+  const aim={direction,target};
   this.cancelAim();
   if(skill?.id===p.skillId)this.cast(p.slot,aim);
  }
@@ -265,7 +300,7 @@ export class P186CombatBridge{
   // original internal skill slot and family for correct damage and VFX.
   const style=KITS.indexOf(skill.kit);
   if(style<0)return false;
-  const dir=aim?.direction?.clone()?.setY(0)?.normalize()||this.facing();
+  const dir=aim?.direction?.clone()?.normalize()||this.facing();
   const skillSlot=skill.slot;
   const oldRecast=this.recast&&this.recast.slot===skillSlot&&
    this.recast.style===style&&now<=this.recast.until;
@@ -631,7 +666,7 @@ export class P186CombatBridge{
    this.tasks.splice(i,1);task.fn();
   }
   this.updateShots(dt);
-  if(this.pendingAim)this.preview?.update(g.player.pos,this.pendingAim.dir);
+  if(this.pendingAim)this.preview?.update(g.player.pos,this.pendingAim.dir,this.pendingAim.target);
   this.fx.setQuality(g.performanceP2?.preset==='FLUID'?0:1);
   this.fx.update(dt);
  }
