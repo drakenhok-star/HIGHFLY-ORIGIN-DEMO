@@ -3,10 +3,8 @@
  * the skillbook and professions (no small floating windows or canvas clones).
  * All text is Spanish. No items, XP or skills granted through the display.
  */
-import {HIGHFLY_SKILL_EXPORT_L26} from '../skillslab/skill-catalog-export-l26.js';
-import {AIM_SPECS_P189} from '../combat/l27-aim-adapter-p189.js';
-import {abilityForShout} from '../combat/abilities-p6.js';
-import {SKILL_ORIGINS_P188} from '../combat/skill-progression-p188.js';
+import {HIGHFLY_SKILLS_P190,SKILL_ORIGINS_P190} from '../combat/skill-progression-p190.js';
+import {AIM_SPECS_P189,NATIVE_AIM_PROFILES_P190} from '../combat/l27-aim-adapter-p189.js';
 import {INICIOS_PROFESSIONS_P186,INICIOS_HUBS_P186,INICIOS_CHAPTERS_P186,
  INICIOS_TRAINERS_P186} from '../world/inicios-v2-p186.js';
 const E=(tag,cls,text,parent)=>{
@@ -55,7 +53,10 @@ const DESCRIPTIONS=Object.freeze({
  woc_frost_nova:'Liberás una explosión de escarcha alrededor tuyo que afecta a enemigos cercanos.',
  woc_backstab:'Asestás un golpe físico preciso a corta distancia.',
  woc_kidney_shot:'Realizás un golpe físico a corta distancia que puede aturdir.',
- woc_charge:'Cargás hacia adelante con una embestida física de corta duración.'
+ woc_charge:'Cargás hacia adelante con una embestida física de corta duración.',
+ native_fus:'Liberás una onda de fuerza que empuja y daña a los enemigos frente al personaje.',
+ native_frost:'Soplás una ráfaga de hielo que daña y ralentiza a los enemigos en un cono.',
+ native_wuld:'Avanzás rápidamente en la dirección que marcaste, esquivando el peligro.'
 });
 const AIM={line:'Línea direccional',cone:'Cono direccional',
  circle:'Círculo de área',zone:'Área de destino',dash:'Trayectoria de movimiento',
@@ -69,18 +70,18 @@ export function renderSkillbookP188(hud,ui){
  list.style.display='';list.style.flexDirection='column';
  const container=E('div','hf-p188-book',undefined,list);
  E('h3',null,'✦ LIBRO DE HABILIDADES · HIGHFLY',container);
- E('p',null,'Descubrí habilidades en misiones, aprendelas y equipalas en S1–S3. S4 es tu técnica especial: se elige abajo.',container);
+ E('p',null,'Todas las habilidades son iguales: descubrí, aprendé y equipá cualquiera en S1–S6. Las runas se consiguen explorando el mundo.',container);
  const count=Object.keys(p.state.learned).length;
- tag(container,count+'/15 aprendidas · '+Object.keys(p.state.discovered).length+'/15 descubiertas');
- const selected=ui.p188SelectedSkill&&HIGHFLY_SKILL_EXPORT_L26.some(s=>s.id===ui.p188SelectedSkill)?
-  ui.p188SelectedSkill:HIGHFLY_SKILL_EXPORT_L26[0].id;
+ tag(container,count+'/'+HIGHFLY_SKILLS_P190.length+' aprendidas · '+Object.keys(p.state.discovered).length+'/'+HIGHFLY_SKILLS_P190.length+' descubiertas');
+ const selected=ui.p188SelectedSkill&&HIGHFLY_SKILLS_P190.some(s=>s.id===ui.p188SelectedSkill)?
+  ui.p188SelectedSkill:HIGHFLY_SKILLS_P190[0].id;
  ui.p188SelectedSkill=selected;
  for(const group of [
   {resource:'ENERGY',title:'⚔ HABILIDADES FÍSICAS · ENERGÍA'},
   {resource:'MP',title:'✦ HABILIDADES MÁGICAS · MANÁ'}
  ]){
   E('div','hf-p188-group-title',group.title,container);
-  for(const sk of HIGHFLY_SKILL_EXPORT_L26.filter(s=>s.resource===group.resource)){
+  for(const sk of HIGHFLY_SKILLS_P190.filter(s=>s.resource===group.resource)){
    const learned=!!p.state.learned[sk.id],seen=!!p.state.discovered[sk.id];
    const slot=p.state.equipped.indexOf(sk.id)+1;
    const status=slot?'EQUIPADA S'+slot:learned?'APRENDIDA':seen?'DESCUBIERTA':'SIN DESCUBRIR';
@@ -93,13 +94,13 @@ export function renderSkillbookP188(hud,ui){
   }
  }
  const box=E('div','hf-p188-details',undefined,detail);
- const sk=HIGHFLY_SKILL_EXPORT_L26.find(x=>x.id===selected);
- const origin=SKILL_ORIGINS_P188.find(x=>x.id===selected);
+ const sk=HIGHFLY_SKILLS_P190.find(x=>x.id===selected);
+ const origin=SKILL_ORIGINS_P190.find(x=>x.id===selected);
  const seen=!!p.state.discovered[sk.id],learned=!!p.state.learned[sk.id];
  const equipped=p.state.equipped.indexOf(sk.id)+1;
  E('h3',null,seen?sk.name:'HABILIDAD NO DESCUBIERTA',box);
  tag(box,'Categoría: '+(sk.resource==='MP'?'Mágica':'Física')+' · Apuntado: '+
-  (AIM[AIM_SPECS_P189[sk.kit+'/'+sk.slot]?.kind]||'Direccional'));
+  (AIM[(sk.nativeId?NATIVE_AIM_PROFILES_P190[sk.id]:AIM_SPECS_P189[sk.kit+'/'+sk.slot])?.kind]||'Direccional'));
  if(seen)tag(box,'Descripción: '+(DESCRIPTIONS[sk.id]||'Habilidad de combate.'));
  tag(box,'Origen: '+origin.source+(origin.implemented?'':' · CONTENIDO FUTURO'));
  if(!seen){
@@ -108,11 +109,14 @@ export function renderSkillbookP188(hud,ui){
   tag(box,'Coste: '+sk.cost+' '+(sk.resource==='MP'?'Maná':'Energía')+
    ' · Recarga: '+sk.cd+' segundos');
   if(!learned){
+   if(sk.nativeId)E('p',null,'Esta habilidad se aprende al encontrar su piedra de conocimiento. No se desbloquea desde el catálogo.',box);
+   else {
    const b=E('button',null,'✦ APRENDER HABILIDAD',box);b.type='button';
    b.addEventListener('click',()=>{if(p.learn(sk.id))ui.render('skills');});
+   }
   }else{
    E('p',null,equipped?'Equipada en S'+equipped+'.':'Aprendida. Elegí una ranura para usarla.',box);
-   for(let slot=1;slot<=3;slot++){
+   for(let slot=1;slot<=6;slot++){
     const current=p.selected(slot);
     const b=E('button',null,'EQUIPAR EN S'+slot+
      (current?' · sustituye '+current.name:''),box);
@@ -130,28 +134,7 @@ export function renderSkillbookP188(hud,ui){
    }
   }
  }
- const combat=g.combat;
- E('h3',null,'S4 · TÉCNICA ESPECIAL',box);
- E('p',null,'La cuarta ranura es para una técnica especial aprendida. Las runas se descubren en el mundo; no se regalan al abrir el libro.',box);
- for(const shout of combat?.shouts||[]){
-  const learnedShout=!!combat.learnedShouts?.includes(shout.id);
-  const equippedShout=combat.equippedShout===shout.id;
-  const ability=abilityForShout(shout.id);
-  const name=shout.id==='fus'?'FUS · Onda de fuerza':shout.id==='frost'?'HIELO · Aliento helado':'WULD · Embestida veloz';
-  const b=E('button',null,
-   (equippedShout?'✓ EQUIPADA S4 · ':'EQUIPAR S4 · ')+name+
-   ' · '+(ability?.cost||0)+' '+(ability?.resource==='mp'?'MANÁ':'ENERGÍA')+
-   ' · CD '+shout.cd+' s',box);
-  b.type='button';b.disabled=!learnedShout||equippedShout;
-  if(!learnedShout)b.textContent='🔒 '+name+' · todavía no aprendida';
-  b.addEventListener('click',()=>{
-   if(!combat.learnedShouts.includes(shout.id))return;
-   combat.equippedShout=shout.id;
-   g.saveSys?.save?.({silent:true});
-   ui.render('skills');
-  });
- }
- tag(box,'Mantené S1–S3, arrastrá para apuntar y soltá para lanzar. La ✕ roja circular cancela sin gastar recursos y se edita desde EDITAR HUD.');
+ tag(box,'Mantené S1–S6, arrastrá para apuntar y soltá para lanzar. La ✕ roja circular cancela sin gastar recursos y se edita desde EDITAR HUD.');
 }
 export function renderProfessionbookP188(hud,ui){
  initStyles();
