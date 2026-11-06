@@ -31,7 +31,16 @@ const CSS=[
  'border-radius:8px;border:1px solid #5a588b;background:#211a3a;',
  'font:11px/1.6 system-ui;color:#ddd7f2}',
  '.hf-p188-group-title{font:800 11px system-ui;color:#9edcff;',
- 'margin:8px 0 2px;letter-spacing:.3px}'
+ 'margin:8px 0 2px;letter-spacing:.3px}',
+ '.hf-p191-equip-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:7px 0}',
+ '.hf-p188-details .hf-p191-equip-grid .hf-p191-slot{margin:0;min-height:53px;padding:4px;',
+ 'display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:center;',
+ 'border-radius:10px;background:#241b48;border:1px solid #8073b9}',
+ '.hf-p191-slot.active{border-color:#ffd18c!important;background:#604071!important}',
+ '.hf-p191-slot small{font:10px/1.2 system-ui;opacity:.86;max-width:100%;',
+ 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+ '.hf-p188-card.unknown{opacity:.67}',
+ '.hf-p188-details .hf-p191-unequip{background:#49243a;border-color:#a45b6e}'
 ].join('');
 function tag(parent,text){return E('div','hf-p188-info',text,parent);}
 function initStyles(){
@@ -62,79 +71,115 @@ const AIM={line:'Línea direccional',cone:'Cono direccional',
  circle:'Círculo de área',zone:'Área de destino',dash:'Trayectoria de movimiento',
  self:'Área alrededor del personaje'};
 
+const statusRank=(p,id)=>{
+ const equip=p.state.equipped.indexOf(id);
+ if(equip>=0)return 0;
+ if(p.state.learned[id])return 1;
+ if(p.state.discovered[id])return 2;
+ return 3;
+};
 export function renderSkillbookP188(hud,ui){
  initStyles();
- const g=hud.game,p=g.p188Skills;
- const list=hud.list,detail=hud.detail;
+ const g=hud.game,p=g.p188Skills,list=hud.list,detail=hud.detail;
+ // Preserve both independent scrolling columns across any list selection,
+ // equip, unequip or learn; no more unexpected reset to the first card.
+ const leftScroll=list.scrollTop;
+ const innerScroll=list.querySelector('.hf-p188-book')?.scrollTop||0;
+ const detailScroll=detail.scrollTop;
+ const selected=ui.p188SelectedSkill&&HIGHFLY_SKILLS_P190.some(s=>s.id===ui.p188SelectedSkill)?
+  ui.p188SelectedSkill:HIGHFLY_SKILLS_P190.find(s=>p.state.discovered[s.id])?.id||
+  HIGHFLY_SKILLS_P190[0].id;
+ ui.p188SelectedSkill=selected;
  list.replaceChildren();detail.replaceChildren();
  list.style.display='';list.style.flexDirection='column';
  const container=E('div','hf-p188-book',undefined,list);
  E('h3',null,'✦ LIBRO DE HABILIDADES · HIGHFLY',container);
- E('p',null,'Todas las habilidades son iguales: descubrí, aprendé y equipá cualquiera en S1–S6. Las runas se consiguen explorando el mundo.',container);
- const count=Object.keys(p.state.learned).length;
- tag(container,count+'/'+HIGHFLY_SKILLS_P190.length+' aprendidas · '+Object.keys(p.state.discovered).length+'/'+HIGHFLY_SKILLS_P190.length+' descubiertas');
- const selected=ui.p188SelectedSkill&&HIGHFLY_SKILLS_P190.some(s=>s.id===ui.p188SelectedSkill)?
-  ui.p188SelectedSkill:HIGHFLY_SKILLS_P190[0].id;
- ui.p188SelectedSkill=selected;
+ E('p',null,'Equipadas primero, luego aprendidas, descubiertas y desconocidas. Sin clases: seis ranuras libres.',container);
+ tag(container,Object.keys(p.state.learned).length+'/'+HIGHFLY_SKILLS_P190.length+
+  ' aprendidas · '+Object.keys(p.state.discovered).length+' descubiertas');
+ const rerender=()=>{ui.render('skills');};
+ const status=sk=>{
+  const position=p.state.equipped.indexOf(sk.id);
+  return position>=0?'S'+(position+1)+' · EQUIPADA':
+   p.state.learned[sk.id]?'APRENDIDA':p.state.discovered[sk.id]?'DESCUBIERTA':'SIN DESCUBRIR';
+ };
  for(const group of [
-  {resource:'ENERGY',title:'⚔ HABILIDADES FÍSICAS · ENERGÍA'},
-  {resource:'MP',title:'✦ HABILIDADES MÁGICAS · MANÁ'}
+  {resource:'ENERGY',title:'⚔ FÍSICAS · ENERGÍA'},
+  {resource:'MP',title:'✦ MÁGICAS · MANÁ'}
  ]){
   E('div','hf-p188-group-title',group.title,container);
-  for(const sk of HIGHFLY_SKILLS_P190.filter(s=>s.resource===group.resource)){
-   const learned=!!p.state.learned[sk.id],seen=!!p.state.discovered[sk.id];
-   const slot=p.state.equipped.indexOf(sk.id)+1;
-   const status=slot?'EQUIPADA S'+slot:learned?'APRENDIDA':seen?'DESCUBIERTA':'SIN DESCUBRIR';
-   const b=E('button','hf-p188-card'+(sk.id===selected?' active':''),undefined,container);
-   b.type='button';
-   E('strong',null,seen?sk.name:'??? · Habilidad oculta',b);
-   E('small',null,status+(seen?' · '+(sk.resource==='MP'?'Maná ':'Energía ')+sk.cost+' · '+sk.cd+' s CD':''),b);
-   b.addEventListener('click',()=>{ui.p188SelectedSkill=sk.id;ui.render('skills');});
-   b.setAttribute('aria-label',sk.name+' '+status);
+  const sorted=HIGHFLY_SKILLS_P190.filter(s=>s.resource===group.resource)
+   .sort((a,b)=>statusRank(p,a.id)-statusRank(p,b.id)||
+     a.name.localeCompare(b.name,'es'));
+  for(const sk of sorted){
+   const seen=!!p.state.discovered[sk.id];
+   const btn=E('button','hf-p188-card hf-p191-card'+
+    (sk.id===selected?' active':'')+(seen?'':' unknown'),undefined,container);
+   btn.type='button';
+   E('strong',null,seen?sk.name:'??? · Por descubrir',btn);
+   E('small',null,status(sk)+(seen?' · '+
+     (sk.resource==='MP'?'Maná ':'Energía ')+sk.cost+' · '+sk.cd+'s':''),btn);
+   btn.addEventListener('click',()=>{
+    ui.p188SelectedSkill=sk.id;
+    rerender();
+   });
   }
  }
- const box=E('div','hf-p188-details',undefined,detail);
  const sk=HIGHFLY_SKILLS_P190.find(x=>x.id===selected);
  const origin=SKILL_ORIGINS_P190.find(x=>x.id===selected);
  const seen=!!p.state.discovered[sk.id],learned=!!p.state.learned[sk.id];
  const equipped=p.state.equipped.indexOf(sk.id)+1;
- E('h3',null,seen?sk.name:'HABILIDAD NO DESCUBIERTA',box);
- tag(box,'Categoría: '+(sk.resource==='MP'?'Mágica':'Física')+' · Apuntado: '+
-  (AIM[(sk.nativeId?NATIVE_AIM_PROFILES_P190[sk.id]:AIM_SPECS_P189[sk.kit+'/'+sk.slot])?.kind]||'Direccional'));
- if(seen)tag(box,'Descripción: '+(DESCRIPTIONS[sk.id]||'Habilidad de combate.'));
- tag(box,'Origen: '+origin.source+(origin.implemented?'':' · CONTENIDO FUTURO'));
+ const box=E('div','hf-p188-details hf-p191-details',undefined,detail);
+ E('h3',null,seen?sk.name:'HABILIDAD POR DESCUBRIR',box);
+ tag(box,(sk.resource==='MP'?'✦ MÁGICA · MANÁ':'⚔ FÍSICA · ENERGÍA')+
+  ' · '+(AIM[(sk.nativeId?NATIVE_AIM_PROFILES_P190[sk.id]:
+   AIM_SPECS_P189[sk.kit+'/'+sk.slot])?.kind]||'Direccional'));
+ if(seen){
+  E('p',null,DESCRIPTIONS[sk.id]||'Habilidad de combate.',box);
+  tag(box,'Coste '+sk.cost+' '+(sk.resource==='MP'?'maná':'energía')+
+   ' · Recarga '+sk.cd+' segundos');
+ }
+ tag(box,'Cómo conseguirla: '+origin.source+
+  (origin.implemented?'':' (misión pendiente)'));
  if(!seen){
-  E('p',null,'Primero completá su misión o conocé a su maestro. No se obtiene por abrir el catálogo.',box);
- }else{
-  tag(box,'Coste: '+sk.cost+' '+(sk.resource==='MP'?'Maná':'Energía')+
-   ' · Recarga: '+sk.cd+' segundos');
-  if(!learned){
-   if(sk.nativeId)E('p',null,'Esta habilidad se aprende al encontrar su piedra de conocimiento. No se desbloquea desde el catálogo.',box);
-   else {
-   const b=E('button',null,'✦ APRENDER HABILIDAD',box);b.type='button';
-   b.addEventListener('click',()=>{if(p.learn(sk.id))ui.render('skills');});
-   }
+  E('p',null,'Todavía no la descubriste. Completá su misión o encontrá su origen en el mundo.',box);
+ }else if(!learned){
+  if(sk.nativeId){
+   E('p',null,'Esta habilidad se aprende en su piedra de conocimiento del mundo.',box);
   }else{
-   E('p',null,equipped?'Equipada en S'+equipped+'.':'Aprendida. Elegí una ranura para usarla.',box);
-   for(let slot=1;slot<=6;slot++){
-    const current=p.selected(slot);
-    const b=E('button',null,'EQUIPAR EN S'+slot+
-     (current?' · sustituye '+current.name:''),box);
-    b.type='button';b.disabled=equipped===slot;
-    b.addEventListener('click',()=>{
-     if(p.equip(sk.id,slot)){
-      g.p186Skills?.drawSkillButtons();ui.render('skills');
-     }
-    });
-   }
-   if(equipped){
-    const unequip=E('button',null,'QUITAR DE S'+equipped,box);
-    unequip.type='button';
-    unequip.addEventListener('click',()=>{p.equip(null,equipped);g.p186Skills?.drawSkillButtons();ui.render('skills');});
-   }
+   const btn=E('button',null,'✦ APRENDER',box);
+   btn.type='button';btn.addEventListener('click',()=>{
+    if(p.learn(sk.id)){g.p186Skills?.drawSkillButtons();rerender();}
+   });
+  }
+ }else{
+  E('div','hf-p188-group-title',equipped?'EQUIPADA EN S'+equipped:
+   'ELEGÍ UNA RANURA',box);
+  const grid=E('div','hf-p191-equip-grid',undefined,box);
+  for(let slot=1;slot<=6;slot++){
+   const existing=p.selected(slot);
+   const active=equipped===slot;
+   const button=E('button','hf-p191-slot'+(active?' active':''),undefined,grid);
+   button.type='button';
+   E('strong',null,'S'+slot,button);
+   E('small',null,active?'✓ ACTUAL':existing?
+     '↔ '+existing.name:'LIBRE',button);
+   button.disabled=active;
+   button.title=existing&&!active?'Reemplazar '+existing.name:'Equipar en S'+slot;
+   button.addEventListener('click',()=>{
+    if(p.equip(sk.id,slot)){g.p186Skills?.drawSkillButtons();rerender();}
+   });
+  }
+  if(equipped){
+   const remove=E('button','hf-p191-unequip','✕ DESEQUIPAR S'+equipped,box);
+   remove.type='button';remove.addEventListener('click',()=>{
+    if(p.equip(null,equipped)){g.p186Skills?.drawSkillButtons();rerender();}
+   });
   }
  }
- tag(box,'Mantené S1–S6, arrastrá para apuntar y soltá para lanzar. La ✕ roja circular cancela sin gastar recursos y se edita desde EDITAR HUD.');
+ E('p',null,'Mantené S1–S6 para apuntar. Arrastrá para orientar, soltá para lanzar. La ✕ roja cancela sin gasto.',box);
+ list.scrollTop=leftScroll;container.scrollTop=innerScroll;
+ detail.scrollTop=detailScroll;
 }
 export function renderProfessionbookP188(hud,ui){
  initStyles();
