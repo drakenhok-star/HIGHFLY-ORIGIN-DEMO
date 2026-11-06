@@ -104,6 +104,7 @@ try{
   const prepared=!!bridge.pendingAim&&bridge.preview?.group.visible &&
     bridge.preview.spec.kind==='line'&&!!circle;
   const circleVisible=getComputedStyle(circle).visibility==='visible';
+  const premiumTip=!!bridge.preview?.guide?.groundTip?.visible;
   const startDir=bridge.pendingAim?.dir.clone();
   document.dispatchEvent(new PointerEvent('pointermove',{bubbles:true,cancelable:true,
    pointerId:24,clientX:910,clientY:290,pointerType:'touch'}));
@@ -111,13 +112,14 @@ try{
   document.dispatchEvent(new PointerEvent('pointercancel',{bubbles:true,cancelable:true,
    pointerId:24,clientX:910,clientY:290,pointerType:'touch'}));
   const cancelled=bridge.pendingAim===null&&!bridge.preview.group.visible;
-  return {prepared,circleVisible,changed,cancelled,mpBefore:mp,mpAfter:g.stats.mp,
+  return {prepared,circleVisible,premiumTip,changed,cancelled,mpBefore:mp,mpAfter:g.stats.mp,
    cooldown:bridge.cooldowns.woc_fireball||0,
    onBody:circle?.parentElement===document.body,
    zIndex:Number(getComputedStyle(circle).zIndex)};
  });
  assert.ok(aiming.prepared,'real L27 3D line telegraph appears before firing');
  assert.ok(aiming.circleVisible,'red cancellation circle visible while aiming');
+ assert.ok(aiming.premiumTip,'P191 ground endpoint reticle visible before cast');
  assert.ok(aiming.onBody&&aiming.zIndex>=100,'cancel above coords/FPS overlay');
  assert.ok(aiming.changed,'drag changes ground aiming orientation');
  assert.ok(aiming.cancelled,'cancellation hides aim');
