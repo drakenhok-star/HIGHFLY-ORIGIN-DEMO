@@ -60,8 +60,7 @@ const DESCRIPTIONS=Object.freeze({
 const AIM={line:'Línea direccional',cone:'Cono direccional',
  circle:'Círculo de área',zone:'Área de destino',dash:'Trayectoria de movimiento',
  self:'Área alrededor del personaje'};
-const AIM={line:'Línea direccional',cone:'Cono direccional',
- circle:'Círculo de área',self:'Área alrededor del personaje'};
+
 export function renderSkillbookP188(hud,ui){
  initStyles();
  const g=hud.game,p=g.p188Skills;
