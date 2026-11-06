@@ -161,7 +161,7 @@ export class WorldEditorP193{
   const put=(id,label,kind,object,ref)=>this.handles.set(id,{id,label,kind,object,ref});
   const s=this.g.structures;
   (s._ringHouses||[]).forEach((o,i)=>put('village:house:'+i,
-    ['Casa del pueblo','Taberna','Casa del pueblo','Casa de Olaf','Casa del pueblo'][i]+' #'+(i+1),
+    ['Casa comunal','Taberna','Taller de recursos','Casa de Olaf','Mercado y cocina'][i]+' #'+(i+1),
     'house',o,null));
   if(s._smithyHouse)put('village:house:5','Herrería de Sigrid','house',s._smithyHouse,null);
   for(const b of this.g.p194CentralTown?.buildings||[]){
