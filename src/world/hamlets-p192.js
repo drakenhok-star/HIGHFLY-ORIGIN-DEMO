@@ -185,7 +185,7 @@ export class P192Hamlets{
  trainersFor(hubId){return ALL_TRAINERS.filter(x=>x.hubId===hubId);}
  update(dt){
   const g=this.game,p=g.player?.pos;
-  if(!p||g.state!=='playing')return;
+  if(!p||g.state!=='playing'||g.p194CentralTown)return; // P194 has placed all trainers centrally
   this._acc+=dt;if(this._acc<.36)return;this._acc=0;
   let nextBuild=null,nextTrainer=null;
   for(const [id,site] of this.sites){
