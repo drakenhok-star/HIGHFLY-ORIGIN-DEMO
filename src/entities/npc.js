@@ -77,7 +77,9 @@ export class NPCs {
   startDialogue(npc) {
     if(this.game.p192Build&&npc.p192TrainerId){
       this.game.setState('dialogue');
-      this.game.menus.showDialogue(this.hamletDialogueP192(npc));
+      const dialogue=this.hamletDialogueP192(npc);
+      this.addClaudeQuestOptionsP197(npc,dialogue);
+      this.game.menus.showDialogue(dialogue);
       return;
     }
     if(this.game.p18Enabled)this.game.livingWorld?.onNpcTalk(npc.id);
