@@ -123,6 +123,11 @@ export class P192Hamlets{
   this.game=game;this.quests=newHamletQuestStateP192();
   this.sites=new Map();this._acc=0;this._lastHub=null;
   for(const hub of INICIOS_HUBS_P186.filter(x=>x.id!=='central_village')){
+   if(game.p194Build){
+    // P194: eliminate expensive exterior-site searches; no exterior settlements.
+    this.sites.set(hub.id,{hub,pos:null,houses:[],trainers:new Set(),status:'pending_central_p194'});
+    continue;
+   }
    const taken=[...this.sites.values()].filter(x=>x.pos).map(x=>x.pos);
    const computed=findHamletSiteP192(game.terrain,game.structures,hub.id,taken);
    const pos=siteForP193(game,hub.id,computed);
