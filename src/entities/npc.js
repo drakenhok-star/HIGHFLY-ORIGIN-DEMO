@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import { npcRoutineP18 } from '../world/world-registry-p18.js';
 import {SIGRID_STARTER_RECIPES_P191,craftWithSigridP191} from '../world/sigrid-forge-p191.js';
 import {openCraftPreviewP192} from '../ui/crafting-preview-p192.js';
+import {HAMLET_QUESTS_P192} from '../world/hamlets-p192.js';
+import {ITEM_DB} from '../systems/inventory.js';
+import {INICIOS_PROFESSIONS_P186} from '../world/inicios-v2-p186.js';
 
 const BJORN_LINES = [
   'Dicen que vieron un dragón cerca de la torre de la montaña.',
@@ -70,6 +73,11 @@ export class NPCs {
   }
 
   startDialogue(npc) {
+    if(this.game.p192Build&&npc.p192TrainerId){
+      this.game.setState('dialogue');
+      this.game.menus.showDialogue(this.hamletDialogueP192(npc));
+      return;
+    }
     if(this.game.p18Enabled)this.game.livingWorld?.onNpcTalk(npc.id);
     this.game.setState('dialogue');
     const dialogue=this.buildDialogue(npc);
@@ -118,6 +126,50 @@ export class NPCs {
       }
     }
     this.game.menus.showDialogue(dialogue);
+  }
+
+  hamletDialogueP192(npc){
+    const game=this.game,runtime=game.p192Hamlets;
+    const hubId=npc.p192HubId,site=runtime.sites.get(hubId);
+    const quest=HAMLET_QUESTS_P192.find(q=>q.hubId===hubId);
+    const status=runtime.status(hubId);
+    const back={label:'Hasta luego',action:()=>game.menus.closeDialogue()};
+    const opts=[];
+    const item=ITEM_DB[quest.item]?.name||quest.item;
+    const owned=game.inventory.slots.get(quest.item)||0;
+    if(status==='available')opts.push({
+      label:'ACEPTAR MISIÓN · '+quest.name,action:()=>{
+        runtime.accept(hubId);this.startDialogue(npc);
+      }
+    });
+    if(runtime.ready(hubId))opts.push({
+      label:'ENTREGAR '+quest.qty+' × '+item+' · recompensa '+quest.gold+' oro',action:()=>{
+        runtime.turnIn(hubId);this.startDialogue(npc);
+      }
+    });
+    if(status==='done'){
+      for(const profession of INICIOS_PROFESSIONS_P186.filter(p=>p.trainerId===npc.id)){
+        const isLearned=game.p187Professions.isLearned(profession.id);
+        if(!isLearned)opts.push({
+          label:'APRENDER '+profession.name+' · Nv. '+profession.introLevel,action:()=>{
+            const res=runtime.learnAtTrainer(npc,profession.id);
+            game.hud.notify(res.ok?'Oficio aprendido: '+profession.name:
+              res.reason==='LEVEL_TOO_LOW'?'Necesitás nivel '+profession.introLevel:
+                'Aún no está disponible esa formación');
+            this.startDialogue(npc);
+          }
+        });
+      }
+    }
+    opts.push(back);
+    const description=status==='available'?
+      'Este pueblo necesita ayuda. '+quest.desc+' Recompensa '+quest.gold+' oro y '+quest.xp+' XP.':
+      status==='active'?
+        'Misión '+quest.name+' · '+item+': '+owned+'/'+quest.qty+
+        '. Conseguí el material en el mundo y regresá a entregarlo.':
+      '¡Gracias por completar '+quest.name+'! Puedo enseñarte mi oficio con materiales reales del mundo.';
+    return {name:npc.name+' · '+(site?.hub.name||'Pueblo'),
+      text:description,options:opts};
   }
 
   _questProgress(id) {
