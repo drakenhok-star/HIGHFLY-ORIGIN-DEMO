@@ -20,7 +20,14 @@ export class HudEditorP10{
  load(){
   try{
    const data=JSON.parse(localStorage.getItem(HUD_LAYOUT_KEY)||'null');
-   return sanitizeHudLayout(data?.layout);
+   const layout=sanitizeHudLayout(data?.layout);
+   // P192: explicit user request to move CANCELAR away from radar X/Z.
+   // Only migrate the unedited historical default, never any custom placement.
+   if(data?.layout?.skillCancel?.x===.788 &&
+      data.layout.skillCancel.y===.31){
+     layout.skillCancel.x=.70;layout.skillCancel.y=.23;
+   }
+   return layout;
   }catch(err){return sanitizeHudLayout();}
  }
  register(id,el){
