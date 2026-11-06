@@ -17,6 +17,8 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --no-save three@0.180.0
+      - name: Verify/download genuinely free Gobkit CC0 boar (pinned hash + real GLB animations)
+        run: bash scripts/fetch_gobkit_boar_p183b.sh
       - name: Verify all JS, ownership, saves and legacy tests
         shell: bash
         run: |
@@ -48,6 +50,8 @@ jobs:
           node-version: '22'
       - run: npm install --no-save playwright@1.58.2
       - run: npx playwright install --with-deps chromium
+      - name: Install pinned genuine CC0 boar used by the existing food and leather quests
+        run: bash scripts/fetch_gobkit_boar_p183b.sh
       - name: Boot actual complete RPG and World Forge
         run: node server.mjs > /tmp/p196-server.log 2>&1 & echo $! > /tmp/p196-server.pid
       - name: Verify editor orbit, 13 safe trainers, readable signs, 15 monsters and game layout transfer
