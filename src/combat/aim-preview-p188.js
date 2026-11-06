@@ -43,9 +43,9 @@ const material=(color,opacity)=>new THREE.MeshBasicMaterial({
  color,transparent:true,opacity,depthWrite:false,depthTest:false,
  side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-1
 });
-function makeSector(){
+function makeSector(angleDeg=85){
  const shape=new THREE.Shape();
- const half=Math.PI*85/180;
+ const half=Math.PI*angleDeg/360;
  shape.moveTo(0,0);
  for(let i=0;i<=30;i++){
   const a=-half+2*half*i/30;
@@ -67,6 +67,7 @@ export class AimPreviewP188{
   line.rotation.x=-Math.PI/2;
   this.line=line;this.group.add(line);
   this.sector=makeSector();this.group.add(this.sector);
+  this.sectorCache=new Map([[85,this.sector.geometry]]);
   const fill=new THREE.Mesh(new THREE.CircleGeometry(1,48),material('#75d7ff',.18));
   fill.rotation.x=-Math.PI/2;
   this.fill=fill;this.group.add(fill);
@@ -79,6 +80,11 @@ export class AimPreviewP188{
  begin(skill){
   this.skillId=skill.id;
   this.spec=AIM_SPECS_P188[skill.id]||{kind:'line',range:10,angleOrRadius:1};
+  if(this.spec.kind==='cone'){
+   const angle=this.spec.angleOrRadius;
+   if(!this.sectorCache.has(angle))this.sectorCache.set(angle,makeSector(angle).geometry);
+   this.sector.geometry=this.sectorCache.get(angle);
+  }
   this.group.visible=true;
  }
  update(player,dir){
@@ -98,8 +104,7 @@ export class AimPreviewP188{
    this.ring.scale.setScalar(Math.max(.6,spec.angleOrRadius));
   }
   if(kind==='cone'){
-   const spread=Math.tan(spec.angleOrRadius*Math.PI/360)/Math.tan(42.5*Math.PI/180);
-   this.sector.scale.set(spec.range*spread,spec.range,1);
+   this.sector.scale.setScalar(spec.range);
    // Rotate the reusable sector within its own local plane to match cone arc.
    // 85° full reusable sector is narrowed by its parent's local scale only
    // for cosmetic preview; hit logic still uses its true aim direction.
@@ -117,8 +122,9 @@ export class AimPreviewP188{
  stop(){this.group.visible=false;this.spec=null;this.skillId=null;}
  dispose(){
   this.stop();this.game.scene.remove(this.group);
+  for(const geo of this.sectorCache.values())geo.dispose();
   this.group.traverse(o=>{
-   o.geometry?.dispose();
+   if(o!==this.sector)o.geometry?.dispose();
    if(o.material?.dispose)o.material.dispose();
   });
  }
