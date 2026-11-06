@@ -12,6 +12,15 @@ import {INICIOS_HUBS_P186,INICIOS_TRAINERS_P186,
 import {HUD_LAYOUT_KEY,HUD_DEFAULTS,sanitizeHudLayout} from '../src/ui/p10-layout.js';
 const source=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const index=JSON.parse(source('docs/audit/WOC0447_WIKI_CROSSWALK_P192.json'));
+const entireRecipes=JSON.parse(source('docs/audit/WOC0447_RECIPES_209_P192.json'));
+const completeWorld=JSON.parse(source('docs/audit/WOC0447_BESTIARY_78_WORLD_15_P192.json'));
+assert.equal(entireRecipes.rows.length,209,'all wiki recipe details retained');
+assert.equal(completeWorld.families.flatMap(f=>f.creatures).length,78);
+assert.equal(completeWorld.zones.length,15);
+assert.equal(completeWorld.dungeons.length,6);
+assert.ok(entireRecipes.rows.every(x=>!x.output?.url),
+ 'no copyrighted visual GLB or icon URLs included');
+
 assert.equal(index.professions.length,15,'all WOC wiki profession routes examined');
 assert.equal(index.professions.filter(x=>x.category==='crafting').length,10);
 assert.equal(index.professions.filter(x=>x.category==='gathering').length,5);
