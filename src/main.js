@@ -391,6 +391,7 @@ const worldLayoutP193=await loadWorldLayoutP193();
 const game = new Game(assets,worldLayoutP193);
 applyCentralLayoutP193(game);
 installCentralTownP194(game); // one safe town, real 13 trainers; no satellite buildings
+if(game.p193EditorMode)game.terrain.prewarmCentralEditorP194();
 if(game.p183cEnabled && !game.p193EditorMode)installBiomeTourP183c(game);
 if(game.p193EditorMode){
   game.setState('world_editor');
