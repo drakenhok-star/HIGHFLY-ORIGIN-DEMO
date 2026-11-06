@@ -330,7 +330,12 @@ export class P186CombatBridge{
   if(skill.resource==='MP'){g.player.castT=0;g.player._castAnimStarted=false;}
   const target=aim?.target||null;
   this.execute(style,skillSlot,pos,dir,oldRecast,target);
-  if(style<3)this.premium.onCast(style,skillSlot,pos,dir);
+  // L25 violet-bolt was drawing fast 'rushLines' across the caster's BODY,
+  // mistaken for an unwanted melee slash after firing a ranged projectile.
+  // Its actual projectile retains glow/trail/impact from L22. Other skills
+  // retain their premium accent layer unchanged.
+  if(style<3 && !(style===0&&skillSlot===1))
+   this.premium.onCast(style,skillSlot,pos,dir);
   this.drawSkillButtons();
   return true;
  }
@@ -340,7 +345,8 @@ export class P186CombatBridge{
   if(style===0){
    if(slot===1){
     const start=pos.clone().add(V(0,1.25,0));
-    fx.launch(pos,dir,0);
+    // Muzzle at the emitter, not two large ground rings through the model.
+    fx.sparks(start.clone().addScaledVector(dir,.4),'#bd92ff',8,1.1,.23,.09);
     this.spawnBolt(start,dir,0,47,17,38); // P190: visible travel, swept collision retained
    }else if(slot===2){
     if(!recast){
@@ -419,7 +425,9 @@ export class P186CombatBridge{
    }
   }else if(style===3){
    if(slot===1){
-    fx.launch(pos,dir,3);cf.fireCharge(pos,dir);
+    // No large caster-centered shock-ring on ordinary ranged fireball.
+    fx.sparks(pos.clone().add(V(0,1.32,0)),'#ffbe69',7,1.0,.21,.09);
+    cf.fireCharge(pos,dir);
     const start=pos.clone().add(V(0,1.32,0)).addScaledVector(dir,.45);
     const airborne=this.focus&&p186IsFlying(this.focus,g)?this.focus:null;
     const aim=airborne?this.targetPoint(airborne).sub(start).normalize():dir;
