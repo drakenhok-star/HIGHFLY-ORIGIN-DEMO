@@ -29,6 +29,13 @@ try{
     buildings:g.p194CentralTown.buildings.length,
     npc:g.npcs.list.length,
     trainerCount:g.p194CentralTown.trainerCount,
+    townAudit:g.p196TownAudit,
+    lanterns:g.p194CentralTown.features.filter(f=>f.id.startsWith('p196:lantern:')).length,
+    premiumSigns:g.p194CentralTown.buildings.filter(b=>b.group.children.some(c=>c.name?.startsWith('HIGHFLY_P196_SIGN_'))).length,
+    enemySpots:g.enemies.p196Spots||[],
+    boarSpotCenter:g.enemies.p196Spots?.find(s=>s.id==='boar_meadow_p196')?.center||null,
+    spotHandles:[...e.handles.keys()].filter(k=>k.startsWith('p196:spot:')),
+    npcCoastal:g.npcs.list.filter(n=>n.p196Town?.safe===false).map(n=>n.id),
     terrainChunks:[...g.terrain.chunks.keys()],
     orbitYaw:e.orbitYaw,orbitElevation:e.orbitElevation,
     bodyText:e.root.innerText.slice(0,1600),
@@ -45,6 +52,14 @@ try{
  assert.equal(before.moonVisible,false,'Moon should not cover a daytime town');
  assert.equal(before.buildings,9);
  assert.equal(before.trainerCount,13);
+ assert.equal(before.townAudit.total,13);
+ assert.equal(before.townAudit.safe,13,'All profession NPC homes should be dry and navigable');
+ assert.equal(before.premiumSigns,9,'Each profession building should have a readable facing sign');
+ assert.ok(before.lanterns>=5,'At least five safe torch posts should light the town');
+ assert.equal(before.spotHandles.length,3,'All wilderness spots should be visible in the editor');
+ assert.equal(before.enemySpots.length,3,'Three wilderness centers must exist');
+ assert.ok(before.enemySpots.every(s=>s.spawned===5),
+   'Each of the three spots should have exactly 5 real monsters: '+JSON.stringify(before.enemySpots));
  assert.equal(before.npc,16);
  assert.equal(before.pier,true);
  assert.ok(before.terrainChunks.includes('0,0') && before.terrainChunks.includes('-1,-1'),
@@ -95,10 +110,14 @@ try{
   const hub=e.handles.get('hub:herbal_hamlet');
   const hb={x:hub.ref.pos.x+.8,z:hub.ref.pos.z+.6};
   e.move(hub,hb.x,hb.z,false);
+  const spot=e.handles.get('p196:spot:boar_meadow_p196');
+  const sp={x:spot.object.position.x+.7,z:spot.object.position.z+.3};
+  e.move(spot,sp.x,sp.z);
   const saved=e.captureLayout();
   return {district:saved.entities['p194:district:apothecary'],
     portal:saved.entities['p194:portal'],
     pier:saved.entities['p194:pier'],
+    spot:saved.entities['p196:spot:boar_meadow_p196'],
     hub:saved.hubs.herbal_hamlet,
     savedOK:e.saveDraft(),
     localStorageKey:'hf_p195_world_forge_v2_draft',
@@ -130,6 +149,9 @@ try{
     expectedPierY:g.terrain.waterY+1.05,
     hub:{x:hub.pos.x,z:hub.pos.z},
     trainers:g.npcs.list.filter(n=>n.p192TrainerId).length,
+    townAudit:g.p196TownAudit,
+    enemySpots:g.enemies.p196Spots||[],
+    lanterns:g.p194CentralTown.features.filter(f=>f.id.startsWith('p196:lantern:')).length,
     outlyingBuildings:[...g.p192Hamlets.sites.values()]
       .reduce((sum,v)=>sum+v.houses.filter(Boolean).length,0),
     savedSchema:g.worldLayoutP193.schemaVersion
@@ -141,6 +163,10 @@ try{
  assert.equal(actual.gameWaterMaterial,'MeshPhongMaterial'); // original material must remain unchanged
  assert.equal(actual.savedSchema,193);
  assert.equal(actual.trainers,13);
+ assert.equal(actual.townAudit.safe,13);
+ assert.equal(actual.enemySpots.length,3);
+ assert.ok(actual.enemySpots.every(s=>s.spawned===5),
+   'Play mode should preserve fifteen added monsters');
  assert.equal(actual.outlyingBuildings,0);
  for(const id of ['district','portal','pier']){
   for(const key of ['x','z','rotation'])assert.ok(
@@ -149,6 +175,9 @@ try{
  }
  assert.ok(Math.abs(actual.pier.y-actual.expectedPierY)<.001,
    'Pier must stay at real water elevation');
+ for(const id of ['x','z'])assert.ok(
+  Math.abs(actual.boarSpotCenter[id]-edits.spot[id])<153,
+  'Edited wilderness camp must remain grounded near the requested position');
  for(const id of ['x','z'])assert.ok(
   Math.abs(actual.hub[id]-edits.hub[id])<.015,
   'Quest hub '+id+' must match editor');
