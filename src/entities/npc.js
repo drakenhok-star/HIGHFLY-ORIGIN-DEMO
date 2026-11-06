@@ -126,6 +126,16 @@ export class NPCs {
         [...options,...dialogue.options]:[...options];
       }
     }
+    if(this.game.p192Build&&npc.id==='sigrid'){
+      for(const recipe of GEAR_RECIPES_P192.filter(r=>r.trainerId==='sigrid'&&
+        this.game.p187Professions?.isLearned(r.profession))){
+        dialogue.options.unshift({
+          label:'VER RECETA · '+recipe.name,
+          action:()=>openCraftPreviewP192(this,npc,recipe,
+            ()=>craftGearP192(this.game,npc.id,recipe.id))
+        });
+      }
+    }
     this.game.menus.showDialogue(dialogue);
   }
 
