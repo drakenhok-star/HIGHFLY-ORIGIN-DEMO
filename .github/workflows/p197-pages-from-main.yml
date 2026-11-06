@@ -79,29 +79,53 @@ jobs:
         run: |
           cd p197-source
           bash scripts/fetch_gobkit_boar_p183b.sh
-      - name: Assemble immutable root, P193, P194, P197 without private packs
+      - name: Assemble DEDUPLICATED immutable editions with one shared CC0 asset library
         shell: bash
         run: |
           set -Eeuo pipefail
           mkdir -p .site .site/p193 .site/p194 .site/p197
-          cp -a index.html styles.css LICENSE PROVENANCE.md src lib assets .site/
-          cp -a p193-source/index.html p193-source/editor.html p193-source/styles.css \
-            p193-source/LICENSE p193-source/PROVENANCE.md p193-source/src \
-            p193-source/lib p193-source/assets .site/p193/
-          cp -a p194-source/index.html p194-source/editor.html p194-source/styles.css \
-            p194-source/LICENSE p194-source/PROVENANCE.md p194-source/src \
-            p194-source/lib p194-source/assets .site/p194/
-          cp -a p197-source/index.html p197-source/editor.html p197-source/styles.css \
-            p197-source/LICENSE p197-source/PROVENANCE.md p197-source/src \
-            p197-source/lib p197-source/assets .site/p197/
+          # The original P192 page keeps its exact document-relative paths.
+          cp -a index.html styles.css LICENSE PROVENANCE.md src lib basis assets .site/
+          # Confirmed SHA-identical model GLBs across P192/P193/P194/P197.
+          # The only additional P197 asset is the independently audited CC0 boar.
+          cp -a p197-source/assets/models/boar_gobkit_cc0.glb .site/assets/models/
+          # Keep distinct executable source for all editions, but do NOT
+          # replicate 30 MB of GLBs or 2 MB of Three.js in each folder.
+          for edition in p193 p194 p197; do
+            source_dir="${edition}-source"
+            dest=".site/${edition}"
+            mkdir -p "${dest}/assets"
+            cp -a "${source_dir}/index.html" "${source_dir}/editor.html" \
+              "${source_dir}/styles.css" "${source_dir}/LICENSE" \
+              "${source_dir}/PROVENANCE.md" "${source_dir}/src" "${dest}/"
+            # Each edition retains its OWN authored world layout JSON.
+            cp -a "${source_dir}/assets/world-layout-p193.json" "${dest}/assets/"
+            # HTML import maps share the exact same pinned local Three.js build.
+            sed -i 's#\./lib/#../lib/#g' "${dest}/index.html" "${dest}/editor.html"
+            # GLTF models and Basis decoder are only referenced by this loader.
+            sed -i -e 's#\./assets/models/#../assets/models/#g' \
+              -e 's#\./basis/#../basis/#g' "${dest}/src/core/assets.js"
+            grep -Fq '../lib/three.module.js' "${dest}/index.html"
+            grep -Fq '../lib/three.module.js' "${dest}/editor.html"
+            grep -Fq '../assets/models/player_barbarian.glb' "${dest}/src/core/assets.js"
+            grep -Fq '../basis/' "${dest}/src/core/assets.js"
+            grep -Fq './assets/world-layout-p193.json' "${dest}/src/world/world-layout-p193.js"
+            test -s "${dest}/assets/world-layout-p193.json"
+          done
           touch .site/.nojekyll
           echo '3a4aa2615bf3f0cff1958967865b18d39b9fe53b' > .site/BUILD_P192.txt
           echo '3814935442c23b2fe055f6040e0dcc5e52150e59' > .site/p193/BUILD_P193.txt
           echo '57889b92df8b693736397a5bddb3504c9b55a7e5' > .site/p194/BUILD_P194.txt
           echo '0f9c3cfd3af1d8ffc2df374722502ddf1e678450' > .site/p197/BUILD_P197.txt
-          test -s .site/p197/assets/models/boar_gobkit_cc0.glb
+          test -s .site/assets/models/boar_gobkit_cc0.glb
           test -s .site/p197/editor.html
           test -s .site/p197/src/world/claudecraft-quests-p197.js
+          # Fail closed if pack bloat accidentally returns: the full 4-edition
+          # release should take less than 60 MiB unpacked, not 4 x 35 MiB.
+          bytes=$(du -sb .site | cut -f1)
+          echo "Pages publish size: ${bytes} bytes"
+          test "$bytes" -lt 62914560
+          test "$(find .site -name 'player_barbarian.glb' | wc -l)" -eq 1
           ! find .site -type f \( -iname '*SOURCE*.zip' -o -iname '*CraftPix*' \) | grep -q .
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
