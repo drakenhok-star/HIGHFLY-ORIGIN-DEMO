@@ -170,7 +170,8 @@ export class PremiumHudP5 {
     this.fireButton=add('S1\nMAGIA','s1',()=>{this.game.input.rightClick=true;});
     this.fusButton=add('S2\nFUS','s2',()=>this.shout('fus'));
     this.frostButton=add('S3\nHIELO','s3',()=>this.shout('frost'));
-    this.wuldButton=add('S4\nWULD','s4',()=>this.shout('wuld'));
+    this.wuldButton=add('S4\nTÉCNICA','s4',()=>this.shout(
+      this.game.p189Build?this.game.combat.equippedShout:'wuld'));
     this.skillButtons = [this.frostButton,this.wuldButton];
     if(this.game.p6Enabled){
       add('FIJAR','p6-lock',()=>this.game.input.justPressed.add('KeyL'));
@@ -255,7 +256,8 @@ export class PremiumHudP5 {
     }
     const learned=(g.combat&&g.combat.learnedShouts)||[];
     if(!(g.p188Build&&g.p186Skills))this.frostButton.classList.toggle('hf-p5-locked',!learned.includes('frost'));
-    this.wuldButton.classList.toggle('hf-p5-locked',!learned.includes('wuld'));
+    this.wuldButton.classList.toggle('hf-p5-locked',
+      !learned.includes(g.p189Build?g.combat.equippedShout:'wuld'));
     if(g.p6Enabled && g.targeting){
       const lock=g.targeting.locked,soft=g.targeting.soft,target=lock||soft;
       const combo=!g.p810Enabled && g.p7Enabled && g.combat?.comboTimer>0?'⚔ COMBO '+g.combat.comboStep+'/4 · ':'';
@@ -269,6 +271,14 @@ export class PremiumHudP5 {
       for(let i=0;i<4;i++){
         const button=[this.fireButton,this.fusButton,this.frostButton,this.wuldButton][i];
         if(g.p188Build && i<3 && g.p186Skills)continue;
+        if(g.p189Build&&i===3){
+         const selected=g.combat.equippedShout||'fus';
+         const rem=g.combat.shoutCooldowns[selected]||0;
+         const key=selected==='frost'?'HIELO':selected.toUpperCase();
+         const label='S4\n'+(rem>.1?rem.toFixed(1)+'s':key);
+         if(button.textContent!==label)button.textContent=label;
+         continue;
+        }
         button.textContent='S'+(i+1)+'\n'+(remaining[i]>0.1?remaining[i].toFixed(1)+'s':labels[i]);
       }
     }else this.targetLine.style.display='none';
