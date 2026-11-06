@@ -37,7 +37,10 @@ export class PerfGovernorP163 {
     this.window=null;
     this.movesDown=0;this.movesUp=0;this.presetTransitions=0;
     this.baseDpr=game.renderer.getPixelRatio();
-    this.dprMin=Math.min(this.baseDpr,P163_DPR_FLOOR);
+    // Clarity preserves more spatial detail in character silhouettes, yet
+    // can still downscale slightly under sustained GPU pressure.
+    this.dprMin=Math.min(this.baseDpr,
+      game.p191Build&&game.performanceP2?.preset==='CLARITY'?.95:P163_DPR_FLOOR);
     this.reason=this.enabled?'warming':'disabled';
     if(typeof window!=='undefined')window.highflyP163Report=()=>this.report();
     if(game.mobileAudit?.report){
@@ -50,7 +53,8 @@ export class PerfGovernorP163 {
     this.presetTransitions++;
     this.samples.length=0;this.lastTime=null;this.lastDecision=performance.now();
     this.baseDpr=this.game.renderer.getPixelRatio();
-    this.dprMin=Math.min(this.baseDpr,P163_DPR_FLOOR);
+    this.dprMin=Math.min(this.baseDpr,
+      this.game.p191Build&&this.game.performanceP2?.preset==='CLARITY'?.95:P163_DPR_FLOOR);
     this.reason='preset-change';
   }
 
@@ -58,7 +62,7 @@ export class PerfGovernorP163 {
     if(!this.enabled)return;
     const g=this.game;
     if(g.state!=='playing'||g.p812Eco||document.visibilityState==='hidden'||
-       (g.performanceP2?.preset!=='FLUID'&&g.performanceP2?.preset!=='BALANCED')){
+       (g.performanceP2?.preset!=='FLUID'&&g.performanceP2?.preset!=='BALANCED'&&g.performanceP2?.preset!=='CLARITY')){
       this.lastTime=null;this.samples.length=0;
       this.reason=g.p812Eco?'eco-cap':g.state!=='playing'?'not-playing':'not-lite-preset';
       return;

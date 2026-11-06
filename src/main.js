@@ -63,6 +63,7 @@ class Game {
     this.p188Build=true; // independent P188 save and RPG skill discovery
     this.p189Build=true; // L27 real aim + editor refinement
     this.p190Build=true; // six equal skills / guarded P190 save migration
+    this.p191Build=true; // skillbook UX, graphics clarity, HUD ergonomics; preserves P190 save
     this.p183Enabled=!new URLSearchParams(location.search).has('hf_p183_off');
     this.p183bEnabled=this.p183Enabled&&!new URLSearchParams(location.search).has('hf_p183b_off');
     this.p183cEnabled=this.p183bEnabled&&!new URLSearchParams(location.search).has('hf_p183c_off');
@@ -81,7 +82,14 @@ class Game {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 0.5;
+    // P191: modest lift in low-light character readability; user-adjustable
+    // and independent of costly bloom/shadows/extra geometry.
+    let exposure=this.p191Build?.62:.5;
+    if(this.p191Build)try{
+     const saved=Number(localStorage.getItem('hf_p191_exposure'));
+     if(saved>=.4&&saved<=1.2)exposure=saved;
+    }catch(e){}
+    this.renderer.toneMappingExposure=exposure;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(this.renderer.domElement);

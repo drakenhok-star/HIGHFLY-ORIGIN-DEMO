@@ -49,6 +49,13 @@ export class HudEditorP10{
    el.style.setProperty('height','auto','important');
   }
   el.classList.toggle('hf-p10-selected',this.editing && this.selected===id);
+  // FPS/MS was impossible to drag because its CSS makes it click-through.
+  if(id==='perf'){
+   el.style.setProperty('pointer-events',this.editing?'auto':'none','important');
+   el.style.setProperty('touch-action',this.editing?'none':'auto','important');
+   el.style.setProperty('cursor',this.editing?'move':'default','important');
+   el.style.setProperty('z-index',this.editing?'140':'46','important');
+  }
   if(id==='skillCancel'){
    // Escape the HUD parent stacking context: above coords/FPS, below HUD editor.
    el.style.setProperty('z-index','119','important');
@@ -94,10 +101,18 @@ export class HudEditorP10{
    node('span',null,text,group);
    const input=node('input',null,undefined,group);
    input.type='range';input.min=String(min);input.max=String(max);input.step=String(step);
-   input.addEventListener('input',()=>onInput(Number(input.value)));return input;
+   const label=node('strong',null,'',group);label.style.cssText='font:750 10px system-ui;min-width:30px';
+   input.addEventListener('input',()=>{
+    label.textContent=text.includes('%')?input.value+'%':input.value;
+    onInput(Number(input.value));
+   });
+   input._valueLabel=label;return input;
   };
-  this.size=makeSlider('TAMAÑO',28,230,1,v=>this.change('size',v));
+  this.size=makeSlider('TAMAÑO PX',28,230,1,v=>this.change('size',v));
+  this.percent=makeSlider('TAMAÑO %',40,300,5,v=>this.changeSizePercent(v));
   this.opacity=makeSlider('OPACIDAD',.25,1,.05,v=>this.change('opacity',v));
+  this.allSkillsPercent=makeSlider('6 SKILLS %',50,190,5,v=>this.equalizeSkillSizes(v));
+  this.allSkillsPercent.value='100';this.allSkillsPercent._valueLabel.textContent='100%';
   const buttons=node('div','hf-p10-editor-buttons',undefined,this.panel);
   const action=(text,fn)=>{const b=node('button',null,text,buttons);b.type='button';b.addEventListener('click',fn);};
   action('CENTRAR SELECCIÓN',()=>{this.change('x',.5);this.change('y',.48);});
@@ -109,13 +124,37 @@ export class HudEditorP10{
  choose(id){
   if(!this.layout[id])return;
   this.selected=id;this.select.value=id;this.size.value=String(this.layout[id].size);
+  this.size._valueLabel.textContent=String(this.layout[id].size);
   this.opacity.value=String(this.layout[id].opacity);
+  this.opacity._valueLabel.textContent=String(this.layout[id].opacity);
+  const percent=clamp(Math.round(this.layout[id].size/HUD_DEFAULTS[id].size*100/5)*5,40,300);
+  this.percent.value=String(percent);this.percent._valueLabel.textContent=percent+'%';
   this.apply();
  }
  change(key,value){
   if(!this.layout[this.selected])return;
   this.layout[this.selected][key]=value;
   this.applyOne(this.selected);
+  if(key==='size'){
+   this.size.value=String(value);this.size._valueLabel.textContent=String(value);
+   const pc=clamp(Math.round(value/HUD_DEFAULTS[this.selected].size*100/5)*5,40,300);
+   this.percent.value=String(pc);this.percent._valueLabel.textContent=pc+'%';
+  }
+ }
+ changeSizePercent(percent){
+  const original=HUD_DEFAULTS[this.selected];if(!original)return;
+  this.change('size',clamp(Math.round(original.size*percent/100),26,230));
+  this.percent.value=String(percent);this.percent._valueLabel.textContent=percent+'%';
+ }
+ equalizeSkillSizes(percent){
+  // All six circles get the same pixel diameter, without shifting saved positions.
+  const size=clamp(Math.round(HUD_DEFAULTS.s1.size*percent/100),26,230);
+  for(const id of ['s1','s2','s3','s4','s5','s6']){
+   this.layout[id].size=size;this.applyOne(id);
+  }
+  this.allSkillsPercent.value=String(percent);
+  this.allSkillsPercent._valueLabel.textContent=percent+'%';
+  this.choose(this.selected);this.persist();
  }
  start(){
   if(this.editing)return;

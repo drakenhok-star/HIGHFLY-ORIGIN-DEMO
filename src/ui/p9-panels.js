@@ -271,11 +271,22 @@ export class HighflyPanelsP9 {
     el('p','hf-p9-muted','Ahorro térmico: limita la tasa de cuadros y baja resolución interna. No mide temperatura ni garantiza que el equipo no se caliente.',content);
    }
    const wrap=el('div','hf-p9-meta',undefined,content);
-   for(const [id,label] of [['FLUID','FLUIDO'],['BALANCED','EQUILIBRADO+'],['WATER','AGUA'],['HIGH','ALTA']]){
+   for(const [id,label] of [['FLUID','FLUIDO'],['CLARITY','NÍTIDO'],['BALANCED','EQUILIBRADO+'],['WATER','AGUA'],['HIGH','ALTA']]){
     const button=el('button',null,(g.performanceP2?.preset===id?'● ':'○ ')+label,wrap);
     button.addEventListener('click',()=>{g.performanceP2.apply(id);this.renderSettings();});
    }
-   el('p','hf-p9-muted','FPS y perfil de GPU aparecen bajo el radar. El porcentaje de utilización GPU no está disponible de forma fiable en WebGL.',content);
+   el('p','hf-p9-muted','Nitidez actual (resolución interna): '+g.renderer.getPixelRatio().toFixed(2)+'×. NÍTIDO prioriza al personaje, pero puede bajar FPS si la GPU está exigida.',content);
+   if(g.p191Build)slider('Claridad nocturna',.4,1.2,.05,
+    Number(g.renderer.toneMappingExposure.toFixed(2)),v=>{
+     g.renderer.toneMappingExposure=v;
+     try{localStorage.setItem('hf_p191_exposure',String(v));}catch(e){}
+    });
+   click('◎ CÁMARA DE COMBATE MÁS CERCANA',()=>{
+    g.player.camDist=7.5;
+    try{localStorage.setItem('hf_p9_cam_dist','7.5');}catch(e){}
+    this.renderSettings();
+   });
+   el('p','hf-p9-muted','FPS y milisegundos por cuadro son editables en EDITAR HUD. P95 queda en COPIAR DATOS, no en pantalla.',content);
   }else if(st==='hud'){
    el('p','hf-p9-muted','Arrastrá controles en el mundo y guardá sus posiciones. Cada botón tiene tamaño y opacidad propios.',content);
    click('✥ ABRIR EDITOR HUD',()=>{this.hud.hide();this.ui.editor.start();});

@@ -11,6 +11,7 @@ const PRESETS = [
   { id: 'WATER', label: 'AGUA', desc: 'Agua liviana, resto en calidad alta' },
   { id: 'FLUID', label: 'FLUIDO', desc: 'Agua liviana, menos píxeles y efectos pesados' },
   { id: 'BALANCED', label: 'EQUILIBRADO+', desc: 'Agua liviana, nitidez 1.15x, sin reflejos completos ni sombras costosas' },
+  { id: 'CLARITY', label: 'NÍTIDO', desc: 'Personajes más legibles: resolución 1.1x y agua optimizada, sin bloom ni sombras pesadas' },
 ];
 
 export class PerformanceP2 {
@@ -76,7 +77,10 @@ export class PerformanceP2 {
     this.originalMaxAnisotropy = null;
 
     this.mount();
-    this.apply('FLUID'); // Important: urgent phone test starts optimized; tap to compare
+    // P191: the old default 0.88 DPR + adaptive fall to 0.70 made the
+    // S23 hero visibly pixelated. CLARITY starts at 1.10 and adapts down
+    // to ~0.95 rather than dropping straight to 0.70.
+    this.apply(game.p191Build?'CLARITY':'FLUID');
     if (game.mobileAudit && typeof game.mobileAudit.report === 'function') {
       const base = game.mobileAudit.report.bind(game.mobileAudit);
       game.mobileAudit.report = () => ({ ...base(), p2Mode: this.preset, p2Preset: PRESETS.find(p => p.id === this.preset).label });
@@ -121,13 +125,15 @@ export class PerformanceP2 {
     if (this.flatWaterGeometry) game.water.mesh.geometry = isHigh ? this.originalWaterGeometry : this.flatWaterGeometry;
     const isFluid = id==='FLUID';
     const isBalanced = id==='BALANCED';
-    const isLight = isFluid || isBalanced;
+    const isClarity = id==='CLARITY';
+    const isLight = isFluid || isBalanced || isClarity;
     if (this.bloomPass) this.bloomPass.enabled = isLight ? false : this.originalBloom;
     game.renderer.shadowMap.enabled = isLight ? false : this.originalShadow;
     // Pixel resolution is the key GPU fill-rate diagnostic. Full original quality
     // is recoverable at any moment by pressing the preset button.
     const targetDpr = isFluid ? Math.min(window.devicePixelRatio || 1, game.p812Enabled?(game.p812Eco?.72:.88):1.0)
-      : isBalanced ? Math.min(window.devicePixelRatio || 1, 1.15) : this.defaultDpr;
+      : isBalanced ? Math.min(window.devicePixelRatio || 1, 1.15)
+      : isClarity ? Math.min(window.devicePixelRatio || 1, 1.10) : this.defaultDpr;
     game.renderer.setPixelRatio(targetDpr);
     game.onResize();
 

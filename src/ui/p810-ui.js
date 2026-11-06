@@ -25,6 +25,15 @@ export class HighflyP810{
   this.panels=new HighflyPanelsP9(hud,this);
   document.body.classList.add('hf-p810');
   const style=node('style',null,CSS,document.head);style.id='highfly-p810-style';
+  style.textContent += [
+   'body.hf-p810 #hf-worldcoords{display:block!important;position:fixed;z-index:47;',
+   'width:auto;min-width:100px;max-width:160px;padding:3px 7px;',
+   'font:700 10px/1.2 system-ui;letter-spacing:.1px;text-align:center;',
+   'color:#fff2c8;background:#1b1239d9;border:1px solid #986bc899;',
+   'border-radius:7px;pointer-events:none;white-space:nowrap}',
+   'body.hf-p810.hf-p10-editing #hf-p810-perf{pointer-events:auto!important;',
+   'touch-action:none!important;cursor:move!important;z-index:140!important}'
+  ].join('');
   this.editor=new HudEditorP10(hud);
   this.mountHud();
   // The async module loads after Game construction; map already exists.
@@ -80,7 +89,7 @@ export class HighflyP810{
    e.preventDefault();e.stopPropagation();this.toggleQuickMenu();
   });
   this.editor.register('menu',menu);
-  const perf=node('div',null,'FPS — · GPU —',document.body);
+  const perf=node('div',null,'FPS — · — ms',document.body);
   perf.id='hf-p810-perf';this.perf=perf;
   this.editor.register('perf',perf);
   const combo=node('div',null,'',document.body);
@@ -134,6 +143,11 @@ export class HighflyP810{
   if(!map?.mini)return;
   this._mapMounted=true;
   this.editor.register('radar',map.mini);
+  // Show REAL player X/Z just BELOW the circular radar, not clipped inside it.
+  // Reparent only a display node; the map's game logic still owns its text.
+  if(map.coords?.parentElement!==document.body){
+   document.body.appendChild(map.coords);
+  }
   map.zoom=120;
   const zoom=node('div',null,undefined,document.body);
   zoom.id='hf-p810-mapzoom';
@@ -170,7 +184,19 @@ export class HighflyP810{
   if(this.zoom){
    this.zoom.style.display=visible&&!this.editor.editing?'flex':'none';
    const radar=this.game.worldMapP34?.mini?.getBoundingClientRect();
-   if(radar){this.zoom.style.left=Math.min(window.innerWidth-31,radar.right+2)+'px';this.zoom.style.top=Math.max(5,radar.top+radar.height/2-28)+'px';}
+   if(radar){
+    this.zoom.style.left=Math.min(window.innerWidth-31,radar.right+2)+'px';
+    this.zoom.style.top=Math.max(5,radar.top+radar.height/2-28)+'px';
+    const coords=this.game.worldMapP34?.coords;
+    if(coords&&(!this._lastCoordLayout||performance.now()-this._lastCoordLayout>160)){
+     this._lastCoordLayout=performance.now();
+     const estimatedWidth=108;
+     coords.style.left=Math.max(2,Math.min(window.innerWidth-estimatedWidth-3,
+      radar.left+radar.width/2-estimatedWidth/2))+'px';
+     coords.style.top=Math.min(window.innerHeight-18,radar.bottom+4)+'px';
+     coords.style.visibility=visible?'visible':'hidden';
+    }
+   }
   }
   if(!visible)return;
   this.frames++;
@@ -184,8 +210,8 @@ export class HighflyP810{
   if(this.game.p812Enabled){
     const measured=this.game.mobileAudit;
     const real=Number.isFinite(measured?.fps)?measured.fps:fps;
-    const p95=Number.isFinite(measured?.p95)?Math.round(measured.p95):null;
-    this.perf.textContent='FPS '+real+(p95?' · P95 '+p95+'ms':'');
+    // Normal HUD shows frame-average ms; P95 remains in COPIAR DATOS telemetry.
+    this.perf.textContent='FPS '+real+' · '+Math.max(1,Math.round(this.ms))+' ms';
   }else this.perf.textContent='FPS '+fps+' · GPU — · '+profile;
  }
 }

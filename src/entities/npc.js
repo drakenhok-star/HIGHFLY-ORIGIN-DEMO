@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { npcRoutineP18 } from '../world/world-registry-p18.js';
+import {SIGRID_STARTER_RECIPES_P191,craftWithSigridP191} from '../world/sigrid-forge-p191.js';
 
 const BJORN_LINES = [
   'Dicen que vieron un dragón cerca de la torre de la montaña.',
@@ -91,6 +92,29 @@ export class NPCs {
         }
       };
       dialogue.options=Array.isArray(dialogue.options)?[teacher,...dialogue.options]:[teacher];
+    }
+    if(this.game.p191Build&&npc.id==='sigrid'){
+      const intro=SIGRID_STARTER_RECIPES_P191.filter(recipe=>
+       this.game.p187Professions?.isLearned(recipe.profession));
+      if(intro.length){
+       const options=intro.map(recipe=>({
+        label:recipe.name+' ('+recipe.inputs.map(x=>x.qty+' '+(
+         x.id==='wolf_pelt'?'pieles de lobo':'colmillos de lobo')).join(' + ')+
+         ' + '+recipe.gold+' oro)',
+        action:()=>{
+         const result=craftWithSigridP191(this.game,recipe.id);
+         if(result.ok)this.startDialogue(npc);
+         else this.game.hud.notify({
+          MISSING_MATERIALS:'Necesitás los materiales indicados de lobos del mundo',
+          MISSING_GOLD:'No tenés suficiente oro',
+          PROFESSION_NOT_LEARNED:'Primero aprendé el oficio con Sigrid',
+          NOT_AT_FORGE:'Acercate a Sigrid y su forja'
+         }[result.reason]||'No se pudo realizar esa fabricación');
+        }
+       }));
+       dialogue.options=Array.isArray(dialogue.options)?
+        [...options,...dialogue.options]:[...options];
+      }
     }
     this.game.menus.showDialogue(dialogue);
   }

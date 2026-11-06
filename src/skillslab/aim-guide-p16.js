@@ -34,6 +34,20 @@ export class TianjieAimGuide {
     new THREE.MeshBasicMaterial({color:0xf8f5ff,transparent:true,opacity:.75,
       depthWrite:false,blending:THREE.AdditiveBlending}));
   this.aerialTip.visible=false;game.scene.add(this.aerialTip);
+  // P191: original lightweight MOBA-like endpoint cue; two reusable meshes,
+  // no downloaded art, no extra particles/draw calls outside active aiming.
+  this.groundTip=new THREE.Mesh(new THREE.RingGeometry(.36,.60,30),
+    new THREE.MeshBasicMaterial({color:0xc591ff,opacity:.92,
+     transparent:true,depthWrite:false,side:THREE.DoubleSide,
+     blending:THREE.AdditiveBlending}));
+  this.groundTip.rotation.x=-Math.PI/2;
+  this.groundTip.renderOrder=13;this.groundTip.visible=false;
+  game.scene.add(this.groundTip);
+  this.groundDot=new THREE.Mesh(new THREE.CircleGeometry(.11,14),
+    new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,
+     opacity:.90,depthWrite:false,side:THREE.DoubleSide}));
+  this.groundDot.rotation.x=-Math.PI/2;this.groundDot.renderOrder=14;
+  this.groundDot.visible=false;game.scene.add(this.groundDot);
  }
  surface(triangles,color,opacity=.3,parent=this.root){
   // X,Z triangulation stays unchanged. Y samples its OWN mountain height.
@@ -138,6 +152,7 @@ export class TianjieAimGuide {
   this._lastCenter.set(1e6,0,0);this._lastYaw=1e6;this._lastRefresh=-1;
   this.lastArcPoint=null;this.lastArcOrigin=null;
   this.aerialBeam.visible=false;this.aerialTip.visible=false;
+  this.groundTip.visible=false;this.groundDot.visible=false;
  }
  begin(style,slot,override=null){
   this.clear();this.profile=override||AIM_PROFILES[style]?.[slot-1]||AIM_PROFILES[0][0];
@@ -244,6 +259,21 @@ export class TianjieAimGuide {
    this._lastCenter.copy(center);this._lastYaw=turn;this._lastRefresh=now;
   }
   const color=blocked?0xff3559:this.mainColor;
+  // A distinct animated destination mark makes range readable without
+  // changing hitboxes, direction/cancel logic or the original L27 geometry.
+  const showTip=q.kind!=='self'&&!this.aerialBeam.visible;
+  this.groundTip.visible=showTip;this.groundDot.visible=showTip;
+  if(showTip){
+   const tip=q.kind==='zone'?center.clone():
+    origin.clone().addScaledVector(dir,q.range);
+   tip.y=g.terrain.getHeight(tip.x,tip.z)+.24;
+   this.groundTip.position.copy(tip);
+   this.groundDot.position.copy(tip).add(new THREE.Vector3(0,.025,0));
+   this.groundTip.material.color.setHex(color);
+   this.groundDot.material.color.setHex(blocked?0xff7a83:0xffffff);
+   const pulse=1+.10*Math.sin(now*7.5);
+   this.groundTip.scale.setScalar(pulse);
+  }
   for(const o of this.root.children)
    if(o.material?.color&&o.material.opacity>.85)o.material.color.setHex(color);
   return {direction:dir,target:center.clone(),valid:this.valid};
