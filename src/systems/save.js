@@ -13,12 +13,13 @@ const KEY_P187 = 'highfly_p187_save';
 const KEY_P188 = 'highfly_p188_save';
 const KEY_P190 = 'highfly_p190_save';
 const KEY_P192 = 'highfly_p192_save';
+const KEY_P196 = 'highfly_p196_save'; // never overwrites stable P192/P194 progress
 
 export class SaveSys {
   constructor(game) {
     this.game = game;
     this.autosaveTimer = 0;
-    this.key=game.p192Build?KEY_P192:game.p190Build?KEY_P190:game.p188Build?KEY_P188:game.p187Build?KEY_P187:game.p183Build?KEY_P183:game.p182Build?KEY_P182:game.p18Build?KEY_P18:game.p16Enabled?KEY_P16:game.p15Enabled?KEY_P15:game.p14Enabled?KEY_P14:game.p13Enabled?KEY_P13:game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
+    this.key=game.p196Build?KEY_P196:game.p192Build?KEY_P192:game.p190Build?KEY_P190:game.p188Build?KEY_P188:game.p187Build?KEY_P187:game.p183Build?KEY_P183:game.p182Build?KEY_P182:game.p18Build?KEY_P18:game.p16Enabled?KEY_P16:game.p15Enabled?KEY_P15:game.p14Enabled?KEY_P14:game.p13Enabled?KEY_P13:game.p812Enabled?KEY_P812:game.p810Enabled?KEY_P810:game.p7Enabled?KEY:LEGACY_KEY;
   }
 
   save({silent=false}={}) {
@@ -52,6 +53,7 @@ export class SaveSys {
 
   hasSave() {
     return localStorage.getItem(this.key) !== null ||
+      (this.game.p196Build && localStorage.getItem(KEY_P192)!==null) ||
       (this.game.p192Build && localStorage.getItem(KEY_P190)!==null) ||
       (this.game.p190Build && (localStorage.getItem(KEY_P188)!==null || localStorage.getItem(KEY_P187)!==null)) ||
       (this.game.p188Build && localStorage.getItem(KEY_P187)!==null) ||
@@ -71,6 +73,7 @@ export class SaveSys {
   loadRaw() {
     // First P7 visit reads P6 progress, but writes ONLY P7: original never overwritten.
     const raw = localStorage.getItem(this.key) ||
+      (this.game.p196Build?localStorage.getItem(KEY_P192):null) ||
       (this.game.p192Build?localStorage.getItem(KEY_P190):null) ||
       (this.game.p190Build?localStorage.getItem(KEY_P188):null) ||
       (this.game.p188Build?localStorage.getItem(KEY_P187):null) ||
