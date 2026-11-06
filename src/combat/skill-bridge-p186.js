@@ -170,22 +170,46 @@ export class P186CombatBridge{
   this.preview?.begin(sk);
   this.preview?.update(this.game.player.pos,dir);
   this.ensureCancelButton();
-  this.cancelButton.style.display='flex';
+  this.syncCancelButton();
  }
  ensureCancelButton(){
   if(this.cancelButton)return;
   const b=document.createElement('button');
-  b.id='hf-p188-skill-cancel';b.type='button';b.textContent='✕ CANCELAR';
-  b.setAttribute('aria-label','Cancelar habilidad sin gastar maná ni energía');
-  b.style.cssText='position:fixed;z-index:300;top:31%;right:17%;'+
-   'width:105px;height:39px;display:none;align-items:center;justify-content:center;'+
-   'border:2px solid #ff859d;background:#491735eb;color:#fff;border-radius:10px;'+
-   'font:800 11px system-ui;touch-action:none;pointer-events:auto';
+  b.id='hf-p188-skill-cancel';b.type='button';
+  b.className='hf-p810-control hf-p189-skill-cancel';
+  b.textContent='✕';
+  b.setAttribute('aria-label','Cancelar habilidad apuntada');
+  b.setAttribute('title','CANCELAR SKILL · sin gasto de maná ni energía');
+  // Only the circular X occupies touch space. Opacity and screen position
+  // are owned by the HUD editor, not by a transient P188 rectangle.
+  b.style.cssText='position:fixed;z-index:76;left:78.8%;top:31%;'+
+   'width:45px;height:45px;display:flex;align-items:center;justify-content:center;'+
+   'border:2px solid rgba(255,124,132,.92);border-radius:50%;'+
+   'background:rgba(171,26,48,.62);color:#fff3f3;'+
+   'font:800 27px/1 system-ui;box-shadow:0 0 8px rgba(199,40,64,.30);'+
+   'visibility:hidden;pointer-events:none;touch-action:none;user-select:none;'+
+   '-webkit-tap-highlight-color:transparent;padding:0';
   b.addEventListener('pointerdown',e=>{
-   e.preventDefault();e.stopPropagation();
+   if(this.game.input.hudEditing)return;
+   e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
    this.cancelAim();
   });
-  document.body.appendChild(b);this.cancelButton=b;
+  (this.game.touch?.root||document.body).appendChild(b);
+  this.cancelButton=b;
+  this.syncCancelButton();
+ }
+ syncCancelButton(){
+  if(!this.cancelButton)return;
+  const editor=this.game.touch?.premium?.p810?.editor;
+  if(editor){
+   if(editor.elements?.get('skillCancel')!==this.cancelButton)
+    editor.register('skillCancel',this.cancelButton);
+   else editor.applyOne('skillCancel');
+  }else{
+   const visible=!!this.pendingAim;
+   this.cancelButton.style.visibility=visible?'visible':'hidden';
+   this.cancelButton.style.pointerEvents=visible?'auto':'none';
+  }
  }
  onAimMove(event){
   const p=this.pendingAim;
@@ -204,8 +228,8 @@ export class P186CombatBridge{
    this.cancelAim();return;
   }
   const bounds=this.cancelButton?.getBoundingClientRect();
-  if(bounds&&event.clientX>=bounds.left&&event.clientX<=bounds.right&&
-    event.clientY>=bounds.top&&event.clientY<=bounds.bottom){
+  if(bounds&&Math.hypot(event.clientX-(bounds.left+bounds.width/2),
+    event.clientY-(bounds.top+bounds.height/2))<=Math.min(bounds.width,bounds.height)*.58){
     this.cancelAim();return;
   }
   p.x=event.clientX;p.y=event.clientY;
@@ -220,7 +244,7 @@ export class P186CombatBridge{
  cancelAim(){
   this.pendingAim=null;
   this.preview?.stop();
-  if(this.cancelButton)this.cancelButton.style.display='none';
+  this.syncCancelButton();
  }
  onKey(event){
   if(this.game.state!=='playing'||this.game.input.hudEditing||event.repeat)return;
@@ -512,6 +536,9 @@ export class P186CombatBridge{
     this.openStyleMenu();
    });
   }
+  // Pre-register CANCELAR SKILL even when not aiming, so the editor can
+  // display and drag it without making a spell or consuming resources.
+  this.ensureCancelButton();
   this.editor=editor;
   this.drawSkillButtons();
  }
