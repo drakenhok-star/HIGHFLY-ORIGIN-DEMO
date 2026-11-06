@@ -98,7 +98,8 @@ export class AimPreviewP188{
    this.ring.scale.setScalar(Math.max(.6,spec.angleOrRadius));
   }
   if(kind==='cone'){
-   this.sector.scale.setScalar(spec.range);
+   const spread=Math.tan(spec.angleOrRadius*Math.PI/360)/Math.tan(42.5*Math.PI/180);
+   this.sector.scale.set(spec.range*spread,spec.range,1);
    // Rotate the reusable sector within its own local plane to match cone arc.
    // 85° full reusable sector is narrowed by its parent's local scale only
    // for cosmetic preview; hit logic still uses its true aim direction.
