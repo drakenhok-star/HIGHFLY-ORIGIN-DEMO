@@ -82,6 +82,9 @@ try{
  assert.ok(after.frame-before.renderFrame<20,'Editor must not render at 60fps while idle');
  if(errors.length)console.warn('Browser errors:',errors.join('\n'));
  assert.deepEqual(errors,[],'Browser should start without runtime errors');
- await page.screenshot({path:'p194-world-forge.png',fullPage:true});
  writeFileSync('p194-world-forge.json',JSON.stringify({before,move,mouse:{before:cx,after:nx},after,errors},null,2));
+ // SwiftShader can stall desktop screenshots even after all game assertions pass.
+ // Keep the functional smoke test authoritative; screenshot is best-effort only.
+ try{await page.screenshot({path:'p194-world-forge.png',fullPage:false,timeout:12000,animations:'disabled'});}
+ catch(e){console.warn('Optional screenshot unavailable:',String(e).slice(0,180));}
 }finally{await browser.close();}
