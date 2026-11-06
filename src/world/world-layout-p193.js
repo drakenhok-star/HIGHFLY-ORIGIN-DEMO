@@ -8,6 +8,7 @@ import {mulberry32} from '../core/noise.js';
 
 export const WORLD_LAYOUT_SCHEMA_P193 = 193;
 export const WORLD_LAYOUT_PATH_P193 = './assets/world-layout-p193.json';
+export const WORLD_FORGE_DRAFT_KEY_P195='hf_p195_world_forge_v2_draft';
 export const P193_REFERENCE_MODELS = Object.freeze([
   'player','sword','skeleton_warrior','skeleton_mage','skeleton_blade','wolf','wolf_claude',
   'spider','crab','goblin','orc','stag','fox','yeti','yeti_highland','boar','dragon'
@@ -67,6 +68,16 @@ export function normalizeWorldLayoutP193(input){
   return out;
 }
 export async function loadWorldLayoutP193(){
+  // Preview is explicitly opt-in: production saves and published layout never
+  // ingest a local draft unless the player visits ?hf_world_draft=1.
+  if(new URLSearchParams(location.search).get('hf_world_draft')==='1'){
+    try{
+      const raw=localStorage.getItem(WORLD_FORGE_DRAFT_KEY_P195);
+      if(raw)return normalizeWorldLayoutP193(JSON.parse(raw));
+    }catch(error){
+      console.warn('[HIGHFLY P195] Borrador invalido; se usa el mapa publicado',error);
+    }
+  }
   try{
     const response=await fetch(WORLD_LAYOUT_PATH_P193,{cache:'no-cache'});
     if(!response.ok)return emptyWorldLayoutP193();
