@@ -130,7 +130,7 @@ function locateShore(game){
   const t=game.terrain,cx=0,cz=40,water=t.waterY;
   let chosen=null;
   // Short radial scan. Never spawn a fake pier on dry land.
-  for(let rad=78;rad<=180;rad+=4){
+  for(let rad=42;rad<=180;rad+=2){ // coastline begins ~52m from town centre
     for(let k=0;k<48;k++){
       const a=k*Math.PI/24,dx=Math.sin(a),dz=Math.cos(a);
       const x=cx+dx*rad,z=cz+dz*rad;
@@ -155,8 +155,9 @@ function buildPier(game){
   const wood=new THREE.MeshStandardMaterial({color:0x99744b,roughness:.9});
   const trim=new THREE.MeshStandardMaterial({color:0x5d4930,roughness:.94});
   for(let n=0;n<8;n++){
-    // Walk from dry land toward water; every plank floats at real water level.
-    box(g,3.7,.22,.88,wood,0,0,n*.86-1);
+    // The first boards step DOWN from real dry land to water level.
+    const ramp=Math.max(0,1-n/4)*Math.max(0,game.terrain.getHeight(x,z)-(water+1.05));
+    box(g,3.7,.22,.88,wood,0,ramp,n*.86-1);
     if(n%2===0)for(const side of [-1,1]){
       box(g,.2,2.5,.2,trim,side*1.65,-.93,n*.86-1);
     }
@@ -267,7 +268,11 @@ export function installCentralTownP194(game){
     if(trainer.id==='sigrid')continue;
     const pref=P194_TRAINER_SPOTS[trainer.id];
     const saved=entityForP193(game,'npc:'+trainer.id);
-    const loc=saved?{x:saved.x,z:saved.z}:safeNPCSpot(game,...pref);
+    // Fisher lives by the REAL pier when a safe shoreline has been found.
+    const preferred=(trainer.id==='master_fisher'&&pier)?
+      [pier.position.x-4*Math.sin(pier.rotation.y),
+       pier.position.z-4*Math.cos(pier.rotation.y)]:pref;
+    const loc=saved?{x:saved.x,z:saved.z}:safeNPCSpot(game,...preferred);
     if(!loc)continue;
     const npc=game.npcs._makeNPC({id:trainer.id,
       name:trainer.role+' · '+P194_SITE_NAMES[trainer.hubId],
