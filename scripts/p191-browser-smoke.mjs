@@ -308,6 +308,7 @@ try{
   }
   return got;
  });
+ console.log('P191 Sigrid real dialogue/craft:',JSON.stringify(sigrid));
  assert.ok(sigrid.found&&sigrid.crafted&&sigrid.consumed&&sigrid.saved);
  assert.equal(sigrid.cost,20);
  assert.equal(sigrid.exp,3);
