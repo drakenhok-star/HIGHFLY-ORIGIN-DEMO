@@ -63,6 +63,7 @@ class Game {
     this.p188Build=true; // independent P188 save and RPG skill discovery
     this.p189Build=true; // L27 real aim + editor refinement
     this.p190Build=true; // six equal skills / guarded P190 save migration
+    this.p191Build=true; // skillbook UX, graphics clarity, HUD ergonomics; preserves P190 save
     this.p183Enabled=!new URLSearchParams(location.search).has('hf_p183_off');
     this.p183bEnabled=this.p183Enabled&&!new URLSearchParams(location.search).has('hf_p183b_off');
     this.p183cEnabled=this.p183bEnabled&&!new URLSearchParams(location.search).has('hf_p183c_off');
