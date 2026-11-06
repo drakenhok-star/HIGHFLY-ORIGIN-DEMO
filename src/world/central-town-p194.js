@@ -126,6 +126,20 @@ function buildPortal(game){
   group.userData.p194Kind='model';game.structures.root.add(group);
   return group;
 }
+/**
+ * P195: apply the same versioned transforms in the editor AND playable game.
+ * Pier altitude must remain at water level, including after moving in Forge.
+ */
+function applyFeatureLayoutP195(game,group,id,water=false){
+  if(!group)return;
+  const saved=entityForP193(game,id);
+  if(!saved)return;
+  group.position.set(saved.x,water?game.terrain.waterY+1.05:
+    game.terrain.getHeight(saved.x,saved.z),saved.z);
+  group.rotation.y=saved.rotation;
+  group.scale.setScalar(saved.scale);
+  group.visible=!saved.hidden;
+}
 function locateShore(game){
   const t=game.terrain,cx=0,cz=40,water=t.waterY;
   let chosen=null;
@@ -250,13 +264,18 @@ export function installCentralTownP194(game){
   const portal=buildPortal(game);
   const paths=makePaths(game);
   const pier=buildPier(game);
+  applyFeatureLayoutP195(game,portal,'p194:portal');
+  applyFeatureLayoutP195(game,pier,'p194:pier',true);
   // Preserve P192 mission IDs, inventory gates and profession/trainer mapping.
   const districts=Object.fromEntries(P194_DISTRICTS.map(d=>[d.id,d]));
   const sites=game.p192Hamlets.sites;
   for(const [id,site] of sites){
     const district=districts[P194_SITE_TO_DISTRICT[id]];
     if(!district)continue;
-    const pos={x:district.x,z:district.z,y:game.terrain.getHeight(district.x,district.z)};
+    const saved=game.worldLayoutP193?.hubs?.[id];
+    const sx=Number.isFinite(saved?.x)?saved.x:district.x;
+    const sz=Number.isFinite(saved?.z)?saved.z:district.z;
+    const pos={x:sx,z:sz,y:game.terrain.getHeight(sx,sz)};
     site.pos=pos;
     site.hub={...site.hub,name:P194_SITE_NAMES[id]};
     site.houses=[null,null]; // no outer or duplicate hamlet house spawns
