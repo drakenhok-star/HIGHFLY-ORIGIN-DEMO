@@ -78,7 +78,7 @@ export class WorldEditorP193{
   this.installHotkeys();
   this.loadDraft();
   this.cameraTick();
-  this.notify('Mundo P192 real cargado. Elegí un edificio o NPC para editarlo.');
+  this.notify('P194: 15 profesiones en el pueblo central. Editá y exportá tu distribución.');
  }
  materializeHamlets(){
   const g=this.g,p=g.player?.pos;if(!p)return;
@@ -105,10 +105,19 @@ export class WorldEditorP193{
   const style=node('style',document.head);style.textContent=css;
   this.root=node('div',document.body);this.root.id='hf-p193-editor';
   const top=node('div',this.root,'hf-panel hf-top');
-  node('strong',top,'hf-title','HIGHFLY · WORLD FORGE P193');
+  node('strong',top,'hf-title','HIGHFLY · WORLD FORGE P194');
   this.addButton(top,'Seleccionar',()=>this.setTool('select'),'tool-select');
   this.addButton(top,'Mover',()=>this.setTool('move'),'tool-move');
   this.addButton(top,'2D / 3D',()=>{this.mode=this.mode==='3d'?'2d':'3d';this.setView();});
+  this.addButton(top,'Centro del pueblo',()=>{
+    this.focus.set(0,this.g.terrain.getHeight(0,40),40);this.distance=135;this.setView();
+  });
+  if(this.g.p194CentralTown?.pier)this.addButton(top,'Ir al muelle',()=>{
+    const p=this.g.p194CentralTown.pier.position;
+    this.focus.set(p.x,this.g.terrain.getHeight(p.x,p.z),p.z);
+    this.distance=85;this.setView();
+  });
+  node('span',top,'hf-note','MODO LIVIANO · IA/COMBATE PAUSADOS');
   this.addButton(top,'Deshacer',()=>this.undo(),'undo');
   this.addButton(top,'Rehacer',()=>this.redo(),'redo');
   this.addButton(top,'Sincronizar villas',()=>{
