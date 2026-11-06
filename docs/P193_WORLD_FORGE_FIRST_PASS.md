@@ -8,7 +8,8 @@ La rama de desarrollo `p193-world-editor-poc-20261106` NO modifica `main` ni pub
 Servir el repositorio **desde su raíz** con un servidor HTTP estático (por ejemplo `python3 -m http.server 8080` o el servidor Node incluido).
 
 - Juego original de esta rama: `http://localhost:8080/`
-- Editor real en la misma escena: `http://localhost:8080/?hf_world_editor=1`
+- Editor real en la misma escena: `http://localhost:8080/editor.html` (alternativa: `/?hf_world_editor=1`)
+- Con `node server.mjs`, abrir `http://localhost:5520/editor.html`.
 
 El editor arranca el **mismo Game, Terrain, Structures, NPCs, Enemies, Scatter e Interiors** que la demo P192.
 Para mostrar las siete villas fuera de distancia de render, fuerza **solo en modo editor** la materialización de las casas y maestros con el mismo constructor de P192. No inventa un segundo mundo, ni reemplaza el mapa por una textura.
