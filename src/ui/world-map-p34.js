@@ -70,7 +70,20 @@ export class WorldMapP34 {
     coords.id = "hf-worldcoords"; mini.appendChild(coords);
     this.coords = coords;
     if(this.ecologyLine)mini.appendChild(this.ecologyLine);
-    mini.addEventListener("click", e => {e.preventDefault(); e.stopPropagation();this.toggle(true)});
+    mini.addEventListener("click",e=>{
+      e.preventDefault();e.stopPropagation();
+      // P189: touch can be retargeted to the radar when it slightly overlaps
+      // the user's saved MENÚ position. In that narrow shared zone MENÚ wins.
+      const menu=document.getElementById('hf-p810-menu');
+      const box=menu?.getBoundingClientRect();
+      const px=e.clientX,py=e.clientY;
+      const nearMenu=box&&Number.isFinite(px)&&Number.isFinite(py)&&
+       px>=box.left-10&&px<=box.right+10&&py>=box.top-10&&py<=box.bottom+10;
+      if(nearMenu&&this.game.touch?.premium?.p810){
+       this.game.touch.premium.p810.toggleQuickMenu(true);return;
+      }
+      this.toggle(true);
+    });
     document.body.appendChild(mini); this.mini = mini;
 
     const overlay = document.createElement("div");
