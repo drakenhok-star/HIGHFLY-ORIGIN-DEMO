@@ -276,6 +276,11 @@ export class HighflyPanelsP9 {
     button.addEventListener('click',()=>{g.performanceP2.apply(id);this.renderSettings();});
    }
    el('p','hf-p9-muted','Nitidez actual (resolución interna): '+g.renderer.getPixelRatio().toFixed(2)+'×. NÍTIDO prioriza al personaje, pero puede bajar FPS si la GPU está exigida.',content);
+   if(g.p191Build)slider('Claridad nocturna',.4,1.2,.05,
+    Number(g.renderer.toneMappingExposure.toFixed(2)),v=>{
+     g.renderer.toneMappingExposure=v;
+     try{localStorage.setItem('hf_p191_exposure',String(v));}catch(e){}
+    });
    click('◎ CÁMARA DE COMBATE MÁS CERCANA',()=>{
     g.player.camDist=7.5;
     try{localStorage.setItem('hf_p9_cam_dist','7.5');}catch(e){}
