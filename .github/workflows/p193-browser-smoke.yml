@@ -1,0 +1,32 @@
+name: P193 browser smoke
+on:
+  push:
+    branches: [p193-world-editor-poc-20261106]
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.58.2
+      - run: npx playwright install --with-deps chromium
+      - name: Launch HIGHFLY test server
+        run: node server.mjs > /tmp/hf-p193-server.log 2>&1 & echo $! > /tmp/hf-p193-server.pid
+      - name: Smoke test world scene and editor
+        run: node scripts/p193-browser-smoke.mjs
+      - name: Upload screenshot and test report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: p193-browser-smoke
+          path: |
+            p193-browser-smoke.png
+            p193-browser-smoke.json
+          if-no-files-found: ignore
