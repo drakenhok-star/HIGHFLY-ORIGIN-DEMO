@@ -1,7 +1,7 @@
-name: HIGHFLY P191 — Unified 18 skills in six editable slots
+name: HIGHFLY P191 — Skillbook UX, clarity and real Pueblo craft
 on:
   push:
-    branches: [p191-six-skills-unified-hud-20261106]
+    branches: [p191-ui-visuals-inicios-progression-20261106]
   workflow_dispatch:
 permissions:
   contents: read
