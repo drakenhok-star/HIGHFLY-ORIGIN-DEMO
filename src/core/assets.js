@@ -309,6 +309,23 @@ export class AssetLib {
       try {
         const gltf = await loader.loadAsync(url);
         applyHiddenProps(gltf.scene, key);
+        // P191 low-cost near-actor texture clarity. Reuses original CC0 maps,
+        // no new textures/triangles/postprocessing. Modest 2x anisotropy
+        // helps oblique model sampling without forcing bloom or shadows.
+        if(/^(player|npc_|wolf|draugr|goblin|orc|fox|stag|spider|yeti|boar|crab)/.test(key)){
+         const seen=new Set();
+         gltf.scene.traverse(node=>{
+          if(!node.isMesh&&!node.isSkinnedMesh)return;
+          for(const material of (Array.isArray(node.material)?node.material:[node.material])){
+           if(!material)return;
+           for(const tex of [material.map,material.normalMap]){
+            if(!tex?.isTexture||seen.has(tex.uuid))continue;
+            seen.add(tex.uuid);
+            if((tex.anisotropy||1)<2){tex.anisotropy=2;tex.needsUpdate=true;}
+           }
+          }
+         });
+        }
         const cfg=SCALE[key];
         const measured=cfg?.animatedBounds?animatedSkinBoundsP183d(gltf):null;
         const nativeHeight=measured?.height??measureVisibleHeight(gltf.scene);
