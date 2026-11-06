@@ -153,6 +153,7 @@ class Game {
 
   setState(s) {
     this.state = s;
+    if(s!=='playing')this.p186Skills?.cancelAim?.();
     this.menus.onState(s);
     this.hud.setVisible(s === 'playing');
     if (this.touch) this.touch.setState(s);
