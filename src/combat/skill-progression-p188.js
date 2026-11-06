@@ -104,8 +104,14 @@ export class SkillProgressP188{
  }
  syncExistingQuests(){
   const q=this.game.quests;
-  for(const questId of ['q1','q2','q3','p18_frontier'])
-   if(q?.getState?.(questId)==='done')this.rewardQuest(questId);
+  for(const questId of ['q1','q2','q3','p18_frontier']){
+   const skillId=SKILL_QUEST_REWARDS_P188[questId];
+   if(!this.state.discovered[skillId]&&q?.getState?.(questId)==='done')this.rewardQuest(questId);
+  }
+ }
+ tick(dt){
+  this._syncElapsed=(this._syncElapsed||0)+dt;
+  if(this._syncElapsed>1){this._syncElapsed=0;this.syncExistingQuests();}
  }
  discover(id,questId){
   const src=SKILL_ORIGINS_P188.find(s=>s.id===id);
