@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071625">
+  <title>HIGHFLY WORLD FORGE P193 — Editor de Mundo</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="importmap">
+    { "imports": { "three": "./lib/three.module.js", "three/addons/": "./lib/jsm/" } }
+  </script>
+</head>
+<body>
+  <script type="module">
+    const address = new URL(location.href);
+    address.searchParams.set('hf_world_editor','1');
+    history.replaceState(null,'',address.pathname+address.search+address.hash);
+    await import('./src/main.js');
+  </script>
+</body>
+</html>
