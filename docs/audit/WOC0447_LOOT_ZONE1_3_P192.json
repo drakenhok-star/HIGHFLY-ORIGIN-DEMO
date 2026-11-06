@@ -1,0 +1,1375 @@
+{
+  "sourceCommit": "493c35a108cef6c8aa290e8793107b1cd117886e",
+  "sourceLicense": "MIT source tables only; media excluded",
+  "purpose": "audit reference, NOT live HIGHFLY loot rules",
+  "regions": [
+    {
+      "sourceFile": "src/sim/content/zone1.ts",
+      "mobs": [
+        {
+          "templateId": "forest_wolf",
+          "drops": [
+            {
+              "itemId": "wolf_fang",
+              "chance": 0.45,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "milepost_boots",
+              "chance": 0.017,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "wolfhide_satchel",
+              "chance": 0.003,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "old_greyjaw",
+          "drops": [
+            {
+              "itemId": "greyjaw_fang",
+              "chance": 1,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "wolf_fang",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "wolfhide_satchel",
+              "chance": 0.35,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "acolyte_chain_grips",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "wild_boar",
+          "drops": [
+            {
+              "itemId": "boar_hide",
+              "chance": 0.6,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "tough_jerky",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "trail_leggings",
+              "chance": 0.02,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "webwood_spider",
+          "drops": [
+            {
+              "itemId": "webwood_silk",
+              "chance": 0.55,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "spider_leg",
+              "chance": 0.4,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "mosshide_vest",
+              "chance": 0.02,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "mogger",
+          "drops": [
+            {
+              "itemId": "linen_scrap",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "moggers_stomper_boots",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "moggers_shiv",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "cryptstalker_jerkin",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "valefire_lantern",
+              "chance": 0.2,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "moggers_hide_quiver",
+              "chance": 0.2,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "mudfin_murloc",
+          "drops": [
+            {
+              "itemId": "mudfin_scale",
+              "chance": 0.5,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "linen_scrap",
+              "chance": 0.2,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "tunnel_rat",
+          "drops": [
+            {
+              "itemId": "tallow_candle",
+              "chance": 0.6,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "blessed_wax",
+              "chance": 0.45,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "linen_scrap",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "mossy_handwraps",
+              "chance": 0.01,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "thornling_grips",
+              "chance": 0.01,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "grix_the_tunnelking",
+          "drops": [
+            {
+              "itemId": "tallow_candle",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "lesser_healing_potion",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "tunnelkings_spade",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "moggers_copper_cudgel",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "hollowbone_hauberk",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "briarroot_staff",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "vale_bandit",
+          "drops": [
+            {
+              "itemId": "bandit_bandana",
+              "chance": 0.5,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "linen_scrap",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "restless_bones",
+          "drops": [
+            {
+              "itemId": "bone_fragments",
+              "chance": 0.6,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "ghostly_essence",
+              "chance": 0.55,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "restless_skull",
+              "chance": 1,
+              "questBound": true,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "captain_verlan",
+          "drops": [
+            {
+              "itemId": "bone_fragments",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "oathbound_greaves",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "verlans_oathblade",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "hollow_vigil_staff",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "gravewardens_shiv",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            }
+          ]
+        },
+        {
+          "templateId": "wraithbinder_maldrec",
+          "drops": [
+            {
+              "itemId": "bone_fragments",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "maldrecs_soulbinder",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "hollowbone_hauberk",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "gravewoven_raiment",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "cryptstalker_jerkin",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            }
+          ]
+        },
+        {
+          "templateId": "gorrak",
+          "drops": [
+            {
+              "itemId": "bandit_bandana",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "oiled_boots",
+              "chance": 0.5,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "quilted_trousers",
+              "chance": 0.5,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "gorraks_cruel_chopper",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "gorraks_cleaver",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "votive_chain_belt",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sourceFile": "src/sim/content/zone2.ts",
+      "mobs": [
+        {
+          "templateId": "mire_prowler",
+          "drops": [
+            {
+              "itemId": "mire_prowler_pelt",
+              "chance": 0.6,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "soggy_moccasin",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "lesser_healing_potion",
+              "chance": 0.08,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "deepfen_murloc",
+          "drops": [
+            {
+              "itemId": "waterlogged_idol",
+              "chance": 0.5,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "mudfin_scale",
+              "chance": 0.4,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "mirejaw_the_ravenous",
+          "drops": [
+            {
+              "itemId": "mudfin_scale",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "mirejaw_biteblade",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "mirejaw_scale_vest",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "fen_reaver_glaive",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "mirejaw_oracle_staff",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "mirebloom_treads",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "sloomtooth_the_drowned",
+          "drops": [
+            {
+              "itemId": "mudfin_scale",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "tidereaver_gaff",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "sloomtooth_tidefang",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "drowned_tide_scepter",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            }
+          ]
+        },
+        {
+          "templateId": "mire_widow",
+          "drops": [
+            {
+              "itemId": "widow_venom_sac",
+              "chance": 0.65,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "spider_leg",
+              "chance": 0.4,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "fenbark_leggings",
+              "chance": 0.02,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "mirefen_broodmother",
+          "drops": [
+            {
+              "itemId": "marshstrider_boots",
+              "chance": 0.4,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "broodmother_silk_robe",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "spider_leg",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "fenwarden_sabatons",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "drowned_dead",
+          "drops": [
+            {
+              "itemId": "bone_fragments",
+              "chance": 0.5,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "cracked_fetish",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "drowned_warlord",
+          "drops": [
+            {
+              "itemId": "bone_fragments",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "cracked_fetish",
+              "chance": 0.6,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "fen_troll",
+          "drops": [
+            {
+              "itemId": "troll_fetish",
+              "chance": 0.6,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "chipped_tusk",
+              "chance": 0.4,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "bogiron_nugget",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "elixir_of_the_bear",
+              "chance": 0.008,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "marshlight_hauberk",
+              "chance": 0.012,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "wayfarers_backpack",
+              "chance": 0.0015,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "grubjaw",
+          "drops": [
+            {
+              "itemId": "grubjaw_tusk",
+              "chance": 1,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "chipped_tusk",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "gravecaller_cultist",
+          "drops": [
+            {
+              "itemId": "linen_scrap",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "tallow_candle",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "gravecaller_summoner",
+          "drops": [
+            {
+              "itemId": "cult_cipher",
+              "chance": 0.6,
+              "questBound": true,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "gravecaller_mender",
+          "drops": [
+            {
+              "itemId": "cult_cipher",
+              "chance": 0.4,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "tallow_candle",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "duskthorn_mantle",
+              "chance": 0.02,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "sister_nhalia",
+          "drops": [
+            {
+              "itemId": "tallow_candle",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "nhalias_funeral_wraps",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "nhalias_dirgeblade",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            }
+          ]
+        },
+        {
+          "templateId": "deacon_voss",
+          "drops": [
+            {
+              "itemId": "tallow_candle",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "voss_sanctified_mace",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "fenshadow_maul",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "bog_bloat",
+          "drops": [
+            {
+              "itemId": "tangled_weed",
+              "chance": 0.5,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sourceFile": "src/sim/content/zone3.ts",
+      "mobs": [
+        {
+          "templateId": "ridge_stalker",
+          "drops": [
+            {
+              "itemId": "ridge_stalker_pelt",
+              "chance": 0.6,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "ridge_stalker_pelt",
+              "chance": 0.6,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "wildgrove_cinch",
+              "chance": 0.02,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "old_cragmaw",
+          "drops": [
+            {
+              "itemId": "old_cragmaws_pelt",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "cragmaw_huntcord",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "cragmaw_prowlboots",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "cragward_pauldrons",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "cragthorn_greatstaff",
+              "chance": 0.2,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "boneglass_shiv",
+              "chance": 0.2,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "cragmaw_huntquiver",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "deeprock_kobold",
+          "drops": [
+            {
+              "itemId": "glowing_wax",
+              "chance": 0.5,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "tallow_candle",
+              "chance": 0.4,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "healing_potion",
+              "chance": 0.08,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "deathlord_sabatons",
+              "chance": 0.001,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "peaksong_helm",
+              "chance": 0.002,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "moonbark_vestments",
+              "chance": 0.002,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "wayfarers_backpack",
+              "chance": 0.001,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "ironvein_foreman",
+          "drops": [
+            {
+              "itemId": "glowing_wax",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "ironvein_pickblade",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "ironvein_lantern_staff",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "gutripper_shiv",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "deathlord_sabatons",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "stormchant_gauntlets",
+              "chance": 0.2,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "thornpeak_ogre",
+          "drops": [
+            {
+              "itemId": "ogre_toe_ring",
+              "chance": 0.35,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "cragprowl_belt",
+              "chance": 0.02,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "wayfarers_backpack",
+              "chance": 0.002,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "brakka_wallbreaker",
+          "drops": [
+            {
+              "itemId": "ogre_toe_ring",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "ogre_crusher",
+          "drops": [
+            {
+              "itemId": "ogre_toe_ring",
+              "chance": 0.5,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "revenantstep_treads",
+              "chance": 0.06,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "warlord_drogmar",
+          "drops": [
+            {
+              "itemId": "drogmar_warboots",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "drogmars_skullcleaver",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "thunderward_legguards",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "brutok_skullsmasher",
+          "drops": [
+            {
+              "itemId": "cracked_ogre_tusk",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "skullsmasher_warbelt",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "brutoks_maul",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "crag_warden_cudgel",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "skullsplitter_dirk",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "stormroot_cowl",
+              "chance": 0.2,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "wayfarers_backpack",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "stormcrag_elemental",
+          "drops": [
+            {
+              "itemId": "storm_core",
+              "chance": 0.55,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "blessed_embers",
+              "chance": 0.55,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "inert_storm_shard",
+              "chance": 0.4,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "shardlord_kazzix",
+          "drops": [
+            {
+              "itemId": "kazzix_heartshard",
+              "chance": 1,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "inert_storm_shard",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "shardfang_grips",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "wyrmcult_zealot",
+          "drops": [
+            {
+              "itemId": "wyrmcult_orders",
+              "chance": 0.1,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "frayed_prayer_beads",
+              "chance": 0.35,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "shardsong_mantle",
+              "chance": 0.002,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "wyrmcult_necromancer",
+          "drops": [
+            {
+              "itemId": "ritual_phylactery",
+              "chance": 0.55,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "linen_scrap",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "wyrmcult_spellgrips",
+              "chance": 0.002,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "threnos_first_voice",
+          "drops": [
+            {
+              "itemId": "frayed_prayer_beads",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "shardsong_mantle",
+              "chance": 0.06,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "boneclad_revenant",
+          "drops": [
+            {
+              "itemId": "bone_fragments",
+              "chance": 0.6,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "runed_bone_shard",
+              "chance": 0.7,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "vanguard_bone",
+              "chance": 0.7,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "necromancers_legwraps",
+              "chance": 0.001,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "thornpeak_wildwraps",
+              "chance": 0.002,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "fallen_captain_aldren",
+          "drops": [
+            {
+              "itemId": "captains_crest",
+              "chance": 1,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "bone_fragments",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "corrupted_priest_malric",
+          "drops": [
+            {
+              "itemId": "priests_sigil",
+              "chance": 1,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "frayed_prayer_beads",
+              "chance": 0.5,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "cryptbloom_shoulderguards",
+              "chance": 0.2,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "deathstalker_voss",
+          "drops": [
+            {
+              "itemId": "royal_seal",
+              "chance": 1,
+              "questBound": true,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "bone_fragments",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "bound_guardian",
+          "drops": [
+            {
+              "itemId": "kings_signet",
+              "chance": 1,
+              "questBound": true,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "marrowlord_varkas",
+          "drops": [
+            {
+              "itemId": "bone_fragments",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "marrowlord_boneboots",
+              "chance": 0.3,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "necromancers_legwraps",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            }
+          ]
+        },
+        {
+          "templateId": "voskar_emberwing",
+          "drops": [
+            {
+              "itemId": "emberwing_cinderscale",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "emberwing_legguards",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "emberfang_warblade",
+              "chance": 0.25,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "stormvotive_hauberk",
+              "chance": 0.2,
+              "questBound": false,
+              "rolledGroup": false
+            }
+          ]
+        },
+        {
+          "templateId": "thunzharr_waking_peak",
+          "drops": [
+            {
+              "itemId": "inert_storm_shard",
+              "chance": 1,
+              "questBound": false,
+              "rolledGroup": false
+            },
+            {
+              "itemId": "crownforged_gauntlets",
+              "chance": 0.08,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "nighttalon_grips",
+              "chance": 0.08,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "soulflame_gloves",
+              "chance": 0.08,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "stormcallers_handguards",
+              "chance": 0.08,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "crownforged_girdle",
+              "chance": 0.08,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "nighttalon_waistband",
+              "chance": 0.08,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "soulflame_cord",
+              "chance": 0.08,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "stormcallers_waistguard",
+              "chance": 0.08,
+              "questBound": false,
+              "rolledGroup": true
+            },
+            {
+              "itemId": "vestments_of_the_waking_grove",
+              "chance": 0.08,
+              "questBound": false,
+              "rolledGroup": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
