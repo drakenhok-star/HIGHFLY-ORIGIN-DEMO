@@ -45,6 +45,9 @@ export class TianjieAimGuide {
   g.setAttribute('position',new THREE.BufferAttribute(values,3));
   const o=new THREE.Mesh(g,mat(color,opacity));o.renderOrder=11;
   o.frustumCulled=false;o.userData.flat=Float32Array.from(values);
+  // Original L27 mesh and terrain fit retained. Light animation uses the
+  // existing material, not an extra draw call or expensive postprocessing.
+  o.userData.baseOpacity=opacity;
   parent.add(o);return o;
  }
  band(points,width,color,opacity=.96){
@@ -244,8 +247,13 @@ export class TianjieAimGuide {
    this._lastCenter.copy(center);this._lastYaw=turn;this._lastRefresh=now;
   }
   const color=blocked?0xff3559:this.mainColor;
-  for(const o of this.root.children)
-   if(o.material?.color&&o.material.opacity>.85)o.material.color.setHex(color);
+  const pulse=.92+.08*Math.sin(now*5);
+  for(const o of this.root.children){
+   if(!o.material?.color)continue;
+   if(o.userData.baseOpacity>.85)o.material.color.setHex(color);
+   o.material.opacity=Math.min(1,o.userData.baseOpacity*
+      (blocked?.76:pulse));
+  }
   return {direction:dir,target:center.clone(),valid:this.valid};
  }
 }
