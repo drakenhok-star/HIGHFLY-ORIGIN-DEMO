@@ -297,7 +297,7 @@ try{
    option?.action();
    got={found:!!option,crafted:(inv.slots.get('hide_armor')||0)===before+1,
     exp:g.p187Professions.state.experience.armorcrafting-expBefore,
-    cost:100-inv.gold,consumed:inv.slots.get('wolf_pelt')===0,
+    cost:100-inv.gold,consumed:(inv.slots.get('wolf_pelt')||0)===0,
     saved:!!JSON.parse(localStorage.getItem('highfly_p190_save')).professionsP187};
   }finally{
    g.menus.showDialogue=originalDialogue;
