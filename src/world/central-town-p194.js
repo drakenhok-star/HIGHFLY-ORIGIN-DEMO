@@ -9,6 +9,7 @@ import {mulberry32} from '../core/noise.js';
 import {INICIOS_TRAINERS_P186} from './inicios-v2-p186.js';
 import {P192_TRAINER_MODELS} from './hamlets-p192.js';
 import {entityForP193,adjustHouseP193} from './world-layout-p193.js';
+import {installLivingTownP196} from './living-town-p196.js';
 
 export const P194_DISTRICTS=Object.freeze([
   {id:'communal',label:'Casa comunal · Olaf',x:-6,z:78,house:0},
@@ -310,5 +311,6 @@ export function installCentralTownP194(game){
     features:[{id:'p194:portal',label:'Monumento · portal central',kind:'model',group:portal},
       ...(pier?[{id:'p194:pier',label:'Muelle de pesca · costa real',kind:'model',group:pier}]:[])]
   };
+  if(game.p196Build)installLivingTownP196(game);
   return game.p194CentralTown;
 }
