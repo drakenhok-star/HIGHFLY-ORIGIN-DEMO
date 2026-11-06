@@ -9,16 +9,16 @@
 import * as THREE from 'three';
 const V=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z);
 const DEFS={
- guin_violet_lance:['line',36,1],guin_ascension:['circle',5.8,2.6],
+ guin_violet_lance:['line',17,1],guin_ascension:['self',0,2.6],
  guin_tempest:['self',0,4.2],
- dyr_fury_slashes:['cone',4.9,65],dyr_step:['line',6.5,1.1],
+ dyr_fury_slashes:['cone',4.9,65],dyr_step:['line',5.4,1.1],
  dyr_final_cut:['cone',10.5,22],
- tig_iron_wave:['cone',6.5,58],tig_charge:['line',7,1.5],
+ tig_iron_wave:['cone',6.5,58],tig_charge:['line',6.3,1.5],
  tig_collapse:['self',0,4.6],
- woc_fireball:['line',40,1.05],woc_meteor:['circle',12.5,4.15],
+ woc_fireball:['line',23,1.05],woc_meteor:['circle',12.5,4.15],
  woc_frost_nova:['self',0,5],
  woc_backstab:['cone',3.45,34],woc_kidney_shot:['cone',3.25,40],
- woc_charge:['line',7,1.3]
+ woc_charge:['line',7.9,1.3]
 };
 export const AIM_SPECS_P188=Object.freeze(Object.fromEntries(Object.entries(DEFS)
  .map(([id,[kind,range,angleOrRadius]])=>[id,Object.freeze({kind,range,angleOrRadius})])));
