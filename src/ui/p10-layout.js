@@ -10,6 +10,8 @@ export const HUD_DEFAULTS=Object.freeze({
  // P189: circular translucent skill cancel, same upper-right battle region.
  skillCancel:{x:.788,y:.31,size:45,opacity:.70},
  s2:{x:.75,y:.625,size:51},s3:{x:.825,y:.52,size:51},s4:{x:.905,y:.555,size:51},
+ // Two small upper skills complete a 4+2 arc; existing HUD positions unchanged.
+ s5:{x:.725,y:.395,size:49},s6:{x:.795,y:.395,size:49},
  lock:{x:.61,y:.57,size:43},next:{x:.665,y:.49,size:42},clear:{x:.72,y:.445,size:37},
  radar:{x:.845,y:.014,size:122},bag:{x:.855,y:.395,size:50},
  menu:{x:.925,y:.395,size:50},combo:{x:.405,y:.022,size:180},
