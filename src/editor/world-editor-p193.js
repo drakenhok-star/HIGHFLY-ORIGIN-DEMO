@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import {emptyWorldLayoutP193,normalizeWorldLayoutP193,
   safeTransformP193,P193_LIBRARY,P193_REFERENCE_MODELS,spawnAddedP193,adjustHouseP193} from '../world/world-layout-p193.js';
 
-const DRAFT_KEY='hf_p193_world_editor_draft';
+const DRAFT_KEY='hf_p194_world_forge_central_draft'; // independent of older P193 draft
 const css=`
 #hf-p193-editor{position:fixed;inset:0;z-index:9500;pointer-events:none;color:#ecf6ff;
   font:13px/1.35 system-ui,-apple-system,Segoe UI,sans-serif}
@@ -64,7 +64,8 @@ export class WorldEditorP193{
  constructor(game){
   this.g=game;this.selected=null;this.mode='3d';this.tool='select';
   this.focus=new THREE.Vector3(0,game.terrain.getHeight(0,40),40);
-  this.distance=210;this.drag=null;this.handles=new Map();
+  this.renderDirty=true;
+  this.distance=135;this.drag=null;this.handles=new Map();
   this.history=[];this.historyIndex=-1;this.dirty=false;this.search='';
   this.raycaster=new THREE.Raycaster();this.pointer=new THREE.Vector2();
   this.g.renderer.domElement.style.touchAction='none';
@@ -81,6 +82,7 @@ export class WorldEditorP193{
  }
  materializeHamlets(){
   const g=this.g,p=g.player?.pos;if(!p)return;
+  if(g.p194CentralTown)return; // already centrally built: never synthesize outlying P192 hamlets
   const original=p.clone(),state=g.state;
   // Build the seven real P192 hamlets in editor; no teleport in normal gameplay.
   try{
@@ -153,6 +155,12 @@ export class WorldEditorP193{
     ['Casa del pueblo','Taberna','Casa del pueblo','Casa de Olaf','Casa del pueblo'][i]+' #'+(i+1),
     'house',o,null));
   if(s._smithyHouse)put('village:house:5','Herrería de Sigrid','house',s._smithyHouse,null);
+  for(const b of this.g.p194CentralTown?.buildings||[]){
+    if(b.id.startsWith('p194:'))put(b.id,b.label,'house',b.group,b);
+  }
+  for(const f of this.g.p194CentralTown?.features||[]){
+    put(f.id,f.label,'model',f.group,f);
+  }
   for(const [id,site] of this.g.p192Hamlets?.sites||[]){
     put('hub:'+id,site.hub.name,'hub',null,site);
     (site.houses||[]).forEach((o,i)=>{
@@ -254,6 +262,7 @@ export class WorldEditorP193{
   this.notify(tool==='move'?'Arrastrá el objeto seleccionado.':'Seleccioná un objeto del mapa.');
  }
  editField(h,id,value){
+  this.renderDirty=true;
   const p=this.coords(h);
   if(id==='x'||id==='z'){
     if(!finite(value)){this.notify('Coordenada fuera de rango',true);return;}
@@ -300,7 +309,8 @@ export class WorldEditorP193{
       }
     }
   }else{
-    h.object.position.set(x,this.g.terrain.getHeight(x,z),z);
+    const y=h.id==='p194:pier'?this.g.terrain.waterY+1.05:this.g.terrain.getHeight(x,z);
+    h.object.position.set(x,y,z);
     if(h.ref?.wander){h.ref.wander.homeX=x;h.ref.wander.homeZ=z;h.ref.wander.target=null;}
   }
  }
@@ -326,6 +336,7 @@ export class WorldEditorP193{
  undo(){if(this.historyIndex<=0)return;this.importLayout(JSON.parse(this.history[--this.historyIndex]),false);}
  redo(){if(this.historyIndex>=this.history.length-1)return;this.importLayout(JSON.parse(this.history[++this.historyIndex]),false);}
  importLayout(layout,addHistory=true){
+  this.renderDirty=true;
   const valid=normalizeWorldLayoutP193(layout),g=this.g;
   // Match added objects by ID; no unsafe eval or arbitrary asset URLs.
   for(const old of [...g.p193Added]){
@@ -441,6 +452,7 @@ export class WorldEditorP193{
   else this.g.camera.position.set(f.x+d*.55,f.y+d*.75,f.z+d*.55);
   this.g.camera.lookAt(f);
   this.g.camera.updateProjectionMatrix();
+  this.renderDirty=true;
  }
  screenTerrain(e){
   const rect=this.g.renderer.domElement.getBoundingClientRect();
@@ -492,7 +504,7 @@ export class WorldEditorP193{
       const mx=e.clientX-this.drag.x,my=e.clientY-this.drag.y;
       this.drag.x=e.clientX;this.drag.y=e.clientY;
       const scale=this.distance/Math.max(500,window.innerHeight);
-      this.focus.x-=mx*scale;this.focus.z+=my*scale;
+      this.focus.x+=mx*scale;this.focus.z+=my*scale; // P194: right-drag moves scene right
       this.focus.y=this.g.terrain.getHeight(this.focus.x,this.focus.z);this.setView();
     }else{
       const h=this.handles.get(this.drag.id),pos=this.screenTerrain(e);
@@ -532,8 +544,11 @@ export class WorldEditorP193{
     if(keys.has('KeyS')||keys.has('ArrowDown'))this.focus.z+=d;
     if(keys.has('KeyA')||keys.has('ArrowLeft'))this.focus.x-=d;
     if(keys.has('KeyD')||keys.has('ArrowRight'))this.focus.x+=d;
-    this.focus.y=this.g.terrain.getHeight(this.focus.x,this.focus.z);
-    this.setView();
+    if(keys.has('KeyW')||keys.has('KeyS')||keys.has('KeyA')||keys.has('KeyD')||
+       keys.has('ArrowUp')||keys.has('ArrowDown')||keys.has('ArrowLeft')||keys.has('ArrowRight')){
+      this.focus.y=this.g.terrain.getHeight(this.focus.x,this.focus.z);
+      this.setView();
+    }
   }
   requestAnimationFrame(()=>this.cameraTick());
  }
