@@ -6,6 +6,8 @@ import { rollBonusLootP183 } from '../systems/loot-table-p183.js';
 import { P183_PENDING_SPECIES, speciesReadyP183 } from '../world/species-gate-p183.js';
 import { P183B_CAMPS,P183B_COAST_TEMPLATE,resolveBiomeCampP183b,resolveCoastSitesP183b,biomeValidP183b } from '../world/biome-families-p183b.js';
 import { realForestP183c } from '../world/habitat-p183c.js';
+import {WILDERNESS_SPOTS_P196,validWildernessSpawnP196} from '../world/wilderness-spots-p196.js';
+import {entityForP193} from '../world/world-layout-p193.js';
 
 const P183_SPIDER_DENS = [{x:-210,z:420},{x:-220,z:432},{x:-196,z:436},{x:-230,z:414},{x:-201,z:405}]; // 5 WOC-inspired Sableweb spiders // independent spawn / no quest ownership
 const WOLF_PACK_HOMES = [
@@ -166,6 +168,7 @@ export class Enemies {
       }
     }
     if(this.game.p183bEnabled)this._spawnBiomeWorldP183b();
+    if(this.game.p196Build&&this.game.p183bEnabled)this._spawnP196WildernessSpots();
     if(this.game.p16Enabled && new URLSearchParams(location.search).has('hf_training'))
       this._spawnTrainingDummy();
   }
@@ -456,6 +459,57 @@ export class Enemies {
     for(const m of e.mats){m.e=m.m.emissive.getHex();m.i=m.m.emissiveIntensity;}
     e.rig.play(spec.clips.idle);e.rig.update((Math.abs(x*3+z*7)%20)/10);
     return e;
+  }
+
+  /**
+   * Three five-monster outposts without touching bosses or original spawn tables.
+   * Every member retains the native species AI, loot and respawn contract.
+   * The authored center is a versioned WORLD FORGE entity, not hardcoded twice.
+   */
+  _spawnP196WildernessSpots(){
+    const terrain=this.game.terrain;
+    this.p196Spots=[];
+    const offsets=[[0,0],[7,2],[-7,3],[3,-7],[-4,-8]];
+    for(const spot of WILDERNESS_SPOTS_P196){
+      const saved=entityForP193(this.game,'p196:spot:'+spot.id);
+      const origin={x:saved?.x??spot.x,z:saved?.z??spot.z};
+      const original=P183B_CAMPS.find(c=>c.id===spot.sourceCamp);
+      if(spot.kind!=='spider'&&!original)continue;
+      let center=null;
+      // Resolve intended biome once, without moving a boss or shifting the old camps.
+      const candidate={...(original||{biome:'forest',x:origin.x,z:origin.z}),x:origin.x,z:origin.z};
+      const valid=(x,z)=>validWildernessSpawnP196(terrain,x,z,spot.biome,biomeValidP183b);
+      center=resolveBiomeCampP183b(terrain,candidate,valid);
+      if(!center){
+        this.p196Spots.push({id:spot.id,type:spot.kind,status:'sin-terreno-seguro',spawned:0,requested:origin});
+        continue;
+      }
+      const positions=[];
+      for(const [dx,dz] of offsets){
+        const preferred=[center.x+dx,center.z+dz];
+        let chosen=null;
+        for(const radius of [0,4,8,12,17,23,29]){
+          if(chosen)break;
+          for(let j=0;j<(radius?12:1);j++){
+            const ang=j*Math.PI/6;
+            const x=preferred[0]+Math.cos(ang)*radius;
+            const z=preferred[1]+Math.sin(ang)*radius;
+            if(!valid(x,z) || positions.some(p=>Math.hypot(x-p.x,z-p.z)<4.1))continue;
+            chosen={x,z};break;
+          }
+        }
+        if(chosen)positions.push(chosen);
+      }
+      const spec=original?{...original,id:spot.id,count:5}:null;
+      let spawned=0;
+      for(const loc of positions){
+        const e=spot.kind==='spider'?this._spawnSpider(loc.x,loc.z):
+          this._spawnBiomeMobP183b(spec,loc.x,loc.z);
+        if(!e)continue;
+        e.p196SpotId=spot.id;spawned++;
+      }
+      this.p196Spots.push({id:spot.id,type:spot.kind,center,status:spawned===5?'activo':'parcial',spawned});
+    }
   }
 
   _spawnSpider(x,z){
@@ -1325,6 +1379,7 @@ export class Enemies {
     this.p183VenomTicks=0;this.p183VenomTime=0;
     this.p183bSites=[];
     this.p183cSpawnAudit=[];
+    this.p196Spots=[];
     this.packs = [];
     this.dragon = null;
     this.spawnAll();
