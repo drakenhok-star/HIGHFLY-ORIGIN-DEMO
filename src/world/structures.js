@@ -371,6 +371,7 @@ export class Structures {
     const r2 = this._box(2.9, 0.12, wLen, this.matRoof, 0, 3.45, -0.45, well);
     r2.rotation.x = -wAng;
     this.root.add(well);
+    this._p194OldWell=well; // P194 relocate existing well without duplicating it
 
     const torchSpots = [[6, 33], [-8, 46], [10, 49]];
     for (let i = 0; i < torchSpots.length; i++) {
