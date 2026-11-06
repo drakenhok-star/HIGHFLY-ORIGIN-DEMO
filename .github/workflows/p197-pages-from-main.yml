@@ -106,9 +106,11 @@ jobs:
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
+          name: highfly-p197-pages-release
           path: .site
       - name: Deploy static FULL HIGHFLY RPG and World Forge 2.0
         uses: actions/deploy-pages@v4
         id: deployment
         with:
-          timeout: 900000
+          artifact_name: highfly-p197-pages-release
+          timeout: 600000
