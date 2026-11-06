@@ -1,0 +1,7609 @@
+{
+  "sourceProject": "World of ClaudeCraft",
+  "sourceCommit": "493c35a108cef6c8aa290e8793107b1cd117886e",
+  "sourceFile": "src/guide/content.generated.ts",
+  "codeLicense": "MIT (Levy Street 2026)",
+  "mediaAssets": "NOT INCLUDED / no CC0 claims",
+  "status": "reference only; adapt to HIGHFLY available items/nodes/CC0 rig; do not inject directly into game",
+  "rows": [
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_thorium_mining_pick",
+      "name": "Osmium Mining Pick",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "toolworks",
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "fine_iron_ore",
+          "name": "Fine Iron Ore",
+          "count": 4
+        },
+        {
+          "itemId": "mithril_mining_pick",
+          "name": "Skysilver Mining Pick",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Osmium Mining Pick",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_arcanite_mining_pick",
+      "name": "Glyphsteel Mining Pick",
+      "skillReq": 125,
+      "tier": 5,
+      "station": "toolworks",
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "arcanite_bar",
+          "name": "Glyphsteel Bar",
+          "count": 2
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 2
+        },
+        {
+          "itemId": "thorium_mining_pick",
+          "name": "Osmium Mining Pick",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Glyphsteel Mining Pick",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_ashwood_axe",
+      "name": "Ashwood Axe",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "toolworks",
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "fine_ashwood_log",
+          "name": "Fine Ashwood Log",
+          "count": 4
+        },
+        {
+          "itemId": "ironbark_axe",
+          "name": "Ironbark Axe",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Ashwood Axe",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_elderwood_axe",
+      "name": "Highpine Axe",
+      "skillReq": 125,
+      "tier": 5,
+      "station": "toolworks",
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 2
+        },
+        {
+          "itemId": "ashwood_axe",
+          "name": "Ashwood Axe",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Highpine Axe",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_goldleaf_sickle",
+      "name": "Goldleaf Sickle",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "toolworks",
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "fine_goldleaf_herb",
+          "name": "Fine Goldleaf Herb",
+          "count": 4
+        },
+        {
+          "itemId": "silverleaf_sickle",
+          "name": "Sheenleaf Sickle",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Goldleaf Sickle",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_sunpetal_sickle",
+      "name": "Sunpetal Sickle",
+      "skillReq": 125,
+      "tier": 5,
+      "station": "toolworks",
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "fine_sunpetal_herb",
+          "name": "Fine Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "goldleaf_sickle",
+          "name": "Goldleaf Sickle",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sunpetal Sickle",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_stormreel_fishing_rod",
+      "name": "Stormreel Fishing Rod",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "toolworks",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "glimmerfin_koi",
+          "name": "Sunglint Koi",
+          "count": 4
+        },
+        {
+          "itemId": "silverstream_fishing_rod",
+          "name": "Silverstream Fishing Rod",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Stormreel Fishing Rod",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 40000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_tidewrought_fishing_rod",
+      "name": "Tidewrought Fishing Rod",
+      "skillReq": 125,
+      "tier": 5,
+      "station": "toolworks",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "glimmerfin_koi",
+          "name": "Sunglint Koi",
+          "count": 2
+        },
+        {
+          "itemId": "raw_stonescale_carp",
+          "name": "Raw Slatefin Carp",
+          "count": 8
+        },
+        {
+          "itemId": "stormreel_fishing_rod",
+          "name": "Stormreel Fishing Rod",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Tidewrought Fishing Rod",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 160000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_clockreel_fishing_rod",
+      "name": "Clockreel Fishing Rod",
+      "skillReq": 125,
+      "tier": 5,
+      "station": "toolworks",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "glimmerfin_koi",
+          "name": "Sunglint Koi",
+          "count": 2
+        },
+        {
+          "itemId": "raw_hollowgill_sturgeon",
+          "name": "Raw Hollowgill Sturgeon",
+          "count": 10
+        },
+        {
+          "itemId": "tidewrought_fishing_rod",
+          "name": "Tidewrought Fishing Rod",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Clockreel Fishing Rod",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_precision_chassis",
+      "name": "Precision Chassis",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "toolworks",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "ashwood_log",
+          "name": "Ashwood Log",
+          "count": 2
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 2
+        },
+        {
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "count": 1
+        },
+        {
+          "itemId": "cogwheel_blank",
+          "name": "Cogwheel Blank",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Precision Chassis",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 40000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_gyrelens_array",
+      "name": "Gyrelens Array",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "toolworks",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "precision_chassis",
+          "name": "Precision Chassis",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "ashwood_log",
+          "name": "Ashwood Log",
+          "count": 4
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Gyrelens Array",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_masters_field_forge",
+      "name": "Master's Field Forge",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "toolworks",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "precision_chassis",
+          "name": "Precision Chassis",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "ashwood_log",
+          "name": "Ashwood Log",
+          "count": 4
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Master's Field Forge",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_makers_charm",
+      "name": "Maker's Charm",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "toolworks",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "precision_chassis",
+          "name": "Precision Chassis",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "ashwood_log",
+          "name": "Ashwood Log",
+          "count": 4
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Maker's Charm",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_bronze_hoe",
+      "name": "Bronze Hoe",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "toolworks",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "fine_vale_wheat",
+          "name": "Fine Vale Wheat",
+          "count": 4
+        },
+        {
+          "itemId": "garden_hoe",
+          "name": "Garden Hoe",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Bronze Hoe",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_skysilver_hoe",
+      "name": "Skysilver Hoe",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "toolworks",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "fine_marsh_rice",
+          "name": "Fine Marsh Rice",
+          "count": 4
+        },
+        {
+          "itemId": "bronze_hoe",
+          "name": "Bronze Hoe",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Skysilver Hoe",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_osmium_hoe",
+      "name": "Osmium Hoe",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "toolworks",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "fine_highland_barley",
+          "name": "Fine Highland Barley",
+          "count": 4
+        },
+        {
+          "itemId": "skysilver_hoe",
+          "name": "Skysilver Hoe",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Osmium Hoe",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 40000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_evergarden_hoe",
+      "name": "Evergarden Hoe",
+      "skillReq": 125,
+      "tier": 5,
+      "station": "toolworks",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "fine_evergarden_greens",
+          "name": "Fine Evergarden Greens",
+          "count": 2
+        },
+        {
+          "itemId": "osmium_hoe",
+          "name": "Osmium Hoe",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Evergarden Hoe",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 160000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_cogwheel_blank",
+      "name": "Cogwheel Blank",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "toolworks",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 4
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Cogwheel Blank",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "recipe_copperlens_ocular",
+      "name": "Copperlens Ocular",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "toolworks",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "cogwheel_blank",
+          "name": "Cogwheel Blank",
+          "count": 1
+        },
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 3
+        }
+      ],
+      "output": {
+        "name": "Copperlens Ocular",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "engineering",
+      "sourceId": "schematic_clockwork_shock_bomb",
+      "name": "Clockwork Shock Bomb",
+      "skillReq": 40,
+      "tier": 1,
+      "station": "toolworks",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 3
+        },
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Clockwork Shock Bomb",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_minor_healing_potion",
+      "name": "Minor Healing Potion",
+      "skillReq": 0,
+      "tier": 0,
+      "station": null,
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "linen_scrap",
+          "name": "Linen Scrap",
+          "count": 1
+        },
+        {
+          "itemId": "spider_leg",
+          "name": "Twitching Spider Leg",
+          "count": 1
+        },
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Minor Healing Potion",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_volatile_flux_elixir",
+      "name": "Elixir of the Bear",
+      "skillReq": 25,
+      "tier": 1,
+      "station": null,
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "linen_scrap",
+          "name": "Linen Scrap",
+          "count": 2
+        },
+        {
+          "itemId": "spider_leg",
+          "name": "Twitching Spider Leg",
+          "count": 2
+        },
+        {
+          "itemId": "venom_gland",
+          "name": "Venom Gland",
+          "count": 2
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Elixir of the Bear",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": {
+        "crafts": [
+          "alchemy",
+          "engineering"
+        ],
+        "minTier": 1
+      },
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_silverleaf_healing_draught",
+      "name": "Sheenleaf Healing Draught",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 4
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sheenleaf Healing Draught",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_silverleaf_mana_draught",
+      "name": "Sheenleaf Mana Draught",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 3
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sheenleaf Mana Draught",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_elixir_of_the_boar",
+      "name": "Elixir of the Boar",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "venom_gland",
+          "name": "Venom Gland",
+          "count": 2
+        },
+        {
+          "itemId": "vale_wheat",
+          "name": "Vale Wheat",
+          "count": 1
+        },
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Elixir of the Boar",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_goldleaf_healing_draught",
+      "name": "Goldleaf Healing Draught",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Goldleaf Healing Draught",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_goldleaf_mana_draught",
+      "name": "Goldleaf Mana Draught",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Goldleaf Mana Draught",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_venomfire_elixir",
+      "name": "Vipersear Elixir",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "venom_gland",
+          "name": "Venom Gland",
+          "count": 3
+        },
+        {
+          "itemId": "bog_beet",
+          "name": "Bog Beet",
+          "count": 2
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 1
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Vipersear Elixir",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_sunpetal_healing_draught",
+      "name": "Sunpetal Healing Draught",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 3
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sunpetal Healing Draught",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_sunpetal_mana_draught",
+      "name": "Sunpetal Mana Draught",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 1
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sunpetal Mana Draught",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_elixir_of_the_serpent",
+      "name": "Elixir of the Serpent",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "pristine_venom_gland",
+          "name": "Pristine Venom Gland",
+          "count": 1
+        },
+        {
+          "itemId": "venom_gland",
+          "name": "Venom Gland",
+          "count": 2
+        },
+        {
+          "itemId": "frost_gourd",
+          "name": "Frost Gourd",
+          "count": 1
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 1
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Elixir of the Serpent",
+        "count": 2,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_quickening_catalyst",
+      "name": "Quickening Catalyst",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 1
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "venom_gland",
+          "name": "Venom Gland",
+          "count": 2
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Quickening Catalyst",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 40000,
+      "oncePerDay": true
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_ironhusk_flask",
+      "name": "Ironhusk Flask",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "apothecary",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "count": 1
+        },
+        {
+          "itemId": "pristine_venom_gland",
+          "name": "Pristine Venom Gland",
+          "count": 1
+        },
+        {
+          "itemId": "venom_gland",
+          "name": "Venom Gland",
+          "count": 2
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "highland_barley",
+          "name": "Highland Barley",
+          "count": 1
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Ironhusk Flask",
+        "count": 2,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_warboar_flask",
+      "name": "Warboar Flask",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "apothecary",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "count": 1
+        },
+        {
+          "itemId": "pristine_venom_gland",
+          "name": "Pristine Venom Gland",
+          "count": 1
+        },
+        {
+          "itemId": "venom_gland",
+          "name": "Venom Gland",
+          "count": 2
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "highland_barley",
+          "name": "Highland Barley",
+          "count": 1
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Warboar Flask",
+        "count": 2,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_runewater_flask",
+      "name": "Runewater Flask",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "apothecary",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "count": 1
+        },
+        {
+          "itemId": "pristine_venom_gland",
+          "name": "Pristine Venom Gland",
+          "count": 1
+        },
+        {
+          "itemId": "venom_gland",
+          "name": "Venom Gland",
+          "count": 2
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "highland_barley",
+          "name": "Highland Barley",
+          "count": 1
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Runewater Flask",
+        "count": 2,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_grand_cauldron",
+      "name": "Grand Cauldron",
+      "skillReq": 125,
+      "tier": 5,
+      "station": "apothecary",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "gilded_sunmelon",
+          "name": "Gilded Sunmelon",
+          "count": 2
+        },
+        {
+          "itemId": "fine_gilded_sunmelon",
+          "name": "Fine Gilded Sunmelon",
+          "count": 1
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 4
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Grand Cauldron",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_growth_tonic",
+      "name": "Growth Tonic",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Growth Tonic",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_lesser_healing_potion",
+      "name": "Lesser Healing Potion",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "tallow_candle",
+          "name": "Greasy Tallow Lump",
+          "count": 2
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 1
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Lesser Healing Potion",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_elixir_of_mana_regeneration",
+      "name": "Elixir of Mana Regeneration",
+      "skillReq": 40,
+      "tier": 1,
+      "station": "apothecary",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 3
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Elixir of Mana Regeneration",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "alchemy",
+      "sourceId": "recipe_potion_of_invisibility",
+      "name": "Potion of Invisibility",
+      "skillReq": 40,
+      "tier": 1,
+      "station": "apothecary",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 3
+        },
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 3
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Potion of Invisibility",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_tough_jerky",
+      "name": "Salted Jerky",
+      "skillReq": 0,
+      "tier": 0,
+      "station": null,
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "spider_leg",
+          "name": "Twitching Spider Leg",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Salted Jerky",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_pan_seared_perch",
+      "name": "Pan-Seared River Perch",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "raw_river_perch",
+          "name": "Raw River Perch",
+          "count": 2
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Pan-Seared River Perch",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_hunters_game_skewer",
+      "name": "Hunter's Game Skewer",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "game_meat",
+          "name": "Game Meat",
+          "count": 2
+        },
+        {
+          "itemId": "vale_wheat",
+          "name": "Vale Wheat",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Hunter's Game Skewer",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_herbed_marsh_pike",
+      "name": "Herbed Marsh Pike",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "raw_marsh_pike",
+          "name": "Raw Marsh Pike",
+          "count": 2
+        },
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Herbed Marsh Pike",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_ashwood_smoked_eel",
+      "name": "Ashwood Smoked Eel",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "raw_bog_eel",
+          "name": "Raw Bog Eel",
+          "count": 2
+        },
+        {
+          "itemId": "ashwood_log",
+          "name": "Ashwood Log",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Ashwood Smoked Eel",
+        "count": 2,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_goldleaf_game_stew",
+      "name": "Goldleaf Game Stew",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "game_meat",
+          "name": "Game Meat",
+          "count": 3
+        },
+        {
+          "itemId": "vale_wheat",
+          "name": "Vale Wheat",
+          "count": 2
+        },
+        {
+          "itemId": "bog_beet",
+          "name": "Bog Beet",
+          "count": 1
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Goldleaf Game Stew",
+        "count": 2,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_frostgill_chowder",
+      "name": "Frostgill Chowder",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "raw_frostgill_trout",
+          "name": "Raw Frostgill Trout",
+          "count": 2
+        },
+        {
+          "itemId": "brook_carrot",
+          "name": "Brook Carrot",
+          "count": 1
+        },
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Frostgill Chowder",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_silvered_carp_supper",
+      "name": "Silvered Carp Supper",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "raw_stonescale_carp",
+          "name": "Raw Slatefin Carp",
+          "count": 3
+        },
+        {
+          "itemId": "raw_mirror_trout",
+          "name": "Raw Mirror Trout",
+          "count": 1
+        },
+        {
+          "itemId": "marsh_rice",
+          "name": "Marsh Rice",
+          "count": 2
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Silvered Carp Supper",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_anglers_feast_platter",
+      "name": "Angler's Feast Platter",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "raw_frostgill_trout",
+          "name": "Raw Frostgill Trout",
+          "count": 2
+        },
+        {
+          "itemId": "raw_bog_eel",
+          "name": "Raw Bog Eel",
+          "count": 2
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Angler's Feast Platter",
+        "count": 3,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_marlows_grand_roast",
+      "name": "Marlow's Grand Roast",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "prime_cut",
+          "name": "Prime Cut",
+          "count": 1
+        },
+        {
+          "itemId": "game_meat",
+          "name": "Game Meat",
+          "count": 4
+        },
+        {
+          "itemId": "highland_barley",
+          "name": "Highland Barley",
+          "count": 2
+        },
+        {
+          "itemId": "frost_gourd",
+          "name": "Frost Gourd",
+          "count": 2
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Marlow's Grand Roast",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_seasoned_stock",
+      "name": "Seasoned Stock",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "prime_cut",
+          "name": "Prime Cut",
+          "count": 1
+        },
+        {
+          "itemId": "game_meat",
+          "name": "Game Meat",
+          "count": 3
+        },
+        {
+          "itemId": "marsh_rice",
+          "name": "Marsh Rice",
+          "count": 2
+        },
+        {
+          "itemId": "bog_beet",
+          "name": "Bog Beet",
+          "count": 2
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        },
+        {
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Seasoned Stock",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 40000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_stonepot_stew",
+      "name": "Stonepot Stew",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "kitchens",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "seasoned_stock",
+          "name": "Seasoned Stock",
+          "count": 1
+        },
+        {
+          "itemId": "prime_cut",
+          "name": "Prime Cut",
+          "count": 2
+        },
+        {
+          "itemId": "game_meat",
+          "name": "Game Meat",
+          "count": 4
+        },
+        {
+          "itemId": "frost_gourd",
+          "name": "Frost Gourd",
+          "count": 2
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        },
+        {
+          "itemId": "raw_deepbarb_catfish",
+          "name": "Raw Deepbarb Catfish",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Stonepot Stew",
+        "count": 4,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_warspice_skewers",
+      "name": "Warspice Skewers",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "kitchens",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "seasoned_stock",
+          "name": "Seasoned Stock",
+          "count": 1
+        },
+        {
+          "itemId": "prime_cut",
+          "name": "Prime Cut",
+          "count": 2
+        },
+        {
+          "itemId": "game_meat",
+          "name": "Game Meat",
+          "count": 4
+        },
+        {
+          "itemId": "highland_barley",
+          "name": "Highland Barley",
+          "count": 2
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        },
+        {
+          "itemId": "raw_deepbarb_catfish",
+          "name": "Raw Deepbarb Catfish",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Warspice Skewers",
+        "count": 4,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_sageleaf_chowder",
+      "name": "Sageleaf Chowder",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "kitchens",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "seasoned_stock",
+          "name": "Seasoned Stock",
+          "count": 1
+        },
+        {
+          "itemId": "prime_cut",
+          "name": "Prime Cut",
+          "count": 2
+        },
+        {
+          "itemId": "game_meat",
+          "name": "Game Meat",
+          "count": 4
+        },
+        {
+          "itemId": "thornpeak_cabbage",
+          "name": "Thornpeak Cabbage",
+          "count": 2
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        },
+        {
+          "itemId": "raw_deepbarb_catfish",
+          "name": "Raw Deepbarb Catfish",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Sageleaf Chowder",
+        "count": 4,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_laden_hearth",
+      "name": "The Laden Hearth",
+      "skillReq": 125,
+      "tier": 5,
+      "station": "kitchens",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "seasoned_stock",
+          "name": "Seasoned Stock",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "prime_cut",
+          "name": "Prime Cut",
+          "count": 4
+        },
+        {
+          "itemId": "game_meat",
+          "name": "Game Meat",
+          "count": 4
+        },
+        {
+          "itemId": "evergarden_greens",
+          "name": "Evergarden Greens",
+          "count": 2
+        },
+        {
+          "itemId": "fine_evergarden_greens",
+          "name": "Fine Evergarden Greens",
+          "count": 1
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "raw_deepbarb_catfish",
+          "name": "Raw Deepbarb Catfish",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "The Laden Hearth",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_peppered_deepbarb_catfish",
+      "name": "Peppered Deepbarb Catfish",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "kitchens",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "raw_deepbarb_catfish",
+          "name": "Raw Deepbarb Catfish",
+          "count": 4
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Peppered Deepbarb Catfish",
+        "count": 2,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_roast_hollowgill_sturgeon",
+      "name": "Roast Hollowgill Sturgeon",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "kitchens",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "raw_hollowgill_sturgeon",
+          "name": "Raw Hollowgill Sturgeon",
+          "count": 4
+        },
+        {
+          "itemId": "raw_deepbarb_catfish",
+          "name": "Raw Deepbarb Catfish",
+          "count": 2
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Roast Hollowgill Sturgeon",
+        "count": 2,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_stonepot_feast",
+      "name": "Stonepot Feast",
+      "skillReq": 125,
+      "tier": 5,
+      "station": "kitchens",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "seasoned_stock",
+          "name": "Seasoned Stock",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 1
+        },
+        {
+          "itemId": "evergarden_greens",
+          "name": "Evergarden Greens",
+          "count": 1
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        },
+        {
+          "itemId": "raw_deepbarb_catfish",
+          "name": "Raw Deepbarb Catfish",
+          "count": 4
+        },
+        {
+          "itemId": "raw_hollowgill_sturgeon",
+          "name": "Raw Hollowgill Sturgeon",
+          "count": 3
+        },
+        {
+          "itemId": "raw_stillmere_salmon",
+          "name": "Raw Stillmere Salmon",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Stonepot Feast",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_warspice_feast",
+      "name": "Warspice Feast",
+      "skillReq": 125,
+      "tier": 5,
+      "station": "kitchens",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "seasoned_stock",
+          "name": "Seasoned Stock",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 1
+        },
+        {
+          "itemId": "evergarden_greens",
+          "name": "Evergarden Greens",
+          "count": 1
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        },
+        {
+          "itemId": "raw_deepbarb_catfish",
+          "name": "Raw Deepbarb Catfish",
+          "count": 4
+        },
+        {
+          "itemId": "raw_hollowgill_sturgeon",
+          "name": "Raw Hollowgill Sturgeon",
+          "count": 3
+        },
+        {
+          "itemId": "raw_stillmere_salmon",
+          "name": "Raw Stillmere Salmon",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Warspice Feast",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_sageleaf_feast",
+      "name": "Sageleaf Feast",
+      "skillReq": 125,
+      "tier": 5,
+      "station": "kitchens",
+      "acquisition": "vendor",
+      "materials": [
+        {
+          "itemId": "seasoned_stock",
+          "name": "Seasoned Stock",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 1
+        },
+        {
+          "itemId": "evergarden_greens",
+          "name": "Evergarden Greens",
+          "count": 1
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        },
+        {
+          "itemId": "raw_deepbarb_catfish",
+          "name": "Raw Deepbarb Catfish",
+          "count": 4
+        },
+        {
+          "itemId": "raw_hollowgill_sturgeon",
+          "name": "Raw Hollowgill Sturgeon",
+          "count": 3
+        },
+        {
+          "itemId": "raw_stillmere_salmon",
+          "name": "Raw Stillmere Salmon",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Sageleaf Feast",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_vale_hearth_loaf",
+      "name": "Vale Hearth Loaf",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "vale_wheat",
+          "name": "Vale Wheat",
+          "count": 3
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Vale Hearth Loaf",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_eastbrook_root_pottage",
+      "name": "Eastbrook Root Pottage",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "brook_carrot",
+          "name": "Brook Carrot",
+          "count": 2
+        },
+        {
+          "itemId": "fine_brook_carrot",
+          "name": "Fine Brook Carrot",
+          "count": 1
+        },
+        {
+          "itemId": "vale_wheat",
+          "name": "Vale Wheat",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Eastbrook Root Pottage",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_fenbridge_rice_bowl",
+      "name": "Fenbridge Rice Bowl",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "marsh_rice",
+          "name": "Marsh Rice",
+          "count": 4
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Fenbridge Rice Bowl",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_fenbridge_beet_braise",
+      "name": "Fenbridge Beet Braise",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "bog_beet",
+          "name": "Bog Beet",
+          "count": 3
+        },
+        {
+          "itemId": "fine_bog_beet",
+          "name": "Fine Bog Beet",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Fenbridge Beet Braise",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_highwatch_barley_bannock",
+      "name": "Highwatch Barley Bannock",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "highland_barley",
+          "name": "Highland Barley",
+          "count": 4
+        },
+        {
+          "itemId": "thornpeak_cabbage",
+          "name": "Thornpeak Cabbage",
+          "count": 2
+        },
+        {
+          "itemId": "fine_thornpeak_cabbage",
+          "name": "Fine Thornpeak Cabbage",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Highwatch Barley Bannock",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_highwatch_gourd_soup",
+      "name": "Highwatch Gourd Soup",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "kitchens",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "frost_gourd",
+          "name": "Frost Gourd",
+          "count": 3
+        },
+        {
+          "itemId": "fine_frost_gourd",
+          "name": "Fine Frost Gourd",
+          "count": 1
+        },
+        {
+          "itemId": "frost_lentils",
+          "name": "Frost Lentils",
+          "count": 2
+        },
+        {
+          "itemId": "fine_frost_lentils",
+          "name": "Fine Frost Lentils",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Highwatch Gourd Soup",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_evergarden_sunmelon_tart",
+      "name": "Evergarden Sunmelon Tart",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "kitchens",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "gilded_sunmelon",
+          "name": "Gilded Sunmelon",
+          "count": 3
+        },
+        {
+          "itemId": "fine_gilded_sunmelon",
+          "name": "Fine Gilded Sunmelon",
+          "count": 1
+        },
+        {
+          "itemId": "gilded_yam",
+          "name": "Gilded Yam",
+          "count": 2
+        },
+        {
+          "itemId": "fine_gilded_yam",
+          "name": "Fine Gilded Yam",
+          "count": 1
+        },
+        {
+          "itemId": "vale_wheat",
+          "name": "Vale Wheat",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Evergarden Sunmelon Tart",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_evergarden_harvest_platter",
+      "name": "Evergarden Harvest Platter",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "kitchens",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "evergarden_greens",
+          "name": "Evergarden Greens",
+          "count": 3
+        },
+        {
+          "itemId": "fine_evergarden_greens",
+          "name": "Fine Evergarden Greens",
+          "count": 1
+        },
+        {
+          "itemId": "evergarden_pumpkin",
+          "name": "Evergarden Pumpkin",
+          "count": 2
+        },
+        {
+          "itemId": "fine_evergarden_pumpkin",
+          "name": "Fine Evergarden Pumpkin",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Evergarden Harvest Platter",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_eastbrook_glazed_carrots",
+      "name": "Eastbrook Glazed Carrots",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "brook_carrot",
+          "name": "Brook Carrot",
+          "count": 4
+        },
+        {
+          "itemId": "vale_wheat",
+          "name": "Vale Wheat",
+          "count": 1
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Eastbrook Glazed Carrots",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_fenbridge_rice_pudding",
+      "name": "Fenbridge Rice Pudding",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "kitchens",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "marsh_rice",
+          "name": "Marsh Rice",
+          "count": 4
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Fenbridge Rice Pudding",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_highwatch_barley_porridge",
+      "name": "Highwatch Barley Porridge",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "kitchens",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "highland_barley",
+          "name": "Highland Barley",
+          "count": 4
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Highwatch Barley Porridge",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_evergarden_braised_greens",
+      "name": "Evergarden Braised Greens",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "kitchens",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "evergarden_greens",
+          "name": "Evergarden Greens",
+          "count": 4
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Evergarden Braised Greens",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "cooking",
+      "sourceId": "recipe_harvest_feast",
+      "name": "Harvest Feast",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "kitchens",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "evergarden_greens",
+          "name": "Evergarden Greens",
+          "count": 4
+        },
+        {
+          "itemId": "gilded_sunmelon",
+          "name": "Gilded Sunmelon",
+          "count": 4
+        },
+        {
+          "itemId": "cooking_salt",
+          "name": "Cooking Salt",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Harvest Feast",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_tanned_leather_jerkin",
+      "name": "Tanned Leather Jerkin",
+      "skillReq": 0,
+      "tier": 0,
+      "station": null,
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 4
+        },
+        {
+          "itemId": "spider_leg",
+          "name": "Twitching Spider Leg",
+          "count": 2
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 5
+        }
+      ],
+      "output": {
+        "name": "Tanned Leather Jerkin",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_eastbrook_druids_hide",
+      "name": "Eastbrook Druid's Hide",
+      "skillReq": 0,
+      "tier": 0,
+      "station": null,
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 5
+        },
+        {
+          "itemId": "spider_leg",
+          "name": "Twitching Spider Leg",
+          "count": 2
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 5
+        }
+      ],
+      "output": {
+        "name": "Eastbrook Druid's Hide",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_duskhide_wraps",
+      "name": "Duskhide Wraps",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "tannery",
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 3
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 2
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Duskhide Wraps",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_fenbridge_hide_leggings",
+      "name": "Fenbridge Hide Leggings",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 3
+        },
+        {
+          "itemId": "spider_leg",
+          "name": "Twitching Spider Leg",
+          "count": 2
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Fenbridge Hide Leggings",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_fenbridge_hide_boots",
+      "name": "Fenbridge Hide Boots",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 2
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Fenbridge Hide Boots",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_fenbridge_hide_belt",
+      "name": "Fenbridge Hide Belt",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 2
+        },
+        {
+          "itemId": "spider_leg",
+          "name": "Twitching Spider Leg",
+          "count": 1
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Fenbridge Hide Belt",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_marshstalker_jerkin",
+      "name": "Marshstalker Jerkin",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 4
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 2
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Marshstalker Jerkin",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_marshstalker_hood",
+      "name": "Marshstalker Hood",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 3
+        },
+        {
+          "itemId": "spider_leg",
+          "name": "Twitching Spider Leg",
+          "count": 2
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Marshstalker Hood",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_marshstalker_spaulders",
+      "name": "Marshstalker Spaulders",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 3
+        },
+        {
+          "itemId": "homespun_cloth",
+          "name": "Homespun Cloth",
+          "count": 2
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Marshstalker Spaulders",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_mirewarden_jerkin",
+      "name": "Mirewarden Jerkin",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 1
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 4
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 1
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Mirewarden Jerkin",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_mirewarden_leggings",
+      "name": "Mirewarden Leggings",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 5
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 1
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Mirewarden Leggings",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_mirewarden_treads",
+      "name": "Mirewarden Treads",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "pristine_claw",
+          "name": "Pristine Claw",
+          "count": 1
+        },
+        {
+          "itemId": "sharp_claw",
+          "name": "Sharp Claw",
+          "count": 2
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 4
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 2
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Mirewarden Treads",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_wyrmhide_cording",
+      "name": "Wyrmhide Cording",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 1
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 4
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 2
+        },
+        {
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Wyrmhide Cording",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 40000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_briarstep_jerkin",
+      "name": "Briarstep Jerkin",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "wyrmhide_cording",
+          "name": "Wyrmhide Cording",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 4
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Briarstep Jerkin",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_fenbloom_breeches",
+      "name": "Fenbloom Breeches",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "wyrmhide_cording",
+          "name": "Wyrmhide Cording",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 4
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Fenbloom Breeches",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_barksong_handguards",
+      "name": "Barksong Handguards",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "wyrmhide_cording",
+          "name": "Wyrmhide Cording",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 4
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Barksong Handguards",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_oiled_boots",
+      "name": "Oiled Leather Boots",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "mudfin_scale",
+          "name": "Slimy Mudfin Scale",
+          "count": 4
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 6
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 2
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Oiled Leather Boots",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_gravewyrm_bone_quiver",
+      "name": "Gravewyrm Bone Quiver",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "cracked_wyrm_scale",
+          "name": "Cracked Wyrm Scale",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 2
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Gravewyrm Bone Quiver",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_wildgrove_cinch",
+      "name": "Wildgrove Cinch",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "old_cragmaws_pelt",
+          "name": "Old Cragmaw's Pelt",
+          "count": 1
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 3
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 1
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Wildgrove Cinch",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_cragprowl_belt",
+      "name": "Cragprowl Belt",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "tannery",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "emberwing_cinderscale",
+          "name": "Emberwing Cinderscale",
+          "count": 1
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 3
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 1
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Cragprowl Belt",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_agi_leather_chest",
+      "name": "Crucible Skirmisher's Jerkin",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Skirmisher's Jerkin",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_agi_leather_waist",
+      "name": "Crucible Skirmisher's Belt",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Skirmisher's Belt",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_agi_leather_feet",
+      "name": "Crucible Skirmisher's Boots",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Skirmisher's Boots",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_str_leather_chest",
+      "name": "Crucible Prowler's Jerkin",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Prowler's Jerkin",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_str_leather_waist",
+      "name": "Crucible Prowler's Belt",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Prowler's Belt",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_str_leather_feet",
+      "name": "Crucible Prowler's Boots",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Prowler's Boots",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_tank_leather_chest",
+      "name": "Crucible Guardian's Jerkin",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Guardian's Jerkin",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_tank_leather_waist",
+      "name": "Crucible Guardian's Belt",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Guardian's Belt",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_tank_leather_feet",
+      "name": "Crucible Guardian's Boots",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Guardian's Boots",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_caster_leather_chest",
+      "name": "Crucible Spellcaster's Jerkin",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Spellcaster's Jerkin",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_caster_leather_waist",
+      "name": "Crucible Spellcaster's Belt",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Spellcaster's Belt",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_caster_leather_feet",
+      "name": "Crucible Spellcaster's Boots",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Spellcaster's Boots",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_healer_leather_chest",
+      "name": "Crucible Healer's Jerkin",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Healer's Jerkin",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_healer_leather_waist",
+      "name": "Crucible Healer's Belt",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Healer's Belt",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "recipe_crucible_healer_leather_feet",
+      "name": "Crucible Healer's Boots",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "tannery",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "pristine_hide",
+          "name": "Pristine Hide",
+          "count": 4
+        },
+        {
+          "itemId": "tanning_agent",
+          "name": "Tanning Agent",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Healer's Boots",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "leatherworking",
+      "sourceId": "pattern_reinforced_armor_kit",
+      "name": "Reinforced Armor Kit",
+      "skillReq": 40,
+      "tier": 1,
+      "station": "tannery",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 5
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 3
+        }
+      ],
+      "output": {
+        "name": "Reinforced Armor Kit",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_eastbrook_wool_trousers",
+      "name": "Eastbrook Wool Trousers",
+      "skillReq": 0,
+      "tier": 0,
+      "station": null,
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "homespun_cloth",
+          "name": "Homespun Cloth",
+          "count": 3
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 9
+        }
+      ],
+      "output": {
+        "name": "Eastbrook Wool Trousers",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_eastbrook_ritual_vestments",
+      "name": "Eastbrook Ritual Vestments",
+      "skillReq": 0,
+      "tier": 0,
+      "station": null,
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "linen_scrap",
+          "name": "Linen Scrap",
+          "count": 3
+        },
+        {
+          "itemId": "spider_leg",
+          "name": "Twitching Spider Leg",
+          "count": 1
+        },
+        {
+          "itemId": "homespun_cloth",
+          "name": "Homespun Cloth",
+          "count": 3
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 5
+        }
+      ],
+      "output": {
+        "name": "Eastbrook Ritual Vestments",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_wardweave_cowl",
+      "name": "Wardweave Cowl",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "loom",
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "pristine_silk",
+          "name": "Pristine Silk",
+          "count": 2
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 4
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Wardweave Cowl",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_homespun_hood",
+      "name": "Homespun Hood",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "homespun_cloth",
+          "name": "Homespun Cloth",
+          "count": 4
+        },
+        {
+          "itemId": "linen_scrap",
+          "name": "Linen Scrap",
+          "count": 2
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Homespun Hood",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_homespun_mitts",
+      "name": "Homespun Mitts",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "homespun_cloth",
+          "name": "Homespun Cloth",
+          "count": 3
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Homespun Mitts",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_silverthread_slippers",
+      "name": "Palethread Slippers",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "linen_scrap",
+          "name": "Linen Scrap",
+          "count": 3
+        },
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Palethread Slippers",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_goldweave_robe",
+      "name": "Gildenweave Robe",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 4
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Gildenweave Robe",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_goldweave_leggings",
+      "name": "Gildenweave Leggings",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "homespun_cloth",
+          "name": "Homespun Cloth",
+          "count": 4
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Gildenweave Leggings",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_silkspun_satchel",
+      "name": "Silkspun Satchel",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 6
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Silkspun Satchel",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_silkbinders_raiment",
+      "name": "Silkbinder's Raiment",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "pristine_silk",
+          "name": "Pristine Silk",
+          "count": 1
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 4
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Silkbinder's Raiment",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_sunweave_mantle",
+      "name": "Sunweave Mantle",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 1
+        },
+        {
+          "itemId": "homespun_cloth",
+          "name": "Homespun Cloth",
+          "count": 4
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Sunweave Mantle",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_sunweave_treads",
+      "name": "Sunweave Treads",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 1
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 3
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sunweave Treads",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_foragers_haversack",
+      "name": "Forager's Haversack",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 8
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 3
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 3
+        }
+      ],
+      "output": {
+        "name": "Forager's Haversack",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_duskweave_bag",
+      "name": "Duskweave Bag",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "pristine_silk",
+          "name": "Pristine Silk",
+          "count": 2
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 3
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 6
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 3
+        }
+      ],
+      "output": {
+        "name": "Duskweave Bag",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_resonant_weave_bag",
+      "name": "Resonantweave Bag",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "resonant_thread",
+          "name": "Resonant Thread",
+          "count": 8
+        },
+        {
+          "itemId": "pristine_silk",
+          "name": "Pristine Silk",
+          "count": 4
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 4
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Resonantweave Bag",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_loombound_reagent_satchel",
+      "name": "Loombound Reagent Satchel",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "resonant_thread",
+          "name": "Resonant Thread",
+          "count": 12
+        },
+        {
+          "itemId": "pristine_silk",
+          "name": "Pristine Silk",
+          "count": 6
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 5
+        },
+        {
+          "itemId": "homespun_cloth",
+          "name": "Homespun Cloth",
+          "count": 8
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 6
+        }
+      ],
+      "output": {
+        "name": "Loombound Reagent Satchel",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_sunspun_bolt",
+      "name": "Sunspun Bolt",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 1
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 4
+        },
+        {
+          "itemId": "pristine_silk",
+          "name": "Pristine Silk",
+          "count": 1
+        },
+        {
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sunspun Bolt",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 40000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_sunspun_vestments",
+      "name": "Sunspun Vestments",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "loom",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "sunspun_bolt",
+          "name": "Sunspun Bolt",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 4
+        },
+        {
+          "itemId": "pristine_silk",
+          "name": "Pristine Silk",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sunspun Vestments",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_sunspun_leggings",
+      "name": "Sunspun Leggings",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "loom",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "sunspun_bolt",
+          "name": "Sunspun Bolt",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 4
+        },
+        {
+          "itemId": "pristine_silk",
+          "name": "Pristine Silk",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sunspun Leggings",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_sunspun_handwraps",
+      "name": "Sunspun Handwraps",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "loom",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "sunspun_bolt",
+          "name": "Sunspun Bolt",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 4
+        },
+        {
+          "itemId": "pristine_silk",
+          "name": "Pristine Silk",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sunspun Handwraps",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_sunspun_haversack",
+      "name": "Sunspun Haversack",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "loom",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "sunspun_bolt",
+          "name": "Sunspun Bolt",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 4
+        },
+        {
+          "itemId": "pristine_silk",
+          "name": "Pristine Silk",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sunspun Haversack",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_linen_pouch",
+      "name": "Linen Pouch",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "loom",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "bandit_bandana",
+          "name": "Red Bandana",
+          "count": 2
+        },
+        {
+          "itemId": "linen_scrap",
+          "name": "Linen Scrap",
+          "count": 4
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Linen Pouch",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_crucible_caster_cloth_chest",
+      "name": "Crucible Spellcaster's Robe",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "loom",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 8
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Spellcaster's Robe",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_crucible_caster_cloth_waist",
+      "name": "Crucible Spellcaster's Sash",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "loom",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 8
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Spellcaster's Sash",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_crucible_caster_cloth_feet",
+      "name": "Crucible Spellcaster's Slippers",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "loom",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 8
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Spellcaster's Slippers",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_crucible_healer_cloth_chest",
+      "name": "Crucible Healer's Robe",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "loom",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 8
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Healer's Robe",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_crucible_healer_cloth_waist",
+      "name": "Crucible Healer's Sash",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "loom",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 8
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Healer's Sash",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "tailoring",
+      "sourceId": "recipe_crucible_healer_cloth_feet",
+      "name": "Crucible Healer's Slippers",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "loom",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "spider_silk",
+          "name": "Spider Silk",
+          "count": 8
+        },
+        {
+          "itemId": "spool_of_thread",
+          "name": "Spool of Thread",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Crucible Healer's Slippers",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "inscription",
+      "sourceId": "recipe_silverleaf_primer",
+      "name": "Sheenleaf Primer",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 3
+        },
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 2
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sheenleaf Primer",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "inscription",
+      "sourceId": "recipe_silverleaf_scroll",
+      "name": "Sheenleaf Scroll",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "silverleaf_herb",
+          "name": "Sheenleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 1
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sheenleaf Scroll",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "inscription",
+      "sourceId": "recipe_goldleaf_folio",
+      "name": "Goldleaf Folio",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 1
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Goldleaf Folio",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "inscription",
+      "sourceId": "recipe_goldleaf_scroll",
+      "name": "Goldleaf Scroll",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 1
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 1
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Goldleaf Scroll",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "inscription",
+      "sourceId": "recipe_sunpetal_grimoire",
+      "name": "Sunpetal Grimoire",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        },
+        {
+          "itemId": "goldleaf_herb",
+          "name": "Goldleaf Herb",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Sunpetal Grimoire",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "inscription",
+      "sourceId": "recipe_sunpetal_scroll",
+      "name": "Sunpetal Scroll",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 1
+        },
+        {
+          "itemId": "frost_gourd",
+          "name": "Frost Gourd",
+          "count": 1
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        },
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sunpetal Scroll",
+        "count": 2,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "inscription",
+      "sourceId": "recipe_deed_of_making",
+      "name": "Deed of Making",
+      "skillReq": 125,
+      "tier": 5,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "sablewax_vellum",
+          "name": "Sablewax Vellum",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 1
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Deed of Making",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 160000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "inscription",
+      "sourceId": "recipe_sablewax_vellum",
+      "name": "Sablewax Vellum",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "apothecary",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 1
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        },
+        {
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Sablewax Vellum",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 40000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "inscription",
+      "sourceId": "recipe_voidbound_grimoire",
+      "name": "Voidbound Grimoire",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "apothecary",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "sablewax_vellum",
+          "name": "Sablewax Vellum",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "sunpetal_herb",
+          "name": "Sunpetal Herb",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        },
+        {
+          "itemId": "glass_vial",
+          "name": "Glass Vial",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Voidbound Grimoire",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "enchanting",
+      "sourceId": "recipe_gatherers_cache",
+      "name": "Gatherer's Cache",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "toolworks",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 1
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 14
+        },
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 10
+        }
+      ],
+      "output": {
+        "name": "Gatherer's Cache",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "enchanting",
+      "sourceId": "recipe_artisans_eye",
+      "name": "Artisan's Eye",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "toolworks",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 1
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 14
+        },
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 10
+        }
+      ],
+      "output": {
+        "name": "Artisan's Eye",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "enchanting",
+      "sourceId": "recipe_lucent_reagent",
+      "name": "Lucent Reagent",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "toolworks",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 3
+        },
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 4
+        },
+        {
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Lucent Reagent",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 40000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "jewelcrafting",
+      "sourceId": "recipe_hammered_copper_band",
+      "name": "Hammered Copper Band",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 4
+        },
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Hammered Copper Band",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "jewelcrafting",
+      "sourceId": "recipe_polished_copper_loop",
+      "name": "Polished Copper Loop",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 4
+        },
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 3
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Polished Copper Loop",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "jewelcrafting",
+      "sourceId": "recipe_coiled_copper_torc",
+      "name": "Coiled Copper Torc",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 5
+        },
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Coiled Copper Torc",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "jewelcrafting",
+      "sourceId": "recipe_riveted_iron_signet",
+      "name": "Riveted Iron Signet",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 4
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 1
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Riveted Iron Signet",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "jewelcrafting",
+      "sourceId": "recipe_etched_iron_loop",
+      "name": "Etched Iron Loop",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 3
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Etched Iron Loop",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "jewelcrafting",
+      "sourceId": "recipe_iron_link_choker",
+      "name": "Iron Link Choker",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 5
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 1
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Iron Link Choker",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "jewelcrafting",
+      "sourceId": "recipe_weighted_thorium_band",
+      "name": "Weighted Osmium Band",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 2
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Weighted Osmium Band",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "jewelcrafting",
+      "sourceId": "recipe_gleaming_thorium_loop",
+      "name": "Gleaming Osmium Loop",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 3
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 2
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Gleaming Osmium Loop",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "jewelcrafting",
+      "sourceId": "recipe_burnished_thorium_amulet",
+      "name": "Burnished Osmium Amulet",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 2
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Burnished Osmium Amulet",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "jewelcrafting",
+      "sourceId": "recipe_prismglass_setting",
+      "name": "Prismglass Setting",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        },
+        {
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Prismglass Setting",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 40000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "jewelcrafting",
+      "sourceId": "recipe_wyrmfall_pendant",
+      "name": "Wyrmfall Pendant",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "prismglass_setting",
+          "name": "Prismglass Setting",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Wyrmfall Pendant",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "jewelcrafting",
+      "sourceId": "recipe_warhewn_signet",
+      "name": "Warhewn Signet",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "prismglass_setting",
+          "name": "Prismglass Setting",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Warhewn Signet",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "jewelcrafting",
+      "sourceId": "recipe_prismglass_loop",
+      "name": "Prismglass Loop",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "prismglass_setting",
+          "name": "Prismglass Setting",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Prismglass Loop",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_eastbrook_arming_sword",
+      "name": "Eastbrook Arming Sword",
+      "skillReq": 0,
+      "tier": 0,
+      "station": null,
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "wolf_fang",
+          "name": "Cracked Wolf Fang",
+          "count": 2
+        },
+        {
+          "itemId": "bone_fragments",
+          "name": "Bone Fragments",
+          "count": 4
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 6
+        }
+      ],
+      "output": {
+        "name": "Eastbrook Arming Sword",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_forgeguard_bulwark_gauntlets",
+      "name": "Gravewyrm Gauntlets",
+      "skillReq": 25,
+      "tier": 1,
+      "station": null,
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 3
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Gravewyrm Gauntlets",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": {
+        "crafts": [
+          "armorcrafting",
+          "weaponcrafting"
+        ],
+        "minTier": 1
+      },
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_copper_bearded_axe",
+      "name": "Copper Bearded Axe",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 4
+        },
+        {
+          "itemId": "ironbark_log",
+          "name": "Ironbark Log",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Copper Bearded Axe",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_copper_flanged_mace",
+      "name": "Copper Flanged Mace",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 3
+        },
+        {
+          "itemId": "bone_fragments",
+          "name": "Bone Fragments",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Copper Flanged Mace",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_ironbark_boar_spear",
+      "name": "Ironbark Boar Spear",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "curved_tusk",
+          "name": "Curved Tusk",
+          "count": 2
+        },
+        {
+          "itemId": "ironbark_log",
+          "name": "Ironbark Log",
+          "count": 3
+        },
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Ironbark Boar Spear",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_ironedge_longsword",
+      "name": "Ironedge Longsword",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 4
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 1
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Ironedge Longsword",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_ironshod_maul",
+      "name": "Ironshod Maul",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 3
+        },
+        {
+          "itemId": "ashwood_log",
+          "name": "Ashwood Log",
+          "count": 1
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Ironshod Maul",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_whetted_iron_dirk",
+      "name": "Whetted Iron Dirk",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 2
+        },
+        {
+          "itemId": "bone_fragments",
+          "name": "Bone Fragments",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Whetted Iron Dirk",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_thorium_warblade",
+      "name": "Osmium Warblade",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Osmium Warblade",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_arcanite_war_axe",
+      "name": "Glyphsteel War Axe",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "arcanite_bar",
+          "name": "Glyphsteel Bar",
+          "count": 1
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 2
+        },
+        {
+          "itemId": "bone_fragments",
+          "name": "Bone Fragments",
+          "count": 4
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Glyphsteel War Axe",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_elderwood_battle_staff",
+      "name": "Highpine Battle Staff",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "elderwood_log",
+          "name": "Highpine Log",
+          "count": 1
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 2
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Highpine Battle Staff",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_duskforged_billet",
+      "name": "Duskforged Billet",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 3
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 2
+        },
+        {
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Duskforged Billet",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 40000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_duskforged_warblade",
+      "name": "Duskforged Warblade",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "duskforged_billet",
+          "name": "Duskforged Billet",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Duskforged Warblade",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_ridgebreaker",
+      "name": "Ridgebreaker",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "duskforged_billet",
+          "name": "Duskforged Billet",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Ridgebreaker",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_duskforged_bulwark",
+      "name": "Duskforged Bulwark",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "duskforged_billet",
+          "name": "Duskforged Billet",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Duskforged Bulwark",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_fenshadow_maul",
+      "name": "Fenshadow Maul",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "cracked_ogre_tusk",
+          "name": "Cracked Ogre Tusk",
+          "count": 2
+        },
+        {
+          "itemId": "elderwood_log",
+          "name": "Highpine Log",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Fenshadow Maul",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "recipe_varkhul_forgebreaker",
+      "name": "Forgebreaker, Engine of Varkhul",
+      "skillReq": 125,
+      "tier": 5,
+      "station": "forge",
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "forgefathers_ember",
+          "name": "Forgefather's Ember",
+          "count": 1
+        },
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 15
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 10
+        },
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 6
+        }
+      ],
+      "output": {
+        "name": "Forgebreaker, Engine of Varkhul",
+        "count": 1,
+        "quality": "legendary"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "weaponcrafting",
+      "sourceId": "plans_dense_sharpening_stone",
+      "name": "Dense Sharpening Stone",
+      "skillReq": 40,
+      "tier": 1,
+      "station": "forge",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Dense Sharpening Stone",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_eastbrook_chain_vest",
+      "name": "Eastbrook Chainmail Vest",
+      "skillReq": 0,
+      "tier": 0,
+      "station": null,
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 4
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 9
+        }
+      ],
+      "output": {
+        "name": "Eastbrook Chainmail Vest",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_eastbrook_warded_leggings",
+      "name": "Eastbrook Warded Leggings",
+      "skillReq": 0,
+      "tier": 0,
+      "station": null,
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "bone_fragments",
+          "name": "Bone Fragments",
+          "count": 3
+        },
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 4
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 4
+        }
+      ],
+      "output": {
+        "name": "Eastbrook Warded Leggings",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_sootscale_mantle",
+      "name": "Kilnscale Mantle",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "forge",
+      "acquisition": "known",
+      "materials": [
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 7
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 5
+        }
+      ],
+      "output": {
+        "name": "Kilnscale Mantle",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_ironbound_warplate_helm",
+      "name": "Boundstone Helm",
+      "skillReq": 25,
+      "tier": 1,
+      "station": null,
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "arcanite_bar",
+          "name": "Glyphsteel Bar",
+          "count": 1
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 5
+        },
+        {
+          "itemId": "wolf_fang",
+          "name": "Cracked Wolf Fang",
+          "count": 4
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Boundstone Helm",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": {
+        "crafts": [
+          "armorcrafting",
+          "weaponcrafting"
+        ],
+        "minTier": 1
+      },
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_riveted_copper_girdle",
+      "name": "Riveted Copper Girdle",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 4
+        },
+        {
+          "itemId": "bone_fragments",
+          "name": "Bone Fragments",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Riveted Copper Girdle",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_coppermail_sabatons",
+      "name": "Coppermail Sabatons",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 4
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Coppermail Sabatons",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_coppermail_gauntlets",
+      "name": "Coppermail Gauntlets",
+      "skillReq": 0,
+      "tier": 0,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "copper_ore",
+          "name": "Copper Ore",
+          "count": 3
+        },
+        {
+          "itemId": "bone_fragments",
+          "name": "Bone Fragments",
+          "count": 2
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Coppermail Gauntlets",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_ironlink_hauberk",
+      "name": "Ironlink Hauberk",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 5
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Ironlink Hauberk",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_ironlink_legguards",
+      "name": "Ironlink Legguards",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 4
+        },
+        {
+          "itemId": "bone_fragments",
+          "name": "Bone Fragments",
+          "count": 3
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Ironlink Legguards",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_ironlink_spaulders",
+      "name": "Ironlink Spaulders",
+      "skillReq": 25,
+      "tier": 1,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 4
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 1
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Ironlink Spaulders",
+        "count": 1,
+        "quality": "uncommon"
+      },
+      "combo": null,
+      "feeCopper": 2500,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_thoriumscale_greathelm",
+      "name": "Osmiumscale Greathelm",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 3
+        },
+        {
+          "itemId": "arcanite_bar",
+          "name": "Glyphsteel Bar",
+          "count": 1
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 2
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Osmiumscale Greathelm",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_thoriumscale_cuirass",
+      "name": "Osmiumscale Cuirass",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "arcanite_bar",
+          "name": "Glyphsteel Bar",
+          "count": 1
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 4
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Osmiumscale Cuirass",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_thoriumscale_leggings",
+      "name": "Osmiumscale Leggings",
+      "skillReq": 50,
+      "tier": 2,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 3
+        },
+        {
+          "itemId": "arcanite_bar",
+          "name": "Glyphsteel Bar",
+          "count": 1
+        },
+        {
+          "itemId": "bone_fragments",
+          "name": "Bone Fragments",
+          "count": 4
+        },
+        {
+          "itemId": "smithing_flux",
+          "name": "Smithing Flux",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Osmiumscale Leggings",
+        "count": 1,
+        "quality": "rare"
+      },
+      "combo": null,
+      "feeCopper": 10000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_forgefold_plating",
+      "name": "Forgefold Plating",
+      "skillReq": 75,
+      "tier": 3,
+      "station": "forge",
+      "acquisition": "trainer",
+      "materials": [
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 3
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 2
+        },
+        {
+          "itemId": "rough_hide",
+          "name": "Rough Hide",
+          "count": 2
+        },
+        {
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "count": 1
+        }
+      ],
+      "output": {
+        "name": "Forgefold Plating",
+        "count": 1,
+        "quality": "common"
+      },
+      "combo": null,
+      "feeCopper": 40000,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_spiritweld_girdle",
+      "name": "Spiritweld Girdle",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "forgefold_plating",
+          "name": "Forgefold Plating",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Spiritweld Girdle",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_forgefold_legguards",
+      "name": "Forgefold Legguards",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "forgefold_plating",
+          "name": "Forgefold Plating",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Forgefold Legguards",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_wardspeaker_sabatons",
+      "name": "Wardspeaker Sabatons",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "drop",
+      "materials": [
+        {
+          "itemId": "forgefold_plating",
+          "name": "Forgefold Plating",
+          "count": 3
+        },
+        {
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "count": 2
+        },
+        {
+          "itemId": "thorium_ore",
+          "name": "Osmium Ore",
+          "count": 4
+        },
+        {
+          "itemId": "iron_ore",
+          "name": "Iron Ore",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Wardspeaker Sabatons",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_crucible_str_mail_chest",
+      "name": "Crucible Striker's Hauberk",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Crucible Striker's Hauberk",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_crucible_str_mail_waist",
+      "name": "Crucible Striker's Girdle",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Crucible Striker's Girdle",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_crucible_str_mail_feet",
+      "name": "Crucible Striker's Sabatons",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Crucible Striker's Sabatons",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_crucible_tank_mail_chest",
+      "name": "Crucible Guardian's Hauberk",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Crucible Guardian's Hauberk",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_crucible_tank_mail_waist",
+      "name": "Crucible Guardian's Girdle",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Crucible Guardian's Girdle",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_crucible_tank_mail_feet",
+      "name": "Crucible Guardian's Sabatons",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Crucible Guardian's Sabatons",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_crucible_caster_mail_chest",
+      "name": "Crucible Spellcaster's Hauberk",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Crucible Spellcaster's Hauberk",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_crucible_caster_mail_waist",
+      "name": "Crucible Spellcaster's Girdle",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Crucible Spellcaster's Girdle",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_crucible_caster_mail_feet",
+      "name": "Crucible Spellcaster's Sabatons",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Crucible Spellcaster's Sabatons",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_crucible_healer_mail_chest",
+      "name": "Crucible Healer's Hauberk",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Crucible Healer's Hauberk",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_crucible_healer_mail_waist",
+      "name": "Crucible Healer's Girdle",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Crucible Healer's Girdle",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    },
+    {
+      "profession": "armorcrafting",
+      "sourceId": "recipe_crucible_healer_mail_feet",
+      "name": "Crucible Healer's Sabatons",
+      "skillReq": 100,
+      "tier": 4,
+      "station": "forge",
+      "acquisition": "dropAndVendor",
+      "materials": [
+        {
+          "itemId": "lastflame_core",
+          "name": "Core of the Last Flame",
+          "count": 3
+        },
+        {
+          "itemId": "fine_thorium_ore",
+          "name": "Fine Osmium Ore",
+          "count": 6
+        },
+        {
+          "itemId": "fine_elderwood_log",
+          "name": "Fine Highpine Log",
+          "count": 2
+        }
+      ],
+      "output": {
+        "name": "Crucible Healer's Sabatons",
+        "count": 1,
+        "quality": "epic"
+      },
+      "combo": null,
+      "feeCopper": 0,
+      "oncePerDay": false
+    }
+  ]
+}

@@ -1,0 +1,1356 @@
+{
+  "sourceProject": "World of ClaudeCraft",
+  "sourceCommit": "493c35a108cef6c8aa290e8793107b1cd117886e",
+  "sourceFile": "src/guide/content.generated.ts",
+  "codeLicense": "MIT (Levy Street 2026)",
+  "mediaAssets": "NOT INCLUDED / no CC0 claims",
+  "status": "reference only; adapt to HIGHFLY available items/nodes/CC0 rig; do not inject directly into game",
+  "families": [
+    {
+      "id": "beast",
+      "creatures": [
+        {
+          "sourceId": "forest_wolf",
+          "name": "Forest Wolf",
+          "levels": [
+            1,
+            2
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_wolf",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "shore_scuttler",
+          "name": "Shore Scuttler",
+          "levels": [
+            1,
+            2
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_crab",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "wild_boar",
+          "name": "Wild Boar",
+          "levels": [
+            2,
+            3
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_boar",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "old_greyjaw",
+          "name": "Old Greyjaw",
+          "levels": [
+            4,
+            4
+          ],
+          "rare": true,
+          "modelLookupKey": "greyjaw",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "void_stalker",
+          "name": "Void Stalker",
+          "levels": [
+            5,
+            6
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_wolf",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "mire_prowler",
+          "name": "Mire Prowler",
+          "levels": [
+            7,
+            8
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_wolf",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "bog_bloat",
+          "name": "Bog Bloat",
+          "levels": [
+            9,
+            11
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_murloc",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "ridge_stalker",
+          "name": "Ridge Stalker",
+          "levels": [
+            13,
+            14
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_wolf",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "veiled_doe",
+          "name": "Veiled Doe",
+          "levels": [
+            14,
+            15
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_veiled_doe",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "veiled_stag",
+          "name": "Veiled Stag",
+          "levels": [
+            15,
+            16
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_veiled_stag",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "snowdrift_wolf",
+          "name": "Snowdrift Wolf",
+          "levels": [
+            17,
+            18
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_wolf",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "gilded_stag",
+          "name": "Gilded Stag",
+          "levels": [
+            18,
+            19
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_stag",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "gloam_fox",
+          "name": "Gloam Fox",
+          "levels": [
+            18,
+            18
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_fox",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "terrace_howler",
+          "name": "Terrace Howler",
+          "levels": [
+            19,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_wolf",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "moonfleece_grazer",
+          "name": "Moonfleece Grazer",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_alpaca",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "moor_ram",
+          "name": "Moor Ram",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_alpaca",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "shoal_scuttler",
+          "name": "Shoal Scuttler",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_crab",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "thicket_boar",
+          "name": "Thicket Boar",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_boar",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "tide_scuttler",
+          "name": "Tide Scuttler",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_crab",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "topiary_stag",
+          "name": "Topiary Stag",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_stag",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "topiary_wolf",
+          "name": "Topiary Wolf",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_wolf",
+          "assetLicense": "UNVERIFIED - lookup only"
+        }
+      ]
+    },
+    {
+      "id": "spider",
+      "creatures": [
+        {
+          "sourceId": "webwood_spider",
+          "name": "Sableweb Lurker",
+          "levels": [
+            2,
+            4
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_spider",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "mire_widow",
+          "name": "Mirefen Widow",
+          "levels": [
+            8,
+            10
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_spider",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "spider_egg",
+          "name": "Broodmother Egg",
+          "levels": [
+            10,
+            10
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_spider_egg_sac",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "canopy_weaver",
+          "name": "Canopy Weaver",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_spider",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "widowsilk_spinner",
+          "name": "Widowsilk Spinner",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_spider",
+          "assetLicense": "UNVERIFIED - lookup only"
+        }
+      ]
+    },
+    {
+      "id": "mudfin",
+      "creatures": [
+        {
+          "sourceId": "mudfin_murloc",
+          "name": "Mudfin Skulker",
+          "levels": [
+            3,
+            5
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_murloc",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "deepfen_murloc",
+          "name": "Deepfen Snapper",
+          "levels": [
+            8,
+            9
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_murloc",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "glimmermere_wader",
+          "name": "Glimmermere Wader",
+          "levels": [
+            15,
+            16
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_murloc",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "bogtoad",
+          "name": "Bogtoad",
+          "levels": [
+            19,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_murloc",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "mere_lurker",
+          "name": "Mere Lurker",
+          "levels": [
+            19,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_murloc",
+          "assetLicense": "UNVERIFIED - lookup only"
+        }
+      ]
+    },
+    {
+      "id": "burrower",
+      "creatures": [
+        {
+          "sourceId": "breach_wretch",
+          "name": "Breach Wretch",
+          "levels": [
+            3,
+            5
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_kobold",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "tunnel_rat",
+          "name": "Deeprock Digger",
+          "levels": [
+            4,
+            6
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_kobold_digger",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "deeprock_kobold",
+          "name": "Deeprock Tunneler",
+          "levels": [
+            14,
+            15
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_kobold",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "mushroom_pixie",
+          "name": "Gleamfolk Pixie",
+          "levels": [
+            15,
+            16
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_mushroom_pixie",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "sporeling_gatherer",
+          "name": "Sporeling Gatherer",
+          "levels": [
+            15,
+            15
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_glub",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "corrupted_sporeling",
+          "name": "Corrupted Sporeling",
+          "levels": [
+            16,
+            17
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_glub",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "fen_sprite",
+          "name": "Fen Sprite",
+          "levels": [
+            17,
+            18
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_kobold",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "harvest_sprite",
+          "name": "Gleaning Sprite",
+          "levels": [
+            18,
+            19
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_kobold",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "willow_sprite",
+          "name": "Willow Sprite",
+          "levels": [
+            19,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_kobold",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "downs_bandit",
+          "name": "Downs Bandit",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_kobold",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "hedge_gnome",
+          "name": "Hedge Gnome",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_kobold",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "wreck_thief",
+          "name": "Wreckfield Thief",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_kobold",
+          "assetLicense": "UNVERIFIED - lookup only"
+        }
+      ]
+    },
+    {
+      "id": "humanoid",
+      "creatures": [
+        {
+          "sourceId": "vale_bandit",
+          "name": "Vale Bandit",
+          "levels": [
+            3,
+            5
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_bandit",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "gravecaller_cultist",
+          "name": "Gravecaller Cultist",
+          "levels": [
+            10,
+            12
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_dark_caster",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "gravecaller_mender",
+          "name": "Gravecaller Mender",
+          "levels": [
+            11,
+            12
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_bandit",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "gravecaller_summoner",
+          "name": "Gravecaller Summoner",
+          "levels": [
+            11,
+            12
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_dark_caster",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "wyrmcult_zealot",
+          "name": "Broodsworn Zealot",
+          "levels": [
+            17,
+            19
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_bandit",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "wyrmcult_necromancer",
+          "name": "Broodsworn Necromancer",
+          "levels": [
+            18,
+            19
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_dark_caster",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "hedge_knight",
+          "name": "Dawnhold Knight",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "npc_knight",
+          "assetLicense": "UNVERIFIED - lookup only"
+        }
+      ]
+    },
+    {
+      "id": "troll",
+      "creatures": [
+        {
+          "sourceId": "fen_troll",
+          "name": "Mirefen Troll",
+          "levels": [
+            10,
+            12
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_troll",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "grubjaw",
+          "name": "Grubjaw the Glutton",
+          "levels": [
+            12,
+            12
+          ],
+          "rare": true,
+          "modelLookupKey": "mob_grubjaw",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "dune_troll",
+          "name": "Dune Troll",
+          "levels": [
+            17,
+            19
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_troll",
+          "assetLicense": "UNVERIFIED - lookup only"
+        }
+      ]
+    },
+    {
+      "id": "ogre",
+      "creatures": [
+        {
+          "sourceId": "thornpeak_ogre",
+          "name": "Thornpeak Ogre",
+          "levels": [
+            15,
+            16
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_ogre",
+          "assetLicense": "UNVERIFIED - lookup only"
+        }
+      ]
+    },
+    {
+      "id": "undead",
+      "creatures": [
+        {
+          "sourceId": "restless_bones",
+          "name": "Restless Bones",
+          "levels": [
+            5,
+            7
+          ],
+          "rare": false,
+          "modelLookupKey": "skel_minion",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "drowned_dead",
+          "name": "Drowned Dead",
+          "levels": [
+            9,
+            11
+          ],
+          "rare": false,
+          "modelLookupKey": "skel_minion",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "drowned_votary",
+          "name": "Drowned Votary",
+          "levels": [
+            15,
+            16
+          ],
+          "rare": false,
+          "modelLookupKey": "skel_minion",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "ashbone_raider",
+          "name": "Ashbone Raider",
+          "levels": [
+            17,
+            18
+          ],
+          "rare": false,
+          "modelLookupKey": "skel_minion",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "ashbone_warcaller",
+          "name": "Ashbone Warcaller",
+          "levels": [
+            18,
+            19
+          ],
+          "rare": false,
+          "modelLookupKey": "skel_minion",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "boneclad_revenant",
+          "name": "Boneclad Revenant",
+          "levels": [
+            18,
+            19
+          ],
+          "rare": false,
+          "modelLookupKey": "skel_warrior",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "barrow_wight",
+          "name": "Barrow Wight",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "skel_minion",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "drowned_deckhand",
+          "name": "Drowned Deckhand",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "skel_minion",
+          "assetLicense": "UNVERIFIED - lookup only"
+        }
+      ]
+    },
+    {
+      "id": "elemental",
+      "creatures": [
+        {
+          "sourceId": "duskwisp",
+          "name": "Duskwisp",
+          "levels": [
+            15,
+            16
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_duskwisp",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "glimmerwisp",
+          "name": "Glimmerwisp",
+          "levels": [
+            15,
+            16
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_glimmerwisp",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "ice_wisp",
+          "name": "Ice Wisp",
+          "levels": [
+            17,
+            18
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_ghost",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "stormcrag_elemental",
+          "name": "Stormcrag Elemental",
+          "levels": [
+            17,
+            18
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_elemental",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "rime_elemental",
+          "name": "Rime Elemental",
+          "levels": [
+            18,
+            19
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_elemental",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "shardlord_kazzix",
+          "name": "Shardlord Kazzix",
+          "levels": [
+            18,
+            18
+          ],
+          "rare": true,
+          "modelLookupKey": "mob_elemental",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "lily_wisp",
+          "name": "Lily Wisp",
+          "levels": [
+            19,
+            19
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_ghost",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "gale_wisp",
+          "name": "Gale Wisp",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_elemental",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "nightkin_stargazer",
+          "name": "Gloamkin Stargazer",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_nightkin",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "gravenbark_shambler",
+          "name": "Gravenbark Shambler",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_treant",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "wood_wraith",
+          "name": "Wood Wraith",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_ghost",
+          "assetLicense": "UNVERIFIED - lookup only"
+        }
+      ]
+    },
+    {
+      "id": "dragonkin",
+      "creatures": [
+        {
+          "sourceId": "sethrael_palecoil",
+          "name": "Sethrael the Palecoil",
+          "levels": [
+            16,
+            16
+          ],
+          "rare": true,
+          "modelLookupKey": "mob_dragonkin",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "dragonkin_broodguard",
+          "name": "Dragonkin Broodguard",
+          "levels": [
+            19,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_dragonkin_broodguard",
+          "assetLicense": "UNVERIFIED - lookup only"
+        },
+        {
+          "sourceId": "dragonkin_egg",
+          "name": "Dragonkin Egg",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_dragon_egg",
+          "assetLicense": "UNVERIFIED - lookup only"
+        }
+      ]
+    },
+    {
+      "id": "demon",
+      "creatures": [
+        {
+          "sourceId": "riftspawn",
+          "name": "Riftspawn",
+          "levels": [
+            3,
+            4
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_demonalt",
+          "assetLicense": "UNVERIFIED - lookup only"
+        }
+      ]
+    },
+    {
+      "id": "reptile",
+      "creatures": [
+        {
+          "sourceId": "gloam_strider",
+          "name": "Gloam Strider",
+          "levels": [
+            20,
+            20
+          ],
+          "rare": false,
+          "modelLookupKey": "mob_raptor",
+          "assetLicense": "UNVERIFIED - lookup only"
+        }
+      ]
+    }
+  ],
+  "zones": [
+    {
+      "id": "eastbrook_vale",
+      "name": "Eastbrook Vale",
+      "levels": [
+        1,
+        7
+      ],
+      "biome": "vale",
+      "hub": "Eastbrook",
+      "pois": [
+        "Eastbrook",
+        "Wolf Run",
+        "Boar Meadow",
+        "Mirror Lake",
+        "Sableweb",
+        "Copper Dig",
+        "Bandit Camp",
+        "Fallen Chapel",
+        "Reliquary Hill",
+        "Brightwood Glade",
+        "The Sowfield",
+        "The Farshore Causeway",
+        "Eastbrook Docks"
+      ],
+      "families": [
+        "beast",
+        "spider",
+        "mudfin",
+        "burrower",
+        "humanoid",
+        "undead"
+      ]
+    },
+    {
+      "id": "mirefen_marsh",
+      "name": "Mirefen Marsh",
+      "levels": [
+        6,
+        13
+      ],
+      "biome": "marsh",
+      "hub": "Fenbridge",
+      "pois": [
+        "Fenbridge",
+        "Prowler Reeds",
+        "Deepfen Shallows",
+        "Widow Thicket",
+        "Drowned Chapel",
+        "Troll Mounds",
+        "Gravecaller Encampment",
+        "The Sunken Bastion"
+      ],
+      "families": [
+        "beast",
+        "spider",
+        "mudfin",
+        "humanoid",
+        "troll",
+        "undead"
+      ]
+    },
+    {
+      "id": "thornpeak_heights",
+      "name": "Thornpeak Heights",
+      "levels": [
+        13,
+        20
+      ],
+      "biome": "peaks",
+      "hub": "Highwatch",
+      "pois": [
+        "Highwatch",
+        "Stalker Ridge",
+        "Deeprock Burrows",
+        "Ogre Foothills",
+        "Drogmar's War-Camp",
+        "Stormcrag",
+        "The Glimmermere",
+        "Broodsworn Tents",
+        "Revenant Fields",
+        "Gravewyrm Sanctum"
+      ],
+      "families": [
+        "beast",
+        "mudfin",
+        "burrower",
+        "humanoid",
+        "ogre",
+        "undead",
+        "elemental",
+        "dragonkin"
+      ]
+    },
+    {
+      "id": "veiled_hollow",
+      "name": "The Veiled Hollow",
+      "levels": [
+        15,
+        20
+      ],
+      "biome": "dusk",
+      "hub": "Eldershine",
+      "pois": [
+        "Eldershine",
+        "Duskfall Cave",
+        "Duskfall Overlook",
+        "Elder Grove",
+        "Starfall Basin",
+        "The Sunken Court",
+        "Crystalline Shallows",
+        "The Gleaming Deep"
+      ],
+      "families": [
+        "beast",
+        "burrower",
+        "elemental"
+      ]
+    },
+    {
+      "id": "drakelands",
+      "name": "The Drakelands",
+      "levels": [
+        16,
+        20
+      ],
+      "biome": "ember",
+      "hub": "Wyrmwatch",
+      "pois": [
+        "Wyrmwatch",
+        "The Gatewood",
+        "Cinder Dunes",
+        "Trollmoot",
+        "The Last Keep",
+        "Bloodglass Fields",
+        "Drakemaw Caldera"
+      ],
+      "families": [
+        "troll",
+        "undead",
+        "dragonkin"
+      ]
+    },
+    {
+      "id": "frostveil",
+      "name": "The Frostveil Reach",
+      "levels": [
+        17,
+        20
+      ],
+      "biome": "frost",
+      "hub": "Icemantle",
+      "pois": [
+        "Icemantle",
+        "The Snowline",
+        "Glacier Tarn",
+        "The Aurora Steps",
+        "The Shiverfen",
+        "The Howling Terraces"
+      ],
+      "families": [
+        "beast",
+        "burrower",
+        "elemental"
+      ]
+    },
+    {
+      "id": "amberfall",
+      "name": "The Amberfall",
+      "levels": [
+        18,
+        20
+      ],
+      "biome": "amber",
+      "hub": "Lanternmere",
+      "pois": [
+        "Lanternmere",
+        "The Goldmelt",
+        "The Gilded Orchard",
+        "Harvest Hollow",
+        "The Great Mere",
+        "Cindermaple Rise",
+        "The Leaning Monolith"
+      ],
+      "families": [
+        "beast",
+        "mudfin",
+        "burrower"
+      ]
+    },
+    {
+      "id": "willowfen",
+      "name": "The Willowfen",
+      "levels": [
+        19,
+        20
+      ],
+      "biome": "fen",
+      "hub": "Bridgemere",
+      "pois": [
+        "Bridgemere",
+        "The Amberfen Steps",
+        "The Lilymoors",
+        "Bogshine Pools",
+        "Willowweep",
+        "The Drowsy Flats"
+      ],
+      "families": [
+        "mudfin",
+        "burrower",
+        "elemental"
+      ]
+    },
+    {
+      "id": "nightbloom",
+      "name": "The Nightbloom",
+      "levels": [
+        20,
+        20
+      ],
+      "biome": "night",
+      "hub": "Moonrest",
+      "pois": [
+        "Moonrest",
+        "The Nightgate",
+        "The Moonspring",
+        "Gloamfield",
+        "The Standing Vigil",
+        "The Sleepless Barrow"
+      ],
+      "families": [
+        "beast",
+        "undead",
+        "elemental",
+        "reptile"
+      ]
+    },
+    {
+      "id": "wraithwood",
+      "name": "The Wraithwood",
+      "levels": [
+        20,
+        20
+      ],
+      "biome": "haunt",
+      "hub": "Gibbetmere",
+      "pois": [
+        "Gibbetmere",
+        "The Crowgate",
+        "Widow's Thicket",
+        "The Hanging Glade",
+        "The Mournstone Chapel",
+        "The Huntsman's Clearing"
+      ],
+      "families": [
+        "spider",
+        "elemental"
+      ]
+    },
+    {
+      "id": "palmreach",
+      "name": "The Palmreach",
+      "levels": [
+        20,
+        20
+      ],
+      "biome": "jungle",
+      "hub": "Drifthaven",
+      "pois": [
+        "Drifthaven",
+        "The Tanglemouth",
+        "The Palmstrand",
+        "The Emerald Tangle",
+        "The Vinefall",
+        "The Sapphire Lagoon",
+        "The Sunken Idol"
+      ],
+      "families": [
+        "beast",
+        "spider"
+      ]
+    },
+    {
+      "id": "evergarden",
+      "name": "The Evergarden",
+      "levels": [
+        20,
+        20
+      ],
+      "biome": "garden",
+      "hub": "Hedgewick",
+      "pois": [
+        "Hedgewick",
+        "The Garden Gate",
+        "The Parterre Walk",
+        "Dawnhold Castle",
+        "The Petal Pond",
+        "The Great Maze",
+        "The Fountain Court",
+        "The Old Mill",
+        "The North Watch",
+        "The Lily Basin"
+      ],
+      "families": [
+        "beast",
+        "burrower",
+        "humanoid"
+      ]
+    },
+    {
+      "id": "galecrest",
+      "name": "The Galecrest",
+      "levels": [
+        20,
+        20
+      ],
+      "biome": "gale",
+      "hub": "Wickharbor",
+      "pois": [
+        "Wickharbor",
+        "The Windway",
+        "The Howling Downs",
+        "The Old Beacon",
+        "The Shear",
+        "The Wreckfields",
+        "The Mirror Tarn",
+        "The Galecrest Stables"
+      ],
+      "families": [
+        "beast",
+        "burrower",
+        "undead",
+        "elemental"
+      ]
+    },
+    {
+      "id": "farshore_isle",
+      "name": "The Farshore",
+      "levels": [
+        3,
+        7
+      ],
+      "biome": "vale",
+      "hub": "Gullhaven",
+      "pois": [
+        "Gullhaven",
+        "The Landing",
+        "The Watch Meadow",
+        "The Sundered Cliffs",
+        "The Riftfields",
+        "The Wreck"
+      ],
+      "families": [
+        "beast",
+        "burrower",
+        "demon"
+      ]
+    },
+    {
+      "id": "proving_shore",
+      "name": "The Proving Shore",
+      "levels": [
+        1,
+        2
+      ],
+      "biome": "vale",
+      "hub": "Dawnrest Camp",
+      "pois": [
+        "Dawnrest Camp",
+        "The Old Pier",
+        "The Practice Yard",
+        "The Wreck Line",
+        "The Gauntlet"
+      ],
+      "families": [
+        "beast"
+      ]
+    }
+  ],
+  "dungeons": [
+    {
+      "id": "hollow_crypt",
+      "isRaid": false,
+      "suggestedPlayers": 5,
+      "min": 7,
+      "max": 10,
+      "name": "The Hollow Crypt"
+    },
+    {
+      "id": "sunken_bastion",
+      "isRaid": false,
+      "suggestedPlayers": 5,
+      "min": 12,
+      "max": 13,
+      "name": "The Sunken Bastion"
+    },
+    {
+      "id": "drowned_temple",
+      "isRaid": false,
+      "suggestedPlayers": 5,
+      "min": 16,
+      "max": 18,
+      "name": "The Drowned Temple"
+    },
+    {
+      "id": "gravewyrm_sanctum",
+      "isRaid": false,
+      "suggestedPlayers": 5,
+      "min": 19,
+      "max": 20,
+      "name": "Gravewyrm Sanctum"
+    },
+    {
+      "id": "wildheart_basin",
+      "isRaid": false,
+      "suggestedPlayers": 5,
+      "min": 20,
+      "max": 20,
+      "name": "The Wildheart Basin"
+    },
+    {
+      "id": "raid",
+      "isRaid": true,
+      "suggestedPlayers": 10,
+      "min": 20,
+      "max": 20
+    }
+  ]
+}

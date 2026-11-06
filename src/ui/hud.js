@@ -1,3 +1,4 @@
+import {ActivityFeedP192} from './activity-feed-p192.js';
 const HALF_VIEW = Math.PI / 2;
 const COMPASS_HALF_W = 240;
 
@@ -52,6 +53,7 @@ export class HUD {
 
     this.notifyStack = el('div', 'hud-notify-stack', this.root);
     this.notifyItems = [];
+    this.p192Feed=game.p192Build?new ActivityFeedP192(game):null;
 
     this.banner = el('div', 'hud-banner', this.root);
     this.bannerQueue = [];
@@ -107,6 +109,7 @@ export class HUD {
 
   setVisible(v) {
     this.root.style.display = v ? 'block' : 'none';
+    this.p192Feed?.updateState(v?'playing':'hidden');
   }
 
   prompt(text) {
@@ -119,6 +122,7 @@ export class HUD {
   }
 
   notify(text) {
+    if(this.p192Feed){this.p192Feed.push(text);return;}
     const n = el('div', 'hud-notify', this.notifyStack, text);
     this.notifyItems.push({ dom: n, t: 3.6 });
     while (this.notifyItems.length > 5) {
@@ -128,6 +132,7 @@ export class HUD {
   }
 
   questBanner(text) {
+    this.p192Feed?.push(text,'quest');
     this.bannerQueue.push(text);
   }
 

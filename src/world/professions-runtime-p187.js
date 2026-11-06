@@ -21,7 +21,12 @@ export class P187ProfessionRuntime {
    const p=INICIOS_PROFESSION_BY_ID_P186[professionId];
    const trainer=TRAINERS.get(trainerId);
    if(!p||!trainer||p.trainerId!==trainerId)return {ok:false,reason:'WRONG_TRAINER'};
-   if(!trainer.existing)return {ok:false,reason:'TRAINER_NOT_YET_IN_WORLD'};
+   const liveTeacher=this.game?.p192Build&&this.game?.npcs?.list?.find(n=>
+    n.id===trainerId&&n.p192TrainerId===trainerId&&
+    (n.pos.x-this.game.player.pos.x)**2+
+    (n.pos.z-this.game.player.pos.z)**2<=144);
+   if(!trainer.existing&&!liveTeacher)
+     return {ok:false,reason:'TRAINER_NOT_YET_IN_WORLD'};
    if((this.game?.stats?.level||0)<p.introLevel)
      return {ok:false,reason:'LEVEL_TOO_LOW',level:p.introLevel};
    if(this.state.learned[p.id])return {ok:false,reason:'ALREADY_LEARNED'};

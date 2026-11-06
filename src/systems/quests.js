@@ -131,6 +131,8 @@ export class Quests {
       rewardGold:P18_FRONTIER_QUEST.rewardGold,rewardXp:P18_FRONTIER_QUEST.rewardXp,
       giver:'Bjorn · aldea',kind:'secundaria',secret:false
     });
+    if(this.game.p192Build&&this.game.p192Hamlets)
+      quests.push(...this.game.p192Hamlets.questList());
     return quests;
   }
 
@@ -160,6 +162,9 @@ export class Quests {
         label:goal.label
       });
     }
+    if(this.game.p192Build&&this.game.p192Hamlets)
+     for(const m of this.game.p192Hamlets.markers())
+      out.push({pos:new THREE.Vector3(m.pos.x,m.pos.y,m.pos.z),label:m.label});
     return out;
   }
 

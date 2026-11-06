@@ -142,7 +142,15 @@ export class WorldMapP34 {
     const frontierActive=this.game.p18Enabled &&
       this.game.livingWorld?.quest?.status==='active';
     const base=frontierActive?P181_ALL_POIS:POIS;
-    if(!this.game.p18Enabled||!this.game.enemies?.packs)return base;
+    // Only mapped villages with verified, grounded world locations.
+    // Uses user's existing atlas/minimap, no second map overlay.
+    if(this.game.p192Build&&!this._p192TownPOIs&&this.game.p192Hamlets){
+      this._p192TownPOIs=[...this.game.p192Hamlets.sites.values()]
+       .filter(site=>!!site.pos)
+       .map(site=>['🏘 '+site.hub.name,site.pos.x,site.pos.z,'#ffd18a']);
+    }
+    const towns=this._p192TownPOIs||[];
+    if(!this.game.p18Enabled||!this.game.enemies?.packs)return base.concat(towns);
     // Cache correctly by list length: a quest change must REMOVE prior gold
     // dots even if this method has already created the 2 extra marker rows.
     if(!this._p182POIs||this._p182POIs.length!==base.length)
@@ -160,7 +168,7 @@ export class WorldMapP34 {
         if(pack?.home){list[POIS.length+i][1]=pack.home.x;list[POIS.length+i][2]=pack.home.z;}
       }
     }
-    return list;
+    return list.concat(towns);
   }
   // More visible than a normal wolf POI: gold diamond with C for Centinela.
   frontierDiamond(ctx,px,py,label,offscreen=false){

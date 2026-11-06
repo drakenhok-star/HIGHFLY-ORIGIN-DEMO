@@ -322,16 +322,34 @@ export class Menus {
     const box = el('div', 'menu-dialogue-box', s);
     this.dlgName = el('div', 'menu-dialogue-name', box);
     this.dlgText = el('div', 'menu-dialogue-text', box);
+    this.dlgRecipe = el('div','hf-p192-recipe-card',box);
     this.dlgOptions = el('div', 'menu-dialogue-options', box);
   }
 
   showDialogue(data) {
     this.dlgName.textContent = data.name;
     this.dlgText.textContent = data.text;
+    this.dlgRecipe.replaceChildren();
+    this.dlgRecipe.style.display=data.craftPreview?'grid':'none';
+    if(data.craftPreview){
+      const p=data.craftPreview;
+      const title=el('strong',null,this.dlgRecipe,'RECETA · '+p.result);
+      title.style.color='#ffdca0';
+      for(const mat of p.inputs){
+        const line=el('div',null,this.dlgRecipe,mat.name+': '+mat.owned+' / '+mat.needed);
+        line.style.color=mat.ok?'#b7ffca':'#ff9fa4';
+      }
+      const oro=el('div',null,this.dlgRecipe,'ORO: '+p.ownedGold+' / '+p.gold);
+      oro.style.color=p.ownedGold>=p.gold?'#b7ffca':'#ff9fa4';
+      this.dlgRecipe.style.cssText='display:grid;gap:5px;padding:11px;margin:8px 0;'+
+        'border:1px solid #be86e6;border-radius:10px;background:#201237;'+
+        'font:600 13px/1.4 system-ui';
+    }
     this.dlgOptions.innerHTML = '';
     for (const opt of data.options) {
       const b = this.btn(opt.label, null, () => opt.action());
       b.classList.add('menu-btn-full');
+      if(opt.disabled){b.disabled=true;b.classList.add('menu-btn-disabled');}
       this.dlgOptions.appendChild(b);
     }
     this.showScreen('dialogue');

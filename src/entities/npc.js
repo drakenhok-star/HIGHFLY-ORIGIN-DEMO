@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 import { npcRoutineP18 } from '../world/world-registry-p18.js';
 import {SIGRID_STARTER_RECIPES_P191,craftWithSigridP191} from '../world/sigrid-forge-p191.js';
+import {openCraftPreviewP192} from '../ui/crafting-preview-p192.js';
+import {HAMLET_QUESTS_P192} from '../world/hamlets-p192.js';
+import {ITEM_DB} from '../systems/inventory.js';
+import {INICIOS_PROFESSIONS_P186} from '../world/inicios-v2-p186.js';
+import {GEAR_RECIPES_P192,craftGearP192} from '../world/gear-crafting-p192.js';
 
 const BJORN_LINES = [
   'Dicen que vieron un dragón cerca de la torre de la montaña.',
@@ -69,6 +74,11 @@ export class NPCs {
   }
 
   startDialogue(npc) {
+    if(this.game.p192Build&&npc.p192TrainerId){
+      this.game.setState('dialogue');
+      this.game.menus.showDialogue(this.hamletDialogueP192(npc));
+      return;
+    }
     if(this.game.p18Enabled)this.game.livingWorld?.onNpcTalk(npc.id);
     this.game.setState('dialogue');
     const dialogue=this.buildDialogue(npc);
@@ -102,21 +112,85 @@ export class NPCs {
          x.id==='wolf_pelt'?'pieles de lobo':'colmillos de lobo')).join(' + ')+
          ' + '+recipe.gold+' oro)',
         action:()=>{
+         if(this.game.p192Build){
+          openCraftPreviewP192(this,npc,recipe,
+            ()=>craftWithSigridP191(this.game,recipe.id));
+          return;
+         }
          const result=craftWithSigridP191(this.game,recipe.id);
          if(result.ok)this.startDialogue(npc);
-         else this.game.hud.notify({
-          MISSING_MATERIALS:'Necesitás los materiales indicados de lobos del mundo',
-          MISSING_GOLD:'No tenés suficiente oro',
-          PROFESSION_NOT_LEARNED:'Primero aprendé el oficio con Sigrid',
-          NOT_AT_FORGE:'Acercate a Sigrid y su forja'
-         }[result.reason]||'No se pudo realizar esa fabricación');
+         else this.game.hud.notify('No se pudo fabricar: '+result.reason);
         }
        }));
        dialogue.options=Array.isArray(dialogue.options)?
         [...options,...dialogue.options]:[...options];
       }
     }
+    if(this.game.p192Build&&npc.id==='sigrid'){
+      for(const recipe of GEAR_RECIPES_P192.filter(r=>r.trainerId==='sigrid'&&
+        this.game.p187Professions?.isLearned(r.profession))){
+        dialogue.options.unshift({
+          label:'VER RECETA · '+recipe.name,
+          action:()=>openCraftPreviewP192(this,npc,recipe,
+            ()=>craftGearP192(this.game,npc.id,recipe.id))
+        });
+      }
+    }
     this.game.menus.showDialogue(dialogue);
+  }
+
+  hamletDialogueP192(npc){
+    const game=this.game,runtime=game.p192Hamlets;
+    const hubId=npc.p192HubId,site=runtime.sites.get(hubId);
+    const quest=HAMLET_QUESTS_P192.find(q=>q.hubId===hubId);
+    const status=runtime.status(hubId);
+    const back={label:'Hasta luego',action:()=>game.menus.closeDialogue()};
+    const opts=[];
+    const item=ITEM_DB[quest.item]?.name||quest.item;
+    const owned=game.inventory.slots.get(quest.item)||0;
+    if(status==='available')opts.push({
+      label:'ACEPTAR MISIÓN · '+quest.name,action:()=>{
+        runtime.accept(hubId);this.startDialogue(npc);
+      }
+    });
+    if(runtime.ready(hubId))opts.push({
+      label:'ENTREGAR '+quest.qty+' × '+item+' · recompensa '+quest.gold+' oro',action:()=>{
+        runtime.turnIn(hubId);this.startDialogue(npc);
+      }
+    });
+    if(status==='done'){
+      for(const profession of INICIOS_PROFESSIONS_P186.filter(p=>p.trainerId===npc.id)){
+        const isLearned=game.p187Professions.isLearned(profession.id);
+        if(!isLearned)opts.push({
+          label:'APRENDER '+profession.name+' · Nv. '+profession.introLevel,action:()=>{
+            const res=runtime.learnAtTrainer(npc,profession.id);
+            game.hud.notify(res.ok?'Oficio aprendido: '+profession.name:
+              res.reason==='LEVEL_TOO_LOW'?'Necesitás nivel '+profession.introLevel:
+                'Aún no está disponible esa formación');
+            this.startDialogue(npc);
+          }
+        });
+      }
+    }
+    if(status==='done'){
+      for(const recipe of GEAR_RECIPES_P192.filter(r=>r.trainerId===npc.id&&
+        game.p187Professions?.isLearned(r.profession))){
+        opts.push({
+          label:'VER RECETA · '+recipe.name,
+          action:()=>openCraftPreviewP192(this,npc,recipe,
+            ()=>craftGearP192(game,npc.id,recipe.id))
+        });
+      }
+    }
+    opts.push(back);
+    const description=status==='available'?
+      'Este pueblo necesita ayuda. '+quest.desc+' Recompensa '+quest.gold+' oro y '+quest.xp+' XP.':
+      status==='active'?
+        'Misión '+quest.name+' · '+item+': '+owned+'/'+quest.qty+
+        '. Conseguí el material en el mundo y regresá a entregarlo.':
+      '¡Gracias por completar '+quest.name+'! Puedo enseñarte mi oficio con materiales reales del mundo.';
+    return {name:npc.name+' · '+(site?.hub.name||'Pueblo'),
+      text:description,options:opts};
   }
 
   _questProgress(id) {
@@ -234,6 +308,19 @@ export class NPCs {
         const craft = (label, materialId, cost, resultId, doneMsg) => ({
           label,
           action: () => {
+            if(game.p192Build){
+              const recipe={id:'dragon_'+resultId,name:label.split(' (')[0],
+               inputs:[{id:materialId,qty:1}],gold:cost,result:resultId};
+              openCraftPreviewP192(this,npc,recipe,()=>{
+                const inv=game.inventory;
+                if(game.quests.getState('q3')!=='done')return {ok:false,reason:'QUEST_LOCKED'};
+                if(!inv.has(materialId)||inv.gold<cost)return {ok:false,reason:'MISSING_MATERIALS'};
+                inv.removeItem(materialId,1);inv.gold-=cost;inv.addItem(resultId,1);
+                game.audio.play('craft');game.saveSys.save({silent:true});
+                return {ok:true,itemId:resultId};
+              });
+              return;
+            }
             const inv = game.inventory;
             if (!inv.has(materialId) || inv.gold < cost) {
               game.hud.notify('No tenés materiales u oro suficientes');
@@ -303,6 +390,13 @@ export class NPCs {
 
     for (let i = 0; i < this.list.length; i++) {
       const npc = this.list[i];
+      if(game.p192Build&&npc.p192TrainerId&&player){
+        const dx=player.pos.x-npc.pos.x,dz=player.pos.z-npc.pos.z;
+        const visible=dx*dx+dz*dz<250*250;
+        npc.group.visible=visible;
+        // Do not waste mixer/animation time simulating distant trainer rigs.
+        if(!visible)continue;
+      }
       const schedule = game.p18Enabled ? npcRoutineP18(npc.id,game.time.dayTime) : null;
 
       let moving = false;

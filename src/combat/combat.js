@@ -351,7 +351,12 @@ export class Combat {
       this.lastConfirmedHit=connected;
       this.lastSwingReason=connected?'confirmed-damage':'miss';
       this.comboStep=commitConfirmedHit(priorConfirmedStep,this._meleeStep,connected);
-      if(connected){this.comboTimer=1.60;this.airComboGrace=0;}
+      if(connected){
+        this.comboTimer=1.60;this.airComboGrace=0;
+        // P192: hold on-screen feedback for a confirmed hit. Whiffs and
+        // empty-air swings still NEVER advance the 1/4 count.
+        if(g.p192Build)this._comboHudUntil=performance.now()+1650;
+      }
     }
   }
 
