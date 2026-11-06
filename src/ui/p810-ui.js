@@ -83,6 +83,15 @@ export class HighflyP810{
   const perf=node('div',null,'FPS — · GPU —',document.body);
   perf.id='hf-p810-perf';this.perf=perf;
   this.editor.register('perf',perf);
+  // P191: the actual top-level FPS element normally ignores taps. Its HUD
+  // pointer capture must be available only in editor mode to allow dragging.
+  const p191Css=node('style',null,
+   'body.hf-p10-editing #hf-p810-perf{pointer-events:auto!important;cursor:grab;z-index:121!important}'+
+   'body.hf-p810 #hf-p191-coords{position:fixed;z-index:47;color:#dbeaff;'+
+   'font:700 10px/1.25 system-ui;text-align:center;pointer-events:none;'+
+   'background:#120e2dd8;border-radius:6px;padding:3px 5px;white-space:nowrap}',document.head);
+  this.coordsText=node('div',null,'X — · Z —',document.body);
+  this.coordsText.id='hf-p191-coords';
   const combo=node('div',null,'',document.body);
   combo.id='hf-p810-combo';this.combo=combo;
   this.editor.register('combo',combo);
@@ -159,6 +168,19 @@ export class HighflyP810{
   }
   if(this.quickOpen&&!visible)this.toggleQuickMenu(false);
   if(this.perf)this.perf.style.visibility=visible?'visible':'hidden';
+  if(this.coordsText){
+   const map=this.game.worldMapP34;
+   const radarRect=map?.mini?.getBoundingClientRect?.();
+   const pos=this.game.player?.pos;
+   if(visible&&radarRect&&pos){
+    // Put coords under current user-edited radar, not in its canvas/touch area.
+    const mid=radarRect.left+radarRect.width/2;
+    this.coordsText.style.left=Math.max(6,Math.min(window.innerWidth-114,mid-54))+'px';
+    this.coordsText.style.top=Math.min(window.innerHeight-25,radarRect.bottom+3)+'px';
+    this.coordsText.textContent='X '+Math.round(pos.x)+' · Z '+Math.round(pos.z);
+    this.coordsText.style.display='block';
+   }else this.coordsText.style.display='none';
+  }
   if(this.combo){
    const c=this.game.combat;
    this.combo.textContent=visible&&(c?.comboTimer>0||this.editor.editing)
@@ -184,8 +206,8 @@ export class HighflyP810{
   if(this.game.p812Enabled){
     const measured=this.game.mobileAudit;
     const real=Number.isFinite(measured?.fps)?measured.fps:fps;
-    const p95=Number.isFinite(measured?.p95)?Math.round(measured.p95):null;
-    this.perf.textContent='FPS '+real+(p95?' · P95 '+p95+'ms':'');
+    const ms=Number.isFinite(this.ms)?Math.round(this.ms):0;
+    this.perf.textContent='FPS '+real+' · '+ms+' ms';
   }else this.perf.textContent='FPS '+fps+' · GPU — · '+profile;
  }
 }
