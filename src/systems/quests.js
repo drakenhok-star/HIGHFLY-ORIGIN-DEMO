@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { nearestFrontierTargetP181 } from '../ui/frontier-tracking-p181.js';
 import { P18_FRONTIER_QUEST } from '../world/living-world-runtime-p18.js';
+import {ClaudeQuestBridgeP197} from '../world/claudecraft-quests-p197.js';
 
 const QUEST_DEFS = {
   q1: { name: 'Amenaza de lobos', giver: 'olaf', desc: 'Eliminá 5 lobos para ayudar a Olaf.', kind: 'kill', target: 'wolf', need: 5, rewardGold: 100, rewardXp: 80 },
@@ -26,11 +27,13 @@ export class Quests {
       p18: new THREE.Vector3(),
     };
     this.reset();
+    this.claudeP197=game.p197Build?new ClaudeQuestBridgeP197(game):null;
   }
 
   reset() {
     this.states = { q1: 'available', q2: 'available', q3: 'locked' };
     this.progress = { q1: 0, q2: 0, q3: 0 };
+    this.claudeP197?.reset();
   }
 
   getState(id) {
@@ -65,6 +68,7 @@ export class Quests {
   }
 
   onEnemyKilled(type) {
+    this.claudeP197?.onEnemyKilled(type);
     for (const id of QUEST_IDS) {
       const def = QUEST_DEFS[id];
       if (this.states[id] !== 'active' || def.kind !== 'kill' || def.target !== type) continue;
@@ -133,6 +137,7 @@ export class Quests {
     });
     if(this.game.p192Build&&this.game.p192Hamlets)
       quests.push(...this.game.p192Hamlets.questList());
+    if(this.claudeP197)quests.push(...this.claudeP197.list());
     return quests;
   }
 
@@ -201,6 +206,7 @@ export class Quests {
     return {
       states: { q1: this.states.q1, q2: this.states.q2, q3: this.states.q3 },
       progress: { q1: this.progress.q1, q2: this.progress.q2, q3: this.progress.q3 },
+      ...(this.claudeP197?{claudeP197:this.claudeP197.serialize()}:{}) ,
     };
   }
 
@@ -208,6 +214,7 @@ export class Quests {
     if (!d) return;
     this.states = { ...this.states, ...(d.states || {}) };
     this.progress = { ...this.progress, ...(d.progress || {}) };
+    this.claudeP197?.applyData(d.claudeP197);
     // 兜底修复旧存档：解锁条件已满足但 q3 仍为 locked
     if (this.states.q1 === 'done' && this.states.q2 === 'done' && this.states.q3 === 'locked') {
       this.states.q3 = 'available';
