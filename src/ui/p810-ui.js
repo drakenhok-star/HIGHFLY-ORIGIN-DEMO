@@ -175,7 +175,9 @@ export class HighflyP810{
   if(this.perf)this.perf.style.visibility=visible?'visible':'hidden';
   if(this.combo){
    const c=this.game.combat;
-   this.combo.textContent=visible&&(c?.comboTimer>0||this.editor.editing)
+   const hasRealHit=c?.comboStep>0&&
+     (c.comboTimer>0||(this.game.p192Build&&performance.now()<(c._comboHudUntil||0)));
+   this.combo.textContent=visible&&(hasRealHit||this.editor.editing)
       ?'⚔ COMBO '+(c?.comboStep||1)+' / 4'+(c?.comboStep===4?' ✦ FINAL'+(this.game.p15Enabled&&c?._finisher?' '+c._finisher.arrow:''):''):'';
    // P14 fixes the inline !important display previously left by the HUD editor.
    if(this.game.p14Enabled)this.combo.style.setProperty('display',
