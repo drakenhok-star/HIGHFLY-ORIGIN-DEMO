@@ -5,6 +5,7 @@ import {openCraftPreviewP192} from '../ui/crafting-preview-p192.js';
 import {HAMLET_QUESTS_P192} from '../world/hamlets-p192.js';
 import {ITEM_DB} from '../systems/inventory.js';
 import {INICIOS_PROFESSIONS_P186} from '../world/inicios-v2-p186.js';
+import {GEAR_RECIPES_P192,craftGearP192} from '../world/gear-crafting-p192.js';
 
 const BJORN_LINES = [
   'Dicen que vieron un dragón cerca de la torre de la montaña.',
