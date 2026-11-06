@@ -8,6 +8,10 @@ import {mulberry32} from '../core/noise.js';
 
 export const WORLD_LAYOUT_SCHEMA_P193 = 193;
 export const WORLD_LAYOUT_PATH_P193 = './assets/world-layout-p193.json';
+export const P193_REFERENCE_MODELS = Object.freeze([
+  'player','sword','skeleton_warrior','skeleton_mage','skeleton_blade','wolf','wolf_claude',
+  'spider','crab','goblin','orc','stag','fox','yeti','yeti_highland','boar','dragon'
+]);
 export const P193_LIBRARY = Object.freeze([
   {id:'house',label:'Casa HIGHFLY',type:'house',license:'Código propio'},
   {id:'pine1',label:'Pino',type:'model',license:'Asset existente en HIGHFLY; verificar licencia individual'},
