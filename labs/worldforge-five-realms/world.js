@@ -440,7 +440,7 @@ function runSeamTest(){
  return {pass,maxJump,counts};
 }
 $('#test').addEventListener('click',runSeamTest);
-window.HIGHFLY_TEST={runSeamTest,groundHeight,regionAt,regions:REGIONS,reset,setMode}; // manual QA from devtools
+window.HIGHFLY_TEST={runSeamTest,groundHeight,regionAt,regions:REGIONS,reset,setMode,getPlayerPosition:()=>({x:hero.position.x,y:hero.position.y,z:hero.position.z}),getJoystick:()=>({...joy})}; // manual QA from devtools
 const minimap=$('#minimap'),ctx=minimap.getContext('2d'),mapW=minimap.width,mapH=minimap.height;
 function mapPoint(x,z){return [mapW/2+x*1.75,mapH/2-z*1.48]}
 function minimapDraw(){
