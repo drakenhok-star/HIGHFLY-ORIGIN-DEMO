@@ -46,8 +46,16 @@ for(const kind of ['manual','wfc']){
   const normal=await page.locator('#modeLabel').innerText();if(normal!=='NORMAL')failures.push(kind+': normal finish failed '+normal);
   await page.locator('[data-mode="2"]').click();
   const premium=await page.locator('#modeLabel').innerText();if(premium!=='PREMIUM')failures.push(kind+': premium finish failed '+premium);
+  for(const rid of [1,2,3,4]){
+   await page.locator('#travel').click();
+   await page.locator('[data-region="'+rid+'"]').click();
+   await page.waitForTimeout(150);
+   const current=await page.evaluate(()=>{const p=window.HIGHFLY_TEST.getPlayerPosition();return window.HIGHFLY_TEST.regionAt(p.x,p.z)?.id});
+   notes.push(kind+': travel to '+rid+' -> '+current);
+   if(current!==rid)failures.push(kind+': region fast travel failed '+rid+' got '+current);
+  }
   const fsBtn=page.locator('#fullscreen');if(!(await fsBtn.isVisible()))failures.push(kind+': fullscreen button hidden');
-  else{await fsBtn.click();notes.push(kind+': fullscreen='+await page.evaluate(()=>!!document.fullscreenElement));}
+  else{await fsBtn.click();await page.waitForTimeout(250);notes.push(kind+': fullscreen='+await page.evaluate(()=>!!document.fullscreenElement));}
   await page.screenshot({path:'/tmp/hf-worldforge-4x-'+kind+'.png'});
  }catch(e){failures.push(kind+': EXCEPTION '+e.message)}
 }
