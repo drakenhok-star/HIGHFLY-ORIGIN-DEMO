@@ -144,7 +144,9 @@ const materials={
  window:new THREE.MeshStandardMaterial({color:'#ffe3a3',roughness:.55,emissive:'#513a18',emissiveIntensity:.3}),
  water:new THREE.MeshStandardMaterial({color:'#49bdc6',transparent:true,opacity:.84,roughness:.24,depthWrite:false,side:THREE.DoubleSide})
 };
-const allDecor=new THREE.Group();scene.add(allDecor);const premiumOnly=new THREE.Group();scene.add(premiumOnly), colliders=[];
+const allDecor=new THREE.Group();scene.add(allDecor);
+const premiumOnly=new THREE.Group();scene.add(premiumOnly);
+const colliders=[];
 function mesh(geo,mat,x=0,y=0,z=0,parent=allDecor){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);parent.add(m);return m}
 function cube(w,h,d,m,x,y,z,parent=allDecor){return mesh(new THREE.BoxGeometry(w,h,d),m,x,y,z,parent)}
 function cone(rad,h,sides,m,x,y,z,parent=allDecor){return mesh(new THREE.ConeGeometry(rad,h,sides),m,x,y,z,parent)}
