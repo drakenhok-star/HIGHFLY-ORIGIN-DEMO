@@ -820,7 +820,13 @@ window.HIGHFLY_TEST={runSeamTest,groundHeight,regionAt,regions:REGIONS,reset,set
  worldMode:WORLD_KIND,sizeRatio:8,seed:SEED,biomeCount:REGIONS.length,waterAt:waterAt,lakes:LAKES,waterSwimReady:false,canEnter:canEnter,getFreeAssets:()=>({loaded:realAssetLoaded,failed:realAssetFailed}),
  wfcStats:()=>WFC_MAPS.map(m=>({id:m.reg.id,cells:m.cells.length,repairs:m.repairs,iterations:m.iterations})),
  getPlayerPosition:()=>({x:hero.position.x,y:hero.position.y,z:hero.position.z}),
- getJoystick:()=>({...joy}),getFinish:()=>visualMode,isFullscreen:()=>!!document.fullscreenElement};
+ getJoystick:()=>({...joy}),getFinish:()=>visualMode,
+ getHeroView:()=>{
+  const center=new THREE.Vector3();hero.getWorldPosition(center);center.y+=1;
+  const projection=center.clone().project(camera);
+  return {projected:{x:projection.x,y:projection.y,z:projection.z},distance:camera.position.distanceTo(center),children:visual.children.length,visible:visual.visible};
+ },
+ isFullscreen:()=>!!document.fullscreenElement};
 
 const minimap=$('#minimap'),ctx=minimap.getContext('2d'),mapW=minimap.width,mapH=minimap.height;
 function mapPoint(x,z){return [mapW/2+x*.12,mapH/2-(z-230)*.10]}
