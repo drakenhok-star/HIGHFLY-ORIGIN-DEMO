@@ -24,7 +24,7 @@
 #tooltip{position:fixed;z-index:4;bottom:93px;left:50%;transform:translateX(-50%);text-shadow:0 1px 8px #080b12;font-size:11px;pointer-events:none;white-space:nowrap;color:#eee8f9}
 #loading{position:fixed;inset:0;z-index:20;background:#090d1b;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e9cfac;gap:12px;transition:opacity .55s}#loading strong{font-size:22px;letter-spacing:3px}#loading p{margin:0;color:#d4c6e2}
 #loadbar{width:240px;height:5px;background:#312441;border-radius:8px;overflow:hidden}#loadfill{height:100%;width:5%;background:linear-gradient(90deg,#8667c6,#eec27d);transition:width .2s}
-@media(max-width:700px){#top{top:4px;left:5px;right:5px}#brand,#metrics{padding:6px 7px}#brand strong{font-size:11px}#brand small{font-size:8px}#metrics{font-size:9px;min-width:116px}#biome{top:47px;left:5px;font-size:10px;padding:5px 8px}#map{top:49px;right:5px;width:112px;height:130px;padding:3px}#minimap{width:104px;height:111px}#map label{font-size:7px}#bottom{bottom:3px;width:99vw;padding:6px}#bottom h2{font-size:9px;margin:0 0 5px}#modes{gap:3px}#modes button,#test,#reset{font-size:9px;padding:6px 5px;flex:1}#desc{font-size:9px;margin:4px 0 1px}#joystick{left:9px;bottom:80px;width:90px;height:90px}#knob{left:27px;top:27px;width:32px;height:32px}#acts{bottom:88px;right:7px;gap:7px}#acts button{width:52px;height:52px;font-size:10px}#tooltip{display:none}}
+@media(max-width:1024px){#top{top:4px;left:5px;right:5px}#brand,#metrics{padding:6px 7px}#brand strong{font-size:11px}#brand small{font-size:8px}#metrics{font-size:9px;min-width:116px}#biome{top:47px;left:5px;font-size:10px;padding:5px 8px}#map{top:49px;right:5px;width:112px;height:130px;padding:3px}#minimap{width:104px;height:111px}#map label{font-size:7px}#bottom{bottom:3px;width:99vw;padding:6px}#bottom h2{font-size:9px;margin:0 0 5px}#modes{gap:3px}#modes button,#test,#reset{font-size:9px;padding:6px 5px;flex:1}#desc{font-size:9px;margin:4px 0 1px}#joystick{left:9px;bottom:80px;width:90px;height:90px}#knob{left:27px;top:27px;width:32px;height:32px}#acts{bottom:88px;right:7px;gap:7px}#acts button{width:52px;height:52px;font-size:10px}#tooltip{display:none}}
 </style>
 <script type="importmap">{"imports":{"three":"../../lib/three.module.js","three/addons/":"../../lib/jsm/"}}</script>
 <style>
@@ -32,7 +32,30 @@
 #fullscreen{border-color:#d9b078!important;color:#ffe4ac!important}
 #run{background:#355a7abd!important}
 #run.running{background:#c7a063!important;color:#1d1732!important}
-@media(max-width:700px){#bottom{max-height:37vh;overflow-y:auto}#modes button{flex:1 0 18%;min-width:72px}#joystick{bottom:112px}#acts{bottom:120px;gap:5px}#acts button{width:46px;height:46px;font-size:9px}#brand strong{font-size:10px}#tooltip{display:none}}
+@media(max-width:1024px){#bottom{max-height:37vh;overflow-y:auto}#modes button{flex:1 0 18%;min-width:72px}#joystick{bottom:112px}#acts{bottom:120px;gap:5px}#acts button{width:46px;height:46px;font-size:9px}#brand strong{font-size:10px}#tooltip{display:none}}
+</style><style>
+#travelPopup{display:none;position:fixed;left:50%;top:18%;transform:translateX(-50%);width:min(580px,92vw);z-index:16;padding:12px;pointer-events:auto}
+#travelPopup.open{display:block}
+#travelPopup strong{display:block;text-align:center;color:#ffe1a0;font-size:12px;margin-bottom:9px;letter-spacing:1px}
+#travelGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+#travelGrid button{border:1px solid #ae8cc8;border-radius:8px;padding:10px 7px;font-weight:700;color:#f4e8ff;background:#493463;cursor:pointer}
+#travelGrid button:active{background:#c39a69}
+@media(max-width:1024px){
+#map{top:49px;right:5px;width:112px;height:130px}
+#minimap{width:104px;height:111px}
+#map label{font-size:7px}
+#brand strong{font-size:10px}
+#bottom{padding:5px 7px;max-height:34vh;overflow-y:auto}
+#bottom h2{margin:0 0 3px;font-size:9px}
+#modes{gap:3px}
+#modes button{flex:1 0 18%;min-width:70px;font-size:9px;padding:6px 4px}
+#desc{font-size:9px;margin:3px 0 1px}
+#joystick{bottom:110px}
+#acts{bottom:113px;right:9px;gap:4px}
+#acts button{width:46px;height:46px;font-size:9px}
+#travelPopup{top:12%}
+#travelGrid button{font-size:10px;padding:8px 4px}
+}
 </style></head><body>
 <div id="app"></div>
 <div id="loading"><strong>HIGHFLY</strong><p>CINCO REINOS · WORLD FORGE</p><div id="loadbar"><div id="loadfill"></div></div><small id="loadingtxt">Construyendo terreno continuo...</small></div>
@@ -41,8 +64,9 @@
 <div id="map" class="panel"><canvas id="minimap" width="296" height="290"></canvas><label>MINIMAPA · REGIONES 4×</label></div>
 <div id="joystick"><div id="knob"></div></div>
 <div id="acts"><button id="run">CORRER</button><button id="jump">SALTO</button><button id="dash">DASH</button></div>
+<div id="travelPopup" class="panel"><strong>VIAJAR A UNA REGIÓN · SIN CAMBIAR EL MUNDO</strong><div id="travelGrid"><button data-region="0">🏰 Arvelia</button><button data-region="1">🌲 Bosque</button><button data-region="2">☀️ Desierto</button><button data-region="3">⛰️ Montañas</button><button data-region="4">❄️ Nieve</button><button id="closeTravel">✕ Cerrar</button></div></div>
 <div id="tooltip">WASD / joystick · cámara libre derecha · ESPACIO salto · SHIFT correr · Q dash</div>
-<div id="bottom" class="panel"><h2>DOS FORMAS DE CONSTRUIR EL MUNDO · MISMA ESCALA 4×</h2><div id="modes"><button id="worldAuto">A · PROCEDURAL</button><button id="worldManual">B · MANUAL</button><button data-mode="1">CAPA NORMAL</button><button class="active" data-mode="2">CAPA PREMIUM</button><button id="fullscreen">⛶ PANTALLA COMPLETA</button><button id="test">TEST UNIONES</button><button id="reset">CIUDAD</button></div><div id="desc">Mundo 4×, cámara en tercera persona, terreno continuo y zonas amplias por explorar.</div></div>
+<div id="bottom" class="panel"><h2>DOS FORMAS DE CONSTRUIR EL MUNDO · MISMA ESCALA 4×</h2><div id="modes"><button id="worldAuto">A · PROCEDURAL</button><button id="worldManual">B · MANUAL</button><button data-mode="1">CAPA NORMAL</button><button class="active" data-mode="2">CAPA PREMIUM</button><button id="fullscreen">⛶ PANTALLA COMPLETA</button><button id="test">TEST UNIONES</button><button id="travel">VIAJAR</button><button id="reset">CIUDAD</button></div><div id="desc">Mundo 4×, cámara en tercera persona, terreno continuo y zonas amplias por explorar.</div></div>
 <script>
 (function(){
  let shown=false;
@@ -64,5 +88,5 @@
  setTimeout(function(){if(!window.HIGHFLY_TEST&&document.getElementById('loading'))showError('La escena no respondió. Verificá WebGL y la conexión de red.')},30000);
 })();
 </script>
-<script type="module" src="./world.js?v=worldforge-4x-compare"></script>
+<script type="module" src="./world.js?v=worldforge-4x-ui-v2"></script>
 </body></html>
