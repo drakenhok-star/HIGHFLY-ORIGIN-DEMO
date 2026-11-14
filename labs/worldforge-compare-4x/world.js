@@ -339,6 +339,7 @@ function wfcAt(x,z){
 
 // Instanced flora; independent from collision geometry, keeps mobile draw calls low.
 const cameraTrees=[];
+const cameraFoliage=[];
 function createVegetation(){
  const pineTrunkGeo=new THREE.CylinderGeometry(.13,.25,1.9,5),
        pineFoliageGeo=new THREE.ConeGeometry(1.45,4.5,7),
@@ -382,6 +383,9 @@ function createVegetation(){
    if(!arr.length)return;
    const m=new THREE.InstancedMesh(geometry,mat,arr.length);
    arr.forEach((p,i)=>{place(p,dummy);dummy.updateMatrix();m.setMatrixAt(i,dummy.matrix);if(colorfn)m.setColorAt(i,new THREE.Color(colorfn(p,i)))});m.instanceMatrix.needsUpdate=true;if(m.instanceColor)m.instanceColor.needsUpdate=true;parent.add(m);
+   const canopy=(geometry.type==='ConeGeometry'&&(arr===specs.green||arr===specs.dark||arr===specs.snow))||(geometry.type==='IcosahedronGeometry'&&arr===specs.palm);
+   if(canopy)cameraFoliage.push({mesh:m,points:arr,source:m.instanceMatrix.array.slice(),hidden:new Uint8Array(arr.length)});
+
  }
  const bark=new THREE.MeshStandardMaterial({color:'#86664a',roughness:1}),greenMat=new THREE.MeshStandardMaterial({color:'#ffffff',roughness:1}),palmMat=new THREE.MeshStandardMaterial({color:'#dbb56a',roughness:1});
  for(const type of ['green','dark','snow']){
@@ -485,6 +489,34 @@ try{
  },undefined,e=>console.warn('CC0 player fallback:',e?.message));
 }catch(err){console.warn(err)}
 function reset(){hero.position.set(9,groundHeight(9,11),11);state.vy=0;state.air=0;state.dash=0;state.crossings=0;state.blocked=0;state.lastRegion=0;$('#crossings').textContent='0';$('#blocks').textContent='0'}
+const hiddenCanopyMatrix=new THREE.Matrix4().makeScale(0,0,0);
+const originalCanopyMatrix=new THREE.Matrix4();
+function updateNearFoliage(){
+ const ax=hero.position.x,az=hero.position.z, bx=camera.position.x, bz=camera.position.z;
+ const vx=bx-ax,vz=bz-az,length2=vx*vx+vz*vz+.0001;
+ for(const entry of cameraFoliage){
+  let changed=false;
+  for(let i=0;i<entry.points.length;i++){
+   const p=entry.points[i],dx=p.x-ax,dz=p.z-az,d2=dx*dx+dz*dz;
+   let hide=d2<(4.0*p.s+1.8)**2;
+   if(!hide){
+    const t=(dx*vx+dz*vz)/length2;
+    if(t>.08&&t<.96){
+     const px=ax+vx*t,pz=az+vz*t;
+     hide=(p.x-px)**2+(p.z-pz)**2<(2.8*p.s+1.1)**2;
+    }
+   }
+   const state=hide?1:0;
+   if(entry.hidden[i]===state)continue;
+   entry.hidden[i]=state;
+   if(hide)entry.mesh.setMatrixAt(i,hiddenCanopyMatrix);
+   else entry.mesh.setMatrixAt(i,originalCanopyMatrix.fromArray(entry.source,i*16));
+   changed=true;
+  }
+  if(changed)entry.mesh.instanceMatrix.needsUpdate=true;
+ }
+}
+
 let visualMode=START_FINISH;
 const descriptions={
   1:'NORMAL: terreno 4× continuo, materiales básicos. Edificios y jugador conservan su escala.',
@@ -683,35 +715,10 @@ function loop(){
  const focus=new THREE.Vector3(hero.position.x,hero.position.y+1.7,hero.position.z);
  const desired=new THREE.Vector3(focus.x+Math.sin(yaw)*Math.cos(pitch)*camDistance,focus.y+Math.sin(pitch)*camDistance+1.45,focus.z+Math.cos(yaw)*Math.cos(pitch)*camDistance);
  desired.y=Math.max(desired.y,groundHeight(desired.x,desired.z)+2.5);
- // Keep the 3rd-person player visible when the camera passes through tree canopies.
- const vector=desired.clone().sub(focus),lenSq=vector.lengthSq();
- let visibleFraction=1;
- for(const t of cameraTrees){
-  const rx=t.x-focus.x,rz=t.z-focus.z;
-  if(rx*rx+rz*rz>450)continue;
-  const dot=(rx*vector.x+rz*vector.z)/(vector.x*vector.x+vector.z*vector.z+.001);
-  if(dot<=.12||dot>=visibleFraction)continue;
-  const nearX=focus.x+vector.x*dot,nearZ=focus.z+vector.z*dot;
-  const dx=t.x-nearX,dz=t.z-nearZ;
-  if(dx*dx+dz*dz>(1.5*t.s+1.0)**2)continue;
-  const yy=focus.y+vector.y*dot;
-  if(yy>t.y+.8*t.s&&yy<t.y+7.6*t.s)visibleFraction=Math.min(visibleFraction,Math.max(.18,dot-.16));
- }
- // When foliage intersects the camera ray, rise slightly above it instead of zooming inside a pine.
- const foliageBlocked=visibleFraction<.99;
- if(foliageBlocked)desired.y+=8.5;
- if(hero.userData.foliageBlocked!==foliageBlocked){
-  hero.userData.foliageBlocked=foliageBlocked;
-  visual.traverse(o=>{
-   if(!o.isMesh)return;
-   o.renderOrder=foliageBlocked?999:0;
-   for(const mat of Array.isArray(o.material)?o.material:[o.material]){
-    if(!mat)continue;
-    mat.depthTest=!foliageBlocked;mat.depthWrite=true;
-   }
-  });
- }
+ // Keep an ordinary third-person camera. Fade only canopies obstructing the hero,
+ // leaving trunks, collision geometry and the rest of the forest intact.
  camera.position.lerp(desired,Math.min(1,dt*9));camera.lookAt(focus);
+ updateNearFoliage();
  const elapsed=performance.now()*.001;
  water.material.opacity=.85+.018*Math.sin(elapsed*1.4);foamMat.opacity=.26+.065*Math.sin(elapsed*.9);
  minimapDraw();renderer.render(scene,camera);
