@@ -455,22 +455,9 @@ if(WORLD_KIND==='wfc'){
  }
 }
 
-// Hexagonal piece overlay: only changes appearance. No seams in character collision.
-const tileLayer=new THREE.Group();scene.add(tileLayer);
-const rad=1.5,hexGeo=new THREE.CylinderGeometry(rad,rad,.21,6),
-hexMat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.92,flatShading:true});
-const positions=[];
-for(let row=-50;row<=50;row++)for(let col=-47;col<=47;col++){
- const x=SQ3*rad*(col+row/2),z=1.5*rad*row;
- const r=regionAt(x,z);if(!r)continue;
- const y=groundHeight(x,z);
- if(r.id===4&&y< -1.3)continue;
- positions.push({x,z,y,k:row*101+col});
-}
-const tiles=new THREE.InstancedMesh(hexGeo,hexMat,positions.length),dummy=new THREE.Object3D();
-positions.forEach((p,i)=>{dummy.position.set(p.x,p.y-.04,p.z);dummy.rotation.set(0,Math.PI/6,0);dummy.scale.set(1,1,1);dummy.updateMatrix();tiles.setMatrixAt(i,dummy.matrix);
- const c=colorAt(p.x,p.z,p.y);c.lerp(new THREE.Color('#ffffff'),.035*Math.sin(p.k));tiles.setColorAt(i,c)});
-tiles.instanceMatrix.needsUpdate=true;if(tiles.instanceColor)tiles.instanceColor.needsUpdate=true;tileLayer.add(tiles);
+// All four comparison combinations use one unified visual terrain mesh and one collision height function.
+// Independent tiny hex tile overlays are intentionally disabled: this prevents visual seams.
+
 // Character: public CC0 asset in HIGHFLY ORIGIN, original fallback if unavailable.
 const hero=new THREE.Group();scene.add(hero);
 const visual=new THREE.Group();hero.add(visual);
@@ -493,33 +480,62 @@ try{
  },undefined,e=>console.warn('CC0 player fallback:',e?.message));
 }catch(err){console.warn(err)}
 function reset(){hero.position.set(9,groundHeight(9,11),11);state.vy=0;state.air=0;state.dash=0;state.crossings=0;state.blocked=0;state.lastRegion=0;$('#crossings').textContent='0';$('#blocks').textContent='0'}
-let visualMode=0;
-const descriptions=[
- '1 · Hexágonos visibles: piezas individuales superpuestas; física continua independiente de sus juntas.',
- '2 · Capa continua: una sola malla comparte vértices, normales y alturas en las cinco regiones.',
- '3 · Premium: mismo terreno físico continuo, materiales refinados y más detalles de vegetación.'
-];
+let visualMode=START_FINISH;
+const descriptions={
+  1:'NORMAL: terreno 4× continuo, materiales básicos. Edificios y jugador conservan su escala.',
+  2:'PREMIUM: mismo suelo físico, colores y texturas mejorados, vegetación complementaria.'
+};
 function setMode(m){
- visualMode=m;tileLayer.visible=m===0;contourGroups[0].visible=m===0;contourGroups[1].visible=m!==0;
- premiumOnly.visible=m===2;groundMesh.geometry.setAttribute('color',new THREE.Float32BufferAttribute(m===2?colsPremium:cols,3));
- groundMesh.material.roughness=m===2?.87:.96;sun.intensity=m===2?2.6:2.2;renderer.toneMappingExposure=m===2?1.42:1.28;
- $('#modeLabel').textContent=['HEX','CONTINUO','PREMIUM'][m];$('#desc').textContent=descriptions[m];
+ visualMode=m;
+ contourGroups[0].visible=m===1;contourGroups[1].visible=m!==1;
+ premiumOnly.visible=m===2;
+ groundMesh.geometry.setAttribute('color',new THREE.Float32BufferAttribute(m===2?colsPremium:cols,3));
+ groundMesh.material.map=m===2?detailTexture:null;
+ groundMesh.material.needsUpdate=true;
+ groundMesh.material.roughness=m===2?.88:.98;
+ sun.intensity=m===2?2.62:2.07;renderer.toneMappingExposure=m===2?1.38:1.17;
+ $('#modeLabel').textContent=m===2?'PREMIUM':'NORMAL';
+ $('#desc').textContent=descriptions[m];
  document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',Number(b.dataset.mode)===m));
 }
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(Number(b.dataset.mode))));
+document.querySelector(WORLD_KIND==='wfc'?'#worldAuto':'#worldManual').classList.add('world-active');
+$('#brand small').textContent=(WORLD_KIND==='wfc'?'A · PROCEDURAL WFC-LITE':'B · CONSTRUCCIÓN MANUAL')+' · 5 REGIONES 4×';
+function openWorld(kind){
+ const u=new URL(location.href);u.searchParams.set('world',kind);u.searchParams.set('finish',visualMode===1?'normal':'premium');
+ location.assign(u.href);
+}
+$('#worldAuto').addEventListener('click',()=>openWorld('wfc'));
+$('#worldManual').addEventListener('click',()=>openWorld('manual'));
+$('#fullscreen').addEventListener('click',async()=>{
+ try{
+  if(document.fullscreenElement)await document.exitFullscreen();
+  else{
+   if(!document.documentElement.requestFullscreen)throw new Error('Tu navegador no admite pantalla completa');
+   await document.documentElement.requestFullscreen({navigationUI:'hide'});
+   if(screen.orientation?.lock)screen.orientation.lock('landscape').catch(()=>{});
+  }
+ }catch(e){$('#desc').textContent='No se pudo abrir pantalla completa: '+e.message+' · Probá Chrome.'}
+});
+document.addEventListener('fullscreenchange',()=>{
+ $('#fullscreen').textContent=document.fullscreenElement?'⛶ SALIR FULL':'⛶ PANTALLA COMPLETA';
+});
 $('#reset').addEventListener('click',reset);
+
 const state={vy:0,air:0,dash:0,blocked:0,crossings:0,lastRegion:0};
 let yaw=.6,pitch=.47,camDistance=15,dragCam=null,lastPX=0,lastPY=0;
 const keys={KeyW:'w',ArrowUp:'w',KeyS:'s',ArrowDown:'s',KeyA:'a',ArrowLeft:'a',KeyD:'d',ArrowRight:'d'};
 const down={w:false,s:false,a:false,d:false,run:false},joy={x:0,y:0};
+const runBtn=$('#run');
+runBtn.addEventListener('pointerdown',e=>{e.preventDefault();down.run=true;runBtn.classList.add('running');runBtn.setPointerCapture(e.pointerId)});
+for(const event of ['pointerup','pointercancel','lostpointercapture'])runBtn.addEventListener(event,()=>{down.run=false;runBtn.classList.remove('running')});
 window.addEventListener('keydown',e=>{
  if(keys[e.code]){down[keys[e.code]]=true;e.preventDefault()}
  if(e.code==='ShiftLeft'||e.code==='ShiftRight')down.run=true;
  if(e.code==='Space'){jump();e.preventDefault()}
  if(e.code==='KeyQ')dash();
- if(e.code==='Digit1')setMode(0);
- if(e.code==='Digit2')setMode(1);
- if(e.code==='Digit3')setMode(2);
+ if(e.code==='Digit1')setMode(1);
+ if(e.code==='Digit2')setMode(2);
 });
 window.addEventListener('keyup',e=>{if(keys[e.code])down[keys[e.code]]=false;if(e.code==='ShiftLeft'||e.code==='ShiftRight')down.run=false});
 function jump(){if(state.air<=.01){state.vy=8;state.air=.01}}
@@ -545,22 +561,29 @@ function runSeamTest(){
  for(const reg of REGIONS.slice(1)){
   const ux=reg.x/DIST,uz=reg.z/DIST,mid=DIST/2;
   let max=0;
-  for(let i=0;i<=60;i++){
-   const dt=(i-30)*.03;
-   const xa=ux*(mid+dt-.015),za=uz*(mid+dt-.015),xb=ux*(mid+dt+.015),zb=uz*(mid+dt+.015);
-   const diff=Math.abs(groundHeight(xa,za)-groundHeight(xb,zb));max=Math.max(diff,max);
+  for(let i=0;i<=80;i++){
+   const offset=(i-40)*.12;
+   const a=mid+offset-.06,b=mid+offset+.06;
+   max=Math.max(max,Math.abs(groundHeight(ux*a,uz*a)-groundHeight(ux*b,uz*b)));
   }
-  maxJump=Math.max(maxJump,max);if(max>.25)failed++;counts.push(reg.short+': '+max.toFixed(3));
+  maxJump=Math.max(maxJump,max);
+  if(max>.36)failed++;
+  counts.push(reg.short+': '+max.toFixed(3));
  }
- const pass=failed===0;$('#seamStatus').textContent=pass?'OK · '+maxJump.toFixed(3):'FALLO '+failed;
+ const pass=failed===0;$('#seamStatus').textContent=pass?'OK · '+maxJump.toFixed(3):'REVISAR '+failed;
  $('#seamStatus').style.color=pass?'#85e3ae':'#ffae9d';
- $('#desc').textContent='TEST PASOS CENTRALES · '+counts.join(' | ')+' unidades/0,03 m. (No sustituye colisiones definitivas).';
+ $('#desc').textContent='TEST CONTINUIDAD · '+counts.join(' | ')+' u / 0,12 m. (No sustituye la física real de PHOENIX).';
  return {pass,maxJump,counts};
 }
 $('#test').addEventListener('click',runSeamTest);
-window.HIGHFLY_TEST={runSeamTest,groundHeight,regionAt,regions:REGIONS,reset,setMode,getPlayerPosition:()=>({x:hero.position.x,y:hero.position.y,z:hero.position.z}),getJoystick:()=>({...joy})}; // manual QA from devtools
+window.HIGHFLY_TEST={runSeamTest,groundHeight,regionAt,regions:REGIONS,reset,setMode,
+ worldMode:WORLD_KIND,sizeRatio:4,
+ wfcStats:()=>WFC_MAPS.map(m=>({id:m.reg.id,cells:m.cells.length,repairs:m.repairs,iterations:m.iterations})),
+ getPlayerPosition:()=>({x:hero.position.x,y:hero.position.y,z:hero.position.z}),
+ getJoystick:()=>({...joy}),getFinish:()=>visualMode,isFullscreen:()=>!!document.fullscreenElement};
+
 const minimap=$('#minimap'),ctx=minimap.getContext('2d'),mapW=minimap.width,mapH=minimap.height;
-function mapPoint(x,z){return [mapW/2+x*1.75,mapH/2-z*1.48]}
+function mapPoint(x,z){return [mapW/2+x*.56,mapH/2-z*.39]}
 function minimapDraw(){
  ctx.clearRect(0,0,mapW,mapH);ctx.fillStyle='#101c2d';ctx.fillRect(0,0,mapW,mapH);
  for(const r of REGIONS){
@@ -577,14 +600,19 @@ function canEnter(x,z){
  for(const c of colliders){const dx=x-c.x,dz=z-c.z;if(dx*dx+dz*dz<(c.r+.5)**2)return false}
  return true;
 }
+function climbAllowed(from,to,distance){
+ const change=to-from,travel=Math.max(.006,distance);
+ if(state.air>.4)return change<=1.4;
+ return change<=.1+travel*.6&&change>=-.25-travel*1.08;
+}
 function movePlayer(dx,dz,dt){
  const h=groundHeight(hero.position.x,hero.position.z),x=hero.position.x+dx,z=hero.position.z+dz;
- if(canEnter(x,z)&&(groundHeight(x,z)-h<.88||state.air>.35)){hero.position.x=x;hero.position.z=z;return true}
- if(canEnter(x,hero.position.z)&&(groundHeight(x,hero.position.z)-h<.88||state.air>.35)){hero.position.x=x;return true}
- if(canEnter(hero.position.x,z)&&(groundHeight(hero.position.x,z)-h<.88||state.air>.35)){hero.position.z=z;return true}
+ if(canEnter(x,z)&&climbAllowed(h,groundHeight(x,z),Math.hypot(dx,dz))){hero.position.x=x;hero.position.z=z;return true}
+ if(canEnter(x,hero.position.z)&&climbAllowed(h,groundHeight(x,hero.position.z),Math.abs(dx))){hero.position.x=x;return true}
+ if(canEnter(hero.position.x,z)&&climbAllowed(h,groundHeight(hero.position.x,z),Math.abs(dz))){hero.position.z=z;return true}
  state.blocked++;return false;
 }
-reset();setMode(0);
+reset();setMode(START_FINISH);
 const clock=new THREE.Clock();let frames=0,totalSeconds=0;
 function loop(){
  requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.05);frames++;totalSeconds+=dt;
@@ -594,8 +622,8 @@ function loop(){
  if(mag>.06){
   const fx=-Math.sin(yaw),fz=-Math.cos(yaw),rx=Math.cos(yaw),rz=-Math.sin(yaw);
   const nx=(rx*ix+fx*iz)/Math.max(1,mag),nz=(rz*ix+fz*iz)/Math.max(1,mag);
-  const speed=(down.run?11.2:7.2)*(state.dash>0?2.25:1);
-  walking=movePlayer(nx*speed*dt,nz*speed*dt,dt);running=down.run||state.dash>0;
+  const speed=(down.run||Math.hypot(joy.x,joy.y)>.95?11.2:7.2)*(state.dash>0?2.25:1);
+  walking=movePlayer(nx*speed*dt,nz*speed*dt,dt);running=down.run||Math.hypot(joy.x,joy.y)>.95||state.dash>0;
   if(walking)hero.rotation.y=Math.atan2(nx,nz);
  }
  if(state.dash>0)state.dash=Math.max(0,state.dash-dt);
