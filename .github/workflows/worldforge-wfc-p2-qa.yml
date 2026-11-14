@@ -1,0 +1,38 @@
+name: HIGHFLY · WorldForge P2 Android QA
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "labs/worldforge-wfc-p2/**"
+      - ".github/workflows/worldforge-wfc-p2-qa.yml"
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install headless Chromium
+        run: |
+          npm install --no-save playwright@1.58.0
+          npx playwright install --with-deps chromium
+      - name: Fetch public CC0 kits for QA
+        run: bash labs/worldforge-wfc-p2/fetch-free-assets.sh labs/worldforge-wfc-p2/assets
+      - name: Test seed, map, water, buildings, touchscreen, travel and fullscreen
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/hf-p2-server.log 2>&1 &
+          node labs/worldforge-wfc-p2/smoke.mjs
+      - name: Save QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: highfly-wfc-p2-qa
+          path: |
+            /tmp/hf-p2-qa.txt
+            /tmp/hf-p2-AETHERIA-07.png
+            /tmp/hf-p2-VALLE-21.png
+          if-no-files-found: ignore
