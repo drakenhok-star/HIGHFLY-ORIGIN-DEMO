@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#090d20">
+<title>HIGHFLY · WFC PREMIUM EXPLORE P2</title>
+<style>
+:root{--ink:#0d1125;--gold:#e6be78;--lilac:#a885e6}*{box-sizing:border-box}html,body{height:100%;width:100%;margin:0;overflow:hidden;background:#081224;color:#f4efff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;touch-action:none}
+#app{position:fixed;inset:0}canvas{display:block}
+.panel{background:linear-gradient(128deg,#141328ed,#261836dd);border:1px solid #ba996785;border-radius:13px;box-shadow:0 8px 28px #07040b90,inset 0 0 22px #8555e41b;backdrop-filter:blur(10px)}
+#top{position:fixed;z-index:5;top:9px;left:11px;right:11px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;pointer-events:none}
+#brand{padding:9px 13px;max-width:350px}#brand strong{font-size:15px;color:#f3ca81;letter-spacing:1px;display:block}#brand small{color:#d2c4e5;letter-spacing:1px;font-size:9px}
+#metrics{padding:9px 12px;text-align:right;font-size:11px;line-height:1.7;min-width:159px}#metrics b{color:#8ce4f4}
+#biome{position:fixed;z-index:3;left:12px;top:77px;padding:8px 12px;pointer-events:none;font-size:12px;max-width:min(320px,45vw)}#biome b{color:var(--gold)}
+#map{position:fixed;right:12px;top:83px;width:160px;height:173px;z-index:3;padding:6px;pointer-events:none}
+#minimap{width:148px;height:146px;display:block}#map label{font-size:9px;color:#e4d5fb;display:block;text-align:center;letter-spacing:.7px}
+#bottom{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);z-index:6;padding:10px 11px;width:min(780px,94vw);pointer-events:auto;text-align:center}
+#bottom h2{font-size:11px;letter-spacing:1px;margin:0 0 8px;color:#f2cd8f}
+#modes{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+#modes button,#test,#reset{background:#221c3c;border:1px solid #786393;color:#efe3ff;padding:9px 11px;border-radius:8px;font-weight:700;font-size:11px;cursor:pointer;touch-action:manipulation}
+#modes button.active{background:linear-gradient(110deg,#ddaf68,#ffedb7);border-color:#fff1c8;color:#251629}
+#desc{font-size:10px;color:#c9bedc;margin:7px 0 1px;min-height:14px}
+#joystick{position:fixed;z-index:5;bottom:122px;left:25px;width:110px;height:110px;border-radius:60px;background:#30204a77;border:2px solid #ba94dd88;touch-action:none;box-shadow:inset 0 0 18px #6f40ad55}
+#knob{position:absolute;left:33px;top:33px;width:40px;height:40px;border-radius:50%;border:2px solid #efe4ff;background:#a88bccdd;box-shadow:0 0 20px #a07ae1a0}
+#acts{position:fixed;bottom:127px;right:25px;display:flex;gap:11px;z-index:5}
+#acts button{width:67px;height:67px;border-radius:50%;color:#fdf4ff;font-weight:800;font-size:11px;border:1.5px solid #dab678a9;background:#48246ebd;touch-action:manipulation}
+#tooltip{position:fixed;z-index:4;bottom:93px;left:50%;transform:translateX(-50%);text-shadow:0 1px 8px #080b12;font-size:11px;pointer-events:none;white-space:nowrap;color:#eee8f9}
+#loading{position:fixed;inset:0;z-index:20;background:#090d1b;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e9cfac;gap:12px;transition:opacity .55s}#loading strong{font-size:22px;letter-spacing:3px}#loading p{margin:0;color:#d4c6e2}
+#loadbar{width:240px;height:5px;background:#312441;border-radius:8px;overflow:hidden}#loadfill{height:100%;width:5%;background:linear-gradient(90deg,#8667c6,#eec27d);transition:width .2s}
+@media(max-width:1024px){#top{top:4px;left:5px;right:5px}#brand,#metrics{padding:6px 7px}#brand strong{font-size:11px}#brand small{font-size:8px}#metrics{font-size:9px;min-width:116px}#biome{top:47px;left:5px;font-size:10px;padding:5px 8px}#map{top:49px;right:5px;width:112px;height:130px;padding:3px}#minimap{width:104px;height:111px}#map label{font-size:7px}#bottom{bottom:3px;width:99vw;padding:6px}#bottom h2{font-size:9px;margin:0 0 5px}#modes{gap:3px}#modes button,#test,#reset{font-size:9px;padding:6px 5px;flex:1}#desc{font-size:9px;margin:4px 0 1px}#joystick{left:9px;bottom:80px;width:90px;height:90px}#knob{left:27px;top:27px;width:32px;height:32px}#acts{bottom:88px;right:7px;gap:7px}#acts button{width:52px;height:52px;font-size:10px}#tooltip{display:none}}
+</style>
+<script type="importmap">{"imports":{"three":"../../lib/three.module.js","three/addons/":"../../lib/jsm/"}}</script>
+<style>
+#modes button.world-active{background:linear-gradient(100deg,#6e3d96,#8f63c9);border-color:#e7c789;color:white}
+#fullscreen{border-color:#d9b078!important;color:#ffe4ac!important}
+#run{background:#355a7abd!important}
+#run.running{background:#c7a063!important;color:#1d1732!important}
+@media(max-width:1024px){#bottom{max-height:37vh;overflow-y:auto}#modes button{flex:1 0 18%;min-width:72px}#joystick{bottom:112px}#acts{bottom:120px;gap:5px}#acts button{width:46px;height:46px;font-size:9px}#brand strong{font-size:10px}#tooltip{display:none}}
+</style><style>
+#travelPopup{display:none;position:fixed;left:50%;top:18%;transform:translateX(-50%);width:min(580px,92vw);z-index:16;padding:12px;pointer-events:auto}
+#travelPopup.open{display:block}
+#travelPopup strong{display:block;text-align:center;color:#ffe1a0;font-size:12px;margin-bottom:9px;letter-spacing:1px}
+#travelGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+#travelGrid button{border:1px solid #ae8cc8;border-radius:8px;padding:10px 7px;font-weight:700;color:#f4e8ff;background:#493463;cursor:pointer}
+#travelGrid button:active{background:#c39a69}
+@media(max-width:1024px){
+#map{top:49px;right:5px;width:112px;height:130px}
+#minimap{width:104px;height:111px}
+#map label{font-size:7px}
+#brand strong{font-size:10px}
+#bottom{padding:5px 7px;max-height:34vh;overflow-y:auto}
+#bottom h2{margin:0 0 3px;font-size:9px}
+#modes{gap:3px}
+#modes button{flex:1 0 18%;min-width:70px;font-size:9px;padding:6px 4px}
+#desc{font-size:9px;margin:3px 0 1px}
+#joystick{bottom:110px}
+#acts{bottom:113px;right:9px;gap:4px}
+#acts button{width:46px;height:46px;font-size:9px}
+#travelPopup{top:12%}
+#travelGrid button{font-size:10px;padding:8px 4px}
+}
+</style><style>
+#seedPopup{display:none;position:fixed;z-index:18;left:50%;top:18%;transform:translateX(-50%);width:min(550px,93vw);padding:14px;pointer-events:auto}
+#seedPopup.open{display:block}
+#seedPopup strong{display:block;color:#f8d599;letter-spacing:.6px;font-size:13px;text-align:center}
+#seedPopup p{color:#d5c5ea;font-size:11px;line-height:1.5;text-align:center}
+.seedRow{display:flex;gap:8px;margin-top:8px}
+.seedRow input{min-width:0;flex:1;border:1px solid #9877c0;background:#140f29;color:white;border-radius:8px;padding:10px}
+.seedRow button{flex:1;border:1px solid #bca073;background:#33254e;color:#f8ebff;border-radius:8px;padding:10px;cursor:pointer;font-weight:700;font-size:11px}
+#waterState{font-size:10px;color:#8fd7ed}
+#travelPopup{max-height:75vh;overflow-y:auto}
+#travelGrid{grid-template-columns:repeat(4,1fr)}
+#bottom h2{font-size:10px}
+@media(max-width:1024px){#map{top:48px}#travelPopup{top:6%;max-height:84vh}#travelGrid button{font-size:9px;padding:7px 4px}#seedPopup{top:5%;padding:8px}#seedPopup p{font-size:9px;margin:6px}#bottom{max-height:35vh;overflow-y:auto}}
+</style></head><body>
+<div id="app"></div>
+<div id="loading"><strong>HIGHFLY</strong><p>CINCO REINOS · WORLD FORGE</p><div id="loadbar"><div id="loadfill"></div></div><small id="loadingtxt">Construyendo terreno continuo...</small></div>
+<div id="top"><div id="brand" class="panel"><strong>HIGHFLY ✦ WORLD FORGE</strong><small>WFC PREMIUM · 13 BIOMAS · ESCALA 8×</small></div><div id="metrics" class="panel">FPS <b id="fps">--</b> · CAPA <b id="modeLabel">PREMIUM</b><br>Fronteras cruzadas <b id="crossings">0</b> · Bloqueos <b id="blocks">0</b><br>Costuras físicas <b id="seamStatus">sin comprobar</b></div></div>
+<div id="biome" class="panel">REGIÓN: <b id="biomeName">Arvelia · Ciudad</b> <span id="waterState">· TIERRA FIRME</span></div>
+<div id="map" class="panel"><canvas id="minimap" width="296" height="290"></canvas><label>MINIMAPA · 13 REGIONES</label></div>
+<div id="joystick"><div id="knob"></div></div>
+<div id="acts"><button id="run">CORRER</button><button id="jump">SALTO</button><button id="dash">DASH</button></div>
+<div id="travelPopup" class="panel"><strong>VIAJAR A UNA REGIÓN · SIN CAMBIAR EL MUNDO</strong><div id="travelGrid"><button data-region="0">🏰 Arvelia</button><button data-region="1">🌲 Bosque</button><button data-region="2">☀️ Desierto</button><button data-region="3">⛰️ Montañas</button><button data-region="4">❄️ Nieve</button><button data-region="5">🐸 Pantano</button><button data-region="6">🌴 Selva</button><button data-region="7">🌋 Volcán</button><button data-region="8">🦌 Sabana</button><button data-region="9">🏜️ Cañones</button><button data-region="10">🌊 Costa</button><button data-region="11">🍁 Otoño</button><button data-region="12">🧊 Tundra</button><button id="closeTravel">✕ Cerrar</button></div></div>
+<div id="tooltip">WASD / joystick · arrastrar derecha para cámara · agua baja: caminar lento · profunda: bloqueada (natación futura)</div>
+<div id="seedPopup" class="panel"><strong>SEMILLA DE MUNDO · PREDETERMINADA AETHERIA-07</strong><p>Una semilla cambia la distribución de bosques, subzonas, rocas y aldeas; conserva conexiones y ciudad central.</p><div class="seedRow"><input id="seedValue" value="AETHERIA-07" maxlength="30" aria-label="Semilla de mundo"/><button id="applySeed">GENERAR MUNDO</button></div><div class="seedRow"><button data-seed="AETHERIA-07">AETHERIA-07</button><button data-seed="VALLE-21">VALLE-21</button><button data-seed="UMBRA-33">UMBRA-33</button><button id="closeSeed">✕</button></div></div><div id="bottom" class="panel"><h2>EXPLORACIÓN PREMIUM · GENERACIÓN POR SEMILLA · AGUA JUGABLE</h2><div id="modes"><button id="seed">🌱 SEMILLA</button><button id="regenerate">↻ GENERAR</button><button data-mode="1">CAPA NORMAL</button><button class="active" data-mode="2">CAPA PREMIUM</button><button id="fullscreen">⛶ PANTALLA COMPLETA</button><button id="test">TEST UNIONES</button><button id="travel">VIAJAR</button><button id="reset">CIUDAD</button></div><div id="desc">Mundo 8× · WFC por semilla · territorio continuo · agua baja caminable. No es natación todavía.</div></div>
+<script>
+(function(){
+ let shown=false;
+ const showError=function(message){
+   if(shown)return;shown=true;
+   const panel=document.getElementById('loading'),msg=document.getElementById('loadingtxt');
+   if(!panel||!msg)return;
+   panel.style.opacity='1';panel.style.pointerEvents='auto';
+   msg.textContent='ERROR AL INICIAR: '+String(message||'Error desconocido').slice(0,220);
+   msg.style.maxWidth='min(92vw,540px)';msg.style.textAlign='center';msg.style.color='#ffc2ae';
+   const bar=document.getElementById('loadbar');if(bar)bar.style.display='none';
+   const retry=document.createElement('button');retry.textContent='REINTENTAR CARGA';retry.style.cssText='padding:12px 22px;background:#e6be78;border:0;border-radius:10px;color:#211629;font-weight:800;cursor:pointer';
+   retry.onclick=function(){location.reload()};panel.append(retry);
+   const hint=document.createElement('small');hint.textContent='Si vuelve a fallar, enviame una captura con este mensaje.';hint.style.textAlign='center';panel.append(hint);
+ };
+ window.HIGHFLY_SHOW_ERROR=showError;
+ window.addEventListener('error',function(e){if(e.message)showError(e.message)},true);
+ window.addEventListener('unhandledrejection',function(e){showError(e.reason&&e.reason.message||String(e.reason))});
+ setTimeout(function(){if(!window.HIGHFLY_TEST&&document.getElementById('loading'))showError('La escena no respondió. Verificá WebGL y la conexión de red.')},30000);
+})();
+</script>
+<script type="module" src="./world.js?v=p2-wfc-premium-1"></script>
+</body></html>
