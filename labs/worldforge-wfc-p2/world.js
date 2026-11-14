@@ -581,6 +581,42 @@ if(WORLD_KIND==='wfc'){
  }
 }
 
+// Real public CC0 KayKit medieval models, packaged at build time from a verified public mirror.
+const FREE_KAYKIT=[
+ {kind:'hall',h:13,spots:[[-34,-10],[43,-26],[-45,55]]},
+ {kind:'house',h:6.5,spots:[[27,36],[-51,28],[52,49],[-10,-64],[71,-8],[-80,-15],[-65,-78],[89,72],
+  ...REGIONS.slice(1).filter(r=>r.id!==7).map(r=>[r.x+46,r.z+55])]},
+ {kind:'tower',h:11,spots:[[105,0],[-104,0],[0,103],[0,-104],[76,77],[-76,-77]]},
+ {kind:'wall',h:5,spots:[[98,17],[98,-17],[-98,17],[-98,-17],[17,98],[-17,98]]},
+ {kind:'tree',h:9,spots:[[117,57],[-118,57],[128,-43],[-123,-52],[75,119]]},
+ {kind:'rock',h:4.5,spots:[[142,72],[-143,89],[118,-112],...REGIONS.slice(1).map(r=>[r.x+95,r.z-55])]}
+];
+let realAssetLoaded=0,realAssetFailed=0;
+const freeLoader=new GLTFLoader();
+for(const spec of FREE_KAYKIT){
+ freeLoader.load('./assets/'+spec.kind+'.glb',g=>{
+  const model=g.scene;
+  const box=new THREE.Box3().setFromObject(model);
+  const size=new THREE.Vector3();box.getSize(size);
+  const ctr=new THREE.Vector3();box.getCenter(ctr);
+  const unit=spec.h/Math.max(.05,size.y);
+  for(const [x,z] of spec.spots){
+   const r=regionAt(x,z);
+   if(!r)continue;
+   const bed=groundHeight(x,z);
+   if(waterAt(x,z,bed).depth>.1)continue;
+   const copy=model.clone(true);
+   copy.scale.setScalar(unit);
+   copy.position.set(x-ctr.x*unit,bed-box.min.y*unit,z-ctr.z*unit);
+   copy.rotation.y=(hash(x*71+z*43)-.5)*.12;
+   copy.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false}});
+   scene.add(copy);
+   realAssetLoaded++;
+   if(spec.kind!=='tree'&&spec.kind!=='rock')addCollider(x,z,Math.max(1.6,Math.min(7,Math.max(size.x,size.z)*unit*.37)));
+  }
+ },undefined,err=>{realAssetFailed++;console.warn('KayKit CC0 model unavailable '+spec.kind,err?.message||err)});
+}
+
 // All four comparison combinations use one unified visual terrain mesh and one collision height function.
 // Independent tiny hex tile overlays are intentionally disabled: this prevents visual seams.
 
@@ -776,7 +812,7 @@ function runSeamTest(){
 
 $('#test').addEventListener('click',runSeamTest);
 window.HIGHFLY_TEST={runSeamTest,groundHeight,regionAt,regions:REGIONS,reset,setMode,
- worldMode:WORLD_KIND,sizeRatio:8,seed:SEED,biomeCount:REGIONS.length,waterAt:waterAt,lakes:LAKES,waterSwimReady:false,
+ worldMode:WORLD_KIND,sizeRatio:8,seed:SEED,biomeCount:REGIONS.length,waterAt:waterAt,lakes:LAKES,waterSwimReady:false,getFreeAssets:()=>({loaded:realAssetLoaded,failed:realAssetFailed}),
  wfcStats:()=>WFC_MAPS.map(m=>({id:m.reg.id,cells:m.cells.length,repairs:m.repairs,iterations:m.iterations})),
  getPlayerPosition:()=>({x:hero.position.x,y:hero.position.y,z:hero.position.z}),
  getJoystick:()=>({...joy}),getFinish:()=>visualMode,isFullscreen:()=>!!document.fullscreenElement};
@@ -799,6 +835,12 @@ for(const collider of colliders){
  const key=kx+','+kz;
  if(!COLLIDER_GRID.has(key))COLLIDER_GRID.set(key,[]);
  COLLIDER_GRID.get(key).push(collider);
+}
+function addCollider(x,z,r){
+ const obstacle={x,z,r};colliders.push(obstacle);
+ const key=Math.floor(x/COLLISION_CELL)+','+Math.floor(z/COLLISION_CELL);
+ if(!COLLIDER_GRID.has(key))COLLIDER_GRID.set(key,[]);
+ COLLIDER_GRID.get(key).push(obstacle);
 }
 function canEnter(x,z){
  const reg=regionAt(x,z);if(!reg)return false;
