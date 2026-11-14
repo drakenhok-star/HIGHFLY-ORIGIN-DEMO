@@ -440,36 +440,39 @@ function createVegetation(){
        pineFoliageGeo=new THREE.ConeGeometry(1.45,4.5,7),
        bushGeo=new THREE.IcosahedronGeometry(.87,0),
        rockGeo=new THREE.DodecahedronGeometry(1.6,0);
- const specs={green:[],dark:[],snow:[],palm:[],rocks:[],bushes:[]};
+ const specs={green:[],dark:[],snow:[],palm:[],autumn:[],rocks:[],bushes:[]};
  let serial=0;
  for(const r of REGIONS){
-  const total=[360,2200,450,750,840][r.id];
+  const total=[750,1850,520,680,700,1150,1550,440,700,480,620,1400,750][r.id];
   for(let i=0;i<total;i++){
     let dx=(hash(i*41+r.id*303+2)-.5)*R*1.76,
         dz=(hash(i*53+r.id*133+6)-.5)*R*1.80;
     if(!inside(dx,dz,R-11))continue;
     const x=r.x+dx,z=r.z+dz;
-    if(Math.hypot(dx,dz)<(r.id===0?50:r.id===2?24:16))continue;
+    if(Math.hypot(dx,dz)<(r.id===0?68:r.id===2?30:24))continue;
     const h=groundHeight(x,z);
-    if(r.id===4&&(h<-.7||h>29))continue;
-    if(r.id===3&&h>34)continue;
-    if(r.id===2&&(Math.hypot(dx-24,dz-28)<28||Math.hypot(dx-24,dz-28)>76&&hash(i*41)>.21))continue;
-    if(r.id!==0){const ux=r.x/DIST,uz=r.z/DIST;if(Math.abs(dx*uz-dz*ux)<9&&Math.hypot(dx,dz)>16)continue}
+    if((r.id===4||r.id===12)&&(h<-.7||h>38))continue;
+    if((r.id===3||r.id===7||r.id===9)&&h>44)continue;
+    if(waterAt(x,z,h).depth>.05)continue;
+    if(r.id===2&&Math.hypot(dx-52,dz-58)>95&&hash(i*41)>.38)continue;
+    if(r.id===7&&hash(i*9)>.32)continue;
+    if(r.id===9&&hash(i*11)>.5)continue;
+    if(roadWeight(x,z)>.13)continue;
     const tile=wfcAt(x,z);
     if(WORLD_KIND==='wfc'&&(tile==='TRACK'||tile==='HAMLET'||tile==='WATER'||tile==='MEADOW'&&hash(i*7+r.id)<.66||tile==='ROCK'&&hash(i*17)<.6))continue;
     const size=(.8+hash(i*11+r.id*223)*.75)*(WORLD_KIND==='wfc'&&tile==='THICKET'?1.15:1);
-    const pick=r.id===4?'snow':(r.id===1||r.id===0?'dark':r.id===2?'palm':'green');
+    const pick=(r.id===4||r.id===12)?'snow':r.id===2||r.id===10?'palm':r.id===11?'autumn':(r.id===7||r.id===9)?'green':(r.id===1||r.id===5||r.id===6)?'dark':'green';
     specs[pick].push({x,z,y:h,s:size,k:i+r.id*600});
     if(serial++%5===0)specs.bushes.push({x:x+2,z:z+1,y:groundHeight(x+2,z+1),s:.45+hash(i*3)*.7,k:i});
   }
-  for(let i=0;i<145;i++){
+  for(let i=0;i<165;i++){
    const dx=(hash(i*97+r.id*154+2)-.5)*R*1.62,dz=(hash(i*103+r.id*24+9)-.5)*R*1.62;
    if(!inside(dx,dz,R-12)||Math.hypot(dx,dz)<21)continue;
    const x=r.x+dx,z=r.z+dz,y=groundHeight(x,z);
-   if(y< -1)continue; if(WORLD_KIND==='wfc'&&wfcAt(x,z)==='WATER')continue; specs.rocks.push({x,z,y,s:.45+hash(i*10+r.id)*1.25,k:i});
+   if(y< -1||waterAt(x,z,y).depth>.5)continue; if(WORLD_KIND==='wfc'&&wfcAt(x,z)==='WATER'&&hash(i*8)>.45)continue; specs.rocks.push({x,z,y,s:.45+hash(i*10+r.id)*1.25,k:i});
   }
  }
- for(const type of ['green','dark','snow','palm'])for(const p of specs[type]){
+ for(const type of ['green','dark','snow','palm','autumn'])for(const p of specs[type]){
   cameraTrees.push({x:p.x,z:p.z,y:p.y,s:p.s});
   colliders.push({x:p.x,z:p.z,r:type==='palm'?.36*p.s:.52*p.s});
  }
@@ -478,16 +481,16 @@ function createVegetation(){
    if(!arr.length)return;
    const m=new THREE.InstancedMesh(geometry,mat,arr.length);
    arr.forEach((p,i)=>{place(p,dummy);dummy.updateMatrix();m.setMatrixAt(i,dummy.matrix);if(colorfn)m.setColorAt(i,new THREE.Color(colorfn(p,i)))});m.instanceMatrix.needsUpdate=true;if(m.instanceColor)m.instanceColor.needsUpdate=true;parent.add(m);
-   const canopy=(geometry.type==='ConeGeometry'&&(arr===specs.green||arr===specs.dark||arr===specs.snow))||(geometry.type==='IcosahedronGeometry'&&arr===specs.palm);
+   const canopy=(geometry.type==='ConeGeometry'&&(arr===specs.green||arr===specs.dark||arr===specs.snow||arr===specs.autumn))||(geometry.type==='IcosahedronGeometry'&&arr===specs.palm);
    if(canopy)cameraFoliage.push({mesh:m,points:arr,source:m.instanceMatrix.array.slice(),hidden:new Uint8Array(arr.length)});
 
  }
  const bark=new THREE.MeshStandardMaterial({color:'#86664a',roughness:1}),greenMat=new THREE.MeshStandardMaterial({color:'#ffffff',roughness:1}),palmMat=new THREE.MeshStandardMaterial({color:'#dbb56a',roughness:1});
- for(const type of ['green','dark','snow']){
+ for(const type of ['green','dark','snow','autumn']){
   const arr=specs[type];
   inst(pineTrunkGeo,bark,arr,(p,d)=>{d.position.set(p.x,p.y+.95*p.s,p.z);d.rotation.set(0,0,0);d.scale.setScalar(p.s)});
-  inst(pineFoliageGeo,greenMat,arr,(p,d)=>{d.position.set(p.x,p.y+3.4*p.s,p.z);d.rotation.set(0,p.k*.8,0);d.scale.setScalar(p.s)},p=>type==='snow'?((hash(p.k)>.5)?'#c6d4cb':'#7cafa2'):type==='dark'?(hash(p.k)>.5?'#2d6949':'#3d7c52'):(hash(p.k)>.5?'#518766':'#41795e'));
-  inst(new THREE.ConeGeometry(.95,3.1,7),greenMat,arr,(p,d)=>{d.position.set(p.x,p.y+5.1*p.s,p.z);d.scale.setScalar(p.s)},p=>type==='snow'?'#e5e9e7':type==='dark'?'#52926a':'#6e9f7c');
+  inst(pineFoliageGeo,greenMat,arr,(p,d)=>{d.position.set(p.x,p.y+3.4*p.s,p.z);d.rotation.set(0,p.k*.8,0);d.scale.setScalar(p.s)},p=>type==='snow'?(hash(p.k)>.5?'#c6d4cb':'#7cafa2'):type==='autumn'?(hash(p.k)>.5?'#bd7441':'#bba057'):type==='dark'?(hash(p.k)>.5?'#2d6949':'#3d7c52'):(hash(p.k)>.5?'#518766':'#41795e'));
+  inst(new THREE.ConeGeometry(.95,3.1,7),greenMat,arr,(p,d)=>{d.position.set(p.x,p.y+5.1*p.s,p.z);d.scale.setScalar(p.s)},p=>type==='snow'?'#e5e9e7':type==='autumn'?(hash(p.k)>.5?'#d18a42':'#bb5d43'):type==='dark'?'#52926a':'#6e9f7c');
  }
  inst(new THREE.CylinderGeometry(.2,.29,4.5,6),palmMat,specs.palm,(p,d)=>{d.position.set(p.x,p.y+2.2*p.s,p.z);d.scale.setScalar(p.s)});
  inst(new THREE.IcosahedronGeometry(2.7,0),greenMat,specs.palm,(p,d)=>{d.position.set(p.x,p.y+5.3*p.s,p.z);d.scale.set(1.1*p.s,.34*p.s,1.1*p.s)},p=>'#4d9872');
@@ -496,17 +499,29 @@ function createVegetation(){
 }
 createVegetation();
 // Tall stone formations, water oasis and shoreline.
-for(let i=0;i<38;i++){
+for(let i=0;i<55;i++){
  let dx=(hash(i*18+6)-.5)*R*1.5,dz=(hash(i*31+7)-.5)*R*1.5;
  if(!inside(dx,dz,R-5)||Math.hypot(dx,dz)<7)continue;
  let x=mountain.x+dx,z=mountain.z+dz,y=groundHeight(x,z);
  const ph=8+hash(i*15)*18;cone(2.2+hash(i*9)*3.1,ph,5,materials.darkStone,x,y+ph/2,z);solid(x,z,2.2+hash(i*9)*3.1);
 }
-const oasisX=desert.x+24,oasisZ=desert.z+28;
-const oasis=mesh(new THREE.CircleGeometry(28.5,56),materials.water,oasisX,.22,oasisZ);oasis.rotation.x=-Math.PI/2;
-const oasisRim=mesh(new THREE.RingGeometry(28.3,31.5,56),new THREE.MeshStandardMaterial({color:'#b9ad7e',side:THREE.DoubleSide}),oasisX,.17,oasisZ);oasisRim.rotation.x=-Math.PI/2;
+const oasisX=LAKES[1].x,oasisZ=LAKES[1].z;
+// Shared water bodies use the same waterAt() depth sampler as the character controller.
+const waterSurfaces=[];
+for(const lake of LAKES){
+ const lakeMaterial=new THREE.MeshStandardMaterial({
+  color:lake.reg===12?'#9ecfd5':lake.reg===5?'#4f9490':'#4db9ca',
+  metalness:.06,roughness:.24,transparent:true,opacity:.77,depthWrite:false,side:THREE.DoubleSide
+ });
+ const surface=mesh(new THREE.CircleGeometry(lake.r,72),lakeMaterial,lake.x,lake.level,lake.z);
+ surface.rotation.x=-Math.PI/2;
+ waterSurfaces.push(surface);
+ const rim=new THREE.Mesh(new THREE.RingGeometry(lake.r,lake.r+3.2,72),new THREE.MeshStandardMaterial({color:lake.reg===2?'#ccba89':'#8eaaa0',side:THREE.DoubleSide,transparent:true,opacity:.68}));
+ rim.rotation.x=-Math.PI/2;rim.position.set(lake.x,lake.level-.03,lake.z);scene.add(rim);
+}
+
 for(let i=0;i<20;i++){
- const a=i*TAU/20,dist=34+hash(i*12)*7,x=oasisX+Math.cos(a)*dist,z=oasisZ+Math.sin(a)*dist,y=groundHeight(x,z);
+ const a=i*TAU/20,dist=LAKES[1].r+5+hash(i*12)*8,x=oasisX+Math.cos(a)*dist,z=oasisZ+Math.sin(a)*dist,y=groundHeight(x,z);
  cylinder(.16,.26,5.8,6,materials.wood,x,y+2.9,z);
  for(let leaf=0;leaf<5;leaf++){const g=cone(1.55,3.0,5,new THREE.MeshStandardMaterial({color:leaf%2?'#46986c':'#6ca86e'}),x+Math.sin(leaf*TAU/5)*1.0,y+6.1,z+Math.cos(leaf*TAU/5)*1);g.rotation.z=.65*Math.sin(leaf*TAU/5);}
 }
@@ -526,19 +541,24 @@ function pathMesh(points,width=2.5,mat=roadMaterial,extra=.09){
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(indices);g.computeVertexNormals();
  const m=new THREE.Mesh(g,mat);allDecor.add(m);return m;
 }
-for(const r of REGIONS.slice(1)){
- const len=Math.hypot(r.x,r.z),ux=r.x/len,uz=r.z/len,pts=[];
- for(let i=0;i<=100;i++){const t=8+(len-7)*i/100;pts.push([ux*t+Math.sin(i*.12)*.35,uz*t+Math.cos(i*.17)*.3])}
- if(r.id===4){pathMesh(pts,6.2,bridgeMat,.14)}
- else pathMesh(pts,5.1,roadMaterial,.08);
+for(const connection of MAIN_ROADS){
+ const src=connection.a,dst=connection.b,dx=dst.x-src.x,dz=dst.z-src.z;
+ const pts=[];
+ for(let i=0;i<=100;i++){
+  const u=i/100;
+  pts.push([src.x+dx*u,src.z+dz*u]);
+ }
+ const isBridge=(dst.id===4||src.id===4||dst.id===10&&src.id===8);
+ pathMesh(pts,isBridge?7.1:6.3,isBridge?bridgeMat:roadMaterial,.11);
 }
+
 function buildBridge(){
  const ux=.5,uz=-SQ3/2,vx=SQ3/2,vz=.5;
- for(let t=70;t<=DIST-70;t+=1.22){
+ for(let t=115;t<=DIST-112;t+=1.9){
    const x=ux*t,z=uz*t,y=groundHeight(x,z);
-   const m=cube(7.8,.25,1.16,materials.wood,x,y+.18,z);m.rotation.y=Math.atan2(ux,uz);
+   const m=cube(8.7,.25,1.7,materials.wood,x,y+.18,z);m.rotation.y=Math.atan2(ux,uz);
    if(Math.floor(t*2)%7<2){for(const side of [-1,1]){
-    const px=x+vx*side*3.7,pz=z+vz*side*3.7,py=groundHeight(px,pz);
+    const px=x+vx*side*3.8,pz=z+vz*side*3.8,py=groundHeight(px,pz);
     cylinder(.15,.15,2.2,6,materials.wood,px,py+1.15,pz);
    }}
  }
@@ -549,12 +569,14 @@ if(WORLD_KIND==='wfc'){
  for(const map of WFC_MAPS){
   let added=0;
   for(const cell of map.cells){
-   if(cell.label!=='HAMLET'||added>=6||Math.hypot(cell.x-map.reg.x,cell.z-map.reg.z)<30)continue;
-   if(!inside(cell.x-map.reg.x,cell.z-map.reg.z,R-14)||groundHeight(cell.x,cell.z)<-.5)continue;
-   if(Math.hypot(cell.x,cell.z)<28)continue;
-   createHouse(cell.x,cell.z,map.reg.id===1?materials.roofGreen:map.reg.id===2?materials.roofGold:map.reg.id===4?materials.roofBlue:materials.roof,.72+hash(placed*13)*.25);
-   const track=[];for(let i=0;i<16;i++){const u=i/15;track.push([lerp(cell.x,map.reg.x,u),lerp(cell.z,map.reg.z,u)])}
-   pathMesh(track,1.6,roadMaterial,.08);added++;placed++;
+   if(cell.label!=='HAMLET'||added>=5||Math.hypot(cell.x-map.reg.x,cell.z-map.reg.z)<75)continue;
+   if(!inside(cell.x-map.reg.x,cell.z-map.reg.z,R-19))continue;
+   const h=groundHeight(cell.x,cell.z);
+   if(h<-.4||waterAt(cell.x,cell.z,h).depth>.03||roadWeight(cell.x,cell.z)>.5)continue;
+   const grad=Math.max(Math.abs(groundHeight(cell.x+3,cell.z)-h),Math.abs(groundHeight(cell.x,cell.z+3)-h));
+   if(grad>1.15)continue;
+   createHouse(cell.x,cell.z,map.reg.id===1||map.reg.id===6?materials.roofGreen:map.reg.id===2?materials.roofGold:map.reg.id===4||map.reg.id===12?materials.roofBlue:materials.roof,.75+hash(placed*13)*.2);
+   added++;placed++;
   }
  }
 }
