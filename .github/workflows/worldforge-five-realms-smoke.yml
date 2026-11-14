@@ -1,0 +1,34 @@
+name: HIGHFLY · WorldForge Five Realms browser smoke
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "labs/worldforge-five-realms/**"
+      - ".github/workflows/worldforge-five-realms-smoke.yml"
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright and headless Chromium
+        run: |
+          npm install --no-save playwright@1.58.0
+          npx playwright install --with-deps chromium
+      - name: Test loading, joystick, and movement in Chromium
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/hf-worldforge-http.log 2>&1 &
+          echo $! > /tmp/hf-worldforge-http.pid
+          node labs/worldforge-five-realms/smoke.mjs
+      - name: Upload smoke logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: worldforge-smoke
+          path: /tmp/hf-worldforge-smoke.txt
+          if-no-files-found: ignore
