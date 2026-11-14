@@ -521,9 +521,41 @@ document.addEventListener('fullscreenchange',()=>{
  $('#fullscreen').textContent=document.fullscreenElement?'⛶ SALIR FULL':'⛶ PANTALLA COMPLETA';
 });
 $('#reset').addEventListener('click',reset);
+$('#travel').addEventListener('click',()=>$('#travelPopup').classList.toggle('open'));
+$('#closeTravel').addEventListener('click',()=>$('#travelPopup').classList.remove('open'));
+document.querySelectorAll('[data-region]').forEach(b=>b.addEventListener('click',()=>{
+ const reg=REGIONS[Number(b.dataset.region)];
+ let target=null;
+ if(reg.id===0)target={x:14,z:19};
+ else{
+  // Find a walkable nearby location rather than placing the character inside an object or lake.
+  for(const rad of [26,35,45,55,68]){
+   for(let i=0;i<16;i++){
+    const angle=i*TAU/16, x=reg.x+Math.cos(angle)*rad,z=reg.z+Math.sin(angle)*rad;
+    if(!canEnter(x,z))continue;
+    const h=groundHeight(x,z);
+    const gradient=Math.max(
+     Math.abs(groundHeight(x+2,z)-h),
+     Math.abs(groundHeight(x,z+2)-h)
+    );
+    if(gradient<.8){target={x,z};break}
+   }
+   if(target)break;
+  }
+ }
+ if(target){
+  hero.position.set(target.x,groundHeight(target.x,target.z),target.z);
+  state.air=0;state.vy=0;state.dash=0;
+  state.lastRegion=reg.id;
+  $('#biomeName').textContent=reg.name;
+  $('#desc').textContent='Llegaste a '+reg.name+'. Podés recorrer el territorio y cruzar libremente por sus caminos.';
+ }else $('#desc').textContent='No encontré un punto seguro en '+reg.name+'.';
+ $('#travelPopup').classList.remove('open');
+}));
+
 
 const state={vy:0,air:0,dash:0,blocked:0,crossings:0,lastRegion:0};
-let yaw=.6,pitch=.47,camDistance=15,dragCam=null,lastPX=0,lastPY=0;
+let yaw=.6,pitch=.33,camDistance=10.5,dragCam=null,lastPX=0,lastPY=0;
 const keys={KeyW:'w',ArrowUp:'w',KeyS:'s',ArrowDown:'s',KeyA:'a',ArrowLeft:'a',KeyD:'d',ArrowRight:'d'};
 const down={w:false,s:false,a:false,d:false,run:false},joy={x:0,y:0};
 const runBtn=$('#run');
@@ -637,7 +669,7 @@ function loop(){
    if(key!==hero.userData.last&&acts[key]){const prev=acts[hero.userData.last];prev?.fadeOut(.16);acts[key].reset().fadeIn(.16).play();hero.userData.last=key;}}
   mixer.update(dt);}
  const focus=new THREE.Vector3(hero.position.x,hero.position.y+1.7,hero.position.z);
- const desired=new THREE.Vector3(focus.x+Math.sin(yaw)*Math.cos(pitch)*camDistance,focus.y+Math.sin(pitch)*camDistance+2.4,focus.z+Math.cos(yaw)*Math.cos(pitch)*camDistance);
+ const desired=new THREE.Vector3(focus.x+Math.sin(yaw)*Math.cos(pitch)*camDistance,focus.y+Math.sin(pitch)*camDistance+1.45,focus.z+Math.cos(yaw)*Math.cos(pitch)*camDistance);
  desired.y=Math.max(desired.y,groundHeight(desired.x,desired.z)+2.5);
  camera.position.lerp(desired,Math.min(1,dt*9));camera.lookAt(focus);
  const elapsed=performance.now()*.001;
