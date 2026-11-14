@@ -641,7 +641,7 @@ try{
   }
  },undefined,e=>console.warn('CC0 player fallback:',e?.message));
 }catch(err){console.warn(err)}
-function reset(){hero.position.set(9,groundHeight(9,11),11);state.vy=0;state.air=0;state.dash=0;state.water='tierra';state.crossings=0;state.blocked=0;state.lastRegion=0;$('#crossings').textContent='0';$('#blocks').textContent='0'}
+function reset(){hero.userData.snapCamera=true;hero.position.set(9,groundHeight(9,11),11);state.vy=0;state.air=0;state.dash=0;state.water='tierra';state.crossings=0;state.blocked=0;state.lastRegion=0;$('#crossings').textContent='0';$('#blocks').textContent='0'}
 const hiddenCanopyMatrix=new THREE.Matrix4().makeScale(0,0,0);
 const originalCanopyMatrix=new THREE.Matrix4();
 function updateNearFoliage(){
@@ -700,6 +700,10 @@ const worldSeed=s=>{
 document.querySelectorAll('[data-seed]').forEach(b=>b.addEventListener('click',()=>worldSeed(b.dataset.seed)));
 $('#applySeed').addEventListener('click',()=>worldSeed($('#seedValue').value));
 $('#regenerate').addEventListener('click',()=>worldSeed('AETHERIA-'+Math.floor(Math.random()*999999).toString().padStart(6,'0')));
+$('#toggleHud').addEventListener('click',()=>{
+ const collapsed=$('#bottom').classList.toggle('collapsed');
+ $('#toggleHud').textContent=collapsed?'☰ MOSTRAR MENÚ':'▾ OCULTAR MENÚ';
+});
 
 $('#fullscreen').addEventListener('click',async()=>{
  try{
@@ -745,6 +749,7 @@ document.querySelectorAll('[data-region]').forEach(b=>b.addEventListener('click'
   }
  }
  if(target){
+  hero.userData.snapCamera=true;
   hero.position.set(target.x,groundHeight(target.x,target.z),target.z);
   state.air=0;state.vy=0;state.dash=0;
   state.lastRegion=reg.id;
@@ -756,7 +761,7 @@ document.querySelectorAll('[data-region]').forEach(b=>b.addEventListener('click'
 
 
 const state={vy:0,air:0,dash:0,water:'tierra',blocked:0,crossings:0,lastRegion:0};
-let yaw=.6,pitch=.33,camDistance=10.5,dragCam=null,lastPX=0,lastPY=0;
+let yaw=.6,pitch=.29,camDistance=8.7,dragCam=null,lastPX=0,lastPY=0;
 const keys={KeyW:'w',ArrowUp:'w',KeyS:'s',ArrowDown:'s',KeyA:'a',ArrowLeft:'a',KeyD:'d',ArrowRight:'d'};
 const down={w:false,s:false,a:false,d:false,run:false},joy={x:0,y:0};
 const runBtn=$('#run');
@@ -812,7 +817,7 @@ function runSeamTest(){
 
 $('#test').addEventListener('click',runSeamTest);
 window.HIGHFLY_TEST={runSeamTest,groundHeight,regionAt,regions:REGIONS,reset,setMode,
- worldMode:WORLD_KIND,sizeRatio:8,seed:SEED,biomeCount:REGIONS.length,waterAt:waterAt,lakes:LAKES,waterSwimReady:false,getFreeAssets:()=>({loaded:realAssetLoaded,failed:realAssetFailed}),
+ worldMode:WORLD_KIND,sizeRatio:8,seed:SEED,biomeCount:REGIONS.length,waterAt:waterAt,lakes:LAKES,waterSwimReady:false,canEnter:canEnter,getFreeAssets:()=>({loaded:realAssetLoaded,failed:realAssetFailed}),
  wfcStats:()=>WFC_MAPS.map(m=>({id:m.reg.id,cells:m.cells.length,repairs:m.repairs,iterations:m.iterations})),
  getPlayerPosition:()=>({x:hero.position.x,y:hero.position.y,z:hero.position.z}),
  getJoystick:()=>({...joy}),getFinish:()=>visualMode,isFullscreen:()=>!!document.fullscreenElement};
@@ -903,7 +908,10 @@ function loop(){
  desired.y=Math.max(desired.y,groundHeight(desired.x,desired.z)+2.5);
  // Keep an ordinary third-person camera. Fade only canopies obstructing the hero,
  // leaving trunks, collision geometry and the rest of the forest intact.
- camera.position.lerp(desired,Math.min(1,dt*9));camera.lookAt(focus);
+ if(hero.userData.snapCamera||camera.position.distanceToSquared(desired)>2200){
+  camera.position.copy(desired);hero.userData.snapCamera=false;
+ }else camera.position.lerp(desired,Math.min(1,dt*11));
+ camera.lookAt(focus);
  updateNearFoliage();
  const elapsed=performance.now()*.001;
  water.material.opacity=.85+.018*Math.sin(elapsed*1.4);foamMat.opacity=.26+.065*Math.sin(elapsed*.9);
