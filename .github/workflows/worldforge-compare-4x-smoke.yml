@@ -1,0 +1,36 @@
+name: HIGHFLY · WorldForge 4X browser smoke
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "labs/worldforge-compare-4x/**"
+      - ".github/workflows/worldforge-compare-4x-smoke.yml"
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-save playwright@1.58.0
+          npx playwright install --with-deps chromium
+      - name: Test both worlds and Android controls
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/hf-worldforge-4x-http.txt 2>&1 &
+          node labs/worldforge-compare-4x/smoke.mjs
+      - name: Browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: worldforge-4x-qa
+          path: |
+            /tmp/hf-worldforge-4x-smoke.txt
+            /tmp/hf-worldforge-4x-manual.png
+            /tmp/hf-worldforge-4x-wfc.png
+          if-no-files-found: ignore
