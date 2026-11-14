@@ -338,6 +338,7 @@ function wfcAt(x,z){
 }
 
 // Instanced flora; independent from collision geometry, keeps mobile draw calls low.
+const cameraTrees=[];
 function createVegetation(){
  const pineTrunkGeo=new THREE.CylinderGeometry(.13,.25,1.9,5),
        pineFoliageGeo=new THREE.ConeGeometry(1.45,4.5,7),
@@ -371,6 +372,10 @@ function createVegetation(){
    const x=r.x+dx,z=r.z+dz,y=groundHeight(x,z);
    if(y< -1)continue; if(WORLD_KIND==='wfc'&&wfcAt(x,z)==='WATER')continue; specs.rocks.push({x,z,y,s:.45+hash(i*10+r.id)*1.25,k:i});
   }
+ }
+ for(const type of ['green','dark','snow','palm'])for(const p of specs[type]){
+  cameraTrees.push({x:p.x,z:p.z,y:p.y,s:p.s});
+  colliders.push({x:p.x,z:p.z,r:type==='palm'?.36*p.s:.52*p.s});
  }
  const dummy=new THREE.Object3D();
  function inst(geometry,mat,arr,place,colorfn,parent=allDecor){
@@ -671,7 +676,22 @@ function loop(){
  const focus=new THREE.Vector3(hero.position.x,hero.position.y+1.7,hero.position.z);
  const desired=new THREE.Vector3(focus.x+Math.sin(yaw)*Math.cos(pitch)*camDistance,focus.y+Math.sin(pitch)*camDistance+1.45,focus.z+Math.cos(yaw)*Math.cos(pitch)*camDistance);
  desired.y=Math.max(desired.y,groundHeight(desired.x,desired.z)+2.5);
- camera.position.lerp(desired,Math.min(1,dt*9));camera.lookAt(focus);
+ // Keep the 3rd-person player visible when the camera passes through tree canopies.
+ const vector=desired.clone().sub(focus),lenSq=vector.lengthSq();
+ let visibleFraction=1;
+ for(const t of cameraTrees){
+  const rx=t.x-focus.x,rz=t.z-focus.z;
+  if(rx*rx+rz*rz>450)continue;
+  const dot=(rx*vector.x+rz*vector.z)/(vector.x*vector.x+vector.z*vector.z+.001);
+  if(dot<=.12||dot>=visibleFraction)continue;
+  const nearX=focus.x+vector.x*dot,nearZ=focus.z+vector.z*dot;
+  const dx=t.x-nearX,dz=t.z-nearZ;
+  if(dx*dx+dz*dz>(1.5*t.s+1.0)**2)continue;
+  const yy=focus.y+vector.y*dot;
+  if(yy>t.y+.8*t.s&&yy<t.y+7.6*t.s)visibleFraction=Math.min(visibleFraction,Math.max(.18,dot-.16));
+ }
+ if(visibleFraction<1)desired.copy(focus).addScaledVector(vector,visibleFraction);
+ camera.position.lerp(desired,Math.min(1,dt*10));camera.lookAt(focus);
  const elapsed=performance.now()*.001;
  water.material.opacity=.85+.018*Math.sin(elapsed*1.4);foamMat.opacity=.26+.065*Math.sin(elapsed*.9);
  minimapDraw();renderer.render(scene,camera);
