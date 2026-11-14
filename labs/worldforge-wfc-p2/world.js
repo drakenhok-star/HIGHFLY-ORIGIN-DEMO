@@ -605,7 +605,7 @@ try{
   }
  },undefined,e=>console.warn('CC0 player fallback:',e?.message));
 }catch(err){console.warn(err)}
-function reset(){hero.position.set(9,groundHeight(9,11),11);state.vy=0;state.air=0;state.dash=0;state.crossings=0;state.blocked=0;state.lastRegion=0;$('#crossings').textContent='0';$('#blocks').textContent='0'}
+function reset(){hero.position.set(9,groundHeight(9,11),11);state.vy=0;state.air=0;state.dash=0;state.water='tierra';state.crossings=0;state.blocked=0;state.lastRegion=0;$('#crossings').textContent='0';$('#blocks').textContent='0'}
 const hiddenCanopyMatrix=new THREE.Matrix4().makeScale(0,0,0);
 const originalCanopyMatrix=new THREE.Matrix4();
 function updateNearFoliage(){
@@ -636,8 +636,8 @@ function updateNearFoliage(){
 
 let visualMode=START_FINISH;
 const descriptions={
-  1:'NORMAL: terreno 4× continuo, materiales básicos. Edificios y jugador conservan su escala.',
-  2:'PREMIUM: mismo suelo físico, colores y texturas mejorados, vegetación complementaria.'
+  1:'NORMAL: terreno 8× continuo en 13 biomas. Agua somera transitable.',
+  2:'PREMIUM: cada hexágono WFC recibe color, detalle y naturaleza, con ciudad y caminos protegidos.'
 };
 function setMode(m){
  visualMode=m;
@@ -653,14 +653,18 @@ function setMode(m){
  document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',Number(b.dataset.mode)===m));
 }
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(Number(b.dataset.mode))));
-document.querySelector(WORLD_KIND==='wfc'?'#worldAuto':'#worldManual').classList.add('world-active');
-$('#brand small').textContent=(WORLD_KIND==='wfc'?'A · PROCEDURAL WFC-LITE':'B · CONSTRUCCIÓN MANUAL')+' · 5 REGIONES 4×';
-function openWorld(kind){
- const u=new URL(location.href);u.searchParams.set('world',kind);u.searchParams.set('finish',visualMode===1?'normal':'premium');
- location.assign(u.href);
-}
-$('#worldAuto').addEventListener('click',()=>openWorld('wfc'));
-$('#worldManual').addEventListener('click',()=>openWorld('manual'));
+$('#brand small').textContent='P2 · 13 BIOMAS 8× · SEMILLA '+SEED;
+$('#seedValue').value=SEED;
+$('#seed').addEventListener('click',()=>$('#seedPopup').classList.toggle('open'));
+$('#closeSeed').addEventListener('click',()=>$('#seedPopup').classList.remove('open'));
+const worldSeed=s=>{
+ const value=String(s||'AETHERIA-07').slice(0,30).replace(/[^a-zA-Z0-9_-]/g,'')||'AETHERIA-07';
+ const url=new URL(location.href);url.searchParams.set('seed',value);url.searchParams.set('finish',visualMode===1?'normal':'premium');location.assign(url.href);
+};
+document.querySelectorAll('[data-seed]').forEach(b=>b.addEventListener('click',()=>worldSeed(b.dataset.seed)));
+$('#applySeed').addEventListener('click',()=>worldSeed($('#seedValue').value));
+$('#regenerate').addEventListener('click',()=>worldSeed('AETHERIA-'+Math.floor(Math.random()*999999).toString().padStart(6,'0')));
+
 $('#fullscreen').addEventListener('click',async()=>{
  try{
   if(document.fullscreenElement)await document.exitFullscreen();
@@ -683,9 +687,9 @@ document.querySelectorAll('[data-region]').forEach(b=>b.addEventListener('click'
  if(reg.id===0)target={x:14,z:19};
  else{
   // Find a walkable nearby location rather than placing the character inside an object or lake.
-  for(const rad of [26,35,45,55,68]){
-   for(let i=0;i<16;i++){
-    const angle=i*TAU/16, x=reg.x+Math.cos(angle)*rad,z=reg.z+Math.sin(angle)*rad;
+  for(const rad of [45,65,90,115,145,165]){
+   for(let i=0;i<24;i++){
+    const angle=i*TAU/24, x=reg.x+Math.cos(angle)*rad,z=reg.z+Math.sin(angle)*rad;
     if(!canEnter(x,z))continue;
     const h=groundHeight(x,z);
     const gradient=Math.max(
@@ -715,7 +719,7 @@ document.querySelectorAll('[data-region]').forEach(b=>b.addEventListener('click'
 }));
 
 
-const state={vy:0,air:0,dash:0,blocked:0,crossings:0,lastRegion:0};
+const state={vy:0,air:0,dash:0,water:'tierra',blocked:0,crossings:0,lastRegion:0};
 let yaw=.6,pitch=.33,camDistance=10.5,dragCam=null,lastPX=0,lastPY=0;
 const keys={KeyW:'w',ArrowUp:'w',KeyS:'s',ArrowDown:'s',KeyA:'a',ArrowLeft:'a',KeyD:'d',ArrowRight:'d'};
 const down={w:false,s:false,a:false,d:false,run:false},joy={x:0,y:0};
@@ -731,7 +735,7 @@ window.addEventListener('keydown',e=>{
  if(e.code==='Digit2')setMode(2);
 });
 window.addEventListener('keyup',e=>{if(keys[e.code])down[keys[e.code]]=false;if(e.code==='ShiftLeft'||e.code==='ShiftRight')down.run=false});
-function jump(){if(state.air<=.01){state.vy=8;state.air=.01}}
+function jump(){if(state.air<=.01&&state.water!=='profunda'){state.vy=8;state.air=.01}}
 function dash(){state.dash=.22}
 $('#jump').addEventListener('pointerdown',e=>{e.preventDefault();jump()});$('#dash').addEventListener('pointerdown',e=>{e.preventDefault();dash()});
 const joystick=$('#joystick'),knob=$('#knob');let joyId=null;
@@ -751,46 +755,62 @@ renderer.domElement.addEventListener('wheel',e=>{camDistance=clamp(camDistance+M
 // Deterministic seam check on all four city-to-region passages.
 function runSeamTest(){
  let maxJump=0,failed=0,counts=[];
- for(const reg of REGIONS.slice(1)){
-  const ux=reg.x/DIST,uz=reg.z/DIST,mid=DIST/2;
+ for(const edge of MAIN_ROADS){
+  const dx=edge.b.x-edge.a.x,dz=edge.b.z-edge.a.z,len=Math.hypot(dx,dz);
+  const ux=dx/len,uz=dz/len,mid={x:(edge.a.x+edge.b.x)/2,z:(edge.a.z+edge.b.z)/2};
   let max=0;
-  for(let i=0;i<=80;i++){
-   const offset=(i-40)*.12;
-   const a=mid+offset-.06,b=mid+offset+.06;
-   max=Math.max(max,Math.abs(groundHeight(ux*a,uz*a)-groundHeight(ux*b,uz*b)));
+  for(let i=0;i<=60;i++){
+   const t=(i-30)*.20;
+   const ax=mid.x+ux*(t-.06),az=mid.z+uz*(t-.06),bx=mid.x+ux*(t+.06),bz=mid.z+uz*(t+.06);
+   max=Math.max(max,Math.abs(groundHeight(ax,az)-groundHeight(bx,bz)));
   }
-  maxJump=Math.max(maxJump,max);
-  if(max>.36)failed++;
-  counts.push(reg.short+': '+max.toFixed(3));
+  maxJump=Math.max(maxJump,max);if(max>.36)failed++;
+  counts.push(edge.a.id+'→'+edge.b.id+':'+max.toFixed(3));
  }
- const pass=failed===0;$('#seamStatus').textContent=pass?'OK · '+maxJump.toFixed(3):'REVISAR '+failed;
+ const pass=failed===0;
+ $('#seamStatus').textContent=pass?'OK · '+maxJump.toFixed(3):'REVISAR '+failed;
  $('#seamStatus').style.color=pass?'#85e3ae':'#ffae9d';
- $('#desc').textContent='TEST CONTINUIDAD · '+counts.join(' | ')+' u / 0,12 m. (No sustituye la física real de PHOENIX).';
- return {pass,maxJump,counts};
+ $('#desc').textContent='12 enlaces: '+(pass?'continuidad OK':'revisar uniones')+' · máximo '+maxJump.toFixed(3)+' u/0,12 m. Terreno de prueba, no motor PHOENIX.';
+ return {pass,maxJump,failed,counts};
 }
+
 $('#test').addEventListener('click',runSeamTest);
 window.HIGHFLY_TEST={runSeamTest,groundHeight,regionAt,regions:REGIONS,reset,setMode,
- worldMode:WORLD_KIND,sizeRatio:4,
+ worldMode:WORLD_KIND,sizeRatio:8,seed:SEED,biomeCount:REGIONS.length,waterAt:waterAt,lakes:LAKES,waterSwimReady:false,
  wfcStats:()=>WFC_MAPS.map(m=>({id:m.reg.id,cells:m.cells.length,repairs:m.repairs,iterations:m.iterations})),
  getPlayerPosition:()=>({x:hero.position.x,y:hero.position.y,z:hero.position.z}),
  getJoystick:()=>({...joy}),getFinish:()=>visualMode,isFullscreen:()=>!!document.fullscreenElement};
 
 const minimap=$('#minimap'),ctx=minimap.getContext('2d'),mapW=minimap.width,mapH=minimap.height;
-function mapPoint(x,z){return [mapW/2+x*.56,mapH/2-z*.39]}
+function mapPoint(x,z){return [mapW/2+x*.12,mapH/2-(z-230)*.10]}
 function minimapDraw(){
  ctx.clearRect(0,0,mapW,mapH);ctx.fillStyle='#101c2d';ctx.fillRect(0,0,mapW,mapH);
  for(const r of REGIONS){
    ctx.beginPath();for(let i=0;i<6;i++){const a=Math.PI/2-i*Math.PI/3,[x,y]=mapPoint(r.x+R*Math.cos(a),r.z+R*Math.sin(a));if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
    ctx.closePath();ctx.fillStyle=r.c;ctx.fill();ctx.strokeStyle='#dfcea6';ctx.lineWidth=1.2;ctx.stroke();
-   const [cx,cy]=mapPoint(r.x,r.z);ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillStyle=r.id===2?'#47321c':'#fff';ctx.fillText(['C','B','D','M','N'][r.id],cx,cy+4);
+   const [cx,cy]=mapPoint(r.x,r.z);ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillStyle=r.id===2?'#47321c':'#fff';ctx.fillText(['C','B','D','M','N','P','J','V','S','K','L','O','T'][r.id],cx,cy+4);
  }
  const [x,y]=mapPoint(hero.position.x,hero.position.z);ctx.fillStyle='#241230';ctx.beginPath();ctx.arc(x,y,7,0,TAU);ctx.fill();ctx.fillStyle='#ffdc8e';ctx.beginPath();ctx.arc(x,y,4.5,0,TAU);ctx.fill();
+}
+// Spatial collision buckets: avoids scanning thousands of trees each movement step.
+const COLLIDER_GRID=new Map(), COLLISION_CELL=20;
+for(const collider of colliders){
+ const kx=Math.floor(collider.x/COLLISION_CELL),kz=Math.floor(collider.z/COLLISION_CELL);
+ const key=kx+','+kz;
+ if(!COLLIDER_GRID.has(key))COLLIDER_GRID.set(key,[]);
+ COLLIDER_GRID.get(key).push(collider);
 }
 function canEnter(x,z){
  const reg=regionAt(x,z);if(!reg)return false;
  const h=groundHeight(x,z);
- if(reg.id===4 && h < -1.68)return false;
- for(const c of colliders){const dx=x-c.x,dz=z-c.z;if(dx*dx+dz*dz<(c.r+.5)**2)return false}
+ const water=waterAt(x,z,h);
+ if(water.kind==='profunda')return false;
+ const cx=Math.floor(x/COLLISION_CELL),cz=Math.floor(z/COLLISION_CELL);
+ for(let xx=cx-1;xx<=cx+1;xx++)for(let zz=cz-1;zz<=cz+1;zz++){
+  for(const c of COLLIDER_GRID.get(xx+','+zz)||[]){
+   const dx=x-c.x,dz=z-c.z;if(dx*dx+dz*dz<(c.r+.5)**2)return false;
+  }
+ }
  return true;
 }
 function climbAllowed(from,to,distance){
@@ -815,13 +835,20 @@ function loop(){
  if(mag>.06){
   const fx=-Math.sin(yaw),fz=-Math.cos(yaw),rx=Math.cos(yaw),rz=-Math.sin(yaw);
   const nx=(rx*ix+fx*iz)/Math.max(1,mag),nz=(rz*ix+fz*iz)/Math.max(1,mag);
-  const speed=(down.run||Math.hypot(joy.x,joy.y)>.95?11.2:7.2)*(state.dash>0?2.25:1);
+  const depthNow=waterAt(hero.position.x,hero.position.z,groundHeight(hero.position.x,hero.position.z));
+  const waterSpeed=depthNow.kind==='vadeo'?.42:depthNow.kind==='orilla'?.78:1;
+  const speed=(down.run||Math.hypot(joy.x,joy.y)>.95?11.2:7.2)*(state.dash>0?2.25:1)*waterSpeed;
   walking=movePlayer(nx*speed*dt,nz*speed*dt,dt);running=down.run||Math.hypot(joy.x,joy.y)>.95||state.dash>0;
   if(walking)hero.rotation.y=Math.atan2(nx,nz);
  }
  if(state.dash>0)state.dash=Math.max(0,state.dash-dt);
  if(state.air>0||state.vy>0){state.vy-=21*dt;state.air=Math.max(0,state.air+state.vy*dt);if(state.air===0)state.vy=0;}
- const gh=groundHeight(hero.position.x,hero.position.z);hero.position.y=gh+state.air;
+ const gh=groundHeight(hero.position.x,hero.position.z);
+ const waterNow=waterAt(hero.position.x,hero.position.z,gh);
+ state.water=waterNow.kind;
+ const label={tierra:'TIERRA FIRME',orilla:'AGUA POCO PROFUNDA',vadeo:'VADEO · MOVIMIENTO LENTO',profunda:'AGUA PROFUNDA · NATACIÓN PENDIENTE'};
+ $('#waterState').textContent=' · '+label[waterNow.kind]+(waterNow.depth?(' ('+waterNow.depth.toFixed(1)+'m)'):'');
+ hero.position.y=gh+state.air;
  const current=regionAt(hero.position.x,hero.position.z);
  if(current&&current.id!==state.lastRegion){state.crossings++;state.lastRegion=current.id;$('#crossings').textContent=String(state.crossings)}
  if(current)$('#biomeName').textContent=current.name;
@@ -840,7 +867,7 @@ function loop(){
  water.material.opacity=.85+.018*Math.sin(elapsed*1.4);foamMat.opacity=.26+.065*Math.sin(elapsed*.9);
  minimapDraw();renderer.render(scene,camera);
 }
-runSeamTest();$('#desc').textContent=descriptions[0];$('#loadingtxt').textContent='Terreno creado. Cargando exploración...';
+runSeamTest();$('#desc').textContent=descriptions[START_FINISH]+' · Semilla '+SEED;$('#loadingtxt').textContent='Terreno creado. Cargando exploración...';
 requestAnimationFrame(loop);
 setTimeout(()=>{const el=$('#loading');el.style.opacity='0';setTimeout(()=>el.remove(),600)},600);
-window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.35))});
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.25))});
