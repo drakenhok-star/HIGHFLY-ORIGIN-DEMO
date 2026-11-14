@@ -543,9 +543,16 @@ document.querySelectorAll('[data-region]').forEach(b=>b.addEventListener('click'
      Math.abs(groundHeight(x+2,z)-h),
      Math.abs(groundHeight(x,z+2)-h)
     );
-    if(gradient<.8){target={x,z};break}
+    if(gradient<.8){
+     if(!target)target={x,z};
+     let clearing=true;
+     for(const p of cameraTrees){const dx=p.x-x,dz=p.z-z;const rad=3.6*p.s+1.1;
+      if(dx*dx+dz*dz<rad*rad){clearing=false;break}
+     }
+     if(clearing){target={x,z,clear:true};break}
+    }
    }
-   if(target)break;
+   if(target?.clear)break;
   }
  }
  if(target){
