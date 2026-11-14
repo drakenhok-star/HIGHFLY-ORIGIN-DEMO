@@ -22,9 +22,18 @@ try{
  const stick=page.locator('#joystick');notes.push('joystick visible: '+await stick.isVisible());
  const rect=await stick.boundingBox();if(!rect)failures.push('joystick has no bounding box');else{
   const x=rect.x+rect.width/2,y=rect.y+rect.height/2;
-  await page.touchscreen.tap(x,y);
-  await page.evaluate(()=>{const knob=document.querySelector('#knob');knob.style.border='3px solid lime'});
-  notes.push('touch joystick tap successful');
+  const beforePos=await page.evaluate(()=>window.HIGHFLY_TEST.getPlayerPosition());
+  const client=await context.newCDPSession(page);
+  await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+  await client.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x+26,y:y-26}]});
+  await page.waitForTimeout(900);
+  const joyVal=await page.evaluate(()=>window.HIGHFLY_TEST.getJoystick());
+  const afterPos=await page.evaluate(()=>window.HIGHFLY_TEST.getPlayerPosition());
+  await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  const dist=Math.hypot(afterPos.x-beforePos.x,afterPos.z-beforePos.z);
+  notes.push('touch joystick: '+JSON.stringify(joyVal)+' displacement='+dist.toFixed(3));
+  if(dist<.20)failures.push('Android joystick did not move player, distance='+dist);
+  await client.detach();
  }
  const before=await page.evaluate(()=>({x:document.querySelector('#biomeName').textContent,mode:document.querySelector('#modeLabel').textContent}));
  await page.locator('[data-mode="1"]').click();notes.push('mode switched: '+await page.locator('#modeLabel').innerText());
