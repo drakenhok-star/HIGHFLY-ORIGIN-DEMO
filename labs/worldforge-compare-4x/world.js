@@ -237,17 +237,106 @@ createForestShrine(forest);
 createDesertTemple(desert);
 createMountainStronghold(mountain);
 createSnowBeacon(snow);
-// City homes and wall-like towers.
-for(const [x,z] of [[-12,-11],[-13,4],[-12,16],[12,12],[12,-10],[2,17],[-1,-16],[16,0]])createHouse(x,z,hash(x+z)>.5?materials.roof:materials.roofBlue,.83);
-for(const a of [0,Math.PI/2,Math.PI,3*Math.PI/2]){
- const x=Math.sin(a)*23,z=Math.cos(a)*23;
- createTower(x,z,materials.roof);
+// Expanded authored world. Buildings stay at real character scale as land grows.
+for(let i=0;i<40;i++){
+ const ring=i<17?33:i<29?61:92,angle=i*2.39996+.2;
+ const rr=ring+(hash(i*39)-.5)*12,x=Math.cos(angle)*rr,z=Math.sin(angle)*rr;
+ if(!inside(x,z,R-9)||Math.abs(x)<8&&Math.abs(z)<12||Math.abs(x+z)<6)continue;
+ createHouse(x,z,i%4===0?materials.roofBlue:i%3===0?materials.roofGold:materials.roof,.76+hash(i*13)*.23);
 }
-// Five unique landmark buildings, plus smaller outposts.
-for(let i=0;i<4;i++){const a=i*Math.PI/2+Math.PI/4;const x=forest.x+Math.cos(a)*12,z=forest.z+Math.sin(a)*12;if(Math.hypot(x-forest.x,z-forest.z)>8)createHouse(x,z,materials.roofGreen,.78)}
-for(const [x,z] of [[desert.x+13,desert.z+10],[desert.x-14,desert.z+6]])createHouse(x,z,materials.roofGold,.88);
-for(const [x,z] of [[mountain.x+9,mountain.z+11],[mountain.x-10,mountain.z+8]])createHouse(x,z,materials.roofBlue,.72);
-createHouse(snow.x+9,snow.z+3,materials.roofBlue,.8);
+for(let i=0;i<6;i++){const a=i*TAU/6;createTower(Math.sin(a)*84,Math.cos(a)*84,materials.roof)}
+for(let i=0;i<12;i++){
+ const a=i*TAU/12,rad=35+hash(i*52)*62,x=forest.x+Math.cos(a)*rad,z=forest.z+Math.sin(a)*rad;
+ if(inside(x-forest.x,z-forest.z,R-12))createHouse(x,z,materials.roofGreen,.72+hash(i*9)*.26);
+}
+for(let i=0;i<8;i++){
+ const a=i*TAU/8,x=desert.x+Math.sin(a)*57,z=desert.z+Math.cos(a)*49;
+ if(inside(x-desert.x,z-desert.z,R-12))createHouse(x,z,materials.roofGold,.82);
+}
+for(let i=0;i<7;i++){
+ const a=i*TAU/7,x=mountain.x+Math.sin(a)*73,z=mountain.z+Math.cos(a)*75;
+ if(inside(x-mountain.x,z-mountain.z,R-11))createHouse(x,z,materials.roofBlue,.72);
+}
+for(let i=0;i<7;i++){
+ const a=i*TAU/7,x=snow.x+Math.sin(a)*54,z=snow.z+Math.cos(a)*55;
+ if(inside(x-snow.x,z-snow.z,R-11)&&groundHeight(x,z)>0)createHouse(x,z,materials.roofBlue,.8);
+}
+// WorldForge WFC-lite: six-neighbor hex rule propagation controls land-use and outposts.
+// This is an independent compact implementation, not a direct port of Felix Turner's full WFC.
+const WFC_TYPES=['MEADOW','WOODS','THICKET','ROCK','WATER','HAMLET','TRACK','SNOW','SAND'];
+const NEIGHBORS=[[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,1]];
+const WFC_ALLOWED={
+ MEADOW:WFC_TYPES,WOODS:['MEADOW','WOODS','THICKET','ROCK','TRACK','HAMLET','SNOW'],
+ THICKET:['MEADOW','WOODS','THICKET','ROCK'],
+ ROCK:['MEADOW','WOODS','THICKET','ROCK','TRACK','HAMLET','SNOW','SAND'],
+ WATER:['MEADOW','WATER','SAND','WOODS'],
+ HAMLET:['MEADOW','WOODS','ROCK','TRACK','HAMLET','SNOW','SAND'],
+ TRACK:['MEADOW','WOODS','ROCK','HAMLET','TRACK','SNOW','SAND'],
+ SNOW:['MEADOW','WOODS','ROCK','TRACK','HAMLET','SNOW'],
+ SAND:['MEADOW','ROCK','WATER','HAMLET','TRACK','SAND']
+};
+const WEIGHTS=[
+ [8,2,.8,.6,0,1.6,2.2,0,0],
+ [3,6,7,2,.35,.45,1.2,0,0],
+ [1,0,0,2,1.5,.7,1.3,0,8],
+ [2,1,.15,8,0,.25,.6,1.5,0],
+ [1,1.3,.3,3,.5,.55,1.3,9,.8]
+];
+const WFC_RAD=8,WFC_STEP=R/(1.5*(WFC_RAD+1)),WFC_MAPS=[];
+function bitCount(m){let n=0;while(m){m&=m-1;n++}return n}
+function firstBit(m){for(let i=0;i<WFC_TYPES.length;i++)if(m&(1<<i))return i;return 0}
+function makeWFC(reg){
+ const list=[],lookup=new Map(),weights=WEIGHTS[reg.id];
+ let allowed=0;for(let i=0;i<9;i++)if(weights[i]>0)allowed|=1<<i;
+ for(let q=-WFC_RAD;q<=WFC_RAD;q++)for(let r=-WFC_RAD;r<=WFC_RAD;r++){
+  if(Math.abs(q+r)>WFC_RAD)continue;
+  const x=reg.x+SQ3*WFC_STEP*(q+r/2),z=reg.z+1.5*WFC_STEP*r;
+  const cell={q,r,x,z,mask:allowed,label:'MEADOW'};
+  if(q===0&&r===0)cell.mask=(1<<(reg.id===0?0:5));
+  list.push(cell);lookup.set(q+','+r,cell);
+ }
+ const allowedMasks=WFC_TYPES.map(t=>WFC_ALLOWED[t].reduce((m,n)=>m|(1<<WFC_TYPES.indexOf(n)),0));
+ let repairs=0,iterations=0;
+ function propagate(start){
+  const queue=[start];
+  while(queue.length){
+   const item=queue.pop(),m=item.mask;let union=0;
+   for(let i=0;i<9;i++)if(m&(1<<i))union|=allowedMasks[i];
+   for(const [dq,dr] of NEIGHBORS){
+    const other=lookup.get((item.q+dq)+','+(item.r+dr));
+    if(!other)continue;
+    let next=other.mask&union;
+    if(!next){next=1;repairs++}
+    if(next!==other.mask){other.mask=next;queue.push(other)}
+   }
+  }
+ }
+ propagate(lookup.get('0,0'));
+ for(let turn=0;turn<list.length;turn++){
+  let min=99,candidates=[];
+  for(const c of list){const count=bitCount(c.mask);if(count<=1)continue;
+   if(count<min){min=count;candidates=[c]}else if(count===min)candidates.push(c)}
+  if(!candidates.length)break;
+  const pick=candidates[Math.floor(hash((reg.id+1)*791+turn*3.17)*candidates.length)];
+  let sum=0;for(let i=0;i<9;i++)if(pick.mask&(1<<i))sum+=weights[i];
+  let draw=hash((turn+1)*557+reg.id*193)*sum,chosen=firstBit(pick.mask);
+  for(let i=0;i<9;i++){if(!(pick.mask&(1<<i)))continue;draw-=weights[i];if(draw<=0){chosen=i;break}}
+  pick.mask=1<<chosen;propagate(pick);iterations++;
+ }
+ for(const c of list)c.label=WFC_TYPES[firstBit(c.mask)];
+ return {reg,lookup,cells:list,repairs,iterations};
+}
+if(WORLD_KIND==='wfc')for(const r of REGIONS)WFC_MAPS.push(makeWFC(r));
+function wfcAt(x,z){
+ if(WORLD_KIND!=='wfc')return 'MEADOW';
+ const r=regionAt(x,z);if(!r)return 'MEADOW';
+ const rf=(2/3*(z-r.z))/WFC_STEP,qf=(x-r.x)/(SQ3*WFC_STEP)-rf/2;
+ let q=Math.round(qf),rr=Math.round(rf),yy=Math.round(-qf-rf);
+ const dq=Math.abs(q-qf),dr=Math.abs(rr-rf),dy=Math.abs(yy+qf+rf);
+ if(dq>dr&&dq>dy)q=-rr-yy;else if(dr>dy)rr=-q-yy;
+ return WFC_MAPS[r.id]?.lookup.get(q+','+rr)?.label||'MEADOW';
+}
+
 // Instanced flora; independent from collision geometry, keeps mobile draw calls low.
 function createVegetation(){
  const pineTrunkGeo=new THREE.CylinderGeometry(.13,.25,1.9,5),
@@ -257,27 +346,30 @@ function createVegetation(){
  const specs={green:[],dark:[],snow:[],palm:[],rocks:[],bushes:[]};
  let serial=0;
  for(const r of REGIONS){
-  const total=[60,280,32,69,90][r.id];
+  const total=[360,2200,450,750,840][r.id];
   for(let i=0;i<total;i++){
     let dx=(hash(i*41+r.id*303+2)-.5)*R*1.76,
         dz=(hash(i*53+r.id*133+6)-.5)*R*1.80;
-    if(!inside(dx,dz,R-2.8))continue;
+    if(!inside(dx,dz,R-11))continue;
     const x=r.x+dx,z=r.z+dz;
-    if(Math.hypot(dx,dz)<(r.id===0?19:r.id===2?11:8))continue;
+    if(Math.hypot(dx,dz)<(r.id===0?50:r.id===2?24:16))continue;
     const h=groundHeight(x,z);
-    if(r.id===4&&(h<-.7||h>13))continue;
-    if(r.id===3&&h>14)continue;
-    if(r.id===2&&Math.hypot(dx-6,dz-7)<11)continue;
-    const size=.8+hash(i*11+r.id*223)*.75;
+    if(r.id===4&&(h<-.7||h>29))continue;
+    if(r.id===3&&h>34)continue;
+    if(r.id===2&&(Math.hypot(dx-24,dz-28)<28||Math.hypot(dx-24,dz-28)>76&&hash(i*41)>.21))continue;
+    if(r.id!==0){const ux=r.x/DIST,uz=r.z/DIST;if(Math.abs(dx*uz-dz*ux)<9&&Math.hypot(dx,dz)>16)continue}
+    const tile=wfcAt(x,z);
+    if(WORLD_KIND==='wfc'&&(tile==='TRACK'||tile==='HAMLET'||tile==='WATER'||tile==='MEADOW'&&hash(i*7+r.id)<.66||tile==='ROCK'&&hash(i*17)<.6))continue;
+    const size=(.8+hash(i*11+r.id*223)*.75)*(WORLD_KIND==='wfc'&&tile==='THICKET'?1.15:1);
     const pick=r.id===4?'snow':(r.id===1||r.id===0?'dark':r.id===2?'palm':'green');
     specs[pick].push({x,z,y:h,s:size,k:i+r.id*600});
     if(serial++%5===0)specs.bushes.push({x:x+2,z:z+1,y:groundHeight(x+2,z+1),s:.45+hash(i*3)*.7,k:i});
   }
-  for(let i=0;i<45;i++){
+  for(let i=0;i<145;i++){
    const dx=(hash(i*97+r.id*154+2)-.5)*R*1.62,dz=(hash(i*103+r.id*24+9)-.5)*R*1.62;
-   if(!inside(dx,dz,R-3.4)||Math.hypot(dx,dz)<8)continue;
+   if(!inside(dx,dz,R-12)||Math.hypot(dx,dz)<21)continue;
    const x=r.x+dx,z=r.z+dz,y=groundHeight(x,z);
-   if(y< -1)continue; specs.rocks.push({x,z,y,s:.45+hash(i*10+r.id)*1.25,k:i});
+   if(y< -1)continue; if(WORLD_KIND==='wfc'&&wfcAt(x,z)==='WATER')continue; specs.rocks.push({x,z,y,s:.45+hash(i*10+r.id)*1.25,k:i});
   }
  }
  const dummy=new THREE.Object3D();
@@ -300,17 +392,17 @@ function createVegetation(){
 }
 createVegetation();
 // Tall stone formations, water oasis and shoreline.
-for(let i=0;i<18;i++){
- let dx=(hash(i*18+6)-.5)*56,dz=(hash(i*31+7)-.5)*56;
+for(let i=0;i<38;i++){
+ let dx=(hash(i*18+6)-.5)*R*1.5,dz=(hash(i*31+7)-.5)*R*1.5;
  if(!inside(dx,dz,R-5)||Math.hypot(dx,dz)<7)continue;
  let x=mountain.x+dx,z=mountain.z+dz,y=groundHeight(x,z);
- cone(2.2+hash(i*9)*2.3,7+hash(i*15)*11,5,materials.darkStone,x,y+3.5,z);
+ const ph=8+hash(i*15)*18;cone(2.2+hash(i*9)*3.1,ph,5,materials.darkStone,x,y+ph/2,z);solid(x,z,2.2+hash(i*9)*3.1);
 }
-const oasisX=desert.x+6,oasisZ=desert.z+7;
-const oasis=mesh(new THREE.CircleGeometry(7.25,48),materials.water,oasisX,.22,oasisZ);oasis.rotation.x=-Math.PI/2;
-const oasisRim=mesh(new THREE.RingGeometry(7.1,8.3,48),new THREE.MeshStandardMaterial({color:'#b9ad7e',side:THREE.DoubleSide}),oasisX,.17,oasisZ);oasisRim.rotation.x=-Math.PI/2;
+const oasisX=desert.x+24,oasisZ=desert.z+28;
+const oasis=mesh(new THREE.CircleGeometry(28.5,56),materials.water,oasisX,.22,oasisZ);oasis.rotation.x=-Math.PI/2;
+const oasisRim=mesh(new THREE.RingGeometry(28.3,31.5,56),new THREE.MeshStandardMaterial({color:'#b9ad7e',side:THREE.DoubleSide}),oasisX,.17,oasisZ);oasisRim.rotation.x=-Math.PI/2;
 for(let i=0;i<20;i++){
- const a=i*TAU/20,dist=9.6+hash(i*12)*3,x=oasisX+Math.cos(a)*dist,z=oasisZ+Math.sin(a)*dist,y=groundHeight(x,z);
+ const a=i*TAU/20,dist=34+hash(i*12)*7,x=oasisX+Math.cos(a)*dist,z=oasisZ+Math.sin(a)*dist,y=groundHeight(x,z);
  cylinder(.16,.26,5.8,6,materials.wood,x,y+2.9,z);
  for(let leaf=0;leaf<5;leaf++){const g=cone(1.55,3.0,5,new THREE.MeshStandardMaterial({color:leaf%2?'#46986c':'#6ca86e'}),x+Math.sin(leaf*TAU/5)*1.0,y+6.1,z+Math.cos(leaf*TAU/5)*1);g.rotation.z=.65*Math.sin(leaf*TAU/5);}
 }
@@ -332,21 +424,37 @@ function pathMesh(points,width=2.5,mat=roadMaterial,extra=.09){
 }
 for(const r of REGIONS.slice(1)){
  const len=Math.hypot(r.x,r.z),ux=r.x/len,uz=r.z/len,pts=[];
- for(let i=0;i<=48;i++){const t=8+(len-7)*i/48;pts.push([ux*t+Math.sin(i*.21)*.35,uz*t+Math.cos(i*.17)*.3])}
- if(r.id===4){pathMesh(pts,3.2,bridgeMat,.14)}
- else pathMesh(pts,3.1,roadMaterial,.08);
+ for(let i=0;i<=100;i++){const t=8+(len-7)*i/100;pts.push([ux*t+Math.sin(i*.12)*.35,uz*t+Math.cos(i*.17)*.3])}
+ if(r.id===4){pathMesh(pts,6.2,bridgeMat,.14)}
+ else pathMesh(pts,5.1,roadMaterial,.08);
 }
 function buildBridge(){
  const ux=.5,uz=-SQ3/2,vx=SQ3/2,vz=.5;
- for(let t=23;t<=DIST-14;t+=1.22){
+ for(let t=70;t<=DIST-70;t+=1.22){
    const x=ux*t,z=uz*t,y=groundHeight(x,z);
-   const m=cube(4.8,.25,1.1,materials.wood,x,y+.18,z);m.rotation.y=Math.atan2(ux,uz);
+   const m=cube(7.8,.25,1.16,materials.wood,x,y+.18,z);m.rotation.y=Math.atan2(ux,uz);
    if(Math.floor(t*2)%7<2){for(const side of [-1,1]){
-    const px=x+vx*side*2.3,pz=z+vz*side*2.3,py=groundHeight(px,pz);
+    const px=x+vx*side*3.7,pz=z+vz*side*3.7,py=groundHeight(px,pz);
     cylinder(.15,.15,2.2,6,materials.wood,px,py+1.15,pz);
    }}
  }
 }buildBridge();
+// Auto-generated secondary hamlets from collapsed WFC cells.
+if(WORLD_KIND==='wfc'){
+ let placed=0;
+ for(const map of WFC_MAPS){
+  let added=0;
+  for(const cell of map.cells){
+   if(cell.label!=='HAMLET'||added>=6||Math.hypot(cell.x-map.reg.x,cell.z-map.reg.z)<30)continue;
+   if(!inside(cell.x-map.reg.x,cell.z-map.reg.z,R-14)||groundHeight(cell.x,cell.z)<-.5)continue;
+   if(Math.hypot(cell.x,cell.z)<28)continue;
+   createHouse(cell.x,cell.z,map.reg.id===1?materials.roofGreen:map.reg.id===2?materials.roofGold:map.reg.id===4?materials.roofBlue:materials.roof,.72+hash(placed*13)*.25);
+   const track=[];for(let i=0;i<16;i++){const u=i/15;track.push([lerp(cell.x,map.reg.x,u),lerp(cell.z,map.reg.z,u)])}
+   pathMesh(track,1.6,roadMaterial,.08);added++;placed++;
+  }
+ }
+}
+
 // Hexagonal piece overlay: only changes appearance. No seams in character collision.
 const tileLayer=new THREE.Group();scene.add(tileLayer);
 const rad=1.5,hexGeo=new THREE.CylinderGeometry(rad,rad,.21,6),
