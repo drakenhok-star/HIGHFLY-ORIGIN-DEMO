@@ -474,7 +474,7 @@ fallback();let mixer=null;
 try{
  new GLTFLoader().load('../../assets/models/player_barbarian.glb',g=>{
   const model=g.scene;model.scale.setScalar(.8);
-  model.traverse(o=>{if(o.isMesh){o.frustumCulled=false;}if(o.name&&/(axe|shield|mug|cape)/i.test(o.name))o.visible=false});
+  model.traverse(o=>{if(o.isMesh){o.frustumCulled=false;o.material=Array.isArray(o.material)?o.material.map(m=>m.clone()):o.material.clone();}if(o.name&&/(axe|shield|mug|cape)/i.test(o.name))o.visible=false});
   visual.clear();visual.add(model);
   if(g.animations?.length){
    mixer=new THREE.AnimationMixer(model);
@@ -690,8 +690,21 @@ function loop(){
   const yy=focus.y+vector.y*dot;
   if(yy>t.y+.8*t.s&&yy<t.y+7.6*t.s)visibleFraction=Math.min(visibleFraction,Math.max(.18,dot-.16));
  }
- if(visibleFraction<1)desired.copy(focus).addScaledVector(vector,visibleFraction);
- camera.position.lerp(desired,Math.min(1,dt*10));camera.lookAt(focus);
+ // When foliage intersects the camera ray, rise slightly above it instead of zooming inside a pine.
+ const foliageBlocked=visibleFraction<.99;
+ if(foliageBlocked)desired.y+=8.5;
+ if(hero.userData.foliageBlocked!==foliageBlocked){
+  hero.userData.foliageBlocked=foliageBlocked;
+  visual.traverse(o=>{
+   if(!o.isMesh)return;
+   o.renderOrder=foliageBlocked?999:0;
+   for(const mat of Array.isArray(o.material)?o.material:[o.material]){
+    if(!mat)continue;
+    mat.depthTest=!foliageBlocked;mat.depthWrite=true;
+   }
+  });
+ }
+ camera.position.lerp(desired,Math.min(1,dt*9));camera.lookAt(focus);
  const elapsed=performance.now()*.001;
  water.material.opacity=.85+.018*Math.sin(elapsed*1.4);foamMat.opacity=.26+.065*Math.sin(elapsed*.9);
  minimapDraw();renderer.render(scene,camera);
