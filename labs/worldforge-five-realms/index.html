@@ -37,5 +37,26 @@
 <div id="acts"><button id="jump">SALTO</button><button id="dash">DASH</button></div>
 <div id="tooltip">WASD mover · mouse arrastrar cámara · ESPACIO salto · SHIFT correr · Q dash</div>
 <div id="bottom" class="panel"><h2>CAMBIÁ LA REPRESENTACIÓN SIN CAMBIAR EL SUELO FÍSICO</h2><div id="modes"><button class="active" data-mode="0">1 · HEX MODULAR</button><button data-mode="1">2 · CAPA CONTINUA</button><button data-mode="2">3 · PREMIUM</button><button id="test">TEST UNIONES</button><button id="reset">VOLVER CIUDAD</button></div><div id="desc">Piezas hexagonales visibles; movimiento con una superficie de altura compartida.</div></div>
+<script>
+(function(){
+ let shown=false;
+ const showError=function(message){
+   if(shown)return;shown=true;
+   const panel=document.getElementById('loading'),msg=document.getElementById('loadingtxt');
+   if(!panel||!msg)return;
+   panel.style.opacity='1';panel.style.pointerEvents='auto';
+   msg.textContent='ERROR AL INICIAR: '+String(message||'Error desconocido').slice(0,220);
+   msg.style.maxWidth='min(92vw,540px)';msg.style.textAlign='center';msg.style.color='#ffc2ae';
+   const bar=document.getElementById('loadbar');if(bar)bar.style.display='none';
+   const retry=document.createElement('button');retry.textContent='REINTENTAR CARGA';retry.style.cssText='padding:12px 22px;background:#e6be78;border:0;border-radius:10px;color:#211629;font-weight:800;cursor:pointer';
+   retry.onclick=function(){location.reload()};panel.append(retry);
+   const hint=document.createElement('small');hint.textContent='Si vuelve a fallar, enviame una captura con este mensaje.';hint.style.textAlign='center';panel.append(hint);
+ };
+ window.HIGHFLY_SHOW_ERROR=showError;
+ window.addEventListener('error',function(e){if(e.message)showError(e.message)},true);
+ window.addEventListener('unhandledrejection',function(e){showError(e.reason&&e.reason.message||String(e.reason))});
+ setTimeout(function(){if(!window.HIGHFLY_TEST&&document.getElementById('loading'))showError('La escena no respondió. Verificá WebGL y la conexión de red.')},30000);
+})();
+</script>
 <script type="module" src="./world.js"></script>
 </body></html>
