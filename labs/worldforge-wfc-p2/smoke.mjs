@@ -34,6 +34,18 @@ for(const seed of ['AETHERIA-07','VALLE-21']){
   if(qa.free.failed>0||qa.free.loaded<12)failures.push(seed+' missing real CC0 buildings '+JSON.stringify(qa.free));
   const kinds=new Set(qa.water.flatMap(l=>l.levels));
   if(!kinds.has('orilla')||!kinds.has('vadeo')||!kinds.has('profunda'))failures.push(seed+' water progression missing '+[...kinds]);
+  const waterAccess=await page.evaluate(()=>{
+    const t=window.HIGHFLY_TEST, found={shore:0,wade:0,deepBlocked:0};
+    for(const l of t.lakes)for(let i=0;i<40;i++)for(let k=0;k<8;k++){
+      const ang=k*Math.PI/4,r=l.r*i/40,x=l.x+Math.cos(ang)*r,z=l.z+Math.sin(ang)*r;
+      const w=t.waterAt(x,z,t.groundHeight(x,z)),allowed=t.canEnter(x,z);
+      if(w.kind==='orilla'&&allowed)found.shore++;
+      if(w.kind==='vadeo'&&allowed)found.wade++;
+      if(w.kind==='profunda'&&!allowed)found.deepBlocked++;
+    }return found;
+   });
+   logs.push(seed+' WATER ACCESS '+JSON.stringify(waterAccess));
+   if(waterAccess.shore===0||waterAccess.wade===0||waterAccess.deepBlocked===0)failures.push(seed+' water entry states not accessible');
   const joystick=page.locator('#joystick'),box=await joystick.boundingBox();
   if(!box){failures.push(seed+' joystick not visible');continue}
   const posA=await page.evaluate(()=>window.HIGHFLY_TEST.getPlayerPosition());
@@ -62,6 +74,12 @@ for(const seed of ['AETHERIA-07','VALLE-21']){
   await page.locator('#fullscreen').click();await page.waitForTimeout(100);
   logs.push(seed+' FULLSCREEN '+await page.evaluate(()=>!!document.fullscreenElement));
   await page.locator('#reset').click();
+  await page.waitForTimeout(1100);
+  const view=await page.evaluate(()=>window.HIGHFLY_TEST.getHeroView());
+  logs.push(seed+' THIRD PERSON '+JSON.stringify(view));
+  if(Math.abs(view.projected.x)>.8||Math.abs(view.projected.y)>.9||view.distance>21||view.children<1)failures.push(seed+' hero not properly framed in third person');
+  await page.locator('#toggleHud').click();
+  if(!(await page.locator('#bottom').evaluate(e=>e.classList.contains('collapsed'))))failures.push(seed+' collapse HUD failed');
   await page.screenshot({path:'/tmp/hf-p2-'+seed+'.png'});
  }catch(e){failures.push(seed+' EXCEPTION '+e.message)}
 }
