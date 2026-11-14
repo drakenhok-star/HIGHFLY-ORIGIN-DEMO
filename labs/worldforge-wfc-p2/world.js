@@ -25,6 +25,42 @@ const REGIONS=[
 ];
 for(const reg of REGIONS){reg.x=SQ3*R*(reg.q+reg.r/2);reg.z=1.5*R*reg.r}
 const HEX_LOOKUP=new Map(REGIONS.map(r=>[r.q+','+r.r,r]));
+const HEX_DIRECTIONS=[[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,1]];
+const hexDistance=r=>(Math.abs(r.q)+Math.abs(r.r)+Math.abs(r.q+r.r))/2;
+const MAIN_ROADS=[];
+for(const r of REGIONS.slice(1)){
+ const parent=HEX_DIRECTIONS.map(([dq,dr])=>HEX_LOOKUP.get((r.q+dq)+','+(r.r+dr)))
+  .filter(x=>x&&hexDistance(x)<hexDistance(r)).sort((a,b)=>hexDistance(a)-hexDistance(b))[0];
+ if(parent)MAIN_ROADS.push({a:parent,b:r});
+}
+const LAKES=[
+ {reg:0,dx:138,dz:-88,r:44,level:.75,type:'lago'},
+ {reg:2,dx:52,dz:58,r:66,level:.95,type:'oasis'},
+ {reg:4,dx:65,dz:69,r:64,level:-.18,type:'lago glaciar'},
+ {reg:5,dx:-48,dz:45,r:89,level:.90,type:'pantano'},
+ {reg:6,dx:76,dz:64,r:50,level:.86,type:'laguna'},
+ {reg:10,dx:75,dz:-18,r:108,level:.70,type:'bahía'},
+ {reg:12,dx:-48,dz:78,r:58,level:.48,type:'lago helado'}
+];
+for(const lake of LAKES){lake.x=REGIONS[lake.reg].x+lake.dx;lake.z=REGIONS[lake.reg].z+lake.dz}
+function roadWeight(x,z){
+ let strength=0;
+ for(const seg of MAIN_ROADS){
+  const vx=seg.b.x-seg.a.x,vz=seg.b.z-seg.a.z;
+  const t=clamp(((x-seg.a.x)*vx+(z-seg.a.z)*vz)/(vx*vx+vz*vz),0,1);
+  const d=Math.hypot(x-seg.a.x-vx*t,z-seg.a.z-vz*t);
+  strength=Math.max(strength,1-smooth(6,18,d));
+ }
+ return strength;
+}
+function waterAt(x,z,bed){
+ let level=null;
+ for(const lake of LAKES){if(Math.hypot(x-lake.x,z-lake.z)<lake.r)level=lake.level}
+ if(!regionAt(x,z)||REGIONS[4]===regionAt(x,z)&&bed<-1.7)level=-1.62;
+ if(level===null||level<=bed+.05)return {kind:'tierra',depth:0,level:null};
+ const depth=Math.max(0,level-bed);
+ return {kind:depth<=.48?'orilla':depth<=1.55?'vadeo':'profunda',depth,level};
+}
 
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x83b8d0);scene.fog=new THREE.Fog(0x83b8d0,250,1500);
 const camera=new THREE.PerspectiveCamera(59,innerWidth/innerHeight,.15,2500);
@@ -54,46 +90,83 @@ cForest=new THREE.Color('#336d4d'),cSand=new THREE.Color('#e5be7c'),cRock=new TH
 cSnow=new THREE.Color('#e7eef1'),cBeach=new THREE.Color('#d6c395'),cWater=new THREE.Color('#5b9ab4'),cDirt=new THREE.Color('#aaa084');
 function groundHeight(x,z){
  const reg=regionAt(x,z);
- const base=.42+.22*Math.sin(x*.035)*Math.cos(z*.031)+.12*Math.sin(x*.053+z*.025);
+ const base=.42+.27*Math.sin(x*.031)*Math.cos(z*.028)+.13*Math.sin(x*.041+z*.023);
  if(!reg)return -3.1;
- const dx=(x-reg.x)/SCALE,dz=(z-reg.z)/SCALE;
- const edge=Math.max(0,edgeDistance(x-reg.x,z-reg.z));
- const blend=smooth(0,25,edge),rnd=WORLD_KIND==='wfc'?.28*Math.sin(dx*.23+reg.id)*Math.cos(dz*.19-reg.id):0;
- let v=base;
- if(reg.id===0)v=base+blend*(.48+.7*Math.sin(dx*.075)*Math.cos(dz*.082)+rnd*.3);
- if(reg.id===1)v=base+blend*(1.7+1.3*Math.sin(dx*.11+1.2)*Math.cos(dz*.13)+1.2*Math.sin(dx*.066+dz*.043)+4*bump(dx,dz,-13,16,17,14)+rnd);
- if(reg.id===2){
-  v=base+blend*(.2+2.3*Math.sin(dx*.15+dz*.05)**2+.68*Math.sin(dz*.15)+rnd);
-  v=lerp(v,.13,Math.min(.96,bump(dx,dz,6,7,8,9)));
+ const dx=(x-reg.x)/SCALE,dz=(z-reg.z)/SCALE,d=Math.hypot(dx,dz);
+ const edge=Math.max(0,edgeDistance(x-reg.x,z-reg.z)),blend=smooth(0,28,edge);
+ const seedWaves=.45*Math.sin(dx*.23+reg.id+SEED_NUMBER*.0001)*Math.cos(dz*.17+reg.id);
+ const hills=2.8*Math.sin(dx*.09)*Math.cos(dz*.085)+1.1*Math.sin(dx*.16+dz*.11);
+ let y=base;
+ switch(reg.id){
+  case 0:y+=blend*(.7+.34*hills);break;
+  case 1:y+=blend*(2.2+.56*hills+7*bump(dx,dz,-12,16,13,15)+seedWaves);break;
+  case 2:y+=blend*(.8+3.3*Math.sin(dx*.13+dz*.05)**2+.66*hills+seedWaves);break;
+  case 3:{
+   const peaks=42*bump(dx,dz,-12,-15,8,9)+53*bump(dx,dz,13,-9,9,10)+37*bump(dx,dz,-2,20,9,10);
+   y+=blend*(1.6+peaks+.6*hills);break;
+  }
+  case 4:{
+   const land=1-smooth(17,29,d);
+   const peaks=37*bump(dx,dz,15,-6,10,11)+42*bump(dx,dz,-8,-13,8,10)+21*bump(dx,dz,9,13,11,11);
+   y=base+blend*(land*(3.6+peaks)-.6*(1-land));break;
+  }
+  case 5:y+=blend*(.15+.5*hills+2.4*bump(dx,dz,-10,19,16,11));break;
+  case 6:y+=blend*(2.3+.77*hills+9*bump(dx,dz,10,11,11,13)+seedWaves);break;
+  case 7:{
+   const c=bump(dx,dz,-2,-6,12,11),crater=bump(dx,dz,-2,-6,4.2,4);
+   y+=blend*(2.2+49*c-19*crater+7*bump(dx,dz,18,14,9,10)+seedWaves);break;
+  }
+  case 8:y+=blend*(1.4+.72*hills+1.8*bump(dx,dz,17,-10,17,12));break;
+  case 9:y+=blend*(3.6+18*bump(dx,dz,-13,-12,13,7)+18*bump(dx,dz,14,13,12,7)+7*Math.pow(Math.sin(dx*.16),4));break;
+  case 10:y+=blend*(1.2+.35*hills-1.9*bump(dx,dz,20,12,18,16));break;
+  case 11:y+=blend*(2.4+.8*hills+7*bump(dx,dz,-17,-7,17,14));break;
+  case 12:y+=blend*(1.2+.32*hills+18*bump(dx,dz,-12,-15,14,13)+7*bump(dx,dz,18,15,14,12));break;
  }
- if(reg.id===3){
-  let peaks=35*bump(dx,dz,-12,-14,8,10)+46*bump(dx,dz,13,-10,9,10)+31*bump(dx,dz,-3,20,8,10)+15*bump(dx,dz,20,22,9,8);
-  const route=Math.abs(dx*.5+dz*(-SQ3/2));
-  peaks*=1-.87*(1-smooth(2,5.5,route));
-  v=base+blend*(1.3+peaks+rnd);
+ for(const lake of LAKES){
+  if(lake.reg!==reg.id)continue;
+  const distance=Math.hypot(x-lake.x,z-lake.z);
+  const depress=1-smooth(lake.r-17,lake.r+7,distance);
+  if(depress>0){
+   const innerDepth=reg.id===5?2.3:reg.id===10?2.8:2.4;
+   y=lerp(y,lake.level-innerDepth,depress);
+  }
  }
- if(reg.id===4){
-  const d=Math.hypot(dx,dz),land=1-smooth(18,29,d);
-  const mountains=24*bump(dx,dz,15,-6,10,10)+30*bump(dx,dz,-7,-13,8,10)+15*bump(dx,dz,9,12,12,10);
-  v=-3.1+land*(4.25+mountains+rnd);
- }
- const bridge=corridor(x,z);
- if(bridge.weight>.0001)v=lerp(v,1.28,bridge.weight);
- return v;
+ // Safe traversable arteries: flatten only the road corridor, never an entire region.
+ const path=roadWeight(x,z);
+ if(path>.001)y=lerp(y,base+.47,path*.97);
+ return y;
 }
 function colorAt(x,z,y,premium=false){
- const reg=regionAt(x,z),noise=Math.sin(x*.11)*Math.cos(z*.098)*.12+Math.sin((x+z)*.27)*.035;
+ const reg=regionAt(x,z);
  if(!reg)return cWater.clone();
- const dx=(x-reg.x)/SCALE,dz=(z-reg.z)/SCALE,d=Math.hypot(dx,dz),weight=smooth(0,25,Math.max(0,edgeDistance(x-reg.x,z-reg.z)));
- let c=cGrass.clone().lerp(new THREE.Color('#648d5d'),smooth(-.16,.20,noise));
- if(reg.id===1)c.lerp(cForest,.68*weight);
- if(reg.id===2)c.lerp(cSand,.99*weight);
- if(reg.id===3){c.lerp(cRock,weight*(.38+.55*smooth(3,10,y)));c.lerp(cGrass,.2*(1-smooth(7,13,y)))}
- if(reg.id===4){c=cBeach.clone();c.lerp(cSnow,1-smooth(14,27,d));c.lerp(cRock,.48*smooth(12,21,y));if(y< -1.5)c.lerp(cWater,.48)}
- if(reg.id===0)c.lerp(new THREE.Color('#a0bd76'),.14*weight);
- if(premium){c.multiplyScalar(.94+.13*(noise+.5));if(reg.id===2)c.lerp(new THREE.Color('#ffd98e'),.11);if(reg.id===1)c.lerp(new THREE.Color('#1f624b'),.1)}
- return c;
+ const dx=(x-reg.x)/SCALE,dz=(z-reg.z)/SCALE;
+ const noise=Math.sin(x*.12)*Math.cos(z*.083)*.13+.036*Math.sin((x+z)*.28);
+ const weight=smooth(0,24,Math.max(0,edgeDistance(x-reg.x,z-reg.z)));
+ const palettes=[
+ '#80b86e','#356d50','#e0ba78','#7d868b','#b9dce3','#648264',
+ '#267b56','#78554f','#b5ae70','#b38868','#b8ba89','#a1764b','#afc0b7'
+ ];
+ let col=cGrass.clone().lerp(new THREE.Color(palettes[reg.id]),weight*.84);
+ if(reg.id===3||reg.id===9||reg.id===7)col.lerp(cRock,smooth(6,15,y)*(.7*weight));
+ if(reg.id===4||reg.id===12)col.lerp(cSnow,smooth(reg.id===4?13:12,reg.id===4?23:20,y)*weight);
+ if(reg.id===10)col.lerp(cSand,weight*(.65+.18*Math.sin(dx*.15)));
+ if(reg.id===2)col.lerp(cSand,.42*weight);
+ if(reg.id===7&&y>25)col.lerp(new THREE.Color('#75413e'),.75);
+ if(reg.id===11)col.lerp(new THREE.Color('#ce8649'),.25*weight);
+ const tile=wfcAt(x,z);
+ if(tile==='WOODS'||tile==='THICKET')col.lerp(new THREE.Color('#2e7754'),.14*weight);
+ if(tile==='ROCK')col.lerp(cRock,.13*weight);
+ if(tile==='SAND')col.lerp(cSand,.12*weight);
+ // Every WFC tile receives the same premium terrain pipeline; no individual tile mesh collisions.
+ if(premium){
+  col.multiplyScalar(clamp(.96+noise*.65,.78,1.18));
+  if(tile==='HAMLET')col.lerp(new THREE.Color('#b2a276'),.13);
+  if(reg.id===10||reg.id===2)col.lerp(new THREE.Color('#f0d297'),.05);
+ }
+ if(roadWeight(x,z)>.15)col.lerp(cDirt,roadWeight(x,z)*.79);
+ return col;
 }
+
 // WorldForge WFC-lite: six-neighbor hex rule propagation controls land-use and outposts.
 // This is an independent compact implementation, not a direct port of Felix Turner's full WFC.
 const WFC_TYPES=['MEADOW','WOODS','THICKET','ROCK','WATER','HAMLET','TRACK','SNOW','SAND'];
