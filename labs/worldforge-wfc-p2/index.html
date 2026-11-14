@@ -69,6 +69,12 @@
 #travelGrid{grid-template-columns:repeat(4,1fr)}
 #bottom h2{font-size:10px}
 @media(max-width:1024px){#map{top:48px}#travelPopup{top:6%;max-height:84vh}#travelGrid button{font-size:9px;padding:7px 4px}#seedPopup{top:5%;padding:8px}#seedPopup p{font-size:9px;margin:6px}#bottom{max-height:35vh;overflow-y:auto}}
+</style><style>
+#toggleHud{display:block;margin:0 auto 6px;cursor:pointer;border:1px solid #b39057;border-radius:7px;padding:4px 14px;background:#342547;color:#f4d6a0;font-size:10px;font-weight:800;letter-spacing:.7px}
+#bottom.collapsed{width:auto!important;min-width:185px;max-width:90vw;padding:4px 8px!important;border-radius:9px;max-height:none!important}
+#bottom.collapsed h2,#bottom.collapsed #modes,#bottom.collapsed #desc{display:none!important}
+#bottom.collapsed #toggleHud{margin:0}
+@media(max-width:1024px){#toggleHud{font-size:9px;margin-bottom:4px;padding:4px 10px}#bottom.collapsed{bottom:4px}}
 </style></head><body>
 <div id="app"></div>
 <div id="loading"><strong>HIGHFLY</strong><p>CINCO REINOS · WORLD FORGE</p><div id="loadbar"><div id="loadfill"></div></div><small id="loadingtxt">Construyendo terreno continuo...</small></div>
@@ -79,7 +85,7 @@
 <div id="acts"><button id="run">CORRER</button><button id="jump">SALTO</button><button id="dash">DASH</button></div>
 <div id="travelPopup" class="panel"><strong>VIAJAR A UNA REGIÓN · SIN CAMBIAR EL MUNDO</strong><div id="travelGrid"><button data-region="0">🏰 Arvelia</button><button data-region="1">🌲 Bosque</button><button data-region="2">☀️ Desierto</button><button data-region="3">⛰️ Montañas</button><button data-region="4">❄️ Nieve</button><button data-region="5">🐸 Pantano</button><button data-region="6">🌴 Selva</button><button data-region="7">🌋 Volcán</button><button data-region="8">🦌 Sabana</button><button data-region="9">🏜️ Cañones</button><button data-region="10">🌊 Costa</button><button data-region="11">🍁 Otoño</button><button data-region="12">🧊 Tundra</button><button id="closeTravel">✕ Cerrar</button></div></div>
 <div id="tooltip">WASD / joystick · arrastrar derecha para cámara · agua baja: caminar lento · profunda: bloqueada (natación futura)</div>
-<div id="seedPopup" class="panel"><strong>SEMILLA DE MUNDO · PREDETERMINADA AETHERIA-07</strong><p>Una semilla cambia la distribución de bosques, subzonas, rocas y aldeas; conserva conexiones y ciudad central.</p><div class="seedRow"><input id="seedValue" value="AETHERIA-07" maxlength="30" aria-label="Semilla de mundo"/><button id="applySeed">GENERAR MUNDO</button></div><div class="seedRow"><button data-seed="AETHERIA-07">AETHERIA-07</button><button data-seed="VALLE-21">VALLE-21</button><button data-seed="UMBRA-33">UMBRA-33</button><button id="closeSeed">✕</button></div></div><div id="bottom" class="panel"><h2>EXPLORACIÓN PREMIUM · GENERACIÓN POR SEMILLA · AGUA JUGABLE</h2><div id="modes"><button id="seed">🌱 SEMILLA</button><button id="regenerate">↻ GENERAR</button><button data-mode="1">CAPA NORMAL</button><button class="active" data-mode="2">CAPA PREMIUM</button><button id="fullscreen">⛶ PANTALLA COMPLETA</button><button id="test">TEST UNIONES</button><button id="travel">VIAJAR</button><button id="reset">CIUDAD</button></div><div id="desc">Mundo 8× · WFC por semilla · territorio continuo · agua baja caminable. No es natación todavía.</div></div>
+<div id="seedPopup" class="panel"><strong>SEMILLA DE MUNDO · PREDETERMINADA AETHERIA-07</strong><p>Una semilla cambia la distribución de bosques, subzonas, rocas y aldeas; conserva conexiones y ciudad central.</p><div class="seedRow"><input id="seedValue" value="AETHERIA-07" maxlength="30" aria-label="Semilla de mundo"/><button id="applySeed">GENERAR MUNDO</button></div><div class="seedRow"><button data-seed="AETHERIA-07">AETHERIA-07</button><button data-seed="VALLE-21">VALLE-21</button><button data-seed="UMBRA-33">UMBRA-33</button><button id="closeSeed">✕</button></div></div><div id="bottom" class="panel"><button id="toggleHud" type="button">▾ OCULTAR MENÚ</button><h2>EXPLORACIÓN PREMIUM · GENERACIÓN POR SEMILLA · AGUA JUGABLE</h2><div id="modes"><button id="seed">🌱 SEMILLA</button><button id="regenerate">↻ GENERAR</button><button data-mode="1">CAPA NORMAL</button><button class="active" data-mode="2">CAPA PREMIUM</button><button id="fullscreen">⛶ PANTALLA COMPLETA</button><button id="test">TEST UNIONES</button><button id="travel">VIAJAR</button><button id="reset">CIUDAD</button></div><div id="desc">Mundo 8× · WFC por semilla · territorio continuo · agua baja caminable. No es natación todavía.</div></div>
 <script>
 (function(){
  let shown=false;
@@ -101,5 +107,5 @@
  setTimeout(function(){if(!window.HIGHFLY_TEST&&document.getElementById('loading'))showError('La escena no respondió. Verificá WebGL y la conexión de red.')},30000);
 })();
 </script>
-<script type="module" src="./world.js?v=p2-wfc-premium-1"></script>
+<script type="module" src="./world.js?v=p2-wfc-premium-camera-hud"></script>
 </body></html>
