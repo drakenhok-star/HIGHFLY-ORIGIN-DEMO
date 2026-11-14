@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/publish-pages.yml"
       - "labs/worldforge-terrain-p0/**"
+      - "labs/worldforge-five-realms/**"
 
 permissions:
   contents: write
@@ -34,7 +35,7 @@ jobs:
       - name: Publish standalone WorldForge terrain lab (public CC0 only)
         run: |
           mkdir -p .public-site/labs
-          cp -a labs/worldforge-terrain-p0 .public-site/labs/
+          cp -a labs/worldforge-terrain-p0 labs/worldforge-five-realms .public-site/labs/
 
       - name: Commit validated playable source files (first publication)
         shell: bash
